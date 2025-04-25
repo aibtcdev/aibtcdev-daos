@@ -4,8 +4,8 @@
 
 ;; traits
 ;;
-(impl-trait .aibtc-dao-traits-v3.extension)
-(impl-trait .aibtc-dao-traits-v3.messaging)
+(impl-trait .aibtc-dao-traits.extension)
+(impl-trait .aibtc-dao-traits.messaging)
 
 ;; constants
 ;;

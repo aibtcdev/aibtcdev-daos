@@ -5,11 +5,11 @@
 
 ;; traits
 ;;
-(impl-trait .aibtc-dao-traits-v3.extension)
-(impl-trait .aibtc-dao-traits-v3.action-proposals)
+(impl-trait .aibtc-dao-traits.extension)
+(impl-trait .aibtc-dao-traits.action-proposals)
 
-(use-trait action-trait .aibtc-dao-traits-v3.action)
-(use-trait treasury-trait .aibtc-dao-traits-v3.treasury)
+(use-trait action-trait .aibtc-dao-traits.action)
+(use-trait treasury-trait .aibtc-dao-traits.treasury)
 
 ;; constants
 ;;

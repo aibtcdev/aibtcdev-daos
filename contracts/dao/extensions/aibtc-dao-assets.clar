@@ -5,8 +5,8 @@
 ;; traits
 ;;
 
-(impl-trait .aibtc-dao-traits-v3.extension)
-;; TODO - add dao-assets trait (impl-trait .aibtc-dao-traits-v3.dao-assets)
+(impl-trait .aibtc-dao-traits.extension)
+;; TODO - add dao-assets trait (impl-trait .aibtc-dao-traits.dao-assets)
 
 ;; constants
 ;;

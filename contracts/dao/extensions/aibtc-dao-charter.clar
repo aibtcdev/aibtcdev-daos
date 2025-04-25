@@ -5,8 +5,8 @@
 ;; traits
 ;;
 
-(impl-trait .aibtc-dao-traits-v3.extension)
-(impl-trait .aibtc-dao-traits-v3.charter)
+(impl-trait .aibtc-dao-traits.extension)
+(impl-trait .aibtc-dao-traits.charter)
 
 ;; constants
 ;;

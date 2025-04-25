@@ -2,8 +2,8 @@
 ;; version: 3.0.0
 ;; summary: A trait that defines an aibtc base dao.
 
-(use-trait proposal-trait .aibtc-dao-traits-v3.proposal)
-(use-trait extension-trait .aibtc-dao-traits-v3.extension)
+(use-trait proposal-trait .aibtc-dao-traits.proposal)
+(use-trait extension-trait .aibtc-dao-traits.extension)
 
 (define-trait aibtc-base-dao (
     ;; Execute a governance proposal

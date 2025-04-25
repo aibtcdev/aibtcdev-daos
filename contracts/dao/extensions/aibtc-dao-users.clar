@@ -5,8 +5,8 @@
 ;; traits
 ;;
 
-(impl-trait .aibtc-dao-traits-v3.extension)
-;; TODO - add dao-users trait (impl-trait .aibtc-dao-traits-v3.dao-users)
+(impl-trait .aibtc-dao-traits.extension)
+;; TODO - add dao-users trait (impl-trait .aibtc-dao-traits.dao-users)
 
 ;; constants
 ;;

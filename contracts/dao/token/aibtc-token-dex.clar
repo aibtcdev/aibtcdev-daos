@@ -1,9 +1,9 @@
 ;; 99af7ff63e5e4bd7542e55d88bacc25a7a6f79004f9937ea0bab3ca4c2438061
 ;; aibtc.dev DAO faktory.fun DEX @version 1.0
 
-  (impl-trait .aibtc-dao-traits-v3.faktory-dex) ;; <%= it.token_faktory_dex_trait %>
-  (impl-trait .faktory-dex-trait-v1-1.dex-trait) ;; <%= it.faktory_dex_trait %>
-  (use-trait faktory-token .faktory-trait-v1.sip-010-trait) ;; <%= it.faktory_sip10_trait %>
+  (impl-trait .aibtc-dao-traits.faktory-dex) ;; <%= it.token_faktory_dex_trait %>
+  (impl-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1.dex-trait) ;; <%= it.faktory_dex_trait %>
+  (use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait) ;; <%= it.faktory_sip10_trait %>
   
   (define-constant ERR-MARKET-CLOSED (err u1001))
   (define-constant ERR-STX-NON-POSITIVE (err u1002))
@@ -71,7 +71,7 @@
             (try! (as-contract (contract-call? ft transfer originator-amount tx-sender ORIGINATOR none)))
             ;; Call XYK Core v-1-2 pool by Bitflow
             ;; <%= it.bitflow_core_contract %> <%= it.pool_contract %> <%= it.bitflow_stx_token_address %> <%= it.bitflow_fee_address %>
-            (try! (as-contract (contract-call? 'ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1.xyk-core-v-1-2 create-pool .aibtc-bitflow-pool 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token ft amm-ustx amm-amount xyk-burn-amount u10 u40 u10 u40 'ST27Q7Z7P5MTJN2B3M9Q406XPCDB1VFZJ3KWX3CES xyk-pool-uri true))) ;; here 'ST27Q7Z7P5MTJN2B3M9Q406XPCDB1VFZJ3KWX3CES replaced of ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1
+            (try! (as-contract (contract-call? 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2 create-pool .aibtc-bitflow-pool 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token ft amm-ustx amm-amount xyk-burn-amount u10 u40 u10 u40 'ST27Q7Z7P5MTJN2B3M9Q406XPCDB1VFZJ3KWX3CES xyk-pool-uri true))) ;; here 'ST27Q7Z7P5MTJN2B3M9Q406XPCDB1VFZJ3KWX3CES replaced of ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1
             (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer GRAD-FEE tx-sender G-RECEIVER none)))
             (var-set open false)
             (var-set stx-balance u0)

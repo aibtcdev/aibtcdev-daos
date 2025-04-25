@@ -1,4 +1,4 @@
-(impl-trait .aibtc-dao-traits-v3.proposal)
+(impl-trait .aibtc-dao-traits.proposal)
 
 (define-constant CFG_DAO_MANIFEST_TEXT "<%= it.dao_manifest %>")
 (define-constant CFG_DAO_MANIFEST_INSCRIPTION_ID "<%= it.dao_manifest_inscription_id %>")
@@ -42,13 +42,6 @@
     (try! (contract-call? .aibtc-dao-charter set-dao-charter CFG_DAO_MANIFEST_TEXT none))
     ;; send DAO manifest as onchain message
     (try! (contract-call? .aibtc-onchain-messaging send CFG_DAO_MANIFEST_TEXT true))
-    ;; allow assets in treasury
-    (try! (contract-call? .aibtc-treasury allow-assets
-      (list
-        {token: .aibtc-token, enabled: true}
-        {token: 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token, enabled: true}
-      )
-    ))
     ;; print manifest
     (print CFG_DAO_MANIFEST_TEXT)
     (ok true)

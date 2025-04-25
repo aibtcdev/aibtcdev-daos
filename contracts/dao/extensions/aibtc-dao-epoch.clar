@@ -5,8 +5,8 @@
 ;; traits
 ;;
 
-(impl-trait .aibtc-dao-traits-v3.extension)
-;; TODO - add dao-epoch trait (impl-trait .aibtc-dao-traits-v3.dao-epoch)
+(impl-trait .aibtc-dao-traits.extension)
+;; TODO - add dao-epoch trait (impl-trait .aibtc-dao-traits.dao-epoch)
 
 ;; constants
 ;;

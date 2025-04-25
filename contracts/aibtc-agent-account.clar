@@ -3,17 +3,17 @@
 ;; summary: A special account contract between a user and an agent for managing assets and DAO interactions. Only the user can withdraw funds.
 
 ;; traits
-(impl-trait .aibtc-user-agent-account-traits.aibtc-account)
-(impl-trait .aibtc-user-agent-account-traits.aibtc-proposals-v3)
-(impl-trait .aibtc-user-agent-account-traits.faktory-dex-approval)
-(impl-trait .aibtc-user-agent-account-traits.faktory-buy-sell)
+(impl-trait .aibtc-agent-account-traits.aibtc-account)
+(impl-trait .aibtc-agent-account-traits.aibtc-proposals)
+(impl-trait .aibtc-agent-account-traits.faktory-dex-approval)
+(impl-trait .aibtc-agent-account-traits.faktory-buy-sell)
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
-(use-trait action-trait .aibtc-dao-traits-v3.action)
-(use-trait proposal-trait .aibtc-dao-traits-v3.proposal)
-(use-trait action-proposals-trait .aibtc-dao-traits-v3.action-proposals)
-(use-trait core-proposals-trait .aibtc-dao-traits-v3.core-proposals)
-(use-trait dao-faktory-dex .aibtc-dao-traits-v3.faktory-dex)
-(use-trait faktory-token .faktory-trait-v1.sip-010-trait)
+(use-trait action-trait .aibtc-dao-traits.action)
+(use-trait proposal-trait .aibtc-dao-traits.proposal)
+(use-trait action-proposals-trait .aibtc-dao-traits.action-proposals)
+(use-trait core-proposals-trait .aibtc-dao-traits.core-proposals)
+(use-trait dao-faktory-dex .aibtc-dao-traits.faktory-dex)
+(use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait)
 
 ;; constants
 (define-constant DEPLOYED_BURN_BLOCK burn-block-height)
