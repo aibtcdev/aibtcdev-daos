@@ -47,6 +47,7 @@
   (ok true)
 )
 
+;; TODO - consider increase-reputation and decrease-reputation
 (define-public (update-user-reputation (address principal) (amount int))
   (ok true)
 )
