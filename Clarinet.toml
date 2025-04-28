@@ -107,8 +107,8 @@ path = 'contracts/dao/extensions/aibtc-onchain-messaging.clar'
 clarity_version = 3
 epoch = 3.1
 
-[contracts.aibtc-rewards-treasury]
-path = 'contracts/dao/extensions/aibtc-rewards-treasury.clar'
+[contracts.aibtc-rewards-account]
+path = 'contracts/dao/extensions/aibtc-rewards-account.clar'
 clarity_version = 3
 epoch = 3.1
 

@@ -1,17 +1,12 @@
-;; title: aibtc-operating-fund
-;; version: 2.0.0
-;; summary: An operations fund for the dao with a 2% allocation of the total supply.
-
-;; TODO - remove notes
-;; this contract receives 2% of total supply at launch
-;; this contract can receive DAO token, sBTC or STX from treasury
-;; this contract can fund a timed vault when initialized
+;; title: aibtc-rewards-account
+;; version: 1.0.0
+;; summary: A smart contract that accrues rewards from the treasury and pays out after successful proposals.
 
 ;; traits
 ;;
 
 (impl-trait .aibtc-dao-traits.extension)
-;; (impl-trait .aibtc-dao-traits.operating-fund)
+;; (impl-trait .aibtc-dao-traits.rewards-account)
 
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
