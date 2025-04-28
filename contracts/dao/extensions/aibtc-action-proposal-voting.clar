@@ -129,10 +129,11 @@
     (print {
       notification: "action-proposal-voting/propose-action",
       payload: {
+        contractCaller: contract-caller,
+        txSender: tx-sender,
         proposalId: newId,
         action: actionContract,
         parameters: parameters,
-        contractCaller: contract-caller,
         creator: tx-sender,
         bond: VOTING_BOND,
         createdAt: createdAt,
@@ -236,9 +237,9 @@
     (print {
       notification: "action-proposal-voting/veto-action-proposal",
       payload: {
-        proposalId: proposalId,
         contractCaller: contract-caller,
-        vetoer: tx-sender,
+        txSender: tx-sender,
+        proposalId: proposalId,
         amount: senderBalance
       }
     })
@@ -258,20 +259,27 @@
     (
       (actionContract (contract-of action))
       (proposalRecord (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (liquidTokens (get liquidTokens proposalRecord))
       (votesFor (get votesFor proposalRecord))
       (votesAgainst (get votesAgainst proposalRecord))
-      (liquidTokens (get liquidTokens proposalRecord))
+      (vetoVotes (get vetoVotes proposalRecord))
       (hasVotes (> (+ votesFor votesAgainst) u0))
-      ;; quorum: check if enough total votes vs liquid supply
       (metQuorum (and hasVotes
         (>= (/ (* (+ votesFor votesAgainst) u100) liquidTokens) VOTING_QUORUM)
       ))
-      ;; threshold: check if enough yes votes vs total votes
       (metThreshold (and hasVotes
         (>= (/ (* votesFor u100) (+ votesFor votesAgainst)) VOTING_THRESHOLD)
       ))
-      ;; proposal passed if quorum and threshold are met
-      (votePassed (and hasVotes metQuorum metThreshold))
+      (vetoMetQuorum (and (> vetoVotes u0)
+        (>= (/ (* vetoVotes u100) liquidTokens) VOTING_QUORUM)
+      ))
+      ;; evaluate criteria to determine if proposal passed
+      (votePassed (and
+        hasVotes ;; check if there are any votes
+        metQuorum ;; quorum: total votes vs liquid supply
+        metThreshold ;; threshold: enough yes votes vs total votes
+        (not vetoMetQuorum) ;; veto quorum: total veto votes vs liquid supply
+      ))
       ;; check info for running action
       (validAction (is-action-valid action))
       (notExpired (< burn-block-height (+ (get endBlock proposalRecord) VOTING_PERIOD)))
@@ -289,7 +297,7 @@
       notification: "action-proposal-voting/conclude-proposal",
       payload: {
         contractCaller: contract-caller,
-        concludedBy: tx-sender,
+        txSender: tx-sender,
         bond: (get bond proposalRecord),
         proposalId: proposalId,
         votesFor: votesFor,
@@ -316,12 +324,19 @@
       (try! (as-contract (contract-call? .aibtc-token transfer (get bond proposalRecord) SELF (get creator proposalRecord) none)))
       (try! (as-contract (contract-call? .aibtc-token transfer (get bond proposalRecord) SELF VOTING_TREASURY none)))
     )
+    ;; transfer the reward to the creator
+    (and votePassed
+      ;; TODO: need treasury withdraw function here not transfer
+      (try! (as-contract (contract-call? .aibtc-token transfer VOTING_REWARD VOTING_TREASURY (get creator proposalRecord) none)))
+    )
     ;; increment the concluded proposal count
     (var-set concludedProposalCount (+ (var-get concludedProposalCount) u1))
     ;; execute the action only if it passed, return false if err
     (ok (if (and votePassed validAction notExpired)
       (and (var-set executedProposalCount (+ (var-get executedProposalCount) u1))
-        (match (contract-call? action run (get parameters proposalRecord)) ok_ true err_ (begin (print {err:err_}) false)))
+        (match (contract-call? action run (get parameters proposalRecord))
+          ok_ true
+          err_ (begin (print {notification: "aibtc-action-proposal-voting/conclude-proposal", payload: {executionError:err_}}) false)))
       false
     ))
   )
