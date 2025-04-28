@@ -46,6 +46,9 @@
 (define-constant VOTING_BOND u100000000000) ;; action proposal bond, 1,000 DAO tokens w/ 8 decimals
 (define-constant VOTING_REWARD u10000000000) ;; action proposal reward, 100 DAO tokens w/ 8 decimals
 
+(define-constant REP_SUCCESS u1) ;; success
+(define-constant REP_FAILURE u2) ;; failure
+
 ;; data vars
 ;;
 
@@ -343,6 +346,11 @@
     ;; transfer the reward to the creator
     (and votePassed
       (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-token VOTING_REWARD (get creator proposalRecord))))
+    )
+    ;; update the users reputation based on outcome
+    (if votePassed
+      (try! (as-contract (contract-call? .aibtc-dao-users increase-user-reputation (get creator proposalRecord) REP_SUCCESS)))
+      (try! (as-contract (contract-call? .aibtc-dao-users decrease-user-reputation (get creator proposalRecord) REP_FAILURE)))
     )
     ;; increment the concluded proposal count
     (var-set concludedProposalCount (+ (var-get concludedProposalCount) u1))

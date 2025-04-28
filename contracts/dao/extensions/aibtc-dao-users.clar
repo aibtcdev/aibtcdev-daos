@@ -18,6 +18,7 @@
 
 ;; error messages
 (define-constant ERR_NOT_DAO_OR_EXTENSION (err u8100)) ;; similar to dao-charter
+(define-constant ERR_USER_NOT_FOUND (err u8101)) ;; user not found
 
 ;; data vars
 ;;
@@ -75,12 +76,58 @@
   )
 )
 
-(define-public (increase-user-reputation (address principal) (amount int))
-  (ok true)
+(define-public (increase-user-reputation (address principal) (amount uint))
+  (let
+    (
+      (userIndex (unwrap! (get-user-index address) ERR_USER_NOT_FOUND))
+      (userData (unwrap! (get-user-data-by-index userIndex) ERR_USER_NOT_FOUND))
+      (increaseAmount (to-int amount))
+    )
+    (try! (is-dao-or-extension))
+    (print {
+      notification: "aibtc-dao-users/increase-user-reputation",
+      payload: {
+        userIndex: userIndex,
+        address: address,
+        createdAt: DEPLOYED_BURN_BLOCK,
+        contractCaller: contract-caller,
+        txSender: tx-sender
+      }
+    })
+    (map-set UserData userIndex {
+      address: address,
+      createdAt: DEPLOYED_BURN_BLOCK,
+      reputation: (+ (get reputation userData) increaseAmount),
+    })
+    (ok true)
+  )
 )
 
-(define-public (decrease-user-reputation (address principal) (amount int))
-  (ok true)
+(define-public (decrease-user-reputation (address principal) (amount uint))
+  (let
+    (
+      (userIndex (unwrap! (get-user-index address) ERR_USER_NOT_FOUND))
+      (userData (unwrap! (get-user-data-by-index userIndex) ERR_USER_NOT_FOUND))
+      (decreaseAmount (to-int amount))
+    )
+    (try! (is-dao-or-extension))
+    (print {
+      notification: "aibtc-dao-users/decrease-user-reputation",
+      payload: {
+        userIndex: userIndex,
+        address: address,
+        createdAt: DEPLOYED_BURN_BLOCK,
+        contractCaller: contract-caller,
+        txSender: tx-sender
+      }
+    })
+    (map-set UserData userIndex {
+      address: address,
+      createdAt: DEPLOYED_BURN_BLOCK,
+      reputation: (- (get reputation userData) decreaseAmount),
+    })
+    (ok true)
+  )
 )
 
 ;; read only functions
