@@ -330,8 +330,7 @@
     )
     ;; transfer the reward to the creator
     (and votePassed
-      ;; TODO: need treasury withdraw function here not transfer
-      (try! (as-contract (contract-call? .aibtc-token transfer VOTING_REWARD VOTING_TREASURY (get creator proposalRecord) none)))
+      (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-token VOTING_REWARD (get creator proposalRecord))))
     )
     ;; increment the concluded proposal count
     (var-set concludedProposalCount (+ (var-get concludedProposalCount) u1))

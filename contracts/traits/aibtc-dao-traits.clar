@@ -36,12 +36,10 @@
   ;; buy tokens from the dex
   ;; @param ft the token contract
   ;; @param ustx the amount of microSTX to spend
-  ;; @returns (response bool uint)
   (buy (<faktory-token> uint) (response bool uint))
   ;; sell tokens to the dex
   ;; @param ft the token contract
   ;; @param amount the amount of tokens to sell
-  ;; @returns (response bool uint)
   (sell (<faktory-token> uint) (response bool uint))
 ))
 
@@ -56,7 +54,6 @@
 ;; a pre-defined action that token holders can propose
 (define-trait action (
   ;; @param parameters serialized hex-encoded Clarity values
-  ;; @returns (response bool uint)
   (run ((buff 2048)) (response bool uint))
 ))
 
@@ -66,17 +63,14 @@
   ;; propose a new action
   ;; @param action the action contract
   ;; @param parameters encoded action parameters
-  ;; @returns (response bool uint)
   (create-action-proposal (<action> (buff 2048) (optional (string-ascii 1024))) (response bool uint))
   ;; vote on an existing proposal
   ;; @param proposal the proposal id
   ;; @param vote true for yes, false for no
-  ;; @returns (response bool uint)
   (vote-on-action-proposal (uint bool) (response bool uint))
   ;; conclude a proposal after voting period
   ;; @param proposal the proposal id
   ;; @param action the action contract
-  ;; @returns (response bool uint)
   (conclude-action-proposal (uint <action>) (response bool uint))
 ))
 
@@ -86,7 +80,6 @@
 (define-trait charter (
   ;; set the dao charter
   ;; @param charter the new charter text
-  ;; @returns (response bool uint)
   (set-dao-charter ((string-ascii 4096)) (response bool uint))
 ))
 
@@ -97,7 +90,6 @@
   ;; send a message on-chain (opt from DAO)
   ;; @param msg the message to send (up to 1MB)
   ;; @param isFromDao whether the message is from the DAO
-  ;; @returns (response bool uint)
   (send ((string-ascii 1048576) bool) (response bool uint))
 ))
 
@@ -106,11 +98,9 @@
 (define-trait token-owner (
   ;; set the token URI
   ;; @param value the new token URI
-  ;; @returns (response bool uint)
   (set-token-uri ((string-utf8 256)) (response bool uint))
   ;; transfer ownership of the token
   ;; @param new-owner the new owner of the token
-  ;; @returns (response bool uint)
   (transfer-ownership (principal) (response bool uint))
 ))
 
@@ -120,15 +110,13 @@
   ;; allow an asset for deposit/withdrawal
   ;; @param token the asset contract principal
   ;; @param enabled whether the asset is allowed
-  ;; @returns (response bool uint)
   (allow-asset (principal bool) (response bool uint))
-  ;; deposit STX to the treasury
-  ;; @param amount amount of microSTX to deposit
-  ;; @returns (response bool uint)
-  (deposit-stx (uint) (response bool uint))
   ;; deposit FT to the treasury
   ;; @param ft the fungible token contract principal
   ;; @param amount amount of tokens to deposit
-  ;; @returns (response bool uint)
   (deposit-ft (<ft-trait> uint) (response bool uint))
+  ;; withdraw FT from the treasury
+  ;; @param ft the fungible token contract principal
+  ;; @param amount amount of tokens to deposit
+  (withdraw-ft (<ft-trait> uint principal) (response bool uint))
 ))

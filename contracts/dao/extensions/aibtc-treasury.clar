@@ -60,23 +60,6 @@
   )
 )
 
-;; deposit STX to the treasury
-(define-public (deposit-stx (amount uint))  
-  (begin
-    ;; no auth - anyone can deposit
-    (print {
-      notification: "aibtc-treasury/deposit-stx",
-      payload: {
-        amount: amount,
-        recipient: SELF,
-        contractCaller: contract-caller,
-        txSender: tx-sender,
-      }
-    })
-    (stx-transfer? amount tx-sender SELF)
-  )
-)
-
 ;; deposit FT to the treasury
 (define-public (deposit-ft (ft <ft-trait>) (amount uint))
   (begin
@@ -93,6 +76,26 @@
       }
     })
     (contract-call? ft transfer amount tx-sender SELF none)
+  )
+)
+
+;; withdraw FT from the treasury
+(define-public (withdraw-ft (ft <ft-trait>) (amount uint) (to principal))
+  (begin
+    ;; only DAO contract can withdraw if token allowed
+    (try! (is-dao-or-extension))
+    (asserts! (is-allowed-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
+    (print {
+      notification: "aibtc-treasury/withdraw-ft",
+      payload: {
+        amount: amount,
+        recipient: to,
+        assetContract: (contract-of ft),
+        contractCaller: contract-caller,
+        txSender: tx-sender
+      }
+    })
+    (contract-call? ft transfer amount SELF to none)
   )
 )
 
