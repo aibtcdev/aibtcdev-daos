@@ -39,7 +39,6 @@
     caller: principal, ;; contract caller
     sender: principal, ;; tx-sender
     charter: (string-ascii 4096), ;; charter text
-    inscriptionId: (optional (buff 33))  ;; 32 bytes for txid + 1 byte for index
   }
 )
 
@@ -48,7 +47,7 @@
 
 (define-public (callback (sender principal) (memo (buff 34))) (ok true))
 
-(define-public (set-dao-charter (charter (string-ascii 4096)) (inscriptionId (optional (buff 33))))
+(define-public (set-dao-charter (charter (string-ascii 4096)))
   (let
     (
       (newVersion (+ (var-get currentVersion) u1))
@@ -65,7 +64,6 @@
       caller: contract-caller,
       sender: tx-sender,
       charter: charter,
-      inscriptionId: inscriptionId
     }) ERR_SAVING_CHARTER)
     ;; print charter info
     (print {
@@ -78,7 +76,6 @@
         dao: SELF,
         charter: charter,
         previousCharter: (var-get daoCharter),
-        inscriptionId: inscriptionId,
         version: newVersion
       }
     })
