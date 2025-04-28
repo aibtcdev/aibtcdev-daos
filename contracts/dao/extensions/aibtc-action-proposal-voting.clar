@@ -65,6 +65,7 @@
     createdAt: uint, ;; stacks block height for at-block calls
     caller: principal, ;; contract caller
     creator: principal, ;; proposal creator (tx-sender)
+    userId: uint, ;; user index
     memo: (optional (string-ascii 1024)), ;; memo for the proposal
     bond: uint, ;; proposal bond amount
     startBlock: uint, ;; burn block height
@@ -107,6 +108,7 @@
   (let
     (
       (actionContract (contract-of action))
+      (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender)))
       (newId (+ (var-get proposalCount) u1))
       (createdAt (- stacks-block-height u1))
       (liquidTokens (try! (get-liquid-supply createdAt)))
@@ -131,6 +133,7 @@
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
+        userId: userId,
         proposalId: newId,
         action: actionContract,
         parameters: parameters,
@@ -152,6 +155,7 @@
       parameters: parameters,
       caller: contract-caller,
       creator: tx-sender,
+      userId: userId,
       memo: (if (is-some memo) memo none),
       bond: VOTING_BOND,
       createdAt: createdAt,
@@ -192,12 +196,15 @@
     (asserts! (< burn-block-height (- (get endBlock proposalRecord) VOTING_DELAY)) ERR_VOTE_TOO_LATE)
     ;; vote not already cast
     (asserts! (is-none (map-get? VoteRecords {proposalId: proposalId, voter: tx-sender})) ERR_ALREADY_VOTED)
+    ;; record user in dao if not already
+    (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender))
     ;; print vote event
     (print {
       notification: "aibtc-action-proposal-voting/vote-on-proposal",
       payload: {
         proposalId: proposalId,
         contractCaller: contract-caller,
+        txSender: tx-sender,
         voter: tx-sender,
         amount: senderBalance,
         vote: vote
@@ -233,6 +240,8 @@
     (asserts! (< burn-block-height (get endBlock proposalRecord)) ERR_VOTE_TOO_LATE)
     ;; veto not already cast
     (asserts! (is-none (map-get? VetoVoteRecords {proposalId: proposalId, voter: tx-sender})) ERR_ALREADY_VOTED)
+    ;; record user in dao if not already
+    (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender))
     ;; print veto event
     (print {
       notification: "aibtc-action-proposal-voting/veto-action-proposal",
@@ -293,6 +302,8 @@
     (asserts! (>= burn-block-height (get endBlock proposalRecord)) ERR_PROPOSAL_EXECUTION_DELAY)
     ;; action must be the same as the one in proposal
     (asserts! (is-eq (get action proposalRecord) actionContract) ERR_INVALID_ACTION)
+    ;; record user in dao if not already
+    (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender))
     ;; print conclusion event
     (print {
       notification: "aibtc-action-proposal-voting/conclude-proposal",

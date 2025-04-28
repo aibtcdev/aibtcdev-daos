@@ -43,8 +43,36 @@
 
 (define-public (callback (sender principal) (memo (buff 34))) (ok true))
 
-(define-public (get-or-create-user (address principal))
-  (ok true)
+(define-public (get-or-create-user-index (address principal))
+  (begin
+    (try! (is-dao-or-extension))
+    (match (map-get? UserIndexes address)
+      ;; user already exists, return the index
+      value (ok value)
+      ;; user does not exist, create a new one
+      (let
+        ((userIndex (+ u1 (var-get userCount))))
+        (print {
+          notification: "aibtc-dao-users/get-or-create-user-index",
+          payload: {
+            userIndex: userIndex,
+            address: address,
+            createdAt: DEPLOYED_BURN_BLOCK,
+            contractCaller: contract-caller,
+            txSender: tx-sender
+          }
+        })
+        (map-insert UserIndexes address userIndex)
+        (map-insert UserData userIndex {
+          address: address,
+          createdAt: DEPLOYED_BURN_BLOCK,
+          reputation: 0,
+        })
+        (var-set userCount userIndex)
+        (ok userIndex)
+      )
+    )
+  )
 )
 
 (define-public (increase-user-reputation (address principal) (amount int))
