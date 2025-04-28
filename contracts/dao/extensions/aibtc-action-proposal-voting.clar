@@ -127,7 +127,7 @@
     (try! (contract-call? .aibtc-token transfer VOTING_BOND tx-sender SELF none))
     ;; print proposal creation event
     (print {
-      notification: "action-proposal-voting/propose-action",
+      notification: "aibtc-action-proposal-voting/propose-action",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
@@ -194,7 +194,7 @@
     (asserts! (is-none (map-get? VoteRecords {proposalId: proposalId, voter: tx-sender})) ERR_ALREADY_VOTED)
     ;; print vote event
     (print {
-      notification: "action-proposal-voting/vote-on-proposal",
+      notification: "aibtc-action-proposal-voting/vote-on-proposal",
       payload: {
         proposalId: proposalId,
         contractCaller: contract-caller,
@@ -235,12 +235,12 @@
     (asserts! (is-none (map-get? VetoVoteRecords {proposalId: proposalId, voter: tx-sender})) ERR_ALREADY_VOTED)
     ;; print veto event
     (print {
-      notification: "action-proposal-voting/veto-action-proposal",
+      notification: "aibtc-action-proposal-voting/veto-action-proposal",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
         proposalId: proposalId,
-        amount: senderBalance
+        amount: senderBalance,
       }
     })
     ;; update the proposal record
@@ -283,6 +283,7 @@
       ;; check info for running action
       (validAction (is-action-valid action))
       (notExpired (< burn-block-height (+ (get endBlock proposalRecord) VOTING_PERIOD)))
+      (tryToExecute (and votePassed validAction notExpired))
     )
     ;; proposal not already concluded
     (asserts! (not (get concluded proposalRecord)) ERR_PROPOSAL_ALREADY_CONCLUDED)
@@ -294,7 +295,7 @@
     (asserts! (is-eq (get action proposalRecord) actionContract) ERR_INVALID_ACTION)
     ;; print conclusion event
     (print {
-      notification: "action-proposal-voting/conclude-proposal",
+      notification: "aibtc-action-proposal-voting/conclude-proposal",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
@@ -302,11 +303,14 @@
         proposalId: proposalId,
         votesFor: votesFor,
         votesAgainst: votesAgainst,
+        vetoVotes: vetoVotes,
         liquidTokens: liquidTokens,
         metQuorum: metQuorum,
         metThreshold: metThreshold,
+        vetoMetQuorum: vetoMetQuorum,
         passed: votePassed,
-        executed: (and votePassed validAction notExpired),
+        notExpired: notExpired,
+        executed: tryToExecute,
       }
     })
     ;; update the proposal record
@@ -316,7 +320,7 @@
         metQuorum: metQuorum,
         metThreshold: metThreshold,
         passed: votePassed,
-        executed: (and votePassed validAction notExpired)
+        executed: tryToExecute
       })
     )
     ;; transfer the bond based on the outcome
@@ -332,8 +336,9 @@
     ;; increment the concluded proposal count
     (var-set concludedProposalCount (+ (var-get concludedProposalCount) u1))
     ;; execute the action only if it passed, return false if err
-    (ok (if (and votePassed validAction notExpired)
-      (and (var-set executedProposalCount (+ (var-get executedProposalCount) u1))
+    (ok (if tryToExecute
+      (and
+        (var-set executedProposalCount (+ (var-get executedProposalCount) u1))
         (match (contract-call? action run (get parameters proposalRecord))
           ok_ true
           err_ (begin (print {notification: "aibtc-action-proposal-voting/conclude-proposal", payload: {executionError:err_}}) false)))
@@ -344,6 +349,7 @@
 
 ;; read only functions
 ;;
+
 (define-read-only (get-voting-power (who principal) (proposalId uint))
   (let
     (
