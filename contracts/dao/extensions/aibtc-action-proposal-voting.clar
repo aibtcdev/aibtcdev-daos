@@ -1,7 +1,6 @@
-;; title: aibtc-action-proposals-v2
-;; version: 2.0.0
+;; title: aibtc-action-proposals
+;; version: 3.0.0
 ;; summary: An extension that manages voting on predefined actions using a SIP-010 Stacks token.
-;; description: This contract allows voting on specific extension actions with a lower threshold than core proposals.
 
 ;; traits
 ;;
@@ -18,6 +17,7 @@
 (define-constant DEPLOYED_STACKS_BLOCK stacks-block-height)
 
 ;; error messages
+;; TODO: review for if we need them or not
 (define-constant ERR_NOT_DAO_OR_EXTENSION (err u1000))
 (define-constant ERR_FETCHING_TOKEN_DATA (err u1001))
 (define-constant ERR_INSUFFICIENT_BALANCE (err u1002))
@@ -44,6 +44,7 @@
 (define-constant VOTING_THRESHOLD u66) ;; 66% of votes must be in favor
 
 ;; contracts used for voting calculations
+;; TODO: simplify here
 (define-constant VOTING_TOKEN_PRE_DEX .aibtc-pre-dex)
 (define-constant VOTING_TOKEN_DEX .aibtc-token-dex)
 (define-constant VOTING_TOKEN_POOL .aibtc-bitflow-pool)

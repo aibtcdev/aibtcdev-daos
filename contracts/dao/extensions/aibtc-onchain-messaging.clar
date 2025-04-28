@@ -9,8 +9,8 @@
 
 ;; constants
 ;;
-(define-constant ERR_INVALID_INPUT (err u4000))
-(define-constant ERR_NOT_DAO_OR_EXTENSION (err u4001))
+(define-constant ERR_NOT_DAO_OR_EXTENSION (err u4000))
+(define-constant ERR_INVALID_INPUT (err u4001))
 
 ;; public functions
 

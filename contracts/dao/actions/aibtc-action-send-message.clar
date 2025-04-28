@@ -21,9 +21,7 @@
 
 (define-public (run (parameters (buff 2048)))
   (let
-    (
-      (message (unwrap! (from-consensus-buff? (string-ascii 2043) parameters) ERR_INVALID_PARAMS))
-    )
+    ((message (unwrap! (from-consensus-buff? (string-ascii 2043) parameters) ERR_INVALID_PARAMS)))
     (try! (is-dao-or-extension))
     (contract-call? .aibtc-onchain-messaging send message true)
   )
