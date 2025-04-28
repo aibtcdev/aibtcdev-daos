@@ -8,7 +8,7 @@
     ;; set initial dao extensions list
     (try! (contract-call? .aibtc-base-dao set-extensions
       (list
-        {extension: .aibtc-action-proposals, enabled: true}
+        {extension: .aibtc-action-proposal-voting, enabled: true}
         {extension: .aibtc-dao-charter, enabled: true}
         {extension: .aibtc-onchain-messaging, enabled: true}
         {extension: .aibtc-token-owner, enabled: true}

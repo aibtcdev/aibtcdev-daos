@@ -1,6 +1,6 @@
 ;; title: aibtc-dao-traits
 ;; version: 3.1.0
-;; summary: A collection of traits for all aibtc daos.
+;; summary: A collection of traits for aibtc cohort 0.
 
 ;; IMPORTS
 (use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait)
@@ -80,34 +80,6 @@
   (conclude-proposal (uint <action>) (response bool uint))
 ))
 
-;; a smart contract that can be funded and assigned to a principal
-;; withdrawals are based on a set amount and time period in blocks
-(define-trait timed-vault (
-  ;; set account holder
-  ;; @param principal the new account holder who can withdraw
-  ;; @returns (response bool uint)
-  (set-account-holder (principal) (response bool uint))
-  ;; set withdrawal period
-  ;; @param period the new withdrawal period in Bitcoin blocks
-  ;; @returns (response bool uint)
-  (set-withdrawal-period (uint) (response bool uint))
-  ;; set withdrawal amount
-  ;; @param amount the new withdrawal amount in micro-units
-  ;; @returns (response bool uint)
-  (set-withdrawal-amount (uint) (response bool uint))
-  ;; override last withdrawal block
-  ;; @param block the new last withdrawal block
-  ;; @returns (response bool uint)
-  (override-last-withdrawal-block (uint) (response bool uint))
-  ;; deposit funds to the timed vault
-  ;; @param amount amount of token to deposit in micro-units
-  ;; @returns (response bool uint)
-  (deposit (uint) (response bool uint))
-  ;; withdraw funds from the timed vault
-  ;; @returns (response bool uint) 
-  (withdraw () (response bool uint))
-))
-
 ;; an extension to manage the dao charter and mission
 ;; allows the dao to define its mission and values on-chain
 ;; used to guide decision-making and proposals
@@ -116,25 +88,6 @@
   ;; @param charter the new charter text
   ;; @returns (response bool uint)
   (set-dao-charter ((string-ascii 4096)) (response bool uint))
-))
-
-;; a voting contract for core dao proposals
-;; has higher voting threshold and quorum than action proposals
-;; can run any Clarity code in the context of the dao
-(define-trait core-proposals (
-  ;; create a new proposal
-  ;; @param proposal the proposal contract
-  ;; @returns (response bool uint)
-  (create-proposal (<proposal> (optional (string-ascii 1024))) (response bool uint))
-  ;; vote on an existing proposal
-  ;; @param proposal the proposal contract
-  ;; @param vote true for yes, false for no
-  ;; @returns (response bool uint)
-  (vote-on-proposal (<proposal> bool) (response bool uint))
-  ;; conclude a proposal after voting period
-  ;; @param proposal the proposal contract
-  ;; @returns (response bool uint)
-  (conclude-proposal (<proposal>) (response bool uint))
 ))
 
 ;; a messaging contract that allows anyone to send public messages on-chain
@@ -146,43 +99,6 @@
   ;; @param isFromDao whether the message is from the DAO
   ;; @returns (response bool uint)
   (send ((string-ascii 1048576) bool) (response bool uint))
-))
-
-;; an invoicing contract that allows anyone to pay invoices
-;; used in conjunction with the 'resources' trait
-(define-trait invoices (
-  ;; pay an invoice by ID
-  ;; @param invoice the ID of the invoice
-  ;; @returns (response uint uint)
-  (pay-invoice (uint (optional (buff 34))) (response uint uint))
-  ;; pay an invoice by resource name
-  ;; @param name the name of the resource
-  ;; @returns (response uint uint)
-  (pay-invoice-by-resource-name ((string-utf8 50) (optional (buff 34))) (response uint uint))
-))
-
-;; a resource contract that allows for management of resources
-;; resources can be paid for by anyone, and toggled on/off
-;; used in conjunction with the 'invoices' trait for a payment system
-(define-trait resources (
-  ;; set payment address for resource invoices
-  ;; @param principal the new payment address
-  ;; @returns (response bool uint)
-  (set-payment-address (principal) (response bool uint))
-  ;; adds a new resource that users can pay for
-  ;; @param name the name of the resource (unique!)
-  ;; @param price the price of the resource in microSTX
-  ;; @param description a description of the resource
-  ;; @returns (response uint uint)
-  (add-resource ((string-utf8 50) (string-utf8 255) uint (optional (string-utf8 255))) (response uint uint))
-  ;; toggles a resource on or off for payment
-  ;; @param resource the ID of the resource
-  ;; @returns (response bool uint)
-  (toggle-resource (uint) (response bool uint))
-  ;; toggles a resource on or off for payment by name
-  ;; @param name the name of the resource
-  ;; @returns (response bool uint)
-  (toggle-resource-by-name ((string-utf8 50)) (response bool uint))
 ))
 
 ;; an extension that manages the token on behalf of the dao
