@@ -89,8 +89,7 @@
 (define-trait messaging (
   ;; send a message on-chain (opt from DAO)
   ;; @param msg the message to send (up to 1MB)
-  ;; @param isFromDao whether the message is from the DAO
-  (send ((string-ascii 1048576) bool) (response bool uint))
+  (send ((string-ascii 1048576)) (response bool uint))
 ))
 
 ;; an extension that manages the token on behalf of the dao

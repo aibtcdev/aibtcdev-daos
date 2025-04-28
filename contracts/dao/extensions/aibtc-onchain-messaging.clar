@@ -11,26 +11,33 @@
 ;;
 (define-constant ERR_NOT_DAO_OR_EXTENSION (err u4000))
 (define-constant ERR_INVALID_INPUT (err u4001))
+(define-constant ERR_FETCHING_TOKEN_DATA (err u4002))
 
 ;; public functions
 
 (define-public (callback (sender principal) (memo (buff 34))) (ok true))
 
-(define-public (send (msg (string-ascii 1048576)) (isFromDao bool))
-  (begin
-    (and isFromDao (try! (is-dao-or-extension)))
+(define-public (send (msg (string-ascii 1048576)))
+  (let
+    (
+      (isFromDao (is-ok (is-dao-or-extension)))
+      (senderBalance (unwrap! (contract-call? .aibtc-token get-balance tx-sender) ERR_FETCHING_TOKEN_DATA))
+      (isFromHolder (> senderBalance u0))
+    )
+    ;; check there is a message
     (asserts! (> (len msg) u0) ERR_INVALID_INPUT)
     ;; print the message as the first event
     (print msg)
-    ;; print the envelope info for the message
+    ;; print the envelope
     (print {
       notification: "aibtc-onchain-messaging/send",
       payload: {
         contractCaller: contract-caller,
+        txSender: tx-sender,
         height: stacks-block-height,
         isFromDao: isFromDao,
-        txSender: tx-sender,
-        messageLength: (len msg)
+        isFromHolder: isFromHolder,
+        messageLength: (len msg),
       }
     })
     (ok true)
