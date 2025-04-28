@@ -1,7 +1,6 @@
 (impl-trait .aibtc-dao-traits.proposal)
 
 (define-constant CFG_DAO_MANIFEST_TEXT "<%= it.dao_manifest %>")
-(define-constant CFG_DAO_MANIFEST_INSCRIPTION_ID "<%= it.dao_manifest_inscription_id %>")
 
 (define-public (execute (sender principal))
   (begin
