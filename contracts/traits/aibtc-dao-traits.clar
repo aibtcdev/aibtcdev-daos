@@ -131,19 +131,4 @@
   ;; @param amount amount of tokens to deposit
   ;; @returns (response bool uint)
   (deposit-ft (<ft-trait> uint) (response bool uint))
-  ;; transfer STX from treasury to operating fund
-  ;; @returns (response bool uint)
-  (transfer-stx-to-operating-fund () (response bool uint))
-  ;; transfer FT from treasury to operating fund
-  ;; @param ft the fungible token contract principal
-  ;; @returns (response bool uint)
-  (transfer-ft-to-operating-fund (<ft-trait>) (response bool uint))
-  ;; delegate STX for stacking in PoX
-  ;; @param amount max amount of microSTX that can be delegated
-  ;; @param to the address to delegate to
-  ;; @returns (response bool uint)
-  (delegate-stx (uint principal) (response bool uint))
-  ;; revoke delegation of STX from stacking in PoX
-  ;; @returns (response bool uint)
-  (revoke-delegate-stx () (response bool uint))
 ))
