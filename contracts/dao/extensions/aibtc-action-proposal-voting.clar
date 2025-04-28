@@ -320,6 +320,7 @@
         metQuorum: metQuorum,
         metThreshold: metThreshold,
         passed: votePassed,
+        vetoed: vetoMetQuorum,
         executed: tryToExecute
       })
     )
