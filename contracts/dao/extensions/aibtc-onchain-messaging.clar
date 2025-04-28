@@ -14,9 +14,7 @@
 
 ;; public functions
 
-(define-public (callback (sender principal) (memo (buff 34)))
-  (ok true)
-)
+(define-public (callback (sender principal) (memo (buff 34))) (ok true))
 
 (define-public (send (msg (string-ascii 1048576)) (isFromDao bool))
   (begin

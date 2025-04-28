@@ -15,9 +15,7 @@
 ;; public functions
 ;;
 
-(define-public (callback (sender principal) (memo (buff 34)))
-  (ok true)
-)
+(define-public (callback (sender principal) (memo (buff 34))) (ok true))
 
 (define-public (set-token-uri (value (string-utf8 256)))
   (begin

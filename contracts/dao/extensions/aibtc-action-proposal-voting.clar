@@ -93,9 +93,7 @@
 
 ;; public functions
 ;;
-(define-public (callback (sender principal) (memo (buff 34)))
-  (ok true)
-)
+(define-public (callback (sender principal) (memo (buff 34))) (ok true))
 
 (define-public (set-proposal-bond (amount uint))
   (begin
