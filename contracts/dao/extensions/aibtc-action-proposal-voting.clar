@@ -20,7 +20,6 @@
 (define-constant DEPLOYED_STACKS_BLOCK stacks-block-height)
 
 ;; error messages
-;; TODO: review for if we need them or not
 (define-constant ERR_NOT_DAO_OR_EXTENSION (err u1000))
 (define-constant ERR_FETCHING_TOKEN_DATA (err u1001))
 (define-constant ERR_INSUFFICIENT_BALANCE (err u1002))
@@ -33,8 +32,11 @@
 (define-constant ERR_RETRIEVING_START_BLOCK_HASH (err u1009))
 (define-constant ERR_VOTE_TOO_SOON (err u1010))
 (define-constant ERR_VOTE_TOO_LATE (err u1011))
-(define-constant ERR_ALREADY_VOTED (err u1012))
-(define-constant ERR_INVALID_ACTION (err u1013))
+(define-constant ERR_VETO_TOO_SOON (err u1012))
+(define-constant ERR_VETO_TOO_LATE (err u1013))
+(define-constant ERR_ALREADY_VETOED (err u1014))
+(define-constant ERR_ALREADY_VOTED (err u1015))
+(define-constant ERR_INVALID_ACTION (err u1016))
 
 ;; voting configuration
 ;; /g/u144/(if is-in-mainnet u144 u1)
@@ -70,16 +72,26 @@
     endBlock: uint, ;; burn block height
     votesFor: uint, ;; total votes for
     votesAgainst: uint, ;; total votes against
+    vetoVotes: uint, ;; total veto votes
     liquidTokens: uint, ;; liquid tokens
     concluded: bool, ;; has the proposal concluded
     metQuorum: bool, ;; did the proposal meet quorum
     metThreshold: bool, ;; did the proposal meet threshold
     passed: bool, ;; did the proposal pass
     executed: bool, ;; did the proposal execute
+    vetoed: bool, ;; was the proposal vetoed
   }
 )
 
 (define-map VoteRecords
+  {
+    proposalId: uint, ;; proposal id
+    voter: principal ;; voter address
+  }
+  uint ;; total votes
+)
+
+(define-map VetoVoteRecords
   {
     proposalId: uint, ;; proposal id
     voter: principal ;; voter address
@@ -147,11 +159,13 @@
       liquidTokens: liquidTokens,
       votesFor: u0,
       votesAgainst: u0,
+      vetoVotes: u0,
       concluded: false,
       metQuorum: false,
       metThreshold: false,
       passed: false,
       executed: false,
+      vetoed: false,
     }) ERR_SAVING_PROPOSAL)
     ;; set last proposal created block height
     (var-set lastProposalCreated createdAt)
@@ -197,6 +211,45 @@
     )
     ;; record the vote for the sender
     (ok (map-set VoteRecords {proposalId: proposalId, voter: tx-sender} senderBalance))
+  )
+)
+
+(define-public (veto-action-proposal (proposalId uint))
+  (let
+    (
+      (proposalRecord (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (proposalBlock (get createdAt proposalRecord))
+      (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
+      (senderBalance (unwrap! (at-block proposalBlockHash (contract-call? .aibtc-token get-balance tx-sender)) ERR_FETCHING_TOKEN_DATA))
+      (vetoStartBlock (- (get endBlock proposalRecord) VOTING_DELAY))
+    )
+    ;; caller has the required balance
+    (asserts! (> senderBalance u0) ERR_INSUFFICIENT_BALANCE)
+    ;; proposal was not already concluded
+    (asserts! (not (get concluded proposalRecord)) ERR_PROPOSAL_ALREADY_CONCLUDED)
+    ;; proposal vote ended, in execution delay
+    (asserts! (>= burn-block-height vetoStartBlock) ERR_VETO_TOO_SOON)
+    (asserts! (< burn-block-height (get endBlock proposalRecord)) ERR_VETO_TOO_LATE)
+    ;; veto not already cast
+    (asserts! (is-none (map-get? VetoVoteRecords {proposalId: proposalId, voter: tx-sender})) ERR_ALREADY_VETOED)
+    ;; print veto event
+    (print {
+      notification: "action-proposal-voting/veto-action-proposal",
+      payload: {
+        proposalId: proposalId,
+        contractCaller: contract-caller,
+        vetoer: tx-sender,
+        amount: senderBalance
+      }
+    })
+    ;; update the proposal record
+    (map-set Proposals proposalId
+      (merge proposalRecord {
+        vetoVotes: (+ (get vetoVotes proposalRecord) senderBalance),
+      })
+    )
+    ;; update the veto vote record
+    (ok (map-set VetoVoteRecords {proposalId: proposalId, voter: tx-sender} senderBalance))
   )
 )
 
@@ -292,6 +345,10 @@
 
 (define-read-only (get-vote-record (proposalId uint) (voter principal))
   (map-get? VoteRecords {proposalId: proposalId, voter: voter})
+)
+
+(define-read-only (get-veto-vote-record (proposalId uint) (voter principal))
+  (map-get? VetoVoteRecords {proposalId: proposalId, voter: voter})
 )
 
 (define-read-only (get-total-proposals)
