@@ -25,7 +25,7 @@
     (try! (as-contract (contract-call? .aibtc-token set-token-uri value)))
     ;; print event
     (print {
-      notification: "set-token-uri",
+      notification: "aibtc-token-owner/set-token-uri",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
@@ -45,7 +45,7 @@
     (try! (as-contract (contract-call? .aibtc-token set-contract-owner new-owner)))
     ;; print event
     (print {
-      notification: "transfer-ownership",
+      notification: "aibtc-token-owner/transfer-ownership",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,

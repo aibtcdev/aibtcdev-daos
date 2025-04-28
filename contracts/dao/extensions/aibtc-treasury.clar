@@ -67,7 +67,7 @@
   (begin
     (try! (is-dao-or-extension))
     (print {
-      notification: "treasury-allow-asset",
+      notification: "aibtc-treasury/allow-asset",
       payload: {
         token: token,
         enabled: enabled,
@@ -84,7 +84,7 @@
   (begin
     ;; no auth - anyone can deposit
     (print {
-      notification: "treasury-deposit-stx",
+      notification: "aibtc-treasury/deposit-stx",
       payload: {
         amount: amount,
         recipient: SELF,
@@ -102,7 +102,7 @@
     ;; no auth - anyone can deposit if token allowed
     (asserts! (is-allowed-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
     (print {
-      notification: "treasury-deposit-ft",
+      notification: "aibtc-treasury/deposit-ft",
       payload: {
         amount: amount,
         recipient: SELF,
@@ -124,7 +124,7 @@
     (try! (is-dao-or-extension))
     (try! (update-claim-stx amount))
     (print {
-      notification: "treasury-transfer-stx-to-operating-fund",
+      notification: "aibtc-treasury/transfer-stx-to-operating-fund",
       payload: {
         amount: amount,
         recipient: CFG_OPERATING_FUND,
@@ -147,7 +147,7 @@
     (asserts! (is-allowed-asset assetContract) ERR_UNKNOWN_ASSET)
     (try! (update-claim-ft amount assetContract))
     (print {
-      notification: "treasury-transfer-ft-to-operating-fund",
+      notification: "aibtc-treasury/transfer-ft-to-operating-fund",
       payload: {
         amount: amount,
         recipient: CFG_OPERATING_FUND,
@@ -165,7 +165,7 @@
   (begin
     (try! (is-dao-or-extension))
     (print {
-      notification: "treasury-delegate-stx",
+      notification: "aibtc-treasury/delegate-stx",
       payload: {
         maxAmount: maxAmount,
         delegateTo: delegateTo,
@@ -185,7 +185,7 @@
   (begin
     (try! (is-dao-or-extension))
     (print {
-      notification: "treasury-revoke-delegate-stx",
+      notification: "aibtc-treasury/revoke-delegate-stx",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender
@@ -265,7 +265,7 @@
 (define-private (update-claim-stx (amount uint))
   (begin
     (print {
-      notification: "treasury-update-claim-stx",
+      notification: "aibtc-treasury/update-claim-stx",
       payload: {
         period: (get-current-period),
         claimed: true,
@@ -299,7 +299,7 @@
 (define-private (update-claim-ft (amount uint) (assetContract principal))
   (begin
     (print {
-      notification: "treasury-update-claim-ft",
+      notification: "aibtc-treasury/update-claim-ft",
       payload: {
         period: (get-current-period),
         claimed: true,

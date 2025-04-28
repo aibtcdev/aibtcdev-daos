@@ -10,7 +10,7 @@
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 (use-trait action-trait .aibtc-dao-traits.action)
 (use-trait proposal-trait .aibtc-dao-traits.proposal)
-(use-trait action-proposals-trait .aibtc-dao-traits.action-proposals)
+(use-trait action-proposals-trait .aibtc-dao-traits.action-proposals-voting)
 (use-trait core-proposals-trait .aibtc-dao-traits.core-proposals)
 (use-trait dao-faktory-dex .aibtc-dao-traits.faktory-dex)
 (use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait)
@@ -54,11 +54,11 @@
 (define-public (deposit-stx (amount uint))
   (begin
     (print {
-      notification: "deposit-stx",
+      notification: "aibtc-agent-account/deposit-stx",
       payload: {
+        contractCaller: contract-caller,
+        txSender: tx-sender,
         amount: amount,
-        sender: tx-sender,
-        caller: contract-caller,
         recipient: SELF
       }
     })
@@ -70,7 +70,7 @@
   (begin
     (asserts! (is-approved-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
     (print {
-      notification: "deposit-ft",
+      notification: "aibtc-agent-account/deposit-ft",
       payload: {
         amount: amount,
         assetContract: (contract-of ft),
@@ -87,7 +87,7 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (print {
-      notification: "withdraw-stx",
+      notification: "aibtc-agent-account/withdraw-stx",
       payload: {
         amount: amount,
         sender: SELF,
@@ -104,7 +104,7 @@
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (asserts! (is-approved-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
     (print {
-      notification: "withdraw-ft",
+      notification: "aibtc-agent-account/withdraw-ft",
       payload: {
         amount: amount,
         assetContract: (contract-of ft),
@@ -121,7 +121,7 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (print {
-      notification: "approve-asset",
+      notification: "aibtc-agent-account/approve-asset",
       payload: {
         asset: asset,
         approved: true,
@@ -137,7 +137,7 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (print {
-      notification: "revoke-asset",
+      notification: "aibtc-agent-account/revoke-asset",
       payload: {
         asset: asset,
         approved: false,
@@ -155,7 +155,7 @@
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
-      notification: "acct-propose-action",
+      notification: "aibtc-agent-account/acct-propose-action",
       payload: {
         proposalContract: (contract-of action-proposals),
         action: (contract-of action),
@@ -172,7 +172,7 @@
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
-      notification: "acct-create-proposal",
+      notification: "aibtc-agent-account/acct-create-proposal",
       payload: {
         proposalContract: (contract-of core-proposals),
         proposal: (contract-of proposal),
@@ -188,7 +188,7 @@
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
-      notification: "vote-on-action-proposal",
+      notification: "aibtc-agent-account/vote-on-action-proposal",
       payload: {
         proposalContract: (contract-of action-proposals),
         proposalId: proposalId,
@@ -205,7 +205,7 @@
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
-      notification: "vote-on-core-proposal",
+      notification: "aibtc-agent-account/vote-on-core-proposal",
       payload: {
         proposalContract: (contract-of core-proposals),
         proposal: (contract-of proposal),
@@ -222,7 +222,7 @@
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
-      notification: "conclude-action-proposal",
+      notification: "aibtc-agent-account/conclude-action-proposal",
       payload: {
         proposalContract: (contract-of action-proposals),
         proposalId: proposalId,
@@ -239,7 +239,7 @@
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
-      notification: "conclude-core-proposal",
+      notification: "aibtc-agent-account/conclude-core-proposal",
       payload: {
         proposalContract: (contract-of core-proposals),
         proposal: (contract-of proposal),
@@ -258,7 +258,7 @@
     (asserts! (buy-sell-allowed) ERR_BUY_SELL_NOT_ALLOWED)
     (asserts! (is-approved-dex (contract-of faktory-dex)) ERR_UNKNOWN_ASSET)
     (print {
-      notification: "acct-buy-asset",
+      notification: "aibtc-agent-account/acct-buy-asset",
       payload: {
         dexContract: (contract-of faktory-dex),
         asset: (contract-of asset),
@@ -276,7 +276,7 @@
     (asserts! (buy-sell-allowed) ERR_BUY_SELL_NOT_ALLOWED)
     (asserts! (is-approved-dex (contract-of faktory-dex)) ERR_UNKNOWN_ASSET)
     (print {
-      notification: "acct-sell-asset",
+      notification: "aibtc-agent-account/acct-sell-asset",
       payload: {
         dexContract: (contract-of faktory-dex),
         asset: (contract-of asset),
@@ -293,7 +293,7 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (print {
-      notification: "acct-approve-dex",
+      notification: "aibtc-agent-account/acct-approve-dex",
       payload: {
         dexContract: (contract-of faktory-dex),
         approved: true,
@@ -309,7 +309,7 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (print {
-      notification: "acct-revoke-dex",
+      notification: "aibtc-agent-account/acct-revoke-dex",
       payload: {
         dexContract: (contract-of faktory-dex),
         approved: false,
@@ -325,7 +325,7 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (print {
-      notification: "set-agent-can-buy-sell",
+      notification: "aibtc-agent-account/set-agent-can-buy-sell",
       payload: {
         canBuySell: canBuySell,
         sender: tx-sender,
@@ -386,6 +386,6 @@
 
 ;; print creation event
 (print {
-  notification: "user-agent-account-created",
+  notification: "aibtc-agent-account/user-agent-account-created",
   payload: (get-configuration)
 })

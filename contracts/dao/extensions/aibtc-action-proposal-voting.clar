@@ -94,26 +94,6 @@
 ;;
 (define-public (callback (sender principal) (memo (buff 34))) (ok true))
 
-(define-public (set-proposal-bond (amount uint))
-  (begin
-    ;; check if sender is dao or extension
-    (try! (is-dao-or-extension))
-    ;; check if amount is greater than zero
-    (asserts! (> amount u0) ERR_INVALID_BOND_AMOUNT)
-    ;; print set proposal bond event
-    (print {
-      notification: "set-proposal-bond",
-      payload: {
-        amount: amount,
-        contractCaller: contract-caller,
-        txSender: tx-sender
-      }
-    })
-    ;; set the proposal bond amount
-    (ok (var-set proposalBond amount))
-  )
-)
-
 (define-public (propose-action (action <action-trait>) (parameters (buff 2048)) (memo (optional (string-ascii 1024))))
   (let
     (
@@ -139,7 +119,7 @@
     (try! (contract-call? .aibtc-token transfer bondAmount tx-sender SELF none))
     ;; print proposal creation event
     (print {
-      notification: "propose-action",
+      notification: "action-proposal-voting/propose-action",
       payload: {
         proposalId: newId,
         action: actionContract,
@@ -203,7 +183,7 @@
     (asserts! (is-none (map-get? VoteRecords {proposalId: proposalId, voter: tx-sender})) ERR_ALREADY_VOTED)
     ;; print vote event
     (print {
-      notification: "vote-on-proposal",
+      notification: "action-proposal-voting/vote-on-proposal",
       payload: {
         proposalId: proposalId,
         contractCaller: contract-caller,
@@ -257,7 +237,7 @@
     (asserts! (is-eq (get action proposalRecord) actionContract) ERR_INVALID_ACTION)
     ;; print conclusion event
     (print {
-      notification: "conclude-proposal",
+      notification: "action-proposal-voting/conclude-proposal",
       payload: {
         contractCaller: contract-caller,
         concludedBy: tx-sender,

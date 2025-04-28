@@ -67,7 +67,7 @@
     }) ERR_SAVING_CHARTER)
     ;; print charter info
     (print {
-      notification: "dao-charter-set-dao-charter",
+      notification: "aibtc-dao-charter/set-dao-charter",
       payload: {
         burnHeight: burn-block-height,
         createdAt: stacks-block-height,

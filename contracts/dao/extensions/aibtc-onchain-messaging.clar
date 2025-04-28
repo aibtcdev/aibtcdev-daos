@@ -24,7 +24,7 @@
     (print msg)
     ;; print the envelope info for the message
     (print {
-      notification: "send",
+      notification: "aibtc-onchain-messaging/send",
       payload: {
         contractCaller: contract-caller,
         height: stacks-block-height,

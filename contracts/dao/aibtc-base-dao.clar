@@ -44,6 +44,13 @@
     (asserts! (not (var-get constructed)) ERR_DAO_ALREADY_CONSTRUCTED)
     (var-set constructed true)
     (var-set executive (as-contract tx-sender))
+    (print {
+      notification: "aibtc-base-dao/construct",
+      payload: {
+        proposal: (contract-of proposal),
+        sender: sender,
+      }
+    })
     (as-contract (execute proposal sender))
   )
 )
@@ -54,7 +61,7 @@
     (try! (is-self-or-extension))
     (asserts! (map-insert ExecutedProposals (contract-of proposal) stacks-block-height) ERR_ALREADY_EXECUTED)
     (print {
-      notification: "execute",
+      notification: "aibtc-base-dao/execute",
       payload: {
         proposal: proposal,
         sender: sender,
@@ -69,7 +76,7 @@
   (begin
     (try! (is-self-or-extension))
     (print {
-      notification: "extension",
+      notification: "aibtc-base-dao/set-extension",
       payload: {
         enabled: enabled,
         extension: extension,
@@ -95,7 +102,7 @@
     (asserts! (is-extension contract-caller) ERR_INVALID_EXTENSION)
     (asserts! (is-eq contract-caller (contract-of extension)) ERR_INVALID_EXTENSION)
     (print {
-      notification: "request-extension-callback",
+      notification: "aibtc-base-dao/request-extension-callback",
       payload: {
         extension: extension,
         memo: memo,
@@ -133,7 +140,7 @@
 (define-private (set-extensions-iter (item {extension: principal, enabled: bool}))
   (begin
     (print {
-      notification: "extension",
+      notification: "aibtc-base-dao/set-extension",
       payload: {
         enabled: (get enabled item),
         extension: (get extension item),

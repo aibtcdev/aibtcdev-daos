@@ -35,7 +35,7 @@
   (begin
     (try! (is-dao-or-extension))
     (print {
-      notification: "dao-assets-configure-dao-asset",
+      notification: "aibtc-dao-assets/configure-dao-asset",
       payload: {
         assetContract: assetContract,
         enabled: enabled,
