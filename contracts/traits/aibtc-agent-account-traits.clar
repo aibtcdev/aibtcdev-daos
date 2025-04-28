@@ -6,7 +6,7 @@
 (use-trait sip010-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 (use-trait dao-action-trait .aibtc-dao-traits.action)
 (use-trait dao-proposal-trait .aibtc-dao-traits.proposal)
-(use-trait dao-action-proposals-trait .aibtc-dao-traits.action-proposals)
+(use-trait dao-action-proposals-trait .aibtc-dao-traits.action-proposals-voting)
 (use-trait dao-core-proposals-trait .aibtc-dao-traits.core-proposals)
 (use-trait dao-faktory-dex .aibtc-dao-traits.faktory-dex)
 (use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait)

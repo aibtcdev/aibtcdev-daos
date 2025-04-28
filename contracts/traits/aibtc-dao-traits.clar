@@ -62,7 +62,7 @@
 
 ;; a voting contract for whitelisted pre-defined actions
 ;; has lower voting threshold and quorum than core proposals
-(define-trait action-proposals (
+(define-trait action-proposals-voting (
   ;; propose a new action
   ;; @param action the action contract
   ;; @param parameters encoded action parameters

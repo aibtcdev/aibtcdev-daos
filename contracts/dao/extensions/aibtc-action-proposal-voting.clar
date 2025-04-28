@@ -1,17 +1,20 @@
-;; title: aibtc-action-proposals
+;; title: aibtc-action-proposal-voting
 ;; version: 3.0.0
 ;; summary: An extension that manages voting on predefined actions using a SIP-010 Stacks token.
 
 ;; traits
 ;;
-(impl-trait .aibtc-dao-traits.extension)
-(impl-trait .aibtc-dao-traits.action-proposals)
 
+;; /g/.aibtc-dao-traits.extension/dao_extension_trait
+(impl-trait .aibtc-dao-traits.extension)
+;; /g/.aibtc-dao-traits.action/dao_action_proposals_voting_trait
+(impl-trait .aibtc-dao-traits.action-proposals-voting)
+;; /g/.aibtc-dao-traits.action/dao_action_trait
 (use-trait action-trait .aibtc-dao-traits.action)
-(use-trait treasury-trait .aibtc-dao-traits.treasury)
 
 ;; constants
 ;;
+
 (define-constant SELF (as-contract tx-sender))
 (define-constant DEPLOYED_BURN_BLOCK burn-block-height)
 (define-constant DEPLOYED_STACKS_BLOCK stacks-block-height)
@@ -36,18 +39,14 @@
 (define-constant ERR_INVALID_BOND_AMOUNT (err u1015))
 
 ;; voting configuration
-;; for template: (if is-in-mainnet u144 u1)
+;; /g/u144/(if is-in-mainnet u144 u1)
 (define-constant VOTING_DELAY u144) ;; 144 Bitcoin blocks, ~1 days
-;; for template: (if is-in-mainnet u288 u3)
+;; /g/u288/(if is-in-mainnet u288 u3)
 (define-constant VOTING_PERIOD u288) ;; 2 x 144 Bitcoin blocks, ~2 days
 (define-constant VOTING_QUORUM u15) ;; 15% of liquid supply must participate
 (define-constant VOTING_THRESHOLD u66) ;; 66% of votes must be in favor
 
 ;; contracts used for voting calculations
-;; TODO: simplify here
-(define-constant VOTING_TOKEN_PRE_DEX .aibtc-pre-dex)
-(define-constant VOTING_TOKEN_DEX .aibtc-token-dex)
-(define-constant VOTING_TOKEN_POOL .aibtc-bitflow-pool)
 (define-constant VOTING_TREASURY .aibtc-treasury)
 
 ;; data vars
@@ -344,8 +343,6 @@
     period: VOTING_PERIOD,
     quorum: VOTING_QUORUM,
     threshold: VOTING_THRESHOLD,
-    tokenDex: VOTING_TOKEN_DEX,
-    tokenPool: VOTING_TOKEN_POOL,
     treasury: VOTING_TREASURY,
     proposalBond: (var-get proposalBond),
   }
@@ -357,13 +354,9 @@
     (
       (blockHash (unwrap! (get-block-hash blockHeight) ERR_RETRIEVING_START_BLOCK_HASH))
       (totalSupply (unwrap! (at-block blockHash (contract-call? .aibtc-token get-total-supply)) ERR_FETCHING_TOKEN_DATA))
-      (preDexBalance (unwrap! (at-block blockHash (contract-call? .aibtc-token get-balance VOTING_TOKEN_PRE_DEX)) ERR_FETCHING_TOKEN_DATA))
-      (dexBalance (unwrap! (at-block blockHash (contract-call? .aibtc-token get-balance VOTING_TOKEN_DEX)) ERR_FETCHING_TOKEN_DATA))
-      (poolBalance (unwrap! (at-block blockHash (contract-call? .aibtc-token get-balance VOTING_TOKEN_POOL)) ERR_FETCHING_TOKEN_DATA))
       (treasuryBalance (unwrap! (at-block blockHash (contract-call? .aibtc-token get-balance VOTING_TREASURY)) ERR_FETCHING_TOKEN_DATA))
-      (totalLocked (+ preDexBalance dexBalance poolBalance treasuryBalance))
     )
-    (ok (- totalSupply totalLocked))
+    (ok (- totalSupply treasuryBalance))
   )
 )
 
