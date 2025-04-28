@@ -1,6 +1,6 @@
-;; title: aibtc-user-agent-account-traits
+;; title: aibtc-agent-account-traits
 ;; version: 1.0.0
-;; summary: A collection of traits for user agent accounts.
+;; summary: A collection of traits for smart contracts that manage agent accounts.
 
 ;; IMPORTS
 (use-trait sip010-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
@@ -47,35 +47,19 @@
   ;; @param action the action contract
   ;; @param parameters encoded action parameters
   ;; @returns (response bool uint)
-  (acct-propose-action (<dao-action-proposals-trait> <dao-action-trait> (buff 2048) (optional (string-ascii 1024))) (response bool uint))
-  ;; create a core proposal to the DAO (user or agent)
-  ;; @param core-proposals the core proposals contract
-  ;; @param proposal the proposal contract
-  ;; @returns (response bool uint)
-  (acct-create-proposal (<dao-core-proposals-trait> <dao-proposal-trait> (optional (string-ascii 1024))) (response bool uint))  
+  (create-action-proposal (<dao-action-proposals-trait> <dao-action-trait> (buff 2048) (optional (string-ascii 1024))) (response bool uint))
   ;; vote on an action proposal (user or agent)
   ;; @param action-proposals the action proposals contract
   ;; @param proposalId the proposal ID
   ;; @param vote true for yes, false for no
   ;; @returns (response bool uint)
   (vote-on-action-proposal (<dao-action-proposals-trait> uint bool) (response bool uint))
-  ;; vote on a core proposal (user or agent)
-  ;; @param core-proposals the core proposals contract
-  ;; @param proposal the proposal contract
-  ;; @param vote true for yes, false for no
-  ;; @returns (response bool uint)
-  (vote-on-core-proposal (<dao-core-proposals-trait> <dao-proposal-trait> bool) (response bool uint))
   ;; conclude an action proposal (user or agent)
   ;; @param action-proposals the action proposals contract
   ;; @param proposalId the proposal ID
   ;; @param action the action contract
   ;; @returns (response bool uint)
   (conclude-action-proposal (<dao-action-proposals-trait> uint <dao-action-trait>) (response bool uint))
-  ;; conclude a core proposal (user or agent)
-  ;; @param core-proposals the core proposals contract
-  ;; @param proposal the proposal contract
-  ;; @returns (response bool uint)
-  (conclude-core-proposal (<dao-core-proposals-trait> <dao-proposal-trait>) (response bool uint))
 ))
 
 (define-trait faktory-dex-approval (

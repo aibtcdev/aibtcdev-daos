@@ -67,17 +67,17 @@
   ;; @param action the action contract
   ;; @param parameters encoded action parameters
   ;; @returns (response bool uint)
-  (propose-action (<action> (buff 2048) (optional (string-ascii 1024))) (response bool uint))
+  (create-action-proposal (<action> (buff 2048) (optional (string-ascii 1024))) (response bool uint))
   ;; vote on an existing proposal
   ;; @param proposal the proposal id
   ;; @param vote true for yes, false for no
   ;; @returns (response bool uint)
-  (vote-on-proposal (uint bool) (response bool uint))
+  (vote-on-action-proposal (uint bool) (response bool uint))
   ;; conclude a proposal after voting period
   ;; @param proposal the proposal id
   ;; @param action the action contract
   ;; @returns (response bool uint)
-  (conclude-proposal (uint <action>) (response bool uint))
+  (conclude-action-proposal (uint <action>) (response bool uint))
 ))
 
 ;; an extension to manage the dao charter and mission

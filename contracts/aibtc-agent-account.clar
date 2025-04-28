@@ -11,7 +11,6 @@
 (use-trait action-trait .aibtc-dao-traits.action)
 (use-trait proposal-trait .aibtc-dao-traits.proposal)
 (use-trait action-proposals-trait .aibtc-dao-traits.action-proposals-voting)
-(use-trait core-proposals-trait .aibtc-dao-traits.core-proposals)
 (use-trait dao-faktory-dex .aibtc-dao-traits.faktory-dex)
 (use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait)
 
@@ -151,11 +150,11 @@
 
 ;; DAO Interaction Functions
 
-(define-public (acct-propose-action (action-proposals <action-proposals-trait>) (action <action-trait>) (parameters (buff 2048)) (memo (optional (string-ascii 1024))))
+(define-public (create-action-proposal (action-proposals <action-proposals-trait>) (action <action-trait>) (parameters (buff 2048)) (memo (optional (string-ascii 1024))))
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
-      notification: "aibtc-agent-account/acct-propose-action",
+      notification: "aibtc-agent-account/create-action-proposal",
       payload: {
         proposalContract: (contract-of action-proposals),
         action: (contract-of action),
@@ -164,23 +163,7 @@
         caller: contract-caller
       }
     })
-    (as-contract (contract-call? action-proposals propose-action action parameters memo))
-  )
-)
-
-(define-public (acct-create-proposal (core-proposals <core-proposals-trait>) (proposal <proposal-trait>) (memo (optional (string-ascii 1024))))
-  (begin
-    (asserts! (is-authorized) ERR_UNAUTHORIZED)
-    (print {
-      notification: "aibtc-agent-account/acct-create-proposal",
-      payload: {
-        proposalContract: (contract-of core-proposals),
-        proposal: (contract-of proposal),
-        sender: tx-sender,
-        caller: contract-caller
-      }
-    })
-    (as-contract (contract-call? core-proposals create-proposal proposal memo))
+    (as-contract (contract-call? action-proposals create-action-proposal action parameters memo))
   )
 )
 
@@ -197,24 +180,7 @@
         caller: contract-caller
       }
     })
-    (as-contract (contract-call? action-proposals vote-on-proposal proposalId vote))
-  )
-)
-
-(define-public (vote-on-core-proposal (core-proposals <core-proposals-trait>) (proposal <proposal-trait>) (vote bool))
-  (begin
-    (asserts! (is-authorized) ERR_UNAUTHORIZED)
-    (print {
-      notification: "aibtc-agent-account/vote-on-core-proposal",
-      payload: {
-        proposalContract: (contract-of core-proposals),
-        proposal: (contract-of proposal),
-        vote: vote,
-        sender: tx-sender,
-        caller: contract-caller
-      }
-    })
-    (as-contract (contract-call? core-proposals vote-on-proposal proposal vote))
+    (as-contract (contract-call? action-proposals vote-on-action-proposal proposalId vote))
   )
 )
 
@@ -231,23 +197,7 @@
         caller: contract-caller
       }
     })
-    (as-contract (contract-call? action-proposals conclude-proposal proposalId action))
-  )
-)
-
-(define-public (conclude-core-proposal (core-proposals <core-proposals-trait>) (proposal <proposal-trait>))
-  (begin
-    (asserts! (is-authorized) ERR_UNAUTHORIZED)
-    (print {
-      notification: "aibtc-agent-account/conclude-core-proposal",
-      payload: {
-        proposalContract: (contract-of core-proposals),
-        proposal: (contract-of proposal),
-        sender: tx-sender,
-        caller: contract-caller
-      }
-    })
-    (as-contract (contract-call? core-proposals conclude-proposal proposal))
+    (as-contract (contract-call? action-proposals conclude-action-proposal proposalId action))
   )
 )
 
@@ -344,10 +294,6 @@
 
 (define-read-only (is-approved-dex (dex principal))
   (default-to false (map-get? ApprovedDexes dex))
-)
-
-(define-read-only (get-balance-stx)
-  (stx-get-balance SELF)
 )
 
 (define-read-only (get-configuration)

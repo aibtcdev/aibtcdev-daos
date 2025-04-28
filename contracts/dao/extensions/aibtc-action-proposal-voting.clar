@@ -35,8 +35,6 @@
 (define-constant ERR_VOTE_TOO_LATE (err u1011))
 (define-constant ERR_ALREADY_VOTED (err u1012))
 (define-constant ERR_INVALID_ACTION (err u1013))
-(define-constant ERR_DAO_NOT_ACTIVATED (err u1014))
-(define-constant ERR_INVALID_BOND_AMOUNT (err u1015))
 
 ;; voting configuration
 ;; /g/u144/(if is-in-mainnet u144 u1)
@@ -45,9 +43,9 @@
 (define-constant VOTING_PERIOD u288) ;; 2 x 144 Bitcoin blocks, ~2 days
 (define-constant VOTING_QUORUM u15) ;; 15% of liquid supply must participate
 (define-constant VOTING_THRESHOLD u66) ;; 66% of votes must be in favor
-
-;; contracts used for voting calculations
-(define-constant VOTING_TREASURY .aibtc-treasury)
+(define-constant VOTING_TREASURY .aibtc-treasury) ;; used to calculate liquid supply
+(define-constant VOTING_BOND u100000000000) ;; action proposal bond, 1,000 DAO tokens w/ 8 decimals
+(define-constant VOTING_REWARD u10000000000) ;; action proposal reward, 100 DAO tokens w/ 8 decimals
 
 ;; data vars
 ;;
@@ -55,7 +53,6 @@
 (define-data-var concludedProposalCount uint u0) ;; total number of concluded proposals
 (define-data-var executedProposalCount uint u0) ;; total number of executed proposals
 (define-data-var lastProposalCreated uint u0) ;; block height of last proposal created
-(define-data-var proposalBond uint u250000000000) ;; action proposal bond, default 2,500 DAO tokens w/ 8 decimals
 
 ;; data maps
 ;;
@@ -94,7 +91,7 @@
 ;;
 (define-public (callback (sender principal) (memo (buff 34))) (ok true))
 
-(define-public (propose-action (action <action-trait>) (parameters (buff 2048)) (memo (optional (string-ascii 1024))))
+(define-public (create-action-proposal (action <action-trait>) (parameters (buff 2048)) (memo (optional (string-ascii 1024))))
   (let
     (
       (actionContract (contract-of action))
@@ -105,7 +102,6 @@
       (endBlock (+ startBlock VOTING_PERIOD VOTING_DELAY))
       (senderBalance (unwrap! (contract-call? .aibtc-token get-balance tx-sender) ERR_FETCHING_TOKEN_DATA))
       (validAction (is-action-valid action))
-      (bondAmount (var-get proposalBond))
     )
     ;; liquidTokens is greater than zero
     (asserts! (> liquidTokens u0) ERR_FETCHING_TOKEN_DATA)
@@ -114,9 +110,9 @@
     ;; at least one stx block has passed since last proposal
     (asserts! (> createdAt (var-get lastProposalCreated)) ERR_ALREADY_PROPOSAL_AT_BLOCK)
     ;; caller has the required balance
-    (asserts! (> senderBalance bondAmount) ERR_INSUFFICIENT_BALANCE)
+    (asserts! (> senderBalance VOTING_BOND) ERR_INSUFFICIENT_BALANCE)
     ;; transfer the proposal bond to this contract
-    (try! (contract-call? .aibtc-token transfer bondAmount tx-sender SELF none))
+    (try! (contract-call? .aibtc-token transfer VOTING_BOND tx-sender SELF none))
     ;; print proposal creation event
     (print {
       notification: "action-proposal-voting/propose-action",
@@ -126,7 +122,7 @@
         parameters: parameters,
         contractCaller: contract-caller,
         creator: tx-sender,
-        bond: bondAmount,
+        bond: VOTING_BOND,
         createdAt: createdAt,
         startBlock: startBlock,
         endBlock: endBlock,
@@ -144,7 +140,7 @@
       caller: contract-caller,
       creator: tx-sender,
       memo: (if (is-some memo) memo none),
-      bond: bondAmount,
+      bond: VOTING_BOND,
       createdAt: createdAt,
       startBlock: startBlock,
       endBlock: endBlock,
@@ -164,7 +160,7 @@
   )
 )
 
-(define-public (vote-on-proposal (proposalId uint) (vote bool))
+(define-public (vote-on-action-proposal (proposalId uint) (vote bool))
   (let
     (
       (proposalRecord (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
@@ -204,7 +200,7 @@
   )
 )
 
-(define-public (conclude-proposal (proposalId uint) (action <action-trait>))
+(define-public (conclude-action-proposal (proposalId uint) (action <action-trait>))
   (let
     (
       (actionContract (contract-of action))
@@ -294,12 +290,8 @@
   (map-get? Proposals proposalId)
 )
 
-(define-read-only (get-proposal-bond)
-  (var-get proposalBond)
-)
-
 (define-read-only (get-vote-record (proposalId uint) (voter principal))
-  (default-to u0 (map-get? VoteRecords {proposalId: proposalId, voter: voter}))
+  (map-get? VoteRecords {proposalId: proposalId, voter: voter})
 )
 
 (define-read-only (get-total-proposals)
@@ -307,11 +299,8 @@
     total: (var-get proposalCount),
     concluded: (var-get concludedProposalCount),
     executed: (var-get executedProposalCount),
+    lastCreated: (var-get lastProposalCreated),
   }
-)
-
-(define-read-only (get-last-proposal-created)
-  (var-get lastProposalCreated)
 )
 
 (define-read-only (get-voting-configuration)
@@ -324,7 +313,8 @@
     quorum: VOTING_QUORUM,
     threshold: VOTING_THRESHOLD,
     treasury: VOTING_TREASURY,
-    proposalBond: (var-get proposalBond),
+    proposalBond: VOTING_BOND,
+    proposalReward: VOTING_REWARD,
   }
 )
 
