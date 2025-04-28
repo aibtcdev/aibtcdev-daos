@@ -335,12 +335,18 @@
     )
     ;; increment the concluded proposal count
     (var-set concludedProposalCount (+ (var-get concludedProposalCount) u1))
-    ;; execute the action only if it passed, return false if err
+    ;; try to execute the action if the proposal passed
+    ;; returns (ok true) if the action was executed
+    ;; returns (ok false) if the action was not executed or executed with an error
     (ok (if tryToExecute
       (and
+        ;; increment the executed proposal count
         (var-set executedProposalCount (+ (var-get executedProposalCount) u1))
+        ;; try to run the action
         (match (contract-call? action run (get parameters proposalRecord))
+          ;; return true on success
           ok_ true
+          ;; return false and print error on failure
           err_ (begin (print {notification: "aibtc-action-proposal-voting/conclude-proposal", payload: {executionError:err_}}) false)))
       false
     ))
