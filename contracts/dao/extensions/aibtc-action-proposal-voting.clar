@@ -32,11 +32,8 @@
 (define-constant ERR_RETRIEVING_START_BLOCK_HASH (err u1009))
 (define-constant ERR_VOTE_TOO_SOON (err u1010))
 (define-constant ERR_VOTE_TOO_LATE (err u1011))
-(define-constant ERR_VETO_TOO_SOON (err u1012))
-(define-constant ERR_VETO_TOO_LATE (err u1013))
-(define-constant ERR_ALREADY_VETOED (err u1014))
-(define-constant ERR_ALREADY_VOTED (err u1015))
-(define-constant ERR_INVALID_ACTION (err u1016))
+(define-constant ERR_ALREADY_VOTED (err u1012))
+(define-constant ERR_INVALID_ACTION (err u1013))
 
 ;; voting configuration
 ;; /g/u144/(if is-in-mainnet u144 u1)
@@ -51,6 +48,7 @@
 
 ;; data vars
 ;;
+
 (define-data-var proposalCount uint u0) ;; total number of proposals
 (define-data-var concludedProposalCount uint u0) ;; total number of concluded proposals
 (define-data-var executedProposalCount uint u0) ;; total number of executed proposals
@@ -58,6 +56,7 @@
 
 ;; data maps
 ;;
+
 (define-map Proposals
   uint ;; proposal id
   {
@@ -101,6 +100,7 @@
 
 ;; public functions
 ;;
+
 (define-public (callback (sender principal) (memo (buff 34))) (ok true))
 
 (define-public (create-action-proposal (action <action-trait>) (parameters (buff 2048)) (memo (optional (string-ascii 1024))))
@@ -229,10 +229,10 @@
     ;; proposal was not already concluded
     (asserts! (not (get concluded proposalRecord)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     ;; proposal vote ended, in execution delay
-    (asserts! (>= burn-block-height vetoStartBlock) ERR_VETO_TOO_SOON)
-    (asserts! (< burn-block-height (get endBlock proposalRecord)) ERR_VETO_TOO_LATE)
+    (asserts! (>= burn-block-height vetoStartBlock) ERR_VOTE_TOO_SOON)
+    (asserts! (< burn-block-height (get endBlock proposalRecord)) ERR_VOTE_TOO_LATE)
     ;; veto not already cast
-    (asserts! (is-none (map-get? VetoVoteRecords {proposalId: proposalId, voter: tx-sender})) ERR_ALREADY_VETOED)
+    (asserts! (is-none (map-get? VetoVoteRecords {proposalId: proposalId, voter: tx-sender})) ERR_ALREADY_VOTED)
     ;; print veto event
     (print {
       notification: "action-proposal-voting/veto-action-proposal",
