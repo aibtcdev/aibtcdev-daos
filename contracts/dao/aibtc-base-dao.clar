@@ -45,6 +45,7 @@
     (var-set constructed true)
     (var-set executive (as-contract tx-sender))
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-base-dao/construct",
       payload: {
         proposal: (contract-of proposal),
@@ -61,6 +62,7 @@
     (try! (is-self-or-extension))
     (asserts! (map-insert ExecutedProposals (contract-of proposal) stacks-block-height) ERR_ALREADY_EXECUTED)
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-base-dao/execute",
       payload: {
         proposal: proposal,
@@ -76,6 +78,7 @@
   (begin
     (try! (is-self-or-extension))
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-base-dao/set-extension",
       payload: {
         enabled: enabled,
@@ -102,6 +105,7 @@
     (asserts! (is-extension contract-caller) ERR_INVALID_EXTENSION)
     (asserts! (is-eq contract-caller (contract-of extension)) ERR_INVALID_EXTENSION)
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-base-dao/request-extension-callback",
       payload: {
         extension: extension,
@@ -140,6 +144,7 @@
 (define-private (set-extensions-iter (item {extension: principal, enabled: bool}))
   (begin
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-base-dao/set-extension",
       payload: {
         enabled: (get enabled item),

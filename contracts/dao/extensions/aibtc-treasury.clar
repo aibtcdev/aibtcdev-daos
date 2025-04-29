@@ -5,9 +5,12 @@
 ;; traits
 ;;
 
+;; /g/.aibtc-dao-traits.extension/dao_extension_trait
 (impl-trait .aibtc-dao-traits.extension)
+;; /g/.aibtc-dao-traits.treasury/dao_treasury_trait
 (impl-trait .aibtc-dao-traits.treasury)
 
+;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; constants
@@ -48,6 +51,7 @@
   (begin
     (try! (is-dao-or-extension))
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-treasury/allow-asset",
       payload: {
         token: token,
@@ -66,6 +70,7 @@
     ;; no auth - anyone can deposit if token allowed
     (asserts! (is-allowed-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-treasury/deposit-ft",
       payload: {
         amount: amount,
@@ -86,6 +91,7 @@
     (try! (is-dao-or-extension))
     (asserts! (is-allowed-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-treasury/withdraw-ft",
       payload: {
         amount: amount,
@@ -123,7 +129,9 @@
 ;;
 
 (define-private (is-dao-or-extension)
+  ;; /g/.aibtc-base-dao/dao_base_contract
   (ok (asserts! (or (is-eq tx-sender .aibtc-base-dao)
+    ;; /g/.aibtc-base-dao/dao_base_contract
     (contract-call? .aibtc-base-dao is-extension contract-caller)) ERR_NOT_DAO_OR_EXTENSION
   ))
 )

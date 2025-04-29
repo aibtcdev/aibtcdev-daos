@@ -5,7 +5,9 @@
 ;; traits
 ;;
 
+;; /g/.aibtc-dao-traits.extension/dao_extension_trait
 (impl-trait .aibtc-dao-traits.extension)
+;; /g/.aibtc-dao-traits.users/dao_users_trait
 ;; TODO - add dao-users trait (impl-trait .aibtc-dao-traits.dao-users)
 
 ;; constants
@@ -54,6 +56,7 @@
       (let
         ((userIndex (+ u1 (var-get userCount))))
         (print {
+          ;; /g/aibtc/dao_token_symbol
           notification: "aibtc-dao-users/get-or-create-user-index",
           payload: {
             userIndex: userIndex,
@@ -85,6 +88,7 @@
     )
     (try! (is-dao-or-extension))
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-dao-users/increase-user-reputation",
       payload: {
         userIndex: userIndex,
@@ -112,6 +116,7 @@
     )
     (try! (is-dao-or-extension))
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-dao-users/decrease-user-reputation",
       payload: {
         userIndex: userIndex,
@@ -158,7 +163,9 @@
 
 ;; returns ok if the caller is the DAO or an extension or err if not
 (define-private (is-dao-or-extension)
+  ;; /g/.aibtc-base-dao/dao_base_contract
   (ok (asserts! (or (is-eq tx-sender .aibtc-base-dao)
+    ;; /g/.aibtc-base-dao/dao_base_contract
     (contract-call? .aibtc-base-dao is-extension contract-caller)) ERR_NOT_DAO_OR_EXTENSION
   ))
 )

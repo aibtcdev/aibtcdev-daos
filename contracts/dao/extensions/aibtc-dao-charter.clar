@@ -5,7 +5,9 @@
 ;; traits
 ;;
 
+;; /g/.aibtc-dao-traits.extension/dao_extension_trait
 (impl-trait .aibtc-dao-traits.extension)
+;; /g/.aibtc-dao-traits.charter/dao_charter_trait
 (impl-trait .aibtc-dao-traits.charter)
 
 ;; constants
@@ -67,6 +69,7 @@
     }) ERR_SAVING_CHARTER)
     ;; print charter info
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-dao-charter/set-dao-charter",
       payload: {
         burnHeight: burn-block-height,
@@ -111,7 +114,9 @@
 ;; private functions
 ;;
 (define-private (is-dao-or-extension)
+  ;; /g/.aibtc-base-dao/dao_base_contract
   (ok (asserts! (or (is-eq tx-sender .aibtc-base-dao)
+    ;; /g/.aibtc-base-dao/dao_base_contract
     (contract-call? .aibtc-base-dao is-extension contract-caller)) ERR_NOT_DAO_OR_EXTENSION
   ))
 )

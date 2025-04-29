@@ -141,6 +141,7 @@
   (let
     (
       (actionContract (contract-of action))
+      ;; /g/.aibtc-dao-users/dao_users_contract
       (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender)))
       (newId (+ (var-get proposalCount) u1))
       (createdStx (- stacks-block-height u1))
@@ -150,6 +151,7 @@
       (voteEnd (+ voteStart VOTING_PERIOD))
       (execStart (+ voteEnd VOTING_DELAY))
       (execEnd (+ execStart VOTING_PERIOD))
+      ;; /g/.aibtc-token/dao_token_contract
       (senderBalance (unwrap! (contract-call? .aibtc-token get-balance tx-sender) ERR_FETCHING_TOKEN_DATA))
       (validAction (is-action-valid action))
     )
@@ -164,9 +166,11 @@
     ;; caller has the required balance
     (asserts! (> senderBalance VOTING_BOND) ERR_INSUFFICIENT_BALANCE)
     ;; transfer the proposal bond to this contract
+    ;; /g/.aibtc-token/dao_token_contract
     (try! (contract-call? .aibtc-token transfer VOTING_BOND tx-sender SELF none))
     ;; print proposal creation event
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-action-proposal-voting/propose-action",
       payload: {
         contractCaller: contract-caller,
@@ -240,7 +244,9 @@
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
+      ;; /g/.aibtc-token/dao_token_contract
       (senderBalance (unwrap! (at-block proposalBlockHash (contract-call? .aibtc-token get-balance tx-sender)) ERR_FETCHING_TOKEN_DATA))
+      ;; /g/.aibtc-dao-users/dao_users_contract
       (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender)))
       (voterRecord (map-get? VoteRecords {proposalId: proposalId, voter: tx-sender}))
       (previousVote (if (is-some voterRecord) (some (get vote (unwrap-panic voterRecord))) none))
@@ -259,6 +265,7 @@
     )
     ;; print vote event
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-action-proposal-voting/vote-on-proposal",
       payload: {
         contractCaller: contract-caller,
@@ -298,7 +305,9 @@
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
+      ;; /g/.aibtc-token/dao_token_contract
       (senderBalance (unwrap! (at-block proposalBlockHash (contract-call? .aibtc-token get-balance tx-sender)) ERR_FETCHING_TOKEN_DATA))
+      ;; /g/.aibtc-dao-users/dao_users_contract
       (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender)))
     )
     ;; caller has the required balance
@@ -312,6 +321,7 @@
     (asserts! (is-none (map-get? VetoVoteRecords {proposalId: proposalId, voter: tx-sender})) ERR_ALREADY_VOTED)
     ;; print veto event
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-action-proposal-voting/veto-action-proposal",
       payload: {
         contractCaller: contract-caller,
@@ -376,9 +386,11 @@
     ;; action must be the same as the one in proposal
     (asserts! (is-eq (get action proposalDetails) actionContract) ERR_INVALID_ACTION)
     ;; record user in dao if not already
+    ;; /g/.aibtc-dao-users/dao_users_contract
     (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender))
     ;; print conclusion event
     (print {
+      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-action-proposal-voting/conclude-proposal",
       payload: {
         contractCaller: contract-caller,
@@ -416,16 +428,22 @@
 
     ;; transfer the bond based on the outcome
     (if votePassed
+      ;; /g/.aibtc-token/dao_token_contract
       (try! (as-contract (contract-call? .aibtc-token transfer (get bond proposalDetails) SELF creator none)))
+      ;; /g/.aibtc-token/dao_token_contract
       (try! (as-contract (contract-call? .aibtc-token transfer (get bond proposalDetails) SELF VOTING_TREASURY none)))
     )
     ;; transfer the reward to the creator
     (and votePassed
+      ;; /g/.aibtc-treasury/dao_treasury_contract
+      ;; /g/.aibtc-token/dao_token_contract
       (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-token VOTING_REWARD creator)))
     )
     ;; update the users reputation based on outcome
     (if votePassed
+      ;; /g/.aibtc-dao-users/dao_users_contract
       (try! (as-contract (contract-call? .aibtc-dao-users increase-user-reputation creator REP_SUCCESS)))
+      ;; /g/.aibtc-dao-users/dao_users_contract
       (try! (as-contract (contract-call? .aibtc-dao-users decrease-user-reputation creator REP_FAILURE)))
     )
     ;; increment the concluded proposal count
@@ -442,6 +460,7 @@
           ;; return true on success
           ok_ true
           ;; return false and print error on failure
+          ;; /g/aibtc/dao_token_symbol
           err_ (begin (print {notification: "aibtc-action-proposal-voting/conclude-proposal", payload: {executionError:err_}}) false)))
       false
     ))
@@ -457,6 +476,7 @@
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlockHash (unwrap! (get-block-hash (get createdStx proposalBlocks)) ERR_RETRIEVING_START_BLOCK_HASH))
     )
+    ;; /g/.aibtc-token/dao_token_contract
     (at-block proposalBlockHash (contract-call? .aibtc-token get-balance voter))
   )
 )
@@ -517,7 +537,9 @@
   (let
     (
       (blockHash (unwrap! (get-block-hash blockHeight) ERR_RETRIEVING_START_BLOCK_HASH))
+      ;; /g/.aibtc-token/dao_token_contract
       (totalSupply (unwrap! (at-block blockHash (contract-call? .aibtc-token get-total-supply)) ERR_FETCHING_TOKEN_DATA))
+      ;; /g/.aibtc-token/dao_token_contract
       (treasuryBalance (unwrap! (at-block blockHash (contract-call? .aibtc-token get-balance VOTING_TREASURY)) ERR_FETCHING_TOKEN_DATA))
     )
     (ok (- totalSupply treasuryBalance))
@@ -527,7 +549,9 @@
 ;; private functions
 ;;
 (define-private (is-dao-or-extension)
+  ;; /g/.aibtc-base-dao/dao_base_contract
   (ok (asserts! (or (is-eq tx-sender .aibtc-base-dao)
+    ;; /g/.aibtc-base-dao/dao_base_contract
     (contract-call? .aibtc-base-dao is-extension contract-caller)) ERR_NOT_DAO_OR_EXTENSION
   ))
 )
@@ -536,6 +560,7 @@
   (let
     (
       (extensionActive (is-ok (as-contract (is-dao-or-extension))))
+      ;; /g/.aibtc-base-dao/dao_base_contract
       (actionActive (contract-call? .aibtc-base-dao is-extension (contract-of action)))
     )
     (and extensionActive actionActive)
