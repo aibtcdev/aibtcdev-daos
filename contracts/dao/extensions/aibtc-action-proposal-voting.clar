@@ -150,6 +150,8 @@
     (asserts! (> liquidTokens u0) ERR_FETCHING_TOKEN_DATA)
     ;; verify this extension and action contract are active in dao
     (asserts! validAction ERR_INVALID_ACTION)
+    ;; verify the parameters are valid
+    (try! (contract-call? action check-parameters parameters))
     ;; at least one btc block has passed since last proposal
     (asserts! (> createdBtc (var-get lastProposalBitcoinBlock)) ERR_PROPOSAL_RATE_LIMIT)
     ;; caller has the required balance

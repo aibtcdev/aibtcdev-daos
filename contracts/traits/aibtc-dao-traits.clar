@@ -55,6 +55,8 @@
 (define-trait action (
   ;; @param parameters serialized hex-encoded Clarity values
   (run ((buff 2048)) (response bool uint))
+  ;; @param parameters serialized hex-encoded Clarity values
+  (check-parameters ((buff 2048)) (response bool uint))
 ))
 
 ;; a voting contract for whitelisted pre-defined actions

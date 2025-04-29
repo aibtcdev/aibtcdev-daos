@@ -29,6 +29,15 @@
   )
 )
 
+(define-public (check-parameters (parameters (buff 2048)))
+  (let
+    ((message (unwrap! (from-consensus-buff? (string-ascii 2043) parameters) ERR_INVALID_PARAMS)))
+    ;; check there is a message
+    (asserts! (> (len message) u0) ERR_INVALID_PARAMS)
+    (ok true)
+  )
+)
+
 ;; private functions
 ;;
 
