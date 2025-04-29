@@ -38,14 +38,21 @@
 ;; voting configuration
 (define-constant VOTING_QUORUM u15) ;; 15% of liquid supply must participate
 (define-constant VOTING_THRESHOLD u66) ;; 66% of votes must be in favor
-(define-constant VOTING_TREASURY .aibtc-treasury) ;; used to calculate liquid supply
 (define-constant VOTING_BOND u100000000000) ;; action proposal bond, 1,000 DAO tokens w/ 8 decimals
 (define-constant VOTING_REWARD u10000000000) ;; action proposal reward, 100 DAO tokens w/ 8 decimals
+;; /g/.aibtc-treasury/dao_treasury_contract
+(define-constant VOTING_TREASURY .aibtc-treasury) ;; used to calculate liquid supply
 
-;; /g/u144/(if is-in-mainnet u144 u1)
-(define-constant VOTING_DELAY u144) ;; 144 Bitcoin blocks, ~1 days
-;; /g/u288/(if is-in-mainnet u288 u3)
-(define-constant VOTING_PERIOD u288) ;; 2 x 144 Bitcoin blocks, ~2 days
+;; set voting delay
+;; mainnet: 144 blocks (24 hours)
+;; testnet: 1 blocks (10 minutes)
+;; devnet: 144 blocks (24 hours)
+(define-constant VOTING_DELAY (if is-in-mainnet u144 (if is-in-regtest u144 u1)))
+;; set voting period
+;; mainnet: 288 blocks (48 hours)
+;; testnet: 3 blocks (30 minutes)
+;; devnet: 288 blocks (48 hours)
+(define-constant VOTING_PERIOD (if is-in-mainnet u288 (if is-in-regtest u288 u3)))
 
 (define-constant REP_SUCCESS u1) ;; reputation increase on proposal success
 (define-constant REP_FAILURE u2) ;; reputation decrease on proposal failure
