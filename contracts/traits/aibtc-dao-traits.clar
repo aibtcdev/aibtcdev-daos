@@ -79,10 +79,32 @@
 ;; an extension to manage the dao charter and mission
 ;; allows the dao to define its mission and values on-chain
 ;; used to guide decision-making and proposals
-(define-trait charter (
+(define-trait dao-charter (
   ;; set the dao charter
   ;; @param charter the new charter text
   (set-dao-charter ((string-ascii 4096)) (response bool uint))
+))
+
+;; an extension that tracks the current epoch of the DAO
+(define-trait dao-epoch (
+  (get-current-dao-epoch () (response uint uint))
+  (get-dao-epoch-length () (response uint uint))
+))
+
+;; an extension that tracks the current users and their reputation in the DAO
+(define-trait dao-users (
+  ;; get or create a user index
+  ;; @param address the user principal
+  ;; @param response the user index
+  (get-or-create-user-index (principal) (response uint uint))
+  ;; increase user reputation
+  ;; @param address the user principal
+  ;; @param amount the amount to increase
+  (increase-user-reputation (principal uint) (response bool uint))
+  ;; decrease user reputation
+  ;; @param address the user principal
+  ;; @param amount the amount to decrease
+  (decrease-user-reputation (principal uint) (response bool uint))
 ))
 
 ;; a messaging contract that allows anyone to send public messages on-chain

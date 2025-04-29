@@ -8,7 +8,7 @@
 ;; /g/.aibtc-dao-traits.extension/dao_extension_trait
 (impl-trait .aibtc-dao-traits.extension)
 ;; /g/.aibtc-dao-traits.users/dao_users_trait
-;; TODO - add dao-users trait (impl-trait .aibtc-dao-traits.dao-users)
+(impl-trait .aibtc-dao-traits.dao-users)
 
 ;; constants
 ;;
