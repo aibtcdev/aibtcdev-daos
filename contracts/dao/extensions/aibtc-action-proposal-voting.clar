@@ -111,7 +111,10 @@
     proposalId: uint, ;; proposal id
     voter: principal ;; voter address
   }
-  uint ;; total votes
+  {
+    vote: bool, ;; true for yes, false for no
+    amount: uint, ;; total votes
+  }
 )
 
 (define-map VetoVoteRecords
@@ -119,7 +122,7 @@
     proposalId: uint, ;; proposal id
     voter: principal ;; voter address
   }
-  uint ;; total votes
+  uint ;; total veto votes
 )
 
 ;; public functions
@@ -230,6 +233,9 @@
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
       (senderBalance (unwrap! (at-block proposalBlockHash (contract-call? .aibtc-token get-balance tx-sender)) ERR_FETCHING_TOKEN_DATA))
       (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender)))
+      (voterRecord (map-get? VoteRecords {proposalId: proposalId, voter: tx-sender}))
+      (previousVote (if (is-some voterRecord) (some (get vote (unwrap-panic voterRecord))) none))
+      (previousVoteAmount (if (is-some voterRecord) (some (get amount (unwrap-panic voterRecord))) none))
     )
     ;; caller has the required balance
     (asserts! (> senderBalance u0) ERR_INSUFFICIENT_BALANCE)
@@ -238,8 +244,10 @@
     ;; proposal vote is still active
     (asserts! (>= burn-block-height (get voteStart proposalBlocks)) ERR_VOTE_TOO_SOON)
     (asserts! (< burn-block-height (get voteEnd proposalBlocks)) ERR_VOTE_TOO_LATE)
-    ;; vote not already cast
-    (asserts! (is-none (map-get? VoteRecords {proposalId: proposalId, voter: tx-sender})) ERR_ALREADY_VOTED)
+    ;; proposal vote not already cast
+    (and (is-some voterRecord)
+      (asserts! (not (is-eq (get vote (unwrap-panic voterRecord)) vote)) ERR_ALREADY_VOTED)
+    )
     ;; print vote event
     (print {
       notification: "aibtc-action-proposal-voting/vote-on-proposal",
@@ -253,6 +261,15 @@
         vote: vote,
       }
     })
+    (and (is-some previousVote)
+      ;; update the proposal record to remove the previous vote
+      (map-set ProposalRecords proposalId
+        (if (is-eq (unwrap-panic previousVote) true)
+          (merge proposalRecord {votesFor: (- (get votesFor proposalRecord) (unwrap-panic previousVoteAmount))})
+          (merge proposalRecord {votesAgainst: (- (get votesAgainst proposalRecord) (unwrap-panic previousVoteAmount))})
+        )
+      )
+    )
     ;; update the proposal record
     (map-set ProposalRecords proposalId
       (if vote
@@ -261,7 +278,7 @@
       )
     )
     ;; record the vote for the sender
-    (ok (map-set VoteRecords {proposalId: proposalId, voter: tx-sender} senderBalance))
+    (ok (map-set VoteRecords {proposalId: proposalId, voter: tx-sender} {vote: vote, amount: senderBalance}))
   )
 )
 
