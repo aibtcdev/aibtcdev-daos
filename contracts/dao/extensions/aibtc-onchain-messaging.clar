@@ -17,7 +17,7 @@
 
 (define-public (callback (sender principal) (memo (buff 34))) (ok true))
 
-(define-public (send (msg (string-ascii 1048576)))
+(define-public (send (msg (string-ascii 1047888)))
   (let
     (
       (isFromDao (is-ok (is-dao-or-extension)))
@@ -26,9 +26,7 @@
     )
     ;; check there is a message
     (asserts! (> (len msg) u0) ERR_INVALID_INPUT)
-    ;; print the message as the first event
-    (print msg)
-    ;; print the envelope
+    ;; print the envelope and message
     (print {
       notification: "aibtc-onchain-messaging/send",
       payload: {
@@ -38,6 +36,7 @@
         isFromDao: isFromDao,
         isFromHolder: isFromHolder,
         messageLength: (len msg),
+        message: msg,
       }
     })
     (ok true)
