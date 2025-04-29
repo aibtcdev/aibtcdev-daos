@@ -26,7 +26,6 @@
 (define-constant ERR_PROPOSAL_NOT_FOUND (err u1003))
 (define-constant ERR_PROPOSAL_VOTING_ACTIVE (err u1004))
 (define-constant ERR_PROPOSAL_EXECUTION_DELAY (err u1005))
-(define-constant ERR_ALREADY_PROPOSAL_AT_BLOCK (err u1006))
 (define-constant ERR_PROPOSAL_RATE_LIMIT (err u1006))
 (define-constant ERR_SAVING_PROPOSAL (err u1007))
 (define-constant ERR_PROPOSAL_ALREADY_CONCLUDED (err u1008))
@@ -149,7 +148,7 @@
     ;; verify this extension and action contract are active in dao
     (asserts! validAction ERR_INVALID_ACTION)
     ;; at least one btc block has passed since last proposal
-    (asserts! (> createdBtc (var-get lastProposalBitcoinBlock)) ERR_ALREADY_PROPOSAL_AT_BLOCK)
+    (asserts! (> createdBtc (var-get lastProposalBitcoinBlock)) ERR_PROPOSAL_RATE_LIMIT)
     ;; caller has the required balance
     (asserts! (> senderBalance VOTING_BOND) ERR_INSUFFICIENT_BALANCE)
     ;; transfer the proposal bond to this contract
