@@ -16,7 +16,7 @@
 ;;
 
 (define-constant SELF (as-contract tx-sender))
-(define-constant DEPLOYED_BURN_BLOCK burn-block-height)
+(define-constant DEPLOYED_BITCOIN_BLOCK burn-block-height)
 (define-constant DEPLOYED_STACKS_BLOCK stacks-block-height)
 
 ;; error messages
@@ -27,6 +27,7 @@
 (define-constant ERR_PROPOSAL_VOTING_ACTIVE (err u1004))
 (define-constant ERR_PROPOSAL_EXECUTION_DELAY (err u1005))
 (define-constant ERR_ALREADY_PROPOSAL_AT_BLOCK (err u1006))
+(define-constant ERR_PROPOSAL_RATE_LIMIT (err u1006))
 (define-constant ERR_SAVING_PROPOSAL (err u1007))
 (define-constant ERR_PROPOSAL_ALREADY_CONCLUDED (err u1008))
 (define-constant ERR_RETRIEVING_START_BLOCK_HASH (err u1009))
@@ -36,18 +37,19 @@
 (define-constant ERR_INVALID_ACTION (err u1013))
 
 ;; voting configuration
-;; /g/u144/(if is-in-mainnet u144 u1)
-(define-constant VOTING_DELAY u144) ;; 144 Bitcoin blocks, ~1 days
-;; /g/u288/(if is-in-mainnet u288 u3)
-(define-constant VOTING_PERIOD u288) ;; 2 x 144 Bitcoin blocks, ~2 days
 (define-constant VOTING_QUORUM u15) ;; 15% of liquid supply must participate
 (define-constant VOTING_THRESHOLD u66) ;; 66% of votes must be in favor
 (define-constant VOTING_TREASURY .aibtc-treasury) ;; used to calculate liquid supply
 (define-constant VOTING_BOND u100000000000) ;; action proposal bond, 1,000 DAO tokens w/ 8 decimals
 (define-constant VOTING_REWARD u10000000000) ;; action proposal reward, 100 DAO tokens w/ 8 decimals
 
-(define-constant REP_SUCCESS u1) ;; success
-(define-constant REP_FAILURE u2) ;; failure
+;; /g/u144/(if is-in-mainnet u144 u1)
+(define-constant VOTING_DELAY u144) ;; 144 Bitcoin blocks, ~1 days
+;; /g/u288/(if is-in-mainnet u288 u3)
+(define-constant VOTING_PERIOD u288) ;; 2 x 144 Bitcoin blocks, ~2 days
+
+(define-constant REP_SUCCESS u1) ;; reputation increase on proposal success
+(define-constant REP_FAILURE u2) ;; reputation decrease on proposal failure
 
 ;; data vars
 ;;
@@ -55,29 +57,48 @@
 (define-data-var proposalCount uint u0) ;; total number of proposals
 (define-data-var concludedProposalCount uint u0) ;; total number of concluded proposals
 (define-data-var executedProposalCount uint u0) ;; total number of executed proposals
-(define-data-var lastProposalCreated uint u0) ;; block height of last proposal created
+
+(define-data-var lastProposalStacksBlock uint u0) ;; stacks block height of last proposal created
+(define-data-var lastProposalBitcoinBlock uint u0) ;; bitcoin block height of last proposal created
 
 ;; data maps
 ;;
 
-(define-map Proposals
+(define-map ProposalDetails
+  uint ;; proposal ID
+  {
+    action: principal, ;; action contract to execute
+    parameters: (buff 2048), ;; parameters to pass to action contract
+    bond: uint, ;; proposal bond amount
+    caller: principal, ;; contract-caller
+    creator: principal, ;; tx-sender
+    creatorUserId: uint, ;; user index in DAO
+    liquidTokens: uint, ;; liquid tokens
+    memo: (optional (string-ascii 1024)), ;; memo for the proposal
+  }
+)
+
+(define-map ProposalBlocks
   uint ;; proposal id
   {
-    action: principal, ;; action contract
-    parameters: (buff 2048), ;; action parameters
-    createdAt: uint, ;; stacks block height for at-block calls
-    caller: principal, ;; contract caller
-    creator: principal, ;; proposal creator (tx-sender)
-    userId: uint, ;; user index
-    memo: (optional (string-ascii 1024)), ;; memo for the proposal
-    bond: uint, ;; proposal bond amount
-    startBlock: uint, ;; burn block height
-    endBlock: uint, ;; burn block height
+    createdBtc: uint, ;; bitcoin block height
+    createdStx: uint, ;; stacks block height for at-block calls
+    voteStart: uint, ;; bitcoin block height
+    voteEnd: uint, ;; bitcoin block height
+    execStart: uint, ;; bitcoin block height
+    execEnd: uint, ;; bitcoin block height
+  }
+)
+
+(define-map ProposalRecords
+  uint ;; proposal id
+  {
+    ;; accumulated in proposal life cycle
     votesFor: uint, ;; total votes for
     votesAgainst: uint, ;; total votes against
     vetoVotes: uint, ;; total veto votes
-    liquidTokens: uint, ;; liquid tokens
-    concluded: bool, ;; has the proposal concluded
+    ;; updated after conclusion
+    concluded: bool, ;; was the proposal concluded
     metQuorum: bool, ;; did the proposal meet quorum
     metThreshold: bool, ;; did the proposal meet threshold
     passed: bool, ;; did the proposal pass
@@ -113,10 +134,13 @@
       (actionContract (contract-of action))
       (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender)))
       (newId (+ (var-get proposalCount) u1))
-      (createdAt (- stacks-block-height u1))
-      (liquidTokens (try! (get-liquid-supply createdAt)))
-      (startBlock (+ burn-block-height VOTING_DELAY))
-      (endBlock (+ startBlock VOTING_PERIOD VOTING_DELAY))
+      (createdStx (- stacks-block-height u1))
+      (createdBtc burn-block-height)
+      (liquidTokens (try! (get-liquid-supply createdStx)))
+      (voteStart (+ burn-block-height VOTING_DELAY))
+      (voteEnd (+ voteStart VOTING_PERIOD))
+      (execStart (+ voteEnd VOTING_DELAY))
+      (execEnd (+ execStart VOTING_PERIOD))
       (senderBalance (unwrap! (contract-call? .aibtc-token get-balance tx-sender) ERR_FETCHING_TOKEN_DATA))
       (validAction (is-action-valid action))
     )
@@ -124,8 +148,8 @@
     (asserts! (> liquidTokens u0) ERR_FETCHING_TOKEN_DATA)
     ;; verify this extension and action contract are active in dao
     (asserts! validAction ERR_INVALID_ACTION)
-    ;; at least one stx block has passed since last proposal
-    (asserts! (> createdAt (var-get lastProposalCreated)) ERR_ALREADY_PROPOSAL_AT_BLOCK)
+    ;; at least one btc block has passed since last proposal
+    (asserts! (> createdBtc (var-get lastProposalBitcoinBlock)) ERR_ALREADY_PROPOSAL_AT_BLOCK)
     ;; caller has the required balance
     (asserts! (> senderBalance VOTING_BOND) ERR_INSUFFICIENT_BALANCE)
     ;; transfer the proposal bond to this contract
@@ -136,35 +160,50 @@
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
-        userId: userId,
-        proposalId: newId,
         action: actionContract,
         parameters: parameters,
-        creator: tx-sender,
         bond: VOTING_BOND,
-        createdAt: createdAt,
-        startBlock: startBlock,
-        endBlock: endBlock,
+        caller: contract-caller,
+        creator: tx-sender,
+        creatorUserId: userId,
         liquidTokens: liquidTokens,
+        memo: (if (is-some memo) memo none),
+        createdBtc: createdBtc,
+        createdStx: createdStx,
+        voteStart: voteStart,
+        voteEnd: voteEnd,
+        execStart: execStart,
+        execEnd: execEnd,
+        proposalId: newId,
         votingPeriod: VOTING_PERIOD,
         votingQuorum: VOTING_QUORUM,
         votingThreshold: VOTING_THRESHOLD,
-        votingDelay: VOTING_DELAY
+        votingDelay: VOTING_DELAY,
+        votingReward: VOTING_REWARD,
       }
     })
-    ;; create the proposal
-    (asserts! (map-insert Proposals newId {
+    ;; create the proposal details
+    (asserts! (map-insert ProposalDetails newId {
       action: actionContract,
       parameters: parameters,
+      bond: VOTING_BOND,
       caller: contract-caller,
       creator: tx-sender,
-      userId: userId,
-      memo: (if (is-some memo) memo none),
-      bond: VOTING_BOND,
-      createdAt: createdAt,
-      startBlock: startBlock,
-      endBlock: endBlock,
+      creatorUserId: userId,
       liquidTokens: liquidTokens,
+      memo: (if (is-some memo) memo none),
+    }) ERR_SAVING_PROPOSAL)
+    ;; create the proposal blocks
+    (asserts! (map-insert ProposalBlocks newId {
+      createdBtc: createdBtc,
+      createdStx: createdStx,
+      voteStart: voteStart,
+      voteEnd: voteEnd,
+      execStart: execStart,
+      execEnd: execEnd,
+    }) ERR_SAVING_PROPOSAL)
+    ;; create the proposal record
+    (asserts! (map-insert ProposalRecords newId {
       votesFor: u0,
       votesAgainst: u0,
       vetoVotes: u0,
@@ -176,7 +215,8 @@
       vetoed: false,
     }) ERR_SAVING_PROPOSAL)
     ;; set last proposal created block height
-    (var-set lastProposalCreated createdAt)
+    (var-set lastProposalBitcoinBlock createdBtc)
+    (var-set lastProposalStacksBlock createdStx)
     ;; increment proposal count
     (ok (var-set proposalCount newId))
   )
@@ -185,36 +225,37 @@
 (define-public (vote-on-action-proposal (proposalId uint) (vote bool))
   (let
     (
-      (proposalRecord (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
-      (proposalBlock (get createdAt proposalRecord))
+      (proposalRecord (unwrap! (map-get? ProposalRecords proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
       (senderBalance (unwrap! (at-block proposalBlockHash (contract-call? .aibtc-token get-balance tx-sender)) ERR_FETCHING_TOKEN_DATA))
+      (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender)))
     )
     ;; caller has the required balance
     (asserts! (> senderBalance u0) ERR_INSUFFICIENT_BALANCE)
     ;; proposal was not already concluded
     (asserts! (not (get concluded proposalRecord)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     ;; proposal vote is still active
-    (asserts! (>= burn-block-height (get startBlock proposalRecord)) ERR_VOTE_TOO_SOON)
-    (asserts! (< burn-block-height (- (get endBlock proposalRecord) VOTING_DELAY)) ERR_VOTE_TOO_LATE)
+    (asserts! (>= burn-block-height (get voteStart proposalBlocks)) ERR_VOTE_TOO_SOON)
+    (asserts! (< burn-block-height (get voteEnd proposalBlocks)) ERR_VOTE_TOO_LATE)
     ;; vote not already cast
     (asserts! (is-none (map-get? VoteRecords {proposalId: proposalId, voter: tx-sender})) ERR_ALREADY_VOTED)
-    ;; record user in dao if not already
-    (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender))
     ;; print vote event
     (print {
       notification: "aibtc-action-proposal-voting/vote-on-proposal",
       payload: {
-        proposalId: proposalId,
         contractCaller: contract-caller,
         txSender: tx-sender,
         voter: tx-sender,
+        voterUserId: userId,
+        proposalId: proposalId,
         amount: senderBalance,
-        vote: vote
+        vote: vote,
       }
     })
     ;; update the proposal record
-    (map-set Proposals proposalId
+    (map-set ProposalRecords proposalId
       (if vote
         (merge proposalRecord {votesFor: (+ (get votesFor proposalRecord) senderBalance)})
         (merge proposalRecord {votesAgainst: (+ (get votesAgainst proposalRecord) senderBalance)})
@@ -228,40 +269,41 @@
 (define-public (veto-action-proposal (proposalId uint))
   (let
     (
-      (proposalRecord (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
-      (proposalBlock (get createdAt proposalRecord))
+      (proposalRecord (unwrap! (map-get? ProposalRecords proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
       (senderBalance (unwrap! (at-block proposalBlockHash (contract-call? .aibtc-token get-balance tx-sender)) ERR_FETCHING_TOKEN_DATA))
-      (vetoStartBlock (- (get endBlock proposalRecord) VOTING_DELAY))
+      (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender)))
     )
     ;; caller has the required balance
     (asserts! (> senderBalance u0) ERR_INSUFFICIENT_BALANCE)
     ;; proposal was not already concluded
     (asserts! (not (get concluded proposalRecord)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     ;; proposal vote ended, in execution delay
-    (asserts! (>= burn-block-height vetoStartBlock) ERR_VOTE_TOO_SOON)
-    (asserts! (< burn-block-height (get endBlock proposalRecord)) ERR_VOTE_TOO_LATE)
+    (asserts! (>= burn-block-height (get voteEnd proposalBlocks)) ERR_VOTE_TOO_SOON)
+    (asserts! (< burn-block-height (get execStart proposalBlocks)) ERR_VOTE_TOO_LATE)
     ;; veto not already cast
     (asserts! (is-none (map-get? VetoVoteRecords {proposalId: proposalId, voter: tx-sender})) ERR_ALREADY_VOTED)
-    ;; record user in dao if not already
-    (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender))
     ;; print veto event
     (print {
       notification: "aibtc-action-proposal-voting/veto-action-proposal",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
+        vetoer: tx-sender,
+        vetoerUserId: userId,
         proposalId: proposalId,
         amount: senderBalance,
       }
     })
     ;; update the proposal record
-    (map-set Proposals proposalId
+    (map-set ProposalRecords proposalId
       (merge proposalRecord {
         vetoVotes: (+ (get vetoVotes proposalRecord) senderBalance),
       })
     )
-    ;; update the veto vote record
+    ;; update the veto vote record for the sender
     (ok (map-set VetoVoteRecords {proposalId: proposalId, voter: tx-sender} senderBalance))
   )
 )
@@ -270,8 +312,11 @@
   (let
     (
       (actionContract (contract-of action))
-      (proposalRecord (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
-      (liquidTokens (get liquidTokens proposalRecord))
+      (proposalDetails (unwrap! (map-get? ProposalDetails proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (proposalRecord (unwrap! (map-get? ProposalRecords proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (creator (get creator proposalDetails))
+      (liquidTokens (get liquidTokens proposalDetails))
       (votesFor (get votesFor proposalRecord))
       (votesAgainst (get votesAgainst proposalRecord))
       (vetoVotes (get vetoVotes proposalRecord))
@@ -294,17 +339,17 @@
       ))
       ;; check info for running action
       (validAction (is-action-valid action))
-      (notExpired (< burn-block-height (+ (get endBlock proposalRecord) VOTING_PERIOD)))
+      (notExpired (< burn-block-height (get execEnd proposalBlocks)))
       (tryToExecute (and votePassed validAction notExpired))
     )
     ;; proposal not already concluded
     (asserts! (not (get concluded proposalRecord)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     ;; proposal is past voting period
-    (asserts! (>= burn-block-height (- (get endBlock proposalRecord) VOTING_DELAY)) ERR_PROPOSAL_VOTING_ACTIVE)
+    (asserts! (>= burn-block-height (get voteEnd proposalBlocks)) ERR_PROPOSAL_VOTING_ACTIVE)
     ;; proposal is past execution delay
-    (asserts! (>= burn-block-height (get endBlock proposalRecord)) ERR_PROPOSAL_EXECUTION_DELAY)
+    (asserts! (>= burn-block-height (get execStart proposalBlocks)) ERR_PROPOSAL_EXECUTION_DELAY)
     ;; action must be the same as the one in proposal
-    (asserts! (is-eq (get action proposalRecord) actionContract) ERR_INVALID_ACTION)
+    (asserts! (is-eq (get action proposalDetails) actionContract) ERR_INVALID_ACTION)
     ;; record user in dao if not already
     (try! (contract-call? .aibtc-dao-users get-or-create-user-index tx-sender))
     ;; print conclusion event
@@ -313,56 +358,62 @@
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
-        bond: (get bond proposalRecord),
+        action: actionContract,
+        parameters: (get parameters proposalDetails),
+        bond: (get bond proposalDetails),
+        creator: creator,
+        creatorUserId: (get creatorUserId proposalDetails),
+        liquidTokens: liquidTokens,
+        memo: (get memo proposalDetails),
         proposalId: proposalId,
         votesFor: votesFor,
         votesAgainst: votesAgainst,
         vetoVotes: vetoVotes,
-        liquidTokens: liquidTokens,
         metQuorum: metQuorum,
         metThreshold: metThreshold,
         vetoMetQuorum: vetoMetQuorum,
         passed: votePassed,
-        notExpired: notExpired,
+        expired: (not notExpired),
         executed: tryToExecute,
       }
     })
     ;; update the proposal record
-    (map-set Proposals proposalId
+    (map-set ProposalRecords proposalId
       (merge proposalRecord {
         concluded: true,
         metQuorum: metQuorum,
         metThreshold: metThreshold,
         passed: votePassed,
+        executed: tryToExecute,
         vetoed: vetoMetQuorum,
-        executed: tryToExecute
       })
     )
+
     ;; transfer the bond based on the outcome
     (if votePassed
-      (try! (as-contract (contract-call? .aibtc-token transfer (get bond proposalRecord) SELF (get creator proposalRecord) none)))
-      (try! (as-contract (contract-call? .aibtc-token transfer (get bond proposalRecord) SELF VOTING_TREASURY none)))
+      (try! (as-contract (contract-call? .aibtc-token transfer (get bond proposalDetails) SELF creator none)))
+      (try! (as-contract (contract-call? .aibtc-token transfer (get bond proposalDetails) SELF VOTING_TREASURY none)))
     )
     ;; transfer the reward to the creator
     (and votePassed
-      (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-token VOTING_REWARD (get creator proposalRecord))))
+      (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-token VOTING_REWARD creator)))
     )
     ;; update the users reputation based on outcome
     (if votePassed
-      (try! (as-contract (contract-call? .aibtc-dao-users increase-user-reputation (get creator proposalRecord) REP_SUCCESS)))
-      (try! (as-contract (contract-call? .aibtc-dao-users decrease-user-reputation (get creator proposalRecord) REP_FAILURE)))
+      (try! (as-contract (contract-call? .aibtc-dao-users increase-user-reputation creator REP_SUCCESS)))
+      (try! (as-contract (contract-call? .aibtc-dao-users decrease-user-reputation creator REP_FAILURE)))
     )
     ;; increment the concluded proposal count
     (var-set concludedProposalCount (+ (var-get concludedProposalCount) u1))
     ;; try to execute the action if the proposal passed
-    ;; returns (ok true) if the action was executed
-    ;; returns (ok false) if the action was not executed or executed with an error
+    ;;   returns (ok true) if the action successfully executes
+    ;;   returns (ok false) if the action was not executed or executed with an error
     (ok (if tryToExecute
       (and
         ;; increment the executed proposal count
         (var-set executedProposalCount (+ (var-get executedProposalCount) u1))
         ;; try to run the action
-        (match (contract-call? action run (get parameters proposalRecord))
+        (match (contract-call? action run (get parameters proposalDetails))
           ;; return true on success
           ok_ true
           ;; return false and print error on failure
@@ -375,18 +426,25 @@
 ;; read only functions
 ;;
 
-(define-read-only (get-voting-power (who principal) (proposalId uint))
+(define-read-only (get-voting-power (proposalId uint) (voter principal))
   (let
     (
-      (proposalRecord (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
-      (proposalBlockHash (unwrap! (get-block-hash (get createdAt proposalRecord)) ERR_RETRIEVING_START_BLOCK_HASH))
+      (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (proposalBlockHash (unwrap! (get-block-hash (get createdStx proposalBlocks)) ERR_RETRIEVING_START_BLOCK_HASH))
     )
-    (at-block proposalBlockHash (contract-call? .aibtc-token get-balance who))
+    (at-block proposalBlockHash (contract-call? .aibtc-token get-balance voter))
   )
 )
 
 (define-read-only (get-proposal (proposalId uint))
-  (map-get? Proposals proposalId)
+  (let
+    (
+      (proposalDetails (unwrap! (map-get? ProposalDetails proposalId) none))
+      (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) none))
+      (proposalRecord (unwrap! (map-get? ProposalRecords proposalId) none))
+    )
+    (some (merge proposalDetails (merge proposalBlocks proposalRecord)))
+  )
 )
 
 (define-read-only (get-vote-record (proposalId uint) (voter principal))
@@ -397,19 +455,27 @@
   (map-get? VetoVoteRecords {proposalId: proposalId, voter: voter})
 )
 
+(define-read-only (get-vote-records (proposalId uint) (voter principal))
+  {
+    voteRecord: (get-vote-record proposalId voter),
+    vetoVoteRecord: (get-veto-vote-record proposalId voter),
+  }
+)
+
 (define-read-only (get-total-proposals)
   {
-    total: (var-get proposalCount),
-    concluded: (var-get concludedProposalCount),
-    executed: (var-get executedProposalCount),
-    lastCreated: (var-get lastProposalCreated),
+    proposalCount: (var-get proposalCount),
+    concludedProposalCount: (var-get concludedProposalCount),
+    executedProposalCount: (var-get executedProposalCount),
+    lastProposalStacksBlock: (var-get lastProposalStacksBlock),
+    lastProposalBitcoinBlock: (var-get lastProposalBitcoinBlock),
   }
 )
 
 (define-read-only (get-voting-configuration)
   {
     self: SELF,
-    deployedBurnBlock: DEPLOYED_BURN_BLOCK,
+    deployedBitcoinBlock: DEPLOYED_BITCOIN_BLOCK,
     deployedStacksBlock: DEPLOYED_STACKS_BLOCK,
     delay: VOTING_DELAY,
     period: VOTING_PERIOD,
@@ -421,7 +487,7 @@
   }
 )
 
-;; calculate the liquid supply of the dao token
+;; calculate the liquid supply of the dao token at a past stacks block height
 (define-read-only (get-liquid-supply (blockHeight uint))
   (let
     (
