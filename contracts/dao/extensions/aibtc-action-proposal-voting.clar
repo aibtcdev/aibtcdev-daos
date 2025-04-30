@@ -171,7 +171,7 @@
     ;; print proposal creation event
     (print {
       ;; /g/aibtc/dao_token_symbol
-      notification: "aibtc-action-proposal-voting/propose-action",
+      notification: "aibtc-action-proposal-voting/create-action-proposal",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
@@ -266,7 +266,7 @@
     ;; print vote event
     (print {
       ;; /g/aibtc/dao_token_symbol
-      notification: "aibtc-action-proposal-voting/vote-on-proposal",
+      notification: "aibtc-action-proposal-voting/vote-on-action-proposal",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
@@ -391,7 +391,7 @@
     ;; print conclusion event
     (print {
       ;; /g/aibtc/dao_token_symbol
-      notification: "aibtc-action-proposal-voting/conclude-proposal",
+      notification: "aibtc-action-proposal-voting/conclude-action-proposal",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
@@ -457,7 +457,7 @@
           ok_ (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-token VOTING_REWARD creator)))
           ;; return false and print error on failure
           ;; /g/aibtc/dao_token_symbol
-          err_ (begin (print {notification: "aibtc-action-proposal-voting/conclude-proposal", payload: {executionError:err_}}) false)))
+          err_ (begin (print {notification: "aibtc-action-proposal-voting/conclude-action-proposal", payload: {executionError:err_}}) false)))
       false
     ))
   )
