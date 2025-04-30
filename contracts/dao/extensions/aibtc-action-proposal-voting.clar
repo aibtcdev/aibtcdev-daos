@@ -433,12 +433,6 @@
       ;; /g/.aibtc-token/dao_token_contract
       (try! (as-contract (contract-call? .aibtc-token transfer (get bond proposalDetails) SELF VOTING_TREASURY none)))
     )
-    ;; transfer the reward to the creator
-    (and votePassed
-      ;; /g/.aibtc-treasury/dao_treasury_contract
-      ;; /g/.aibtc-token/dao_token_contract
-      (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-token VOTING_REWARD creator)))
-    )
     ;; update the users reputation based on outcome
     (if votePassed
       ;; /g/.aibtc-dao-users/dao_users_contract
@@ -457,8 +451,10 @@
         (var-set executedProposalCount (+ (var-get executedProposalCount) u1))
         ;; try to run the action
         (match (contract-call? action run (get parameters proposalDetails))
-          ;; return true on success
-          ok_ true
+          ;; transfer reward to creator
+          ;; /g/.aibtc-treasury/dao_treasury_contract
+          ;; /g/.aibtc-token/dao_token_contract
+          ok_ (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-token VOTING_REWARD creator)))
           ;; return false and print error on failure
           ;; /g/aibtc/dao_token_symbol
           err_ (begin (print {notification: "aibtc-action-proposal-voting/conclude-proposal", payload: {executionError:err_}}) false)))
