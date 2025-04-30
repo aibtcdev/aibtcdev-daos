@@ -38,8 +38,8 @@
 ;; voting configuration
 (define-constant VOTING_QUORUM u15) ;; 15% of liquid supply must participate
 (define-constant VOTING_THRESHOLD u66) ;; 66% of votes must be in favor
-(define-constant VOTING_BOND u100000000000) ;; action proposal bond, 1,000 DAO tokens w/ 8 decimals
-(define-constant VOTING_REWARD u10000000000) ;; action proposal reward, 100 DAO tokens w/ 8 decimals
+(define-constant VOTING_BOND u500000000000) ;; action proposal bond, 5,000 DAO tokens w/ 8 decimals
+(define-constant VOTING_REWARD u100000000000) ;; action proposal reward, 1,000 DAO tokens w/ 8 decimals
 ;; /g/.aibtc-treasury/dao_treasury_contract
 (define-constant VOTING_TREASURY .aibtc-treasury) ;; used to calculate liquid supply
 
