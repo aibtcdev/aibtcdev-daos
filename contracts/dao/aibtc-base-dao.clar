@@ -93,7 +93,7 @@
 (define-public (set-extensions (extensionList (list 200 {extension: principal, enabled: bool})))
   (begin
     (try! (is-self-or-extension))
-    (asserts! (>= (len extensionList) u0) ERR_NO_EMPTY_LISTS)
+    (asserts! (> (len extensionList) u0) ERR_NO_EMPTY_LISTS)
     (ok (map set-extensions-iter extensionList))
   )
 )
