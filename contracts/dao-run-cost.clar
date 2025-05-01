@@ -14,6 +14,10 @@
 (define-constant ERR_NOT_OWNER (err u1000))
 (define-constant ERR_ALREADY_CONFIRMED (err u1001))
 
+;; possible actions
+(define-constant SET_OWNER u1)
+(define-constant SET_ASSET u2)
+
 ;; data vars
 ;;
 
@@ -24,13 +28,14 @@
 ;;
 
 (define-map Owners principal bool)
-(define-map OwnerConfirmations { id: uint, owner: principal } bool)
-(define-map TotalConfirmations uint uint)
+(define-map OwnerConfirmations { id: uint, nonce: uint, owner: principal } bool)
+(define-map TotalConfirmations { id: uint, nonce: uint } uint)
+(define-map AllowedAssets principal bool)
 
 ;; public functions
 ;;
 
-(define-public (set-owner (id uint) (who principal) (status bool))
+(define-public (set-owner (nonce uint) (who principal) (status bool))
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
     (print {
@@ -42,7 +47,23 @@
         txSender: tx-sender
       }
     })
-    (ok (and (is-confirmed id) (map-set Owners who status)))
+    (ok (and (is-confirmed SET_OWNER nonce) (map-set Owners who status)))
+  )
+)
+
+(define-public (set-asset (nonce uint) (token principal) (enabled bool))
+  (begin
+    (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
+    (print {
+      notification: "dao-run-cost/set-asset",
+      payload: {
+        token: token,
+        enabled: enabled,
+        contractCaller: contract-caller,
+        txSender: tx-sender
+      }
+    })
+    (ok (and (is-confirmed SET_ASSET nonce) (map-set AllowedAssets token enabled)))
   )
 )
 
@@ -65,24 +86,24 @@
   (var-get confirmationsRequired)
 )
 
-(define-read-only (has-confirmed (id uint) (who principal))
-  (default-to false (map-get? OwnerConfirmations { id: id, owner: who }))
+(define-read-only (has-confirmed (id uint) (nonce uint) (who principal))
+  (default-to false (map-get? OwnerConfirmations { id: id, nonce: nonce, owner: who }))
 )
 
-(define-read-only (get-confirmations (id uint))
-  (default-to u0 (map-get? TotalConfirmations id))
+(define-read-only (get-confirmations (id uint) (nonce uint))
+  (default-to u0 (map-get? TotalConfirmations { id: id, nonce: nonce }))
 )
 
 ;; private functions
 ;;
 
-(define-private (is-confirmed (id uint))
+(define-private (is-confirmed (id uint) (nonce uint))
   (let
     (
-      (confirmations (+ (get-confirmations id) (if (has-confirmed id contract-caller) u0 u1)))
+      (confirmations (+ (get-confirmations id nonce) (if (has-confirmed id nonce contract-caller) u0 u1)))
     )
-    (map-set OwnerConfirmations { id: id, owner: contract-caller } true)
-    (map-set TotalConfirmations id confirmations)
+    (map-set OwnerConfirmations { id: id, nonce: nonce, owner: contract-caller } true)
+    (map-set TotalConfirmations { id: id, nonce: nonce } confirmations)
     (is-eq confirmations (var-get confirmationsRequired))
   )
 )
