@@ -173,9 +173,8 @@
     ;; transfer the proposal bond to this contract
     ;; /g/.aibtc-token/dao_token_contract
     (try! (contract-call? .aibtc-token transfer VOTING_BOND tx-sender SELF none))
-    ;; transfer the run cost fee to the dao run cost contract
-    ;; TODO: withdraw from treasury instead of sender
-    (try! (contract-call? .aibtc-token transfer AIBTC_DAO_RUN_COST_AMOUNT tx-sender AIBTC_DAO_RUN_COST_CONTRACT none))
+    ;; transfer the run cost fee to the run AIBTC dao cost contract
+    (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-token AIBTC_DAO_RUN_COST_AMOUNT AIBTC_DAO_RUN_COST_CONTRACT)))
     ;; print proposal creation event
     (print {
       ;; /g/aibtc/dao_token_symbol
