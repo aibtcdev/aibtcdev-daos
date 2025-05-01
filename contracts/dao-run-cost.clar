@@ -43,7 +43,7 @@
 )
 
 ;; will accept trait to use for contract transfer
-;; we should maintain an approved assets list too
+;; we should maintain an allowed assets list too
 (define-public (transfer-dao-token) (ok true))
 
 ;; read only functions
