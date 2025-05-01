@@ -10,7 +10,7 @@
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 (use-trait action-trait .aibtc-dao-traits.action)
 (use-trait proposal-trait .aibtc-dao-traits.proposal)
-(use-trait action-proposals-trait .aibtc-dao-traits.action-proposals-voting)
+(use-trait action-proposals-voting-trait .aibtc-dao-traits.action-proposals-voting)
 (use-trait dao-faktory-dex .aibtc-dao-traits.faktory-dex)
 (use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait)
 
@@ -150,54 +150,54 @@
 
 ;; DAO Interaction Functions
 
-(define-public (create-action-proposal (action-proposals <action-proposals-trait>) (action <action-trait>) (parameters (buff 2048)) (memo (optional (string-ascii 1024))))
+(define-public (create-action-proposal (voting-contract <action-proposals-voting-trait>) (action <action-trait>) (parameters (buff 2048)) (memo (optional (string-ascii 1024))))
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
       notification: "aibtc-agent-account/create-action-proposal",
       payload: {
-        proposalContract: (contract-of action-proposals),
+        proposalContract: (contract-of voting-contract),
         action: (contract-of action),
         parameters: parameters,
         sender: tx-sender,
         caller: contract-caller
       }
     })
-    (as-contract (contract-call? action-proposals create-action-proposal action parameters memo))
+    (as-contract (contract-call? voting-contract create-action-proposal action parameters memo))
   )
 )
 
-(define-public (vote-on-action-proposal (action-proposals <action-proposals-trait>) (proposalId uint) (vote bool))
+(define-public (vote-on-action-proposal (voting-contract <action-proposals-voting-trait>) (proposalId uint) (vote bool))
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
       notification: "aibtc-agent-account/vote-on-action-proposal",
       payload: {
-        proposalContract: (contract-of action-proposals),
+        proposalContract: (contract-of voting-contract),
         proposalId: proposalId,
         vote: vote,
         sender: tx-sender,
         caller: contract-caller
       }
     })
-    (as-contract (contract-call? action-proposals vote-on-action-proposal proposalId vote))
+    (as-contract (contract-call? voting-contract vote-on-action-proposal proposalId vote))
   )
 )
 
-(define-public (conclude-action-proposal (action-proposals <action-proposals-trait>) (proposalId uint) (action <action-trait>))
+(define-public (conclude-action-proposal (voting-contract <action-proposals-voting-trait>) (proposalId uint) (action <action-trait>))
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
       notification: "aibtc-agent-account/conclude-action-proposal",
       payload: {
-        proposalContract: (contract-of action-proposals),
+        proposalContract: (contract-of voting-contract),
         proposalId: proposalId,
         action: (contract-of action),
         sender: tx-sender,
         caller: contract-caller
       }
     })
-    (as-contract (contract-call? action-proposals conclude-action-proposal proposalId action))
+    (as-contract (contract-call? voting-contract conclude-action-proposal proposalId action))
   )
 )
 
