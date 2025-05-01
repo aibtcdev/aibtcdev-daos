@@ -58,8 +58,8 @@ epoch = 3.1
 
 # protocol fees
 
-[contracts.aibtc-protocol-fees]
-path = "contracts/protocol-fees.clar"
+[contracts.aibtc-protocol-fees-account]
+path = "contracts/protocol-fees-account.clar"
 clarity_version = 3
 epoch = 3.1
 

@@ -36,7 +36,7 @@
 (define-constant ERR_INVALID_ACTION (err u1013))
 
 (define-constant AIBTC_PROTOCOL_FEE_AMOUNT u10000000000) ;; 100 DAO tokens w/ 8 decimals
-(define-constant AIBTC_PROTOCOL_FEE_CONTRACT .protocol-fees) ;; protocol fees contract
+(define-constant AIBTC_PROTOCOL_FEE_CONTRACT .protocol-fees-account) ;; protocol fees contract
 ;; /g/.aibtc-rewards-account/dao_rewards_account_contract
 (define-constant DAO_REWARDS_ACCOUNT .aibtc-rewards-account) ;; rewards account for the DAO
 
