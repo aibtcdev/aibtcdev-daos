@@ -12,21 +12,25 @@
 
 ;; error messages
 (define-constant ERR_NOT_OWNER (err u1000))
+(define-constant ERR_ALREADY_CONFIRMED (err u1001))
 
 ;; data vars
 ;;
 
-(define-data-var signalsRequired uint u3) ;; 3 of 5
+(define-data-var confirmationId uint u0)
+(define-data-var confirmationsRequired uint u3) ;; 3 of 5
 
 ;; data maps
 ;;
 
 (define-map Owners principal bool)
+(define-map OwnerConfirmations { id: uint, owner: principal } bool)
+(define-map TotalConfirmations uint uint)
 
 ;; public functions
 ;;
 
-(define-public (set-owner (who principal) (status bool))
+(define-public (set-owner (id uint) (who principal) (status bool))
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
     (print {
@@ -38,7 +42,7 @@
         txSender: tx-sender
       }
     })
-    (ok (map-set Owners who status))
+    (ok (and (is-confirmed id) (map-set Owners who status)))
   )
 )
 
@@ -49,9 +53,36 @@
 ;; read only functions
 ;;
 
+(define-read-only (is-owner (who principal))
+  (default-to false (map-get? Owners who))
+)
+
+(define-read-only (get-current-id)
+  (var-get confirmationId)
+)
+
+(define-read-only (get-confirmations-required)
+  (var-get confirmationsRequired)
+)
+
+(define-read-only (has-confirmed (id uint) (who principal))
+  (default-to false (map-get? OwnerConfirmations { id: id, owner: who }))
+)
+
+(define-read-only (get-confirmations (id uint))
+  (default-to u0 (map-get? TotalConfirmations id))
+)
+
 ;; private functions
 ;;
 
-(define-private (is-owner (who principal))
-  (default-to false (map-get? Owners who))
+(define-private (is-confirmed (id uint))
+  (let
+    (
+      (confirmations (+ (get-confirmations id) (if (has-confirmed id contract-caller) u0 u1)))
+    )
+    (map-set OwnerConfirmations { id: id, owner: contract-caller } true)
+    (map-set TotalConfirmations id confirmations)
+    (is-eq confirmations (var-get confirmationsRequired))
+  )
 )
