@@ -11,14 +11,14 @@
 (impl-trait .aibtc-dao-traits.treasury)
 
 ;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait
-(use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+(use-trait sip010-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; constants
 ;;
 
 ;; error messages
 (define-constant ERR_NOT_DAO_OR_EXTENSION (err u1900))
-(define-constant ERR_UNKNOWN_ASSET (err u1901))
+(define-constant ERR_ASSET_NOT_ALLOWED (err u1901))
 
 ;; contract details
 (define-constant DEPLOYED_BURN_BLOCK burn-block-height)
@@ -63,10 +63,10 @@
 )
 
 ;; deposit FT to the treasury
-(define-public (deposit-ft (ft <ft-trait>) (amount uint))
+(define-public (deposit-ft (ft <sip010-trait>) (amount uint))
   (begin
     ;; no auth - anyone can deposit if token allowed
-    (asserts! (is-allowed-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
+    (asserts! (is-allowed-asset (contract-of ft)) ERR_ASSET_NOT_ALLOWED)
     (print {
       ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-treasury/deposit-ft",
@@ -83,11 +83,11 @@
 )
 
 ;; withdraw FT from the treasury
-(define-public (withdraw-ft (ft <ft-trait>) (amount uint) (to principal))
+(define-public (withdraw-ft (ft <sip010-trait>) (amount uint) (to principal))
   (begin
     ;; only DAO contract can withdraw if token allowed
     (try! (is-dao-or-extension))
-    (asserts! (is-allowed-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
+    (asserts! (is-allowed-asset (contract-of ft)) ERR_ASSET_NOT_ALLOWED)
     (print {
       ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-treasury/withdraw-ft",
