@@ -1,6 +1,7 @@
 // protocol-fees-account.clar
 export enum ErrCodeProtocolFeesAccount {
   ERR_NOT_OWNER = 1000,
+  ERR_ASSET_NOT_ALLOWED,
 }
 
 // aibtc-agent-account.clar
@@ -76,7 +77,7 @@ export enum ErrCodeTokenOwner {
 // aibtc-treasury.clar
 export enum ErrCodeTreasury {
   ERR_NOT_DAO_OR_EXTENSION = 1900,
-  ERR_UNKNOWN_ASSET,
+  ERR_ASSET_NOT_ALLOWED,
 }
 
 // aibtc-action-send-proposal.clar

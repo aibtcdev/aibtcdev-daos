@@ -99,7 +99,7 @@
         txSender: tx-sender
       }
     })
-    (contract-call? ft transfer amount SELF to none)
+    (as-contract (contract-call? ft transfer amount SELF to none))
   )
 )
 
@@ -115,7 +115,6 @@
 )
 
 (define-read-only (get-contract-info)
-  ;; return contract info object
   {
     self: SELF,
     deployedBurnBlock: DEPLOYED_BURN_BLOCK,
