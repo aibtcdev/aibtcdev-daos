@@ -35,6 +35,11 @@
 (define-constant ERR_ALREADY_VOTED (err u1012))
 (define-constant ERR_INVALID_ACTION (err u1013))
 
+(define-constant AIBTC_PROTOCOL_FEE_AMOUNT u10000000000) ;; 100 DAO tokens w/ 8 decimals
+(define-constant AIBTC_PROTOCOL_FEE_CONTRACT .protocol-fees) ;; protocol fees contract
+;; /g/.aibtc-rewards-account/dao_rewards_account_contract
+(define-constant DAO_REWARDS_ACCOUNT .aibtc-rewards-account) ;; rewards account for the DAO
+
 ;; voting configuration
 (define-constant VOTING_QUORUM u15) ;; 15% of liquid supply must participate
 (define-constant VOTING_THRESHOLD u66) ;; 66% of votes must be in favor
@@ -64,8 +69,8 @@
 (define-data-var concludedProposalCount uint u0) ;; total number of concluded proposals
 (define-data-var executedProposalCount uint u0) ;; total number of executed proposals
 
-(define-data-var lastProposalStacksBlock uint u0) ;; stacks block height of last proposal created
-(define-data-var lastProposalBitcoinBlock uint u0) ;; bitcoin block height of last proposal created
+(define-data-var lastProposalStacksBlock uint stacks-block-height) ;; stacks block height of last proposal created
+(define-data-var lastProposalBitcoinBlock uint burn-block-height) ;; bitcoin block height of last proposal created
 
 ;; data maps
 ;;
@@ -164,10 +169,12 @@
     ;; at least one btc block has passed since last proposal
     (asserts! (> createdBtc (var-get lastProposalBitcoinBlock)) ERR_PROPOSAL_RATE_LIMIT)
     ;; caller has the required balance
-    (asserts! (> senderBalance VOTING_BOND) ERR_INSUFFICIENT_BALANCE)
+    (asserts! (> senderBalance (+ VOTING_BOND AIBTC_PROTOCOL_FEE_AMOUNT)) ERR_INSUFFICIENT_BALANCE)
     ;; transfer the proposal bond to this contract
     ;; /g/.aibtc-token/dao_token_contract
     (try! (contract-call? .aibtc-token transfer VOTING_BOND tx-sender SELF none))
+    ;; transfer the protocol fee to the protocol fees contract
+    (try! (contract-call? .aibtc-token transfer AIBTC_PROTOCOL_FEE_AMOUNT tx-sender AIBTC_PROTOCOL_FEE_CONTRACT none))
     ;; print proposal creation event
     (print {
       ;; /g/aibtc/dao_token_symbol
@@ -233,7 +240,9 @@
     (var-set lastProposalBitcoinBlock createdBtc)
     (var-set lastProposalStacksBlock createdStx)
     ;; increment proposal count
-    (ok (var-set proposalCount newId))
+    (var-set proposalCount newId)
+    ;; check if any new rewards go to treasury
+    (ok (drip-rewards))
   )
 )
 
@@ -445,16 +454,18 @@
     ;; try to execute the action if the proposal passed
     ;;   returns (ok true) if the action successfully executes
     ;;   returns (ok false) if the action was not executed or executed with an error
+    ;; if the proposal can be executed
+    ;;   set executedProposalCount += 1
+    ;;   update the drip (private func?)
+    ;;   try to run the action
     (ok (if tryToExecute
       (and
         ;; increment the executed proposal count
         (var-set executedProposalCount (+ (var-get executedProposalCount) u1))
         ;; try to run the action
         (match (contract-call? action run (get parameters proposalDetails))
-          ;; transfer reward to creator
-          ;; /g/.aibtc-treasury/dao_treasury_contract
-          ;; /g/.aibtc-token/dao_token_contract
-          ok_ (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-token VOTING_REWARD creator)))
+          ;; return true on success
+          ok_ true
           ;; return false and print error on failure
           ;; /g/aibtc/dao_token_symbol
           err_ (begin (print {notification: "aibtc-action-proposal-voting/conclude-action-proposal", payload: {executionError:err_}}) false)))
@@ -565,4 +576,34 @@
 
 (define-private (get-block-hash (blockHeight uint))
   (get-stacks-block-info? id-header-hash blockHeight)
+)
+
+(define-private (drip-rewards)
+  (let
+    (
+      (blocksToProcess (> burn-block-height (var-get lastProposalBitcoinBlock)))
+      (totalBlocks (if blocksToProcess 
+        (- burn-block-height (var-get lastProposalBitcoinBlock))
+        u0
+      ))
+      (totalDripAmount (* totalBlocks VOTING_REWARD))
+    )
+  (asserts! (and blocksToProcess (> totalBlocks u0)) false)
+  (print {
+    notification: "aibtc-action-proposal-voting/drip-rewards",
+    payload: {
+      contractCaller: contract-caller,
+      txSender: tx-sender,
+      totalBlocks: totalBlocks,
+      totalDripAmount: totalDripAmount,
+    }
+  })
+  (match (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-token totalDripAmount DAO_REWARDS_ACCOUNT))
+    ok_ true
+    err_ (begin
+      (print {notification: "aibtc-action-proposal-voting/drip-rewards", payload: {executionError:err_}})
+      false
+    )
+  )
+  )
 )
