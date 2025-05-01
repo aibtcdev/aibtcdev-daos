@@ -80,7 +80,7 @@ export enum ErrCodeTreasury {
   ERR_ASSET_NOT_ALLOWED,
 }
 
-// aibtc-action-send-proposal.clar
-export enum ErrCodeActionSendProposal {
+// aibtc-action-send-message.clar
+export enum ErrCodeActionSendMessage {
   ERR_NOT_DAO_OR_EXTENSION = 2000,
 }

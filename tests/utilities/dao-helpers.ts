@@ -1,7 +1,10 @@
 import { expect } from "vitest";
-import { Cl } from "@stacks/transactions";
+import { Cl, ClarityValue } from "@stacks/transactions";
 import { SBTC_CONTRACT } from "./contract-helpers";
 import { dbgLog } from "./debug-logging";
+
+export const VOTING_DELAY = 144;
+export const VOTING_PERIOD = 288;
 
 // helper to get sBTC from faucet and buy DAO tokens from the token dex
 export function getDaoTokens(
@@ -38,6 +41,14 @@ export function fundVoters(
   voters: string[]
 ) {
   for (const voter of voters) {
+    // get sbtc from the faucet
+    const faucetReceipt = simnet.callPublicFn(
+      SBTC_CONTRACT,
+      "faucet",
+      [],
+      voter
+    );
+    expect(faucetReceipt.result).toBeOk(Cl.bool(true));
     // generate an amount between 100k and 1M satoshis
     const btcAmount =
       Math.floor(Math.random() * (1000000 - 100000 + 1)) + 100000;
@@ -73,7 +84,47 @@ export function constructDao(
 }
 
 // helper to pass an action proposal
-const memoContext = "Can pass up to 1024 characters for additional context.";
-export function passActionProposal() {
-  dbgLog(memoContext); // TODO: fill in when needed from test
+export function passActionProposal(
+  actionProposalsContractAddress: string,
+  proposedActionContractAddress: string,
+  proposalParams: ClarityValue,
+  deployer: string,
+  sender: string,
+  voters: string[],
+  memo?: string
+) {
+  // create action proposal
+  const proposeActionReceipt = simnet.callPublicFn(
+    actionProposalsContractAddress,
+    "create-action-proposal",
+    [
+      Cl.principal(proposedActionContractAddress),
+      Cl.buffer(Cl.serialize(proposalParams)),
+      memo ? Cl.some(Cl.stringAscii(memo)) : Cl.none(),
+    ],
+    sender
+  );
+  expect(proposeActionReceipt.result).toBeOk(Cl.bool(true));
+  // progress past the voting delay
+  simnet.mineEmptyBlocks(VOTING_DELAY);
+  // vote on the proposal
+  for (const voter of voters) {
+    const voteReceipt = simnet.callPublicFn(
+      actionProposalsContractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      voter
+    );
+    expect(voteReceipt.result).toBeOk(Cl.bool(true));
+  }
+  // progress past the voting period and execution delay
+  simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY);
+  // conclude the proposal
+  const concludeProposalReceipt = simnet.callPublicFn(
+    actionProposalsContractAddress,
+    "conclude-action-proposal",
+    [Cl.uint(1), Cl.principal(proposedActionContractAddress)],
+    deployer
+  );
+  expect(concludeProposalReceipt.result).toBeOk(Cl.bool(true));
 }

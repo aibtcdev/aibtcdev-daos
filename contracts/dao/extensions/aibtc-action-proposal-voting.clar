@@ -52,12 +52,12 @@
 ;; mainnet: 144 blocks (24 hours)
 ;; testnet: 1 blocks (10 minutes)
 ;; devnet: 144 blocks (24 hours)
-(define-constant VOTING_DELAY (if is-in-mainnet u144 (if is-in-regtest u144 u1)))
+(define-constant VOTING_DELAY u144)
 ;; set voting period
 ;; mainnet: 288 blocks (48 hours)
 ;; testnet: 3 blocks (30 minutes)
 ;; devnet: 288 blocks (48 hours)
-(define-constant VOTING_PERIOD (if is-in-mainnet u288 (if is-in-regtest u288 u3)))
+(define-constant VOTING_PERIOD u288)
 
 (define-constant REP_SUCCESS u1) ;; reputation increase on proposal success
 (define-constant REP_FAILURE u2) ;; reputation decrease on proposal failure

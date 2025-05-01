@@ -4,8 +4,8 @@ import { ErrCodeBaseDao } from "../utilities/contract-error-codes";
 import { constructDao } from "../utilities/dao-helpers";
 
 const accounts = simnet.getAccounts();
-const address1 = accounts.get("wallet_1")!;
 const deployer = accounts.get("deployer")!;
+const address1 = accounts.get("wallet_1")!;
 
 const contractName = "aibtc-base-dao";
 const contractAddress = `${deployer}.${contractName}`;
@@ -18,7 +18,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // construct() tests
   ////////////////////////////////////////
-  it("construct() fails if called directly", () => {
+  it("construct() fails if called by another address", () => {
     // arrange
     // act
     const receipt = simnet.callPublicFn(
@@ -29,6 +29,18 @@ describe(`public functions: ${contractName}`, () => {
     );
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
+  });
+  it("construct() succeeds if called by the deployer", () => {
+    // arrange
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "construct",
+      [Cl.principal(bootstrapContractAddress)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
   });
   ////////////////////////////////////////
   // execute() tests
