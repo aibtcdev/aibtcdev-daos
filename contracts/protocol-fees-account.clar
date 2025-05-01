@@ -11,8 +11,7 @@
 ;;
 
 ;; error messages
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_NOT_OWNER (err u1001))
+(define-constant ERR_NOT_OWNER (err u1000))
 
 ;; data vars
 ;;

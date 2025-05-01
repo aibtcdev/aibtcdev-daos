@@ -19,10 +19,10 @@
 (define-constant SELF (as-contract tx-sender))
 
 ;; error codes
-(define-constant ERR_NOT_DAO_OR_EXTENSION (err u8000))
-(define-constant ERR_SAVING_CHARTER (err u8001))
-(define-constant ERR_CHARTER_TOO_SHORT (err u8002))
-(define-constant ERR_CHARTER_TOO_LONG (err u8003))
+(define-constant ERR_NOT_DAO_OR_EXTENSION (err u1400))
+(define-constant ERR_SAVING_CHARTER (err u1401))
+(define-constant ERR_CHARTER_TOO_SHORT (err u1402))
+(define-constant ERR_CHARTER_TOO_LONG (err u1403))
 
 ;; data vars
 ;;

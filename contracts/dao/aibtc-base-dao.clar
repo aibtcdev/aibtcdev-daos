@@ -12,11 +12,11 @@
 ;; constants
 ;;
 
-(define-constant ERR_UNAUTHORIZED (err u900))
-(define-constant ERR_ALREADY_EXECUTED (err u901))
-(define-constant ERR_INVALID_EXTENSION (err u902))
-(define-constant ERR_NO_EMPTY_LISTS (err u903))
-(define-constant ERR_DAO_ALREADY_CONSTRUCTED (err u904))
+(define-constant ERR_UNAUTHORIZED (err u1200))
+(define-constant ERR_ALREADY_EXECUTED (err u1201))
+(define-constant ERR_INVALID_EXTENSION (err u1202))
+(define-constant ERR_NO_EMPTY_LISTS (err u1203))
+(define-constant ERR_DAO_ALREADY_CONSTRUCTED (err u1204))
 
 ;; data vars
 ;;

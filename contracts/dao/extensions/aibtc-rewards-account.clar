@@ -22,8 +22,8 @@
 ;;
 
 ;; error messages
-(define-constant ERR_NOT_DAO_OR_EXTENSION (err u1800))
-(define-constant ERR_INSUFFICIENT_BALANCE (err u1801))
+(define-constant ERR_NOT_DAO_OR_EXTENSION (err u1700))
+(define-constant ERR_INSUFFICIENT_BALANCE (err u1701))
 
 ;; contract details
 (define-constant DEPLOYED_BURN_BLOCK burn-block-height)

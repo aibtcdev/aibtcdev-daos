@@ -13,7 +13,7 @@
 ;; constants
 ;;
 
-(define-constant ERR_NOT_DAO_OR_EXTENSION (err u7000))
+(define-constant ERR_NOT_DAO_OR_EXTENSION (err u1800))
 
 ;; public functions
 ;;

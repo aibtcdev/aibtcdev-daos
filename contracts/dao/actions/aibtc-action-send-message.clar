@@ -13,8 +13,8 @@
 ;; constants
 ;;
 
-(define-constant ERR_NOT_DAO_OR_EXTENSION (err u1100))
-(define-constant ERR_INVALID_PARAMS (err u1101))
+(define-constant ERR_NOT_DAO_OR_EXTENSION (err u2000))
+(define-constant ERR_INVALID_PARAMS (err u2001))
 
 ;; public functions
 ;;

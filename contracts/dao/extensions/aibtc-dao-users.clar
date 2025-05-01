@@ -19,8 +19,8 @@
 (define-constant SELF (as-contract tx-sender))
 
 ;; error messages
-(define-constant ERR_NOT_DAO_OR_EXTENSION (err u8100)) ;; similar to dao-charter
-(define-constant ERR_USER_NOT_FOUND (err u8101)) ;; user not found
+(define-constant ERR_NOT_DAO_OR_EXTENSION (err u1500))
+(define-constant ERR_USER_NOT_FOUND (err u1501))
 
 ;; data vars
 ;;

@@ -17,10 +17,8 @@
 ;;
 
 ;; error messages
-(define-constant ERR_NOT_DAO_OR_EXTENSION (err u6000))
-(define-constant ERR_UNKNOWN_ASSET (err u6001))
-(define-constant ERR_FETCHING_ASSET (err u6002))
-(define-constant ERR_PERIOD_ALREADY_CLAIMED (err u6003))
+(define-constant ERR_NOT_DAO_OR_EXTENSION (err u1900))
+(define-constant ERR_UNKNOWN_ASSET (err u1901))
 
 ;; contract details
 (define-constant DEPLOYED_BURN_BLOCK burn-block-height)

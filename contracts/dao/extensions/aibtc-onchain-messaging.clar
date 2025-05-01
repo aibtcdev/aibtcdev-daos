@@ -12,9 +12,9 @@
 
 ;; constants
 ;;
-(define-constant ERR_NOT_DAO_OR_EXTENSION (err u4000))
-(define-constant ERR_INVALID_INPUT (err u4001))
-(define-constant ERR_FETCHING_TOKEN_DATA (err u4002))
+(define-constant ERR_NOT_DAO_OR_EXTENSION (err u1600))
+(define-constant ERR_INVALID_INPUT (err u1601))
+(define-constant ERR_FETCHING_TOKEN_DATA (err u1602))
 
 ;; public functions
 
