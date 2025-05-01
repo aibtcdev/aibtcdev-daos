@@ -35,8 +35,8 @@
 (define-constant ERR_ALREADY_VOTED (err u1312))
 (define-constant ERR_INVALID_ACTION (err u1313))
 
-(define-constant AIBTC_PROTOCOL_FEE_AMOUNT u10000000000) ;; 100 DAO tokens w/ 8 decimals
-(define-constant AIBTC_PROTOCOL_FEE_CONTRACT .protocol-fees-account) ;; protocol fees contract
+(define-constant AIBTC_DAO_RUN_COST_AMOUNT u10000000000) ;; 100 DAO tokens w/ 8 decimals
+(define-constant AIBTC_DAO_RUN_COST_CONTRACT .dao-run-cost) ;; AIBTC dao run cost contract
 ;; /g/.aibtc-rewards-account/dao_rewards_account_contract
 (define-constant DAO_REWARDS_ACCOUNT .aibtc-rewards-account) ;; rewards account for the DAO
 
@@ -169,12 +169,13 @@
     ;; at least one btc block has passed since last proposal
     (asserts! (> createdBtc (var-get lastProposalBitcoinBlock)) ERR_PROPOSAL_RATE_LIMIT)
     ;; caller has the required balance
-    (asserts! (> senderBalance (+ VOTING_BOND AIBTC_PROTOCOL_FEE_AMOUNT)) ERR_INSUFFICIENT_BALANCE)
+    (asserts! (> senderBalance (+ VOTING_BOND AIBTC_DAO_RUN_COST_AMOUNT)) ERR_INSUFFICIENT_BALANCE)
     ;; transfer the proposal bond to this contract
     ;; /g/.aibtc-token/dao_token_contract
     (try! (contract-call? .aibtc-token transfer VOTING_BOND tx-sender SELF none))
-    ;; transfer the protocol fee to the protocol fees contract
-    (try! (contract-call? .aibtc-token transfer AIBTC_PROTOCOL_FEE_AMOUNT tx-sender AIBTC_PROTOCOL_FEE_CONTRACT none))
+    ;; transfer the run cost fee to the dao run cost contract
+    ;; TODO: withdraw from treasury instead of sender
+    (try! (contract-call? .aibtc-token transfer AIBTC_DAO_RUN_COST_AMOUNT tx-sender AIBTC_DAO_RUN_COST_CONTRACT none))
     ;; print proposal creation event
     (print {
       ;; /g/aibtc/dao_token_symbol

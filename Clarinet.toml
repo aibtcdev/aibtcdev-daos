@@ -56,10 +56,10 @@ path = "contracts/traits/aibtc-agent-account-traits.clar"
 clarity_version = 3
 epoch = 3.1
 
-# protocol fees
+# dao run cost (collects fee per proposal)
 
-[contracts.aibtc-protocol-fees-account]
-path = "contracts/protocol-fees-account.clar"
+[contracts.dao-run-cost]
+path = "contracts/dao-run-cost.clar"
 clarity_version = 3
 epoch = 3.1
 
