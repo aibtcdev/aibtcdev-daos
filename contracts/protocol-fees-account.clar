@@ -4,7 +4,7 @@
 
 ;; funds are transferred to this contract every time a proposal is created
 ;; will be a mix of several different dao tokens over time
-;; only allows withdrawal with 2-of-6 approval from an approved list of addresses
+;; only allows withdrawal with 3-of-5 approval from an approved list of addresses
 ;; an approved address can add/remove other addresses
 
 ;; constants
