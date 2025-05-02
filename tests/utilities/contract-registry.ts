@@ -76,4 +76,76 @@ export class ContractRegistry {
   ): string {
     return originalName.replace(replaceText, tokenSymbol.toLowerCase());
   }
+
+  // Get a contract by type and subtype name strings
+  getContractByNames(typeName: string, subtypeName: string): ContractBase | undefined {
+    // Validate that the type exists
+    if (!CONTRACT_TYPES.includes(typeName as ContractType)) {
+      return undefined;
+    }
+    
+    const type = typeName as ContractType;
+    
+    // Get the valid subtypes for this type
+    const validSubtypes = CONTRACT_SUBTYPES[type];
+    
+    // Check if the subtype is valid for this type
+    if (!validSubtypes.includes(subtypeName as any)) {
+      return undefined;
+    }
+    
+    const subtype = subtypeName as ContractSubtype<typeof type>;
+    
+    // Get the contract name from the mapping
+    const contractName = CONTRACT_NAMES[type][subtype];
+    
+    if (!contractName) {
+      return undefined;
+    }
+    
+    // Return the contract
+    return this.getContract(contractName);
+  }
+
+  // Get all available contract names for a given type
+  getContractNamesByType(typeName: string): string[] {
+    if (!CONTRACT_TYPES.includes(typeName as ContractType)) {
+      return [];
+    }
+    
+    const type = typeName as ContractType;
+    const subtypes = CONTRACT_SUBTYPES[type];
+    const names: string[] = [];
+    
+    subtypes.forEach(subtype => {
+      const contractName = CONTRACT_NAMES[type][subtype as any];
+      if (contractName) {
+        names.push(contractName);
+      }
+    });
+    
+    return names;
+  }
+
+  // Get all contract names in the registry
+  getAllContractNames(): string[] {
+    return Array.from(this.contracts.keys());
+  }
+
+  // Get all available contract names from the CONTRACT_NAMES mapping
+  getAllAvailableContractNames(): string[] {
+    const names: string[] = [];
+    
+    CONTRACT_TYPES.forEach(type => {
+      const subtypes = CONTRACT_SUBTYPES[type];
+      subtypes.forEach(subtype => {
+        const contractName = CONTRACT_NAMES[type][subtype as any];
+        if (contractName) {
+          names.push(contractName);
+        }
+      });
+    });
+    
+    return names;
+  }
 }

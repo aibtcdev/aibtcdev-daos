@@ -40,6 +40,39 @@ const CONTRACT_SUBTYPES = {
 export type ContractSubtype<C extends ContractType> =
   (typeof CONTRACT_SUBTYPES)[C][number];
 
-export const CONTRACT_NAMES = {
-  [CONTRACT_TYPES.BASE]: "aibtc-base-dao",
+export const CONTRACT_NAMES: {
+  [K in ContractType]: {
+    [S in ContractSubtype<K>]?: string;
+  };
+} = {
+  BASE: {
+    DAO: "aibtc-base-dao",
+    AGENT_ACCOUNT: "aibtc-agent-account",
+    DAO_RUN_COST: "dao-run-cost"
+  },
+  ACTIONS: {
+    SEND_MESSAGE: "aibtc-action-send-message"
+  },
+  EXTENSIONS: {
+    ACTION_PROPOSAL_VOTING: "aibtc-action-proposal-voting",
+    DAO_CHARTER: "aibtc-dao-charter",
+    DAO_EPOCH: "aibtc-dao-epoch",
+    DAO_USERS: "aibtc-dao-users",
+    ONCHAIN_MESSAGING: "aibtc-onchain-messaging",
+    REWARDS_ACCOUNT: "aibtc-rewards-account",
+    TOKEN_OWNER: "aibtc-token-owner",
+    TREASURY: "aibtc-treasury"
+  },
+  PROPOSALS: {
+    INITIALIZE_DAO: "aibtc-initialize-dao"
+  },
+  EXTERNAL: {
+    // Fill in as needed
+  },
+  TOKEN: {
+    DAO: "aibtc-faktory",
+    DEX: "aibtc-faktory-dex",
+    POOL: "xyk-pool-sbtc-aibtc-v-1-1",
+    PRELAUNCH: "aibtc-pre-dex"
+  }
 };
