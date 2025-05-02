@@ -1,29 +1,36 @@
 import { CONTRACT_NAMES } from "./contract-types";
 
+// Helper function to safely access contract names
+function getContractName(category: keyof typeof CONTRACT_NAMES, subcategory: string): string {
+  const value = CONTRACT_NAMES[category][subcategory as any];
+  if (!value) {
+    throw new Error(`Contract name not found for ${category}.${subcategory}`);
+  }
+  return value;
+}
+
 export const DEPLOYMENT_ORDER: Record<string, number> = {
   // separate from dao deployment
   // can be deployed anytime
-  [CONTRACT_NAMES.AGENT.AGENT_ACCOUNT]: 1,
+  [getContractName("AGENT", "AGENT_ACCOUNT")]: 1,
   // token contracts
-  [CONTRACT_NAMES.TOKEN.PRELAUNCH]: 10,
-  [CONTRACT_NAMES.TOKEN.DAO]: 11,
-  [CONTRACT_NAMES.TOKEN.POOL]: 12,
-  [CONTRACT_NAMES.TOKEN.DEX]: 13,
+  [getContractName("TOKEN", "PRELAUNCH")]: 10,
+  [getContractName("TOKEN", "DAO")]: 11,
+  [getContractName("TOKEN", "POOL")]: 12,
+  [getContractName("TOKEN", "DEX")]: 13,
   // base dao contract
-  [CONTRACT_NAMES.BASE.DAO]: 20,
+  [getContractName("BASE", "DAO")]: 20,
   // extensions
-  [CONTRACT_NAMES.EXTENSIONS.ACTION_PROPOSAL_VOTING]: 30,
-  [CONTRACT_NAMES.EXTENSIONS.DAO_CHARTER]: 31,
-  [CONTRACT_NAMES.EXTENSIONS.DAO_EPOCH]: 32,
-  [CONTRACT_NAMES.EXTENSIONS.DAO_USERS]: 33,
-  [CONTRACT_NAMES.EXTENSIONS.ONCHAIN_MESSAGING]: 34,
-  [CONTRACT_NAMES.EXTENSIONS.REWARDS_ACCOUNT]: 35,
-  [CONTRACT_NAMES.EXTENSIONS.TOKEN_OWNER]: 36,
-  [CONTRACT_NAMES.EXTENSIONS.TREASURY]: 37,
+  [getContractName("EXTENSIONS", "ACTION_PROPOSAL_VOTING")]: 30,
+  [getContractName("EXTENSIONS", "DAO_CHARTER")]: 31,
+  [getContractName("EXTENSIONS", "DAO_EPOCH")]: 32,
+  [getContractName("EXTENSIONS", "DAO_USERS")]: 33,
+  [getContractName("EXTENSIONS", "ONCHAIN_MESSAGING")]: 34,
+  [getContractName("EXTENSIONS", "REWARDS_ACCOUNT")]: 35,
+  [getContractName("EXTENSIONS", "TOKEN_OWNER")]: 36,
+  [getContractName("EXTENSIONS", "TREASURY")]: 37,
   // actions
-  [CONTRACT_NAMES.ACTIONS.SEND_MESSAGE]: 40,
+  [getContractName("ACTIONS", "SEND_MESSAGE")]: 40,
   // initialize dao (always last)
-  [CONTRACT_NAMES.PROPOSALS.INITIALIZE_DAO]: 50,
+  [getContractName("PROPOSALS", "INITIALIZE_DAO")]: 50,
 };
-
-// Remove the DaoContractAddresses type as it's no longer needed
