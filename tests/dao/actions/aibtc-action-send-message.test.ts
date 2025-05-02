@@ -51,21 +51,14 @@ describe(`public functions: ${contractName}`, () => {
   it("run() succeeds if called as a DAO action proposal", () => {
     // arrange
     const memo = "hello world";
-    // setup contract names
-    const tokenContractAddress = `${deployer}.aibtc-token`;
-    const tokenDexContractAddress = `${deployer}.aibtc-token-dex`;
-    const baseDaoContractAddress = `${deployer}.aibtc-base-dao`;
-    const actionProposalsContractAddress = `${deployer}.aibtc-action-proposal-voting`;
-    const bootstrapContractAddress = `${deployer}.aibtc-base-initialize-dao`;
     // fund accounts for creating and voting on proposals
     const voters = [deployer, address1, address2, address3];
-    fundVoters(tokenContractAddress, tokenDexContractAddress, voters);
+    fundVoters(voters);
     // construct the DAO
-    constructDao(deployer, baseDaoContractAddress, bootstrapContractAddress);
+    constructDao(deployer);
     // pass the action proposal
     passActionProposal(
-      actionProposalsContractAddress,
-      contractAddress,
+      "SEND_MESSAGE",
       Cl.stringAscii(memo),
       deployer,
       deployer,

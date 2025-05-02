@@ -12,14 +12,11 @@ export const VOTING_PERIOD = 288;
 const registry = setupDaoContractRegistry();
 
 // helper to get sBTC from faucet and buy DAO tokens from the token dex
-export function getDaoTokens(
-  address: string,
-  satsAmount: number
-) {
+export function getDaoTokens(address: string, satsAmount: number) {
   // Get contract references from registry
   const tokenContract = registry.getContractByTypeAndSubtype("TOKEN", "DAO");
   const tokenDexContract = registry.getContractByTypeAndSubtype("TOKEN", "DEX");
-  
+
   if (!tokenContract || !tokenDexContract) {
     throw new Error("Required token contracts not found in registry");
   }
@@ -32,7 +29,7 @@ export function getDaoTokens(
     address
   );
   expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-  
+
   // get dao tokens from the token dex
   const getDaoTokensReceipt = simnet.callPublicFn(
     tokenDexContract.name,
@@ -42,7 +39,7 @@ export function getDaoTokens(
   );
   dbgLog(`getDaoTokensReceipt: ${JSON.stringify(getDaoTokensReceipt)}`);
   expect(getDaoTokensReceipt.result).toBeOk(Cl.bool(true));
-  
+
   // progress chain for at-block calls
   simnet.mineEmptyBlocks(10);
 }
@@ -52,7 +49,7 @@ export function fundVoters(voters: string[]) {
   // Get contract references from registry
   const tokenContract = registry.getContractByTypeAndSubtype("TOKEN", "DAO");
   const tokenDexContract = registry.getContractByTypeAndSubtype("TOKEN", "DEX");
-  
+
   if (!tokenContract || !tokenDexContract) {
     throw new Error("Required token contracts not found in registry");
   }
@@ -66,11 +63,11 @@ export function fundVoters(voters: string[]) {
       voter
     );
     expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // generate an amount between 100k and 1M satoshis
     const btcAmount =
       Math.floor(Math.random() * (1000000 - 100000 + 1)) + 100000;
-    
+
     // get dao tokens from the token dex
     const getDaoTokensReceipt = simnet.callPublicFn(
       tokenDexContract.name,
@@ -80,7 +77,7 @@ export function fundVoters(voters: string[]) {
     );
     dbgLog(`getDaoTokensReceipt: ${JSON.stringify(getDaoTokensReceipt)}`);
     expect(getDaoTokensReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // progress chain for at-block calls
     simnet.mineEmptyBlocks(10);
   }
@@ -90,20 +87,23 @@ export function fundVoters(voters: string[]) {
 export function constructDao(deployer: string) {
   // Get contract references from registry
   const baseDaoContract = registry.getContractByTypeAndSubtype("BASE", "DAO");
-  const initializeContract = registry.getContractByTypeAndSubtype("PROPOSALS", "INITIALIZE_DAO");
-  
+  const initializeContract = registry.getContractByTypeAndSubtype(
+    "PROPOSALS",
+    "INITIALIZE_DAO"
+  );
+
   if (!baseDaoContract || !initializeContract) {
     throw new Error("Required DAO contracts not found in registry");
   }
 
   const constructDaoReceipt = simnet.callPublicFn(
-    baseDaoContract.name,
+    `${deployer}.${baseDaoContract.name}`,
     "construct",
-    [Cl.principal(initializeContract.name)],
+    [Cl.principal(`${deployer}.${initializeContract.name}`)],
     deployer
   );
   expect(constructDaoReceipt.result).toBeOk(Cl.bool(true));
-  
+
   // progress chain for at-block calls
   simnet.mineEmptyBlocks(10);
 }
@@ -118,13 +118,21 @@ export function passActionProposal(
   memo?: string
 ) {
   // Get contract references from registry
-  const actionProposalsContract = registry.getContractByTypeAndSubtype("EXTENSIONS", "ACTION_PROPOSAL_VOTING");
-  
+  const actionProposalsContract = registry.getContractByTypeAndSubtype(
+    "EXTENSIONS",
+    "ACTION_PROPOSAL_VOTING"
+  );
+
   // Get the specific action contract based on the type parameter
-  const proposedActionContract = registry.getContractByTypeAndSubtype("ACTIONS", proposedActionType);
-  
+  const proposedActionContract = registry.getContractByTypeAndSubtype(
+    "ACTIONS",
+    proposedActionType
+  );
+
   if (!actionProposalsContract || !proposedActionContract) {
-    throw new Error(`Required action contracts not found in registry: ${proposedActionType}`);
+    throw new Error(
+      `Required action contracts not found in registry: ${proposedActionType}`
+    );
   }
 
   // create action proposal
@@ -139,10 +147,10 @@ export function passActionProposal(
     sender
   );
   expect(proposeActionReceipt.result).toBeOk(Cl.bool(true));
-  
+
   // progress past the voting delay
   simnet.mineEmptyBlocks(VOTING_DELAY);
-  
+
   // vote on the proposal
   for (const voter of voters) {
     const voteReceipt = simnet.callPublicFn(
@@ -153,10 +161,10 @@ export function passActionProposal(
     );
     expect(voteReceipt.result).toBeOk(Cl.bool(true));
   }
-  
+
   // progress past the voting period and execution delay
   simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY);
-  
+
   // conclude the proposal
   const concludeProposalReceipt = simnet.callPublicFn(
     actionProposalsContract.name,
@@ -166,14 +174,21 @@ export function passActionProposal(
   );
   expect(concludeProposalReceipt.result).toBeOk(Cl.bool(true));
 }
+
 // Optional: Allow using a custom registry for testing different configurations
 export function useCustomRegistry(customRegistry: ContractRegistry) {
   return {
     getDaoTokens: (address: string, satsAmount: number) => {
       // Get contract references from registry
-      const tokenContract = customRegistry.getContractByTypeAndSubtype("TOKEN", "DAO");
-      const tokenDexContract = customRegistry.getContractByTypeAndSubtype("TOKEN", "DEX");
-      
+      const tokenContract = customRegistry.getContractByTypeAndSubtype(
+        "TOKEN",
+        "DAO"
+      );
+      const tokenDexContract = customRegistry.getContractByTypeAndSubtype(
+        "TOKEN",
+        "DEX"
+      );
+
       if (!tokenContract || !tokenDexContract) {
         throw new Error("Required token contracts not found in registry");
       }
@@ -186,7 +201,7 @@ export function useCustomRegistry(customRegistry: ContractRegistry) {
         address
       );
       expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-      
+
       // get dao tokens from the token dex
       const getDaoTokensReceipt = simnet.callPublicFn(
         tokenDexContract.name,
@@ -196,16 +211,22 @@ export function useCustomRegistry(customRegistry: ContractRegistry) {
       );
       dbgLog(`getDaoTokensReceipt: ${JSON.stringify(getDaoTokensReceipt)}`);
       expect(getDaoTokensReceipt.result).toBeOk(Cl.bool(true));
-      
+
       // progress chain for at-block calls
       simnet.mineEmptyBlocks(10);
     },
-    
+
     fundVoters: (voters: string[]) => {
       // Get contract references from registry
-      const tokenContract = customRegistry.getContractByTypeAndSubtype("TOKEN", "DAO");
-      const tokenDexContract = customRegistry.getContractByTypeAndSubtype("TOKEN", "DEX");
-      
+      const tokenContract = customRegistry.getContractByTypeAndSubtype(
+        "TOKEN",
+        "DAO"
+      );
+      const tokenDexContract = customRegistry.getContractByTypeAndSubtype(
+        "TOKEN",
+        "DEX"
+      );
+
       if (!tokenContract || !tokenDexContract) {
         throw new Error("Required token contracts not found in registry");
       }
@@ -219,11 +240,11 @@ export function useCustomRegistry(customRegistry: ContractRegistry) {
           voter
         );
         expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-        
+
         // generate an amount between 100k and 1M satoshis
         const btcAmount =
           Math.floor(Math.random() * (1000000 - 100000 + 1)) + 100000;
-        
+
         // get dao tokens from the token dex
         const getDaoTokensReceipt = simnet.callPublicFn(
           tokenDexContract.name,
@@ -233,17 +254,23 @@ export function useCustomRegistry(customRegistry: ContractRegistry) {
         );
         dbgLog(`getDaoTokensReceipt: ${JSON.stringify(getDaoTokensReceipt)}`);
         expect(getDaoTokensReceipt.result).toBeOk(Cl.bool(true));
-        
+
         // progress chain for at-block calls
         simnet.mineEmptyBlocks(10);
       }
     },
-    
+
     constructDao: (deployer: string) => {
       // Get contract references from registry
-      const baseDaoContract = customRegistry.getContractByTypeAndSubtype("BASE", "DAO");
-      const initializeContract = customRegistry.getContractByTypeAndSubtype("PROPOSALS", "INITIALIZE_DAO");
-      
+      const baseDaoContract = customRegistry.getContractByTypeAndSubtype(
+        "BASE",
+        "DAO"
+      );
+      const initializeContract = customRegistry.getContractByTypeAndSubtype(
+        "PROPOSALS",
+        "INITIALIZE_DAO"
+      );
+
       if (!baseDaoContract || !initializeContract) {
         throw new Error("Required DAO contracts not found in registry");
       }
@@ -255,11 +282,11 @@ export function useCustomRegistry(customRegistry: ContractRegistry) {
         deployer
       );
       expect(constructDaoReceipt.result).toBeOk(Cl.bool(true));
-      
+
       // progress chain for at-block calls
       simnet.mineEmptyBlocks(10);
     },
-    
+
     passActionProposal: (
       proposedActionType: "SEND_MESSAGE",
       proposalParams: ClarityValue,
@@ -269,13 +296,22 @@ export function useCustomRegistry(customRegistry: ContractRegistry) {
       memo?: string
     ) => {
       // Get contract references from registry
-      const actionProposalsContract = customRegistry.getContractByTypeAndSubtype("EXTENSIONS", "ACTION_PROPOSAL_VOTING");
-      
+      const actionProposalsContract =
+        customRegistry.getContractByTypeAndSubtype(
+          "EXTENSIONS",
+          "ACTION_PROPOSAL_VOTING"
+        );
+
       // Get the specific action contract based on the type parameter
-      const proposedActionContract = customRegistry.getContractByTypeAndSubtype("ACTIONS", proposedActionType);
-      
+      const proposedActionContract = customRegistry.getContractByTypeAndSubtype(
+        "ACTIONS",
+        proposedActionType
+      );
+
       if (!actionProposalsContract || !proposedActionContract) {
-        throw new Error(`Required action contracts not found in registry: ${proposedActionType}`);
+        throw new Error(
+          `Required action contracts not found in registry: ${proposedActionType}`
+        );
       }
 
       // create action proposal
@@ -290,10 +326,10 @@ export function useCustomRegistry(customRegistry: ContractRegistry) {
         sender
       );
       expect(proposeActionReceipt.result).toBeOk(Cl.bool(true));
-      
+
       // progress past the voting delay
       simnet.mineEmptyBlocks(VOTING_DELAY);
-      
+
       // vote on the proposal
       for (const voter of voters) {
         const voteReceipt = simnet.callPublicFn(
@@ -304,10 +340,10 @@ export function useCustomRegistry(customRegistry: ContractRegistry) {
         );
         expect(voteReceipt.result).toBeOk(Cl.bool(true));
       }
-      
+
       // progress past the voting period and execution delay
       simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY);
-      
+
       // conclude the proposal
       const concludeProposalReceipt = simnet.callPublicFn(
         actionProposalsContract.name,
@@ -316,6 +352,6 @@ export function useCustomRegistry(customRegistry: ContractRegistry) {
         deployer
       );
       expect(concludeProposalReceipt.result).toBeOk(Cl.bool(true));
-    }
+    },
   };
 }

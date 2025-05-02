@@ -1,5 +1,3 @@
-export type DaoContractAddresses = keyof typeof DEPLOYMENT_ORDER;
-
 export const DEPLOYMENT_ORDER = {
   // separate from dao deployment
   // can be deployed anytime
@@ -23,5 +21,5 @@ export const DEPLOYMENT_ORDER = {
   // actions
   "aibtc-action-send-message": 40,
   // initialize dao (always last)
-  "aibtc-initialize-dao": 50,
+  "aibtc-base-initialize-dao": 50,
 } as const;

@@ -128,7 +128,7 @@ describe(`read-only functions: ${contractName}`, () => {
   });
   it("is-constructed() returns true after dao is constructed", () => {
     // arrange
-    constructDao(deployer, contractAddress, bootstrapContractAddress);
+    constructDao(deployer);
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -156,7 +156,7 @@ describe(`read-only functions: ${contractName}`, () => {
   });
   it("is-extension() returns true after dao is constructed", () => {
     // arrange
-    constructDao(deployer, contractAddress, bootstrapContractAddress);
+    constructDao(deployer);
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -185,7 +185,7 @@ describe(`read-only functions: ${contractName}`, () => {
   it("executed-at() returns some blockheight if the proposal was executed", () => {
     // arrange
     const blockHeight = simnet.blockHeight + 1;
-    constructDao(deployer, contractAddress, bootstrapContractAddress);
+    constructDao(deployer);
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,

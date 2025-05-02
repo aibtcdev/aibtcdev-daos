@@ -14,7 +14,7 @@ export type ContractType = (typeof CONTRACT_TYPES)[number];
 
 // Helper type to get all possible subtypes across all contract types
 export type AllContractSubtypes = {
-  [T in ContractType]: ContractSubtype<T>
+  [T in ContractType]: ContractSubtype<T>;
 }[ContractType];
 
 export const CONTRACT_SUBTYPES = {
@@ -75,7 +75,7 @@ export const CONTRACT_NAMES: {
     TREASURY: "aibtc-treasury",
   },
   PROPOSALS: {
-    INITIALIZE_DAO: "aibtc-initialize-dao",
+    INITIALIZE_DAO: "aibtc-base-initialize-dao",
   },
   EXTERNAL: {
     // Fill in as needed
