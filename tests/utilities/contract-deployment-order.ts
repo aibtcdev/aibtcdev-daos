@@ -25,5 +25,3 @@ export const DEPLOYMENT_ORDER = {
   // initialize dao (always last)
   "aibtc-initialize-dao": 50,
 } as const;
-
-// separate deployment order but as a map of contract name to deployment order
