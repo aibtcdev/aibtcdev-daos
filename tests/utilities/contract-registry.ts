@@ -11,6 +11,9 @@ import { TokenContract } from "../models/dao-token-contract";
 import { ExtensionContract } from "../models/dao-extension-contract";
 import { ActionContract } from "../models/dao-action-contract";
 import { ProposalContract } from "../models/dao-proposal-contract";
+import { AgentContract } from "../models/agent-contract";
+import { CoreContract } from "../models/core-contract";
+import { ExternalContract } from "../models/external-contract";
 
 export function setupDaoContractRegistry(): ContractRegistry {
   const registry = new ContractRegistry();
@@ -298,6 +301,24 @@ export class ContractRegistry {
         contract = new ProposalContract(
           name as any, // Type assertion to handle the string literal constraint
           subtype as ContractSubtype<"PROPOSALS">
+        );
+        break;
+      case "AGENT":
+        contract = new AgentContract(
+          name as any, // Type assertion to handle the string literal constraint
+          subtype as ContractSubtype<"AGENT">
+        );
+        break;
+      case "CORE":
+        contract = new CoreContract(
+          name as any, // Type assertion to handle the string literal constraint
+          subtype as ContractSubtype<"CORE">
+        );
+        break;
+      case "EXTERNAL":
+        contract = new ExternalContract(
+          name as any, // Type assertion to handle the string literal constraint
+          subtype as ContractSubtype<"EXTERNAL">
         );
         break;
       default:
