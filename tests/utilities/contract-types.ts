@@ -1,3 +1,5 @@
+import { ClarityVersion } from "@stacks/transactions";
+
 export const CONTRACT_TYPES = [
   "BASE", // base-dao
   "ACTIONS", // action proposal extensions
@@ -37,3 +39,14 @@ const CONTRACT_SUBTYPES = {
 // helper type that infers subcategory keys per category
 export type ContractSubType<C extends ContractType> =
   (typeof CONTRACT_SUBTYPES)[C][number];
+
+// base contract info that persists through all stages
+export type BaseContractInfo = {
+  [C in ContractType]: {
+    name: string;
+    type: C;
+    subtype: ContractSubType<C>;
+    deploymentOrder: number; // lower numbers deploy first
+    clarityVersion?: ClarityVersion; // optional for deployment
+  };
+}[ContractType];

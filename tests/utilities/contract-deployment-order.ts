@@ -1,4 +1,7 @@
 export const DEPLOYMENT_ORDER = {
+  // separate from dao deployment
+  // can be deployed anytime
+  "aibtc-agent-account": 1,
   // token contracts
   "aibtc-pre-faktory": 10,
   "aibtc-faktory": 11,
