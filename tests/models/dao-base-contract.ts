@@ -3,13 +3,10 @@ import {
   DEPLOYMENT_ORDER,
   DaoContractAddresses,
 } from "../utilities/contract-deployment-order";
-import { ContractSubtype, ContractType } from "../utilities/contract-types";
+import { ContractSubtype } from "../utilities/contract-types";
 
 export class BaseContract extends ContractBase {
-  constructor(
-    name: DaoContractAddresses,
-    subtype: ContractSubtype<"BASE">
-  ) {
+  constructor(name: DaoContractAddresses, subtype: ContractSubtype<"BASE">) {
     super(
       name,
       "BASE",

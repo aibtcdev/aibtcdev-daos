@@ -6,10 +6,7 @@ import {
 import { ContractSubtype } from "../utilities/contract-types";
 
 export class ActionContract extends ContractBase {
-  constructor(
-    name: DaoContractAddresses, 
-    subtype: ContractSubtype<"ACTIONS">
-  ) {
+  constructor(name: DaoContractAddresses, subtype: ContractSubtype<"ACTIONS">) {
     super(
       name,
       "ACTIONS",

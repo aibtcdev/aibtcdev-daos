@@ -7,7 +7,7 @@ import { ContractSubtype } from "../utilities/contract-types";
 
 export class ProposalContract extends ContractBase {
   constructor(
-    name: DaoContractAddresses, 
+    name: DaoContractAddresses,
     subtype: ContractSubtype<"PROPOSALS">
   ) {
     super(
