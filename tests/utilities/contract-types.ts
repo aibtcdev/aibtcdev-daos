@@ -12,7 +12,7 @@ export const CONTRACT_TYPES = [
 // derive a type from the array
 export type ContractType = (typeof CONTRACT_TYPES)[number];
 
-const CONTRACT_SubtypeS = {
+const CONTRACT_SUBTYPES = {
   BASE: ["DAO", "AGENT_ACCOUNT", "DAO_RUN_COST"] as const,
   ACTIONS: ["SEND_MESSAGE"],
   EXTENSIONS: [
@@ -38,15 +38,8 @@ const CONTRACT_SubtypeS = {
 
 // helper type that infers subcategory keys per category
 export type ContractSubtype<C extends ContractType> =
-  (typeof CONTRACT_SubtypeS)[C][number];
+  (typeof CONTRACT_SUBTYPES)[C][number];
 
-// base contract info that persists through all stages
-export type BaseContractInfo = {
-  [C in ContractType]: {
-    name: string;
-    type: C;
-    Subtype: ContractSubtype<C>;
-    deploymentOrder: number; // lower numbers deploy first
-    clarityVersion?: ClarityVersion; // optional for deployment
-  };
-}[ContractType];
+export const CONTRACT_NAMES = {
+  [CONTRACT_TYPES.BASE]: "aibtc-base-dao",
+};
