@@ -1,4 +1,4 @@
-export type DeploymentKeys = keyof typeof DEPLOYMENT_ORDER;
+export type DaoContractAddresses = keyof typeof DEPLOYMENT_ORDER;
 
 export const DEPLOYMENT_ORDER = {
   // separate from dao deployment

@@ -1,13 +1,13 @@
 import { ContractBase } from "./contract-template";
 import {
   DEPLOYMENT_ORDER,
-  DeploymentKeys,
+  DaoContractAddresses,
 } from "../utilities/contract-deployment-order";
 import { ContractType } from "../utilities/contract-types";
 
 export class ExtensionContract extends ContractBase {
   constructor(
-    name: DeploymentKeys,
+    name: DaoContractAddresses,
     Subtype:
       | "ACTION_PROPOSAL_VOTING"
       | "DAO_CHARTER"

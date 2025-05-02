@@ -1,5 +1,5 @@
-import { ContractBase } from "./contract-template";
 import { ContractSubtype, ContractType } from "./contract-types";
+import { ContractBase } from "../models/contract-template";
 
 export class ContractRegistry {
   private contracts: Map<string, ContractBase> = new Map();
@@ -29,7 +29,7 @@ export class ContractRegistry {
     this.contractsByType.set(contract.type, typeArray);
 
     // Add to type+Subtype map
-    const key = `${contract.type}/${contract.Subtype}`;
+    const key = `${contract.type}/${contract.subtype}`;
     const SubtypeArray = this.contractsByTypeAndSubtype.get(key) || [];
     SubtypeArray.push(contract);
     this.contractsByTypeAndSubtype.set(key, SubtypeArray);
@@ -55,18 +55,18 @@ export class ContractRegistry {
   // Get contracts by Subtype
   getContractsBySubtype<C extends ContractType>(
     type: C,
-    Subtype: ContractSubtype<C>
+    subtype: ContractSubtype<C>
   ): ContractBase[] {
-    const key = `${type}/${Subtype}`;
+    const key = `${type}/${subtype}`;
     return this.contractsByTypeAndSubtype.get(key) || [];
   }
 
   // Get the contract for a specific type and Subtype (assumes one contract per combination)
   getContractByTypeAndSubtype<C extends ContractType>(
     type: C,
-    Subtype: ContractSubtype<C>
+    subtype: ContractSubtype<C>
   ): ContractBase | undefined {
-    const contracts = this.getContractsBySubtype(type, Subtype);
+    const contracts = this.getContractsBySubtype(type, subtype);
     return contracts.length > 0 ? contracts[0] : undefined;
   }
 

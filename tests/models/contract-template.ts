@@ -34,11 +34,11 @@ export interface DeploymentResult {
 export abstract class ContractBase {
   readonly name: string;
   readonly type: ContractType;
-  readonly Subtype: ContractSubtype<ContractType>;
+  readonly subtype: ContractSubtype<ContractType>;
   readonly deploymentOrder: number;
-  readonly clarityVersion?: ClarityVersion;
   readonly templatePath: string;
 
+  protected clarityVersion: ClarityVersion | undefined;
   protected _source?: string;
   protected _hash?: string;
   protected _deploymentResult?: DeploymentResult;
@@ -52,14 +52,14 @@ export abstract class ContractBase {
   constructor(
     name: string,
     type: ContractType,
-    Subtype: ContractSubtype<ContractType>,
+    subtype: ContractSubtype<ContractType>,
     deploymentOrder: number,
     templatePath: string,
     clarityVersion?: ClarityVersion
   ) {
     this.name = name;
     this.type = type;
-    this.Subtype = Subtype;
+    this.subtype = subtype;
     this.deploymentOrder = deploymentOrder;
     this.templatePath = templatePath;
     this.clarityVersion = clarityVersion;
@@ -128,7 +128,7 @@ export abstract class ContractBase {
     const entry: any = {
       name: this.name,
       type: this.type,
-      Subtype: this.Subtype,
+      subtype: this.subtype,
       deploymentOrder: this.deploymentOrder,
       templatePath: this.templatePath,
     };

@@ -1,12 +1,12 @@
 import { ContractBase } from "./contract-template";
 import {
   DEPLOYMENT_ORDER,
-  DeploymentKeys,
+  DaoContractAddresses,
 } from "../utilities/contract-deployment-order";
 import { ContractType } from "../utilities/contract-types";
 
 export class ProposalContract extends ContractBase {
-  constructor(name: DeploymentKeys, Subtype: "INITIALIZE_DAO") {
+  constructor(name: DaoContractAddresses, Subtype: "INITIALIZE_DAO") {
     super(
       name,
       "PROPOSALS" as ContractType,
