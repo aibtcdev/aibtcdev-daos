@@ -12,6 +12,11 @@ export const CONTRACT_TYPES = [
 // derive a type from the array
 export type ContractType = (typeof CONTRACT_TYPES)[number];
 
+// Helper type to get all possible subtypes across all contract types
+export type AllContractSubtypes = {
+  [T in ContractType]: ContractSubtype<T>
+}[ContractType];
+
 export const CONTRACT_SUBTYPES = {
   AGENT: ["AGENT_ACCOUNT"] as const,
   BASE: ["DAO"] as const,

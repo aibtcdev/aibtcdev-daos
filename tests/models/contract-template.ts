@@ -43,6 +43,30 @@ export abstract class ContractBase {
   protected _hash?: string;
   protected _deploymentResult?: DeploymentResult;
 
+  // Generate template path based on contract type
+  static generateTemplatePath(type: ContractType, name: string): string {
+    switch (type) {
+      case "BASE":
+        return `${name}.clar`;
+      case "ACTIONS":
+        return `actions/${name}.clar`;
+      case "EXTENSIONS":
+        return `extensions/${name}.clar`;
+      case "PROPOSALS":
+        return `proposals/${name}.clar`;
+      case "TOKEN":
+        return `tokens/${name}.clar`;
+      case "AGENT":
+        return `${name}.clar`;
+      case "CORE":
+        return `${name}.clar`;
+      case "EXTERNAL":
+        return `external/${name}.clar`;
+      default:
+        return `${name}.clar`;
+    }
+  }
+
   // Dependencies
   readonly requiredAddresses: AddressDependency[] = [];
   readonly requiredTraits: TraitDependency[] = [];

@@ -3,27 +3,19 @@ import {
   DEPLOYMENT_ORDER,
   DaoContractAddresses,
 } from "../utilities/contract-deployment-order";
-import { ContractType } from "../utilities/contract-types";
+import { ContractSubtype } from "../utilities/contract-types";
 
 export class ExtensionContract extends ContractBase {
   constructor(
     name: DaoContractAddresses,
-    Subtype:
-      | "ACTION_PROPOSAL_VOTING"
-      | "DAO_CHARTER"
-      | "DAO_EPOCH"
-      | "DAO_USERS"
-      | "ONCHAIN_MESSAGING"
-      | "REWARDS_ACCOUNT"
-      | "TOKEN_OWNER"
-      | "TREASURY"
+    subtype: ContractSubtype<"EXTENSIONS">
   ) {
     super(
       name,
-      "EXTENSIONS" as ContractType,
-      Subtype,
+      "EXTENSIONS",
+      subtype,
       DEPLOYMENT_ORDER[name],
-      `extensions/${name}.clar`
+      ContractBase.generateTemplatePath("EXTENSIONS", name)
     );
   }
 }

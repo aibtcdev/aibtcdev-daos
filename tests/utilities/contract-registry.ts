@@ -70,18 +70,18 @@ export class ContractRegistry {
   }
 
   // Get contracts by subtype
-  getContractsBySubtype<C extends ContractType>(
-    type: C,
-    subtype: ContractSubtype<C>
+  getContractsBySubtype<T extends ContractType>(
+    type: T,
+    subtype: ContractSubtype<T>
   ): ContractBase[] {
     const key = `${type}/${subtype}`;
     return this.contractsByTypeAndSubtype.get(key) || [];
   }
 
   // Get the contract for a specific type and subtype (assumes one contract per combination)
-  getContractByTypeAndSubtype<C extends ContractType>(
-    type: C,
-    subtype: ContractSubtype<C>
+  getContractByTypeAndSubtype<T extends ContractType>(
+    type: T,
+    subtype: ContractSubtype<T>
   ): ContractBase | undefined {
     const contracts = this.getContractsBySubtype(type, subtype);
     return contracts.length > 0 ? contracts[0] : undefined;
@@ -101,8 +101,8 @@ export class ContractRegistry {
     type: T,
     subtype: ContractSubtype<T>
   ): string | undefined {
-    // This type assertion tells TypeScript that we're accessing the correct subtype map
-    return (CONTRACT_NAMES[type] as any)[subtype];
+    // This is now properly typed
+    return CONTRACT_NAMES[type][subtype];
   }
 
   // Get all available contract names for a given type

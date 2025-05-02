@@ -3,16 +3,19 @@ import {
   DEPLOYMENT_ORDER,
   DaoContractAddresses,
 } from "../utilities/contract-deployment-order";
-import { ContractType } from "../utilities/contract-types";
+import { ContractSubtype } from "../utilities/contract-types";
 
 export class ProposalContract extends ContractBase {
-  constructor(name: DaoContractAddresses, Subtype: "INITIALIZE_DAO") {
+  constructor(
+    name: DaoContractAddresses, 
+    subtype: ContractSubtype<"PROPOSALS">
+  ) {
     super(
       name,
-      "PROPOSALS" as ContractType,
-      Subtype,
+      "PROPOSALS",
+      subtype,
       DEPLOYMENT_ORDER[name],
-      `proposals/${name}.clar`
+      ContractBase.generateTemplatePath("PROPOSALS", name)
     );
   }
 }
