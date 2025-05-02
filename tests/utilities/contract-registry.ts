@@ -6,6 +6,24 @@ import {
   ContractType,
 } from "./contract-types";
 import { ContractBase } from "../models/contract-template";
+import { BaseContract } from "../models/dao-base-contract";
+import { TokenContract } from "../models/dao-token-contract";
+import { ExtensionContract } from "../models/dao-extension-contract";
+import { ActionContract } from "../models/dao-action-contract";
+import { ProposalContract } from "../models/dao-proposal-contract";
+
+export function setupDaoContractRegistry(): ContractRegistry {
+  const registry = new ContractRegistry();
+  registry.registerDaoContracts();
+  return registry;
+}
+
+// Create and populate the registry
+export function setupFullContractRegistry(): ContractRegistry {
+  const registry = new ContractRegistry();
+  registry.registerAllDefinedContracts();
+  return registry;
+}
 
 export class ContractRegistry {
   private contracts: Map<string, ContractBase> = new Map();
@@ -170,70 +188,76 @@ export class ContractRegistry {
    * Creates and registers all contracts defined in CONTRACT_NAMES
    */
   registerAllDefinedContracts(): this {
-    CONTRACT_TYPES.forEach(type => {
+    CONTRACT_TYPES.forEach((type) => {
       const subtypes = CONTRACT_SUBTYPES[type];
-      
-      subtypes.forEach(subtype => {
+
+      subtypes.forEach((subtype) => {
         const contractName = this.getContractNameByTypeAndSubtype(
           type,
           subtype as ContractSubtype<typeof type>
         );
-        
+
         if (contractName) {
           this.createAndRegisterContract(type, contractName, subtype as any);
         }
       });
     });
-    
+
     return this;
   }
-  
+
   /**
    * Creates and registers only DAO-related contracts
    */
   registerDaoContracts(): this {
-    const daoTypes: ContractType[] = ["BASE", "ACTIONS", "EXTENSIONS", "PROPOSALS", "TOKEN"];
-    
-    daoTypes.forEach(type => {
+    const daoTypes: ContractType[] = [
+      "BASE",
+      "ACTIONS",
+      "EXTENSIONS",
+      "PROPOSALS",
+      "TOKEN",
+    ];
+
+    daoTypes.forEach((type) => {
       const subtypes = CONTRACT_SUBTYPES[type];
-      
-      subtypes.forEach(subtype => {
+
+      subtypes.forEach((subtype) => {
         const contractName = this.getContractNameByTypeAndSubtype(
           type,
           subtype as ContractSubtype<typeof type>
         );
-        
+
         if (contractName) {
           this.createAndRegisterContract(type, contractName, subtype as any);
         }
       });
     });
-    
+
     return this;
   }
-  
+
   /**
    * Creates and registers contracts of specific types
    */
   registerContractsByTypes(types: ContractType[]): this {
-    types.forEach(type => {
+    types.forEach((type) => {
       const subtypes = CONTRACT_SUBTYPES[type];
-      
-      subtypes.forEach(subtype => {
+
+      subtypes.forEach((subtype) => {
         const contractName = this.getContractNameByTypeAndSubtype(
           type,
           subtype as ContractSubtype<typeof type>
         );
-        
+
         if (contractName) {
           this.createAndRegisterContract(type, contractName, subtype as any);
         }
       });
     });
-    
+
     return this;
   }
-  
+
   /**
    * Helper method to create and register a contract based on its type
    */
@@ -243,7 +267,7 @@ export class ContractRegistry {
     subtype: ContractSubtype<T>
   ): ContractBase | null {
     let contract: ContractBase | null = null;
-    
+
     // Create the appropriate contract type
     switch (type) {
       case "BASE":
@@ -276,15 +300,14 @@ export class ContractRegistry {
           subtype as ContractSubtype<"PROPOSALS">
         );
         break;
-      // We can add other cases as needed
       default:
         return null;
     }
-    
+
     if (contract) {
       this.register(contract);
     }
-    
+
     return contract;
   }
 }
