@@ -316,7 +316,7 @@ export class ContractRegistry {
     subtype: ContractSubtype<T>
   ): ContractBase | null {
     const contract = this.createContractInstance(type, name, subtype);
-    
+
     if (contract) {
       this.register(contract);
     }
