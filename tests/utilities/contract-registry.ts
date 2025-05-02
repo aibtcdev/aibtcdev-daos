@@ -96,7 +96,7 @@ export class ContractRegistry {
       const subtypeKey = subtype as ContractSubtype<typeof type>;
       // Now access the contract name in a type-safe way
       const contractName = subtypeMap[subtypeKey];
-      
+
       if (contractName) {
         names.push(contractName);
       }
@@ -117,13 +117,13 @@ export class ContractRegistry {
     CONTRACT_TYPES.forEach((type) => {
       const subtypes = CONTRACT_SUBTYPES[type];
       const subtypeMap = CONTRACT_NAMES[type];
-      
+
       subtypes.forEach((subtype) => {
         // Use type assertion only once to get the proper subtype key
         const subtypeKey = subtype as ContractSubtype<typeof type>;
         // Now access the contract name in a type-safe way
         const contractName = subtypeMap[subtypeKey];
-        
+
         if (contractName) {
           names.push(contractName);
         }
