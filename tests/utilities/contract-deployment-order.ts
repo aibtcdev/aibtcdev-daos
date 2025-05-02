@@ -1,3 +1,5 @@
+export type DeploymentKeys = keyof typeof DEPLOYMENT_ORDER;
+
 export const DEPLOYMENT_ORDER = {
   // separate from dao deployment
   // can be deployed anytime
@@ -22,4 +24,6 @@ export const DEPLOYMENT_ORDER = {
   "aibtc-action-send-message": 40,
   // initialize dao (always last)
   "aibtc-initialize-dao": 50,
-};
+} as const;
+
+// separate deployment order but as a map of contract name to deployment order
