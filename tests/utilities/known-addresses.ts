@@ -1,0 +1,70 @@
+import { StacksNetworkName } from "@stacks/network";
+
+// define all known addresses by key
+export interface KnownAddresses {
+  DEPLOYER: string;
+  POX: string;
+  BURN: string;
+  SBTC: string;
+  BITFLOW_CORE: string;
+  BITFLOW_STX_TOKEN: string;
+  BITFLOW_FEE: string;
+}
+
+// define known addresses for each network
+
+const mainnetAddresses: KnownAddresses = {
+  DEPLOYER: "SP2XCME6ED8RERGR9R7YDZW7CA6G3F113Y8JMVA46",
+  POX: "SP000000000000000000002Q6VF78.pox-4",
+  BURN: "SP000000000000000000002Q6VF78",
+  SBTC: "SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token",
+  BITFLOW_CORE: "SM1793C4R5PZ4NS4VQ4WMP7SKKYVH8JZEWSZ9HCCR.xyk-core-v-1-2",
+  BITFLOW_STX_TOKEN:
+    "SM1793C4R5PZ4NS4VQ4WMP7SKKYVH8JZEWSZ9HCCR.token-stx-v-1-2",
+  BITFLOW_FEE: "SP31C60QVZKZ9CMMZX73TQ3F3ZZNS89YX2DCCFT8P",
+};
+
+const testnetAddresses: KnownAddresses = {
+  DEPLOYER: "ST1994Y3P6ZDJX476QFSABEFE5T6YMTJT0T7RSQDW",
+  POX: "ST000000000000000000002AMW42H.pox-4",
+  BURN: "ST000000000000000000002AMW42H",
+  SBTC: "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token",
+  BITFLOW_CORE: "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.xyk-core-v-1-2",
+  BITFLOW_STX_TOKEN:
+    "ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1.token-stx-v-1-2",
+  BITFLOW_FEE: "ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1",
+};
+
+const devnetAddresses: KnownAddresses = {
+  DEPLOYER: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+  POX: "ST000000000000000000002AMW42H.pox-4",
+  BURN: "ST000000000000000000002AMW42H",
+  SBTC: "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token",
+  BITFLOW_CORE: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.xyk-core-v-1-2",
+  BITFLOW_STX_TOKEN:
+    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token-stx-v-1-2",
+  BITFLOW_FEE: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+};
+
+// combine the addresses for each network
+
+const ADDRESSES: Record<StacksNetworkName, KnownAddresses> = {
+  mainnet: mainnetAddresses,
+  testnet: testnetAddresses,
+  devnet: devnetAddresses,
+  mocknet: devnetAddresses,
+} as const;
+
+// helper to get known addresses for a network
+// TODO: replaces ADDRESSES in constants.ts
+export function getKnownAddresses(network: StacksNetworkName): KnownAddresses {
+  return ADDRESSES[network];
+}
+
+// helper to get a specific address
+export function getKnownAddress(
+  network: StacksNetworkName,
+  address: keyof KnownAddresses
+): string {
+  return ADDRESSES[network][address];
+}
