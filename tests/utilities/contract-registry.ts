@@ -259,9 +259,9 @@ export class ContractRegistry {
   }
 
   /**
-   * Helper method to create and register a contract based on its type
+   * Creates a contract instance without registering it
    */
-  private createAndRegisterContract<T extends ContractType>(
+  createContractInstance<T extends ContractType>(
     type: T,
     name: string,
     subtype: ContractSubtype<T>
@@ -304,6 +304,19 @@ export class ContractRegistry {
         return null;
     }
 
+    return contract;
+  }
+
+  /**
+   * Helper method to create and register a contract based on its type
+   */
+  private createAndRegisterContract<T extends ContractType>(
+    type: T,
+    name: string,
+    subtype: ContractSubtype<T>
+  ): ContractBase | null {
+    const contract = this.createContractInstance(type, name, subtype);
+    
     if (contract) {
       this.register(contract);
     }
