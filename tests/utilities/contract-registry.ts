@@ -81,7 +81,7 @@ export class ContractRegistry {
 
   // Helper function to safely access contract names by type and subtype
   private getContractNameByTypeAndSubtype<T extends ContractType>(
-    type: T, 
+    type: T,
     subtype: ContractSubtype<T>
   ): string | undefined {
     // This type assertion tells TypeScript that we're accessing the correct subtype map
@@ -100,10 +100,10 @@ export class ContractRegistry {
 
     subtypes.forEach((subtype) => {
       const contractName = this.getContractNameByTypeAndSubtype(
-        type, 
+        type,
         subtype as ContractSubtype<typeof type>
       );
-      
+
       if (contractName) {
         names.push(contractName);
       }
@@ -117,19 +117,47 @@ export class ContractRegistry {
     return Array.from(this.contracts.keys());
   }
 
+  // Get all DAO contract names from the CONTRACT_NAMES mapping
+  getAllDaoContractNames(): string[] {
+    const daoContractNames: string[] = [];
+
+    const daoTypes = ["BASE", "ACTIONS", "EXTENSIONS", "PROPOSALS", "TOKEN"];
+
+    CONTRACT_TYPES.forEach((type) => {
+      const subtypes = CONTRACT_SUBTYPES[type];
+
+      subtypes.forEach((subtype) => {
+        if (!daoTypes.includes(type)) {
+          return;
+        }
+
+        const contractName = this.getContractNameByTypeAndSubtype(
+          type,
+          subtype as ContractSubtype<typeof type>
+        );
+
+        if (contractName) {
+          daoContractNames.push(contractName);
+        }
+      });
+    });
+
+    return daoContractNames;
+  }
+
   // Get all available contract names from the CONTRACT_NAMES mapping
   getAllAvailableContractNames(): string[] {
     const names: string[] = [];
 
     CONTRACT_TYPES.forEach((type) => {
       const subtypes = CONTRACT_SUBTYPES[type];
-      
+
       subtypes.forEach((subtype) => {
         const contractName = this.getContractNameByTypeAndSubtype(
-          type, 
+          type,
           subtype as ContractSubtype<typeof type>
         );
-        
+
         if (contractName) {
           names.push(contractName);
         }

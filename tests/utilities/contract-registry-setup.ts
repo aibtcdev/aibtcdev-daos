@@ -1,3 +1,9 @@
+import {
+  CONTRACT_NAMES,
+  CONTRACT_TYPES,
+  ContractSubtype,
+  ContractType,
+} from "./contract-types";
 import { ContractRegistry } from "./contract-registry";
 import { BaseContract } from "../models/dao-base-contract";
 import { TokenContract } from "../models/dao-token-contract";
@@ -7,6 +13,8 @@ import { ProposalContract } from "../models/dao-proposal-contract";
 
 export function setupDaoContractRegistry(): ContractRegistry {
   const registry = new ContractRegistry();
+
+  const availableContracts = registry.getAllDaoContractNames();
 
   // Base contracts
 

@@ -1,6 +1,6 @@
-import { ClarityVersion } from "@stacks/transactions";
-
 export const CONTRACT_TYPES = [
+  "AGENT", // agent account
+  "CORE", // core contracts
   "BASE", // base-dao
   "ACTIONS", // action proposal extensions
   "EXTENSIONS", // extensions
@@ -12,8 +12,10 @@ export const CONTRACT_TYPES = [
 // derive a type from the array
 export type ContractType = (typeof CONTRACT_TYPES)[number];
 
-const CONTRACT_SUBTYPES = {
-  BASE: ["DAO", "AGENT_ACCOUNT", "DAO_RUN_COST"] as const,
+export const CONTRACT_SUBTYPES = {
+  AGENT: ["AGENT_ACCOUNT"] as const,
+  BASE: ["DAO"] as const,
+  CORE: ["DAO_RUN_COST"] as const,
   ACTIONS: ["SEND_MESSAGE"],
   EXTENSIONS: [
     "ACTION_PROPOSAL_VOTING",
@@ -45,13 +47,17 @@ export const CONTRACT_NAMES: {
     [S in ContractSubtype<K>]?: string;
   };
 } = {
+  AGENT: {
+    AGENT_ACCOUNT: "aibtc-agent-account",
+  },
   BASE: {
     DAO: "aibtc-base-dao",
-    AGENT_ACCOUNT: "aibtc-agent-account",
-    DAO_RUN_COST: "dao-run-cost"
+  },
+  CORE: {
+    DAO_RUN_COST: "aibtc-dao-run-cost",
   },
   ACTIONS: {
-    SEND_MESSAGE: "aibtc-action-send-message"
+    SEND_MESSAGE: "aibtc-action-send-message",
   },
   EXTENSIONS: {
     ACTION_PROPOSAL_VOTING: "aibtc-action-proposal-voting",
@@ -61,10 +67,10 @@ export const CONTRACT_NAMES: {
     ONCHAIN_MESSAGING: "aibtc-onchain-messaging",
     REWARDS_ACCOUNT: "aibtc-rewards-account",
     TOKEN_OWNER: "aibtc-token-owner",
-    TREASURY: "aibtc-treasury"
+    TREASURY: "aibtc-treasury",
   },
   PROPOSALS: {
-    INITIALIZE_DAO: "aibtc-initialize-dao"
+    INITIALIZE_DAO: "aibtc-initialize-dao",
   },
   EXTERNAL: {
     // Fill in as needed
@@ -73,6 +79,6 @@ export const CONTRACT_NAMES: {
     DAO: "aibtc-faktory",
     DEX: "aibtc-faktory-dex",
     POOL: "xyk-pool-sbtc-aibtc-v-1-1",
-    PRELAUNCH: "aibtc-pre-dex"
-  }
+    PRELAUNCH: "aibtc-pre-dex",
+  },
 };
