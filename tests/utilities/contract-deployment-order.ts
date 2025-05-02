@@ -1,25 +1,29 @@
-export const DEPLOYMENT_ORDER = {
+import { CONTRACT_NAMES } from "./contract-types";
+
+export const DEPLOYMENT_ORDER: Record<string, number> = {
   // separate from dao deployment
   // can be deployed anytime
-  "aibtc-agent-account": 1,
+  [CONTRACT_NAMES.AGENT.AGENT_ACCOUNT]: 1,
   // token contracts
-  "aibtc-pre-faktory": 10,
-  "aibtc-faktory": 11,
-  "xyk-pool-sbtc-aibtc-v-1-1": 12,
-  "aibtc-faktory-dex": 13,
+  [CONTRACT_NAMES.TOKEN.PRELAUNCH]: 10,
+  [CONTRACT_NAMES.TOKEN.DAO]: 11,
+  [CONTRACT_NAMES.TOKEN.POOL]: 12,
+  [CONTRACT_NAMES.TOKEN.DEX]: 13,
   // base dao contract
-  "aibtc-base-dao": 20,
+  [CONTRACT_NAMES.BASE.DAO]: 20,
   // extensions
-  "aibtc-action-proposal-voting": 30,
-  "aibtc-dao-charter": 31,
-  "aibtc-dao-epoch": 32,
-  "aibtc-dao-users": 33,
-  "aibtc-onchain-messaging": 34,
-  "aibtc-rewards-account": 35,
-  "aibtc-token-owner": 36,
-  "aibtc-treasury": 37,
+  [CONTRACT_NAMES.EXTENSIONS.ACTION_PROPOSAL_VOTING]: 30,
+  [CONTRACT_NAMES.EXTENSIONS.DAO_CHARTER]: 31,
+  [CONTRACT_NAMES.EXTENSIONS.DAO_EPOCH]: 32,
+  [CONTRACT_NAMES.EXTENSIONS.DAO_USERS]: 33,
+  [CONTRACT_NAMES.EXTENSIONS.ONCHAIN_MESSAGING]: 34,
+  [CONTRACT_NAMES.EXTENSIONS.REWARDS_ACCOUNT]: 35,
+  [CONTRACT_NAMES.EXTENSIONS.TOKEN_OWNER]: 36,
+  [CONTRACT_NAMES.EXTENSIONS.TREASURY]: 37,
   // actions
-  "aibtc-action-send-message": 40,
+  [CONTRACT_NAMES.ACTIONS.SEND_MESSAGE]: 40,
   // initialize dao (always last)
-  "aibtc-base-initialize-dao": 50,
-} as const;
+  [CONTRACT_NAMES.PROPOSALS.INITIALIZE_DAO]: 50,
+};
+
+// Remove the DaoContractAddresses type as it's no longer needed

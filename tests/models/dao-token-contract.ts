@@ -1,17 +1,20 @@
 import { ContractBase } from "./contract-template";
-import {
-  DEPLOYMENT_ORDER,
-  DaoContractAddresses,
-} from "../utilities/contract-deployment-order";
-import { ContractSubtype } from "../utilities/contract-types";
+import { DEPLOYMENT_ORDER } from "../utilities/contract-deployment-order";
+import { ContractSubtype, CONTRACT_NAMES } from "../utilities/contract-types";
 
 export class TokenContract extends ContractBase {
-  constructor(name: DaoContractAddresses, subtype: ContractSubtype<"TOKEN">) {
+  constructor(name: string, subtype: ContractSubtype<"TOKEN">) {
+    // Validate that the name is a valid contract name for this type/subtype
+    const validName = CONTRACT_NAMES.TOKEN[subtype];
+    if (!validName || name !== validName) {
+      throw new Error(`Invalid contract name for TOKEN/${subtype}: ${name}`);
+    }
+
     super(
       name,
       "TOKEN",
       subtype,
-      DEPLOYMENT_ORDER[name],
+      DEPLOYMENT_ORDER[name] || 0,
       ContractBase.generateTemplatePath("TOKEN", name)
     );
   }
