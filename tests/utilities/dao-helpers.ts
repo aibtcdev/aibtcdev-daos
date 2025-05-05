@@ -71,7 +71,8 @@ export function fundVoters(voters: string[]) {
     simnet.mineEmptyBlocks(10);
 
     // generate an amount between 100k and 1M satoshis
-    const btcAmount = Math.floor(Math.random() * (100000 - 10000 + 1)) + 10000;
+    const btcAmount =
+      Math.floor(Math.random() * (1000000 - 100000 + 1)) + 100000;
     dbgLog(`btcAmount: ${btcAmount} satoshis`);
 
     // get dao tokens from the token dex
@@ -134,12 +135,15 @@ export function passActionProposal(
     );
   }
 
+  const actionProposalContractAddress = `${deployer}.${actionProposalsContract.name}`;
+  const proposedActionContractAddress = `${deployer}.${proposedActionContract.name}`;
+
   // create action proposal
   const proposeActionReceipt = simnet.callPublicFn(
-    actionProposalsContract.name,
+    actionProposalContractAddress,
     "create-action-proposal",
     [
-      Cl.principal(proposedActionContract.name),
+      Cl.principal(proposedActionContractAddress),
       Cl.buffer(Cl.serialize(proposalParams)),
       memo ? Cl.some(Cl.stringAscii(memo)) : Cl.none(),
     ],
@@ -153,7 +157,7 @@ export function passActionProposal(
   // vote on the proposal
   for (const voter of voters) {
     const voteReceipt = simnet.callPublicFn(
-      actionProposalsContract.name,
+      actionProposalContractAddress,
       "vote-on-action-proposal",
       [Cl.uint(1), Cl.bool(true)],
       voter
@@ -166,9 +170,9 @@ export function passActionProposal(
 
   // conclude the proposal
   const concludeProposalReceipt = simnet.callPublicFn(
-    actionProposalsContract.name,
+    actionProposalContractAddress,
     "conclude-action-proposal",
-    [Cl.uint(1), Cl.principal(proposedActionContract.name)],
+    [Cl.uint(1), Cl.principal(proposedActionContractAddress)],
     deployer
   );
   expect(concludeProposalReceipt.result).toBeOk(Cl.bool(true));

@@ -1,5 +1,5 @@
 // set to true to enable logging
-const DEBUG_ENABLED = true;
+const DEBUG_ENABLED = false;
 // helper function to log messages to the console
 export function dbgLog(
   msg: unknown,
