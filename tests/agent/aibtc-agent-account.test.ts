@@ -1,7 +1,7 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeAgentAccount } from "../utilities/contract-error-codes";
-import { setupDaoContractRegistry } from "../utilities/contract-registry";
+import { setupFullContractRegistry } from "../utilities/contract-registry";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -11,7 +11,7 @@ const address2 = accounts.get("wallet_2")!;
 const address3 = accounts.get("wallet_3")!;
 
 // setup contract info for tests
-const registry = setupDaoContractRegistry();
+const registry = setupFullContractRegistry();
 const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "AGENT",
   "AGENT_ACCOUNT"
@@ -27,7 +27,6 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("construct() fails if called by another address", () => {
     // arrange
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   contractAddress,
@@ -35,14 +34,12 @@ describe(`public functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   address1
     // );
-    
     // assert
     // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
 
   it("construct() succeeds if called by the deployer", () => {
     // arrange
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   contractAddress,
@@ -50,7 +47,6 @@ describe(`public functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   deployer
     // );
-    
     // assert
     // expect(receipt.result).toBeOk(Cl.bool(true));
   });
@@ -60,7 +56,6 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("transfer-stx() fails if called by unauthorized principal", () => {
     // arrange
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   contractAddress,
@@ -68,7 +63,6 @@ describe(`public functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   address1
     // );
-    
     // assert
     // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
@@ -78,7 +72,6 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("transfer-ft() fails if called by unauthorized principal", () => {
     // arrange
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   contractAddress,
@@ -86,7 +79,6 @@ describe(`public functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   address1
     // );
-    
     // assert
     // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
@@ -96,7 +88,6 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("transfer-nft() fails if called by unauthorized principal", () => {
     // arrange
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   contractAddress,
@@ -104,7 +95,6 @@ describe(`public functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   address1
     // );
-    
     // assert
     // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
@@ -116,7 +106,6 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-balance() returns expected value", () => {
     // arrange
-    
     // act
     // const result = simnet.callReadOnlyFn(
     //   contractAddress,
@@ -124,7 +113,6 @@ describe(`read-only functions: ${contractName}`, () => {
     //   [],
     //   deployer
     // ).result;
-    
     // assert
     // expect(result).toStrictEqual(/* expected value */);
   });
@@ -134,7 +122,6 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-ft-balance() returns expected value", () => {
     // arrange
-    
     // act
     // const result = simnet.callReadOnlyFn(
     //   contractAddress,
@@ -142,7 +129,6 @@ describe(`read-only functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   deployer
     // ).result;
-    
     // assert
     // expect(result).toStrictEqual(/* expected value */);
   });

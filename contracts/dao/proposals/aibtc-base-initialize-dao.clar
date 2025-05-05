@@ -27,8 +27,8 @@
         {extension: .aibtc-dao-users, enabled: true}
         ;; /g/.aibtc-onchain-messaging/dao_messaging_contract
         {extension: .aibtc-onchain-messaging, enabled: true}
-        ;; /g/.aibtc-faktory-owner/dao_token_owner_contract
-        {extension: .aibtc-faktory-owner, enabled: true}
+        ;; /g/.aibtc-token-owner/dao_token_owner_contract
+        {extension: .aibtc-token-owner, enabled: true}
         ;; /g/.aibtc-treasury/dao_treasury_contract
         {extension: .aibtc-treasury, enabled: true}
         ;; initial action proposals (as extensions)

@@ -32,7 +32,8 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("callback() should respond with (ok true)", () => {
     // arrange
-    
+    console.log("contractAddress: ", contractAddress);
+
     // act
     const callback = simnet.callPublicFn(
       contractAddress,
@@ -40,7 +41,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(deployer), Cl.bufferFromAscii("test")],
       deployer
     );
-    
+
     // assert
     expect(callback.result).toBeOk(Cl.bool(true));
   });
@@ -50,7 +51,6 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("transfer-token() fails if called directly", () => {
     // arrange
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   contractAddress,
@@ -58,7 +58,6 @@ describe(`public functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   address1
     // );
-    
     // assert
     // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
@@ -66,7 +65,6 @@ describe(`public functions: ${contractName}`, () => {
   it("transfer-token() succeeds if called by the DAO", () => {
     // arrange
     // constructDao(deployer);
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   baseDaoContractAddress,
@@ -77,7 +75,6 @@ describe(`public functions: ${contractName}`, () => {
     //   ],
     //   deployer
     // );
-    
     // assert
     // expect(receipt.result).toBeOk(Cl.bool(true));
   });
@@ -90,7 +87,6 @@ describe(`read-only functions: ${contractName}`, () => {
   it("get-token-balance() returns expected value", () => {
     // arrange
     // constructDao(deployer);
-    
     // act
     // const result = simnet.callReadOnlyFn(
     //   contractAddress,
@@ -98,7 +94,6 @@ describe(`read-only functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   deployer
     // ).result;
-    
     // assert
     // expect(result).toStrictEqual(/* expected value */);
   });

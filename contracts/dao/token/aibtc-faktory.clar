@@ -9,7 +9,7 @@
 
 (define-fungible-token SYMBOL-AIBTC-DAO MAX) ;; <%= it.token_symbol %>
 (define-constant MAX u100000000000000000) ;; <%= it.token_max_supply %>
-(define-data-var contract-owner principal .aibtc-faktory-owner) ;; <%= it.token_owner %>
+(define-data-var contract-owner principal .aibtc-token-owner) ;; <%= it.token_owner %>
 (define-data-var token-uri (optional (string-utf8 256)) (some u"<%= it.token_uri %>")) 
 
 ;; SIP-10 Functions

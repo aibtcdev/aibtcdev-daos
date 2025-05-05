@@ -1,6 +1,6 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
-import { setupDaoContractRegistry } from "../utilities/contract-registry";
+import { setupFullContractRegistry } from "../utilities/contract-registry";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -10,7 +10,7 @@ const address2 = accounts.get("wallet_2")!;
 const address3 = accounts.get("wallet_3")!;
 
 // setup contract info for tests
-const registry = setupDaoContractRegistry();
+const registry = setupFullContractRegistry();
 const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "CORE",
   "DAO_RUN_COST"
@@ -23,7 +23,6 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("construct() fails if called by another address", () => {
     // arrange
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   contractAddress,
@@ -31,14 +30,12 @@ describe(`public functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   address1
     // );
-    
     // assert
     // expect(receipt.result).toBeErr(/* expected error */);
   });
 
   it("construct() succeeds if called by the deployer", () => {
     // arrange
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   contractAddress,
@@ -46,7 +43,6 @@ describe(`public functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   deployer
     // );
-    
     // assert
     // expect(receipt.result).toBeOk(Cl.bool(true));
   });
@@ -56,7 +52,6 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("set-run-cost() fails if called by unauthorized principal", () => {
     // arrange
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   contractAddress,
@@ -64,7 +59,6 @@ describe(`public functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   address1
     // );
-    
     // assert
     // expect(receipt.result).toBeErr(/* expected error */);
   });
@@ -76,7 +70,6 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-run-cost() returns expected value", () => {
     // arrange
-    
     // act
     // const result = simnet.callReadOnlyFn(
     //   contractAddress,
@@ -84,7 +77,6 @@ describe(`read-only functions: ${contractName}`, () => {
     //   [],
     //   deployer
     // ).result;
-    
     // assert
     // expect(result).toStrictEqual(/* expected value */);
   });

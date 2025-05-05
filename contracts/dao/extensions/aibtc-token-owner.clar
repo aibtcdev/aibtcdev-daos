@@ -1,4 +1,4 @@
-;; title: aibtc-faktory-owner
+;; title: aibtc-token-owner
 ;; version: 1.0.0
 ;; summary: An extension that provides management functions for the dao token
 
@@ -30,7 +30,7 @@
     ;; print event
     (print {
       ;; /g/aibtc/dao_token_symbol
-      notification: "aibtc-faktory-owner/set-token-uri",
+      notification: "aibtc-token-owner/set-token-uri",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
@@ -52,7 +52,7 @@
     ;; print event
     (print {
       ;; /g/aibtc/dao_token_symbol
-      notification: "aibtc-faktory-owner/transfer-ownership",
+      notification: "aibtc-token-owner/transfer-ownership",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,

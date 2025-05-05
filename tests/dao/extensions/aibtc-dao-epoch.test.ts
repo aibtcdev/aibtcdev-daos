@@ -28,7 +28,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("callback() should respond with (ok true)", () => {
     // arrange
-    
+
     // act
     const callback = simnet.callPublicFn(
       contractAddress,
@@ -36,7 +36,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(deployer), Cl.bufferFromAscii("test")],
       deployer
     );
-    
+
     // assert
     expect(callback.result).toBeOk(Cl.bool(true));
   });
@@ -49,7 +49,6 @@ describe(`read-only functions: ${contractName}`, () => {
   it("get-current-epoch() returns expected value", () => {
     // arrange
     // constructDao(deployer);
-    
     // act
     // const result = simnet.callReadOnlyFn(
     //   contractAddress,
@@ -57,7 +56,6 @@ describe(`read-only functions: ${contractName}`, () => {
     //   [],
     //   deployer
     // ).result;
-    
     // assert
     // expect(result).toStrictEqual(/* expected value */);
   });
@@ -67,7 +65,6 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-epoch-start-height() returns expected value", () => {
     // arrange
-    
     // act
     // const result = simnet.callReadOnlyFn(
     //   contractAddress,
@@ -75,7 +72,6 @@ describe(`read-only functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   deployer
     // ).result;
-    
     // assert
     // expect(result).toStrictEqual(/* expected value */);
   });
