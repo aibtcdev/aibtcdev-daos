@@ -46,54 +46,91 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   ////////////////////////////////////////
-  // set-charter() tests
+  // set-dao-charter() tests
   ////////////////////////////////////////
-  it("set-charter() fails if called directly", () => {
+  it("set-dao-charter() fails if called directly", () => {
     // arrange
     // act
-    // const receipt = simnet.callPublicFn(
-    //   contractAddress,
-    //   "set-charter",
-    //   [/* parameters */],
-    //   address1
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "set-dao-charter",
+      [Cl.stringAscii("Test Charter")],
+      address1
+    );
     // assert
-    // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
 
-  it("set-charter() succeeds if called by the DAO", () => {
+  it("set-dao-charter() succeeds if called by the DAO", () => {
     // arrange
-    // constructDao(deployer);
+    constructDao(deployer);
     // act
-    // const receipt = simnet.callPublicFn(
-    //   baseDaoContractAddress,
-    //   "request-extension-callback",
-    //   [
-    //     Cl.principal(contractAddress),
-    //     Cl.buffer(Cl.serialize(/* parameters */))
-    //   ],
-    //   deployer
-    // );
+    const receipt = simnet.callPublicFn(
+      baseDaoContractAddress,
+      "request-extension-callback",
+      [
+        Cl.principal(contractAddress),
+        Cl.buffer(Cl.serialize(Cl.tuple({
+          "function-name": Cl.stringAscii("set-dao-charter"),
+          "charter": Cl.stringAscii("Test Charter")
+        })))
+      ],
+      deployer
+    );
     // assert
-    // expect(receipt.result).toBeOk(Cl.bool(true));
+    expect(receipt.result).toBeOk(Cl.bool(true));
   });
 });
 
 describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
-  // get-charter() tests
+  // get-current-dao-charter-version() tests
   ////////////////////////////////////////
-  it("get-charter() returns expected value", () => {
+  it("get-current-dao-charter-version() returns expected value", () => {
     // arrange
-    // constructDao(deployer);
+    constructDao(deployer);
     // act
-    // const result = simnet.callReadOnlyFn(
-    //   contractAddress,
-    //   "get-charter",
-    //   [],
-    //   deployer
-    // ).result;
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-current-dao-charter-version",
+      [],
+      deployer
+    ).result;
     // assert
-    // expect(result).toStrictEqual(/* expected value */);
+    expect(result).toBeNone(); // or appropriate value
+  });
+
+  ////////////////////////////////////////
+  // get-current-dao-charter() tests
+  ////////////////////////////////////////
+  it("get-current-dao-charter() returns expected value", () => {
+    // arrange
+    constructDao(deployer);
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-current-dao-charter",
+      [],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeNone(); // or appropriate value
+  });
+
+  ////////////////////////////////////////
+  // get-dao-charter() tests
+  ////////////////////////////////////////
+  it("get-dao-charter() returns expected value", () => {
+    // arrange
+    constructDao(deployer);
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-dao-charter",
+      [Cl.uint(1)],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeNone(); // or appropriate value
   });
 });

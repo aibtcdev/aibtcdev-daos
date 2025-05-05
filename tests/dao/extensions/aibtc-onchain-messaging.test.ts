@@ -46,54 +46,33 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   ////////////////////////////////////////
-  // send-message() tests
+  // send() tests
   ////////////////////////////////////////
-  it("send-message() fails if called directly", () => {
+  it("send() fails with empty message", () => {
     // arrange
     // act
-    // const receipt = simnet.callPublicFn(
-    //   contractAddress,
-    //   "send-message",
-    //   [/* parameters */],
-    //   address1
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "send",
+      [Cl.stringAscii("")],
+      address1
+    );
     // assert
-    // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INVALID_INPUT));
   });
 
-  it("send-message() succeeds if called by the DAO", () => {
+  it("send() succeeds with valid message", () => {
     // arrange
-    // constructDao(deployer);
     // act
-    // const receipt = simnet.callPublicFn(
-    //   baseDaoContractAddress,
-    //   "request-extension-callback",
-    //   [
-    //     Cl.principal(contractAddress),
-    //     Cl.buffer(Cl.serialize(/* parameters */))
-    //   ],
-    //   deployer
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "send",
+      [Cl.stringAscii("Test message")],
+      address1
+    );
     // assert
-    // expect(receipt.result).toBeOk(Cl.bool(true));
+    expect(receipt.result).toBeOk(Cl.bool(true));
   });
 });
 
-describe(`read-only functions: ${contractName}`, () => {
-  ////////////////////////////////////////
-  // get-messages() tests
-  ////////////////////////////////////////
-  it("get-messages() returns expected value", () => {
-    // arrange
-    // constructDao(deployer);
-    // act
-    // const result = simnet.callReadOnlyFn(
-    //   contractAddress,
-    //   "get-messages",
-    //   [/* parameters */],
-    //   deployer
-    // ).result;
-    // assert
-    // expect(result).toStrictEqual(/* expected value */);
-  });
-});
+// Note: There are no read-only functions in this contract

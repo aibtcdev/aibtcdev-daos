@@ -44,35 +44,35 @@ describe(`public functions: ${contractName}`, () => {
 
 describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
-  // get-current-epoch() tests
+  // get-current-dao-epoch() tests
   ////////////////////////////////////////
-  it("get-current-epoch() returns expected value", () => {
+  it("get-current-dao-epoch() returns expected value", () => {
     // arrange
-    // constructDao(deployer);
+    constructDao(deployer);
     // act
-    // const result = simnet.callReadOnlyFn(
-    //   contractAddress,
-    //   "get-current-epoch",
-    //   [],
-    //   deployer
-    // ).result;
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-current-dao-epoch",
+      [],
+      deployer
+    ).result;
     // assert
-    // expect(result).toStrictEqual(/* expected value */);
+    expect(result).toBeOk(Cl.uint(0)); // or appropriate value
   });
 
   ////////////////////////////////////////
-  // get-epoch-start-height() tests
+  // get-dao-epoch-length() tests
   ////////////////////////////////////////
-  it("get-epoch-start-height() returns expected value", () => {
+  it("get-dao-epoch-length() returns expected value", () => {
     // arrange
     // act
-    // const result = simnet.callReadOnlyFn(
-    //   contractAddress,
-    //   "get-epoch-start-height",
-    //   [/* parameters */],
-    //   deployer
-    // ).result;
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-dao-epoch-length",
+      [],
+      deployer
+    ).result;
     // assert
-    // expect(result).toStrictEqual(/* expected value */);
+    expect(result).toBeOk(Cl.uint(4320)); // or appropriate value
   });
 });

@@ -22,6 +22,10 @@ const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
   "BASE",
   "DAO"
 );
+const actionContractAddress = registry.getContractAddressByTypeAndSubtype(
+  "ACTIONS",
+  "SEND_MESSAGE"
+);
 
 // import error codes
 const ErrCode = ErrCodeActionProposalVoting;
@@ -46,102 +50,224 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   ////////////////////////////////////////
-  // propose() tests
+  // create-action-proposal() tests
   ////////////////////////////////////////
-  it("propose() fails if called directly", () => {
+  it("create-action-proposal() fails with insufficient balance", () => {
     // arrange
+    constructDao(deployer);
     // act
-    // const receipt = simnet.callPublicFn(
-    //   contractAddress,
-    //   "propose",
-    //   [/* parameters */],
-    //   address1
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.contractPrincipal(actionContractAddress.split(".")[0], actionContractAddress.split(".")[1]),
+        Cl.buffer(new Uint8Array(0)),
+        Cl.none()
+      ],
+      address1
+    );
     // assert
-    // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
-  });
-
-  it("propose() succeeds if called by the DAO", () => {
-    // arrange
-    // constructDao(deployer);
-    // act
-    // const receipt = simnet.callPublicFn(
-    //   baseDaoContractAddress,
-    //   "request-extension-callback",
-    //   [
-    //     Cl.principal(contractAddress),
-    //     Cl.buffer(Cl.serialize(/* parameters */))
-    //   ],
-    //   deployer
-    // );
-    // assert
-    // expect(receipt.result).toBeOk(Cl.bool(true));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INSUFFICIENT_BALANCE));
   });
 
   ////////////////////////////////////////
-  // vote() tests
+  // vote-on-action-proposal() tests
   ////////////////////////////////////////
-  it("vote() fails if called directly", () => {
+  it("vote-on-action-proposal() fails if proposal not found", () => {
     // arrange
     // act
-    // const receipt = simnet.callPublicFn(
-    //   contractAddress,
-    //   "vote",
-    //   [/* parameters */],
-    //   address1
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(999), Cl.bool(true)],
+      address1
+    );
     // assert
-    // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_PROPOSAL_NOT_FOUND));
   });
 
   ////////////////////////////////////////
-  // conclude() tests
+  // veto-action-proposal() tests
   ////////////////////////////////////////
-  it("conclude() fails if called directly", () => {
+  it("veto-action-proposal() fails if proposal not found", () => {
     // arrange
     // act
-    // const receipt = simnet.callPublicFn(
-    //   contractAddress,
-    //   "conclude",
-    //   [/* parameters */],
-    //   address1
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "veto-action-proposal",
+      [Cl.uint(999)],
+      address1
+    );
     // assert
-    // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_PROPOSAL_NOT_FOUND));
+  });
+
+  ////////////////////////////////////////
+  // conclude-action-proposal() tests
+  ////////////////////////////////////////
+  it("conclude-action-proposal() fails if proposal not found", () => {
+    // arrange
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "conclude-action-proposal",
+      [
+        Cl.uint(999),
+        Cl.contractPrincipal(actionContractAddress.split(".")[0], actionContractAddress.split(".")[1])
+      ],
+      address1
+    );
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_PROPOSAL_NOT_FOUND));
   });
 });
 
 describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
-  // get-proposal-by-id() tests
+  // get-voting-power() tests
   ////////////////////////////////////////
-  it("get-proposal-by-id() returns expected value", () => {
+  it("get-voting-power() returns expected value", () => {
     // arrange
-    // constructDao(deployer);
     // act
-    // const result = simnet.callReadOnlyFn(
-    //   contractAddress,
-    //   "get-proposal-by-id",
-    //   [/* parameters */],
-    //   deployer
-    // ).result;
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-voting-power",
+      [Cl.uint(1), Cl.principal(address1)],
+      deployer
+    ).result;
     // assert
-    // expect(result).toStrictEqual(/* expected value */);
+    expect(result).toBeErr(Cl.uint(ErrCode.ERR_PROPOSAL_NOT_FOUND)); // or appropriate value
   });
 
   ////////////////////////////////////////
-  // get-vote-by-voter-and-proposal-id() tests
+  // get-proposal() tests
   ////////////////////////////////////////
-  it("get-vote-by-voter-and-proposal-id() returns expected value", () => {
+  it("get-proposal() returns expected value", () => {
     // arrange
     // act
-    // const result = simnet.callReadOnlyFn(
-    //   contractAddress,
-    //   "get-vote-by-voter-and-proposal-id",
-    //   [/* parameters */],
-    //   deployer
-    // ).result;
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-proposal",
+      [Cl.uint(1)],
+      deployer
+    ).result;
     // assert
-    // expect(result).toStrictEqual(/* expected value */);
+    expect(result).toBeNone(); // or appropriate value
+  });
+
+  ////////////////////////////////////////
+  // get-vote-record() tests
+  ////////////////////////////////////////
+  it("get-vote-record() returns expected value", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-vote-record",
+      [Cl.uint(1), Cl.principal(address1)],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeNone(); // or appropriate value
+  });
+
+  ////////////////////////////////////////
+  // get-veto-vote-record() tests
+  ////////////////////////////////////////
+  it("get-veto-vote-record() returns expected value", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-veto-vote-record",
+      [Cl.uint(1), Cl.principal(address1)],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeNone(); // or appropriate value
+  });
+
+  ////////////////////////////////////////
+  // get-vote-records() tests
+  ////////////////////////////////////////
+  it("get-vote-records() returns expected value", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-vote-records",
+      [Cl.uint(1), Cl.principal(address1)],
+      deployer
+    ).result;
+    // assert
+    expect(result).toStrictEqual(Cl.tuple({
+      voteRecord: Cl.none(),
+      vetoVoteRecord: Cl.none()
+    })); // or appropriate value
+  });
+
+  ////////////////////////////////////////
+  // get-total-proposals() tests
+  ////////////////////////////////////////
+  it("get-total-proposals() returns expected value", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-total-proposals",
+      [],
+      deployer
+    ).result;
+    // assert
+    expect(result).toStrictEqual(Cl.tuple({
+      proposalCount: Cl.uint(0),
+      concludedProposalCount: Cl.uint(0),
+      executedProposalCount: Cl.uint(0),
+      lastProposalStacksBlock: Cl.uint(0),
+      lastProposalBitcoinBlock: Cl.uint(0)
+    })); // or appropriate value
+  });
+
+  ////////////////////////////////////////
+  // get-voting-configuration() tests
+  ////////////////////////////////////////
+  it("get-voting-configuration() returns expected value", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-voting-configuration",
+      [],
+      deployer
+    ).result;
+    // assert
+    expect(result).toStrictEqual(Cl.tuple({
+      self: Cl.principal(contractAddress),
+      deployedBitcoinBlock: Cl.uint(0),
+      deployedStacksBlock: Cl.uint(0),
+      delay: Cl.uint(144),
+      period: Cl.uint(288),
+      quorum: Cl.uint(15),
+      threshold: Cl.uint(66),
+      treasury: Cl.principal(registry.getContractAddressByTypeAndSubtype("EXTENSIONS", "TREASURY")),
+      proposalBond: Cl.uint(500000000000),
+      proposalReward: Cl.uint(100000000000)
+    })); // or appropriate value
+  });
+
+  ////////////////////////////////////////
+  // get-liquid-supply() tests
+  ////////////////////////////////////////
+  it("get-liquid-supply() returns expected value", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-liquid-supply",
+      [Cl.uint(0)],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeErr(Cl.uint(ErrCode.ERR_RETRIEVING_START_BLOCK_HASH)); // or appropriate value
   });
 });

@@ -46,54 +46,36 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   ////////////////////////////////////////
-  // transfer-token() tests
+  // set-token-uri() tests
   ////////////////////////////////////////
-  it("transfer-token() fails if called directly", () => {
+  it("set-token-uri() fails if called directly", () => {
     // arrange
     // act
-    // const receipt = simnet.callPublicFn(
-    //   contractAddress,
-    //   "transfer-token",
-    //   [/* parameters */],
-    //   address1
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "set-token-uri",
+      [Cl.stringUtf8("https://example.com/token.json")],
+      address1
+    );
     // assert
-    // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
 
-  it("transfer-token() succeeds if called by the DAO", () => {
+  ////////////////////////////////////////
+  // transfer-ownership() tests
+  ////////////////////////////////////////
+  it("transfer-ownership() fails if called directly", () => {
     // arrange
-    // constructDao(deployer);
     // act
-    // const receipt = simnet.callPublicFn(
-    //   baseDaoContractAddress,
-    //   "request-extension-callback",
-    //   [
-    //     Cl.principal(contractAddress),
-    //     Cl.buffer(Cl.serialize(/* parameters */))
-    //   ],
-    //   deployer
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "transfer-ownership",
+      [Cl.principal(address1)],
+      address1
+    );
     // assert
-    // expect(receipt.result).toBeOk(Cl.bool(true));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
 });
 
-describe(`read-only functions: ${contractName}`, () => {
-  ////////////////////////////////////////
-  // get-token-balance() tests
-  ////////////////////////////////////////
-  it("get-token-balance() returns expected value", () => {
-    // arrange
-    // constructDao(deployer);
-    // act
-    // const result = simnet.callReadOnlyFn(
-    //   contractAddress,
-    //   "get-token-balance",
-    //   [/* parameters */],
-    //   deployer
-    // ).result;
-    // assert
-    // expect(result).toStrictEqual(/* expected value */);
-  });
-});
+// Note: There are no read-only functions in this contract that need testing
