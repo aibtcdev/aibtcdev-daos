@@ -1,4 +1,4 @@
-;; title: aibtc-token-owner
+;; title: aibtc-faktory-owner
 ;; version: 1.0.0
 ;; summary: An extension that provides management functions for the dao token
 
@@ -25,12 +25,12 @@
     ;; check if caller is authorized
     (try! (is-dao-or-extension))
     ;; update token uri
-    ;; /g/.aibtc-token/dao_token_contract
-    (try! (as-contract (contract-call? .aibtc-token set-token-uri value)))
+    ;; /g/.aibtc-faktory/dao_token_contract
+    (try! (as-contract (contract-call? .aibtc-faktory set-token-uri value)))
     ;; print event
     (print {
       ;; /g/aibtc/dao_token_symbol
-      notification: "aibtc-token-owner/set-token-uri",
+      notification: "aibtc-faktory-owner/set-token-uri",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
@@ -47,12 +47,12 @@
     ;; check if caller is authorized
     (try! (is-dao-or-extension))
     ;; transfer ownership
-    ;; /g/.aibtc-token/dao_token_contract
-    (try! (as-contract (contract-call? .aibtc-token set-contract-owner new-owner)))
+    ;; /g/.aibtc-faktory/dao_token_contract
+    (try! (as-contract (contract-call? .aibtc-faktory set-contract-owner new-owner)))
     ;; print event
     (print {
       ;; /g/aibtc/dao_token_symbol
-      notification: "aibtc-token-owner/transfer-ownership",
+      notification: "aibtc-faktory-owner/transfer-ownership",
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,

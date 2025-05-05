@@ -25,7 +25,7 @@
     (
       (isFromDao (is-ok (is-dao-or-extension)))
       ;; /g/.aibtc-base-dao/dao_base_contract
-      (senderBalance (unwrap! (contract-call? .aibtc-token get-balance tx-sender) ERR_FETCHING_TOKEN_DATA))
+      (senderBalance (unwrap! (contract-call? .aibtc-faktory get-balance tx-sender) ERR_FETCHING_TOKEN_DATA))
       (isFromHolder (> senderBalance u0))
     )
     ;; check there is a message

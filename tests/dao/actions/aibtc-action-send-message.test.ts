@@ -6,6 +6,9 @@ import {
   fundVoters,
   passActionProposal,
 } from "../../utilities/dao-helpers";
+import { setupDaoContractRegistry } from "../../utilities/contract-registry";
+
+const registry = setupDaoContractRegistry();
 
 const accounts = simnet.getAccounts();
 const deployer = accounts.get("deployer")!;
@@ -13,7 +16,12 @@ const address1 = accounts.get("wallet_1")!;
 const address2 = accounts.get("wallet_2")!;
 const address3 = accounts.get("wallet_3")!;
 
-const contractName = "aibtc-action-send-message";
+const contractRecord = registry.getContractByTypeAndSubtype(
+  "ACTIONS",
+  "SEND_MESSAGE"
+);
+expect(contractRecord).toBeDefined();
+const contractName = contractRecord!.name;
 const contractAddress = `${deployer}.${contractName}`;
 
 const ErrCode = ErrCodeActionSendMessage;

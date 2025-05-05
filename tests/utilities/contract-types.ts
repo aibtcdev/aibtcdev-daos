@@ -84,6 +84,6 @@ export const CONTRACT_NAMES: {
     DAO: "aibtc-faktory",
     DEX: "aibtc-faktory-dex",
     POOL: "xyk-pool-sbtc-aibtc-v-1-1",
-    PRELAUNCH: "aibtc-pre-dex",
+    PRELAUNCH: "aibtc-pre-faktory",
   },
 };

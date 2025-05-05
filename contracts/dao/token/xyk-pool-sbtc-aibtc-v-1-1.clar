@@ -20,7 +20,7 @@
 
 ;; XYK Core address and contract deployer address
 (define-constant CORE_ADDRESS 'ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1.xyk-core-v-1-2) ;; <%= it.bitflow_xyk_core_address %>
-(define-constant CONTRACT_DEPLOYER .aibtc-token-dex) ;; <%= it.dex_contract %>
+(define-constant CONTRACT_DEPLOYER .aibtc-faktory-dex) ;; <%= it.dex_contract %>
 
 ;; Define all pool data vars
 (define-data-var pool-id uint u0)

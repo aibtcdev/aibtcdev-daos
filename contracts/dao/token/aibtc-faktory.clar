@@ -9,7 +9,7 @@
 
 (define-fungible-token SYMBOL-AIBTC-DAO MAX) ;; <%= it.token_symbol %>
 (define-constant MAX u100000000000000000) ;; <%= it.token_max_supply %>
-(define-data-var contract-owner principal .aibtc-token-owner) ;; <%= it.token_owner %>
+(define-data-var contract-owner principal .aibtc-faktory-owner) ;; <%= it.token_owner %>
 (define-data-var token-uri (optional (string-utf8 256)) (some u"<%= it.token_uri %>")) 
 
 ;; SIP-10 Functions
@@ -93,8 +93,8 @@
 (begin 
     ;; ft distribution
     (try! (ft-mint? SYMBOL-AIBTC-DAO (/ (* MAX u80) u100) .aibtc-treasury)) ;; 80% treasury SPVMS254T8Q0RXQP95Y01T7KBHZV91X88CDK48QH
-    (try! (ft-mint? SYMBOL-AIBTC-DAO (/ (* MAX u16) u100) .aibtc-token-dex)) ;; 16% dex SPVMS254T8Q0RXQP95Y01T7KBHZV91X88CDK48QH
-    (try! (ft-mint? SYMBOL-AIBTC-DAO (/ (* MAX u4) u100) .aibtc-pre-dex)) ;; 4% pre-launch SPVMS254T8Q0RXQP95Y01T7KBHZV91X88CDK48QH
+    (try! (ft-mint? SYMBOL-AIBTC-DAO (/ (* MAX u16) u100) .aibtc-faktory-dex)) ;; 16% dex SPVMS254T8Q0RXQP95Y01T7KBHZV91X88CDK48QH
+    (try! (ft-mint? SYMBOL-AIBTC-DAO (/ (* MAX u4) u100) .aibtc-pre-faktory)) ;; 4% pre-launch SPVMS254T8Q0RXQP95Y01T7KBHZV91X88CDK48QH
 
     (print { 
         type: "faktory-trait-v1", 

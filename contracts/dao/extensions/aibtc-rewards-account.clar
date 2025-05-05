@@ -44,7 +44,7 @@
 (define-public (transfer-reward (recipient principal) (amount uint))
   (let
     (
-      (contractBalance (unwrap-panic (contract-call? .aibtc-token get-balance SELF)))
+      (contractBalance (unwrap-panic (contract-call? .aibtc-faktory get-balance SELF)))
     )
     (try! (is-dao-or-extension))
     (asserts! (>= contractBalance amount) ERR_INSUFFICIENT_BALANCE)
@@ -58,7 +58,7 @@
         txSender: tx-sender
       }
     })
-    (as-contract (contract-call? .aibtc-token transfer amount SELF recipient none))
+    (as-contract (contract-call? .aibtc-faktory transfer amount SELF recipient none))
   )
 )
 

@@ -30,8 +30,8 @@
 
 ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_token_contract
 (define-constant CFG_SBTC_TOKEN 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token)
-;; /g/.aibtc-token/dao_token_contract
-(define-constant CFG_DAO_TOKEN .aibtc-token)
+;; /g/.aibtc-faktory/dao_token_contract
+(define-constant CFG_DAO_TOKEN .aibtc-faktory)
 
 ;; data maps
 ;;

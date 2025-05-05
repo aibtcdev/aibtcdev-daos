@@ -68,8 +68,8 @@
 (define-data-var governance-active bool false)
 
 ;; Determined after multi-sig creation
-(define-constant TOKEN-DAO .aibtc-token) ;; param
-(define-constant DEX-DAO .aibtc-token-dex) ;; param
+(define-constant TOKEN-DAO .aibtc-faktory) ;; param
+(define-constant DEX-DAO .aibtc-faktory-dex) ;; param
 
 ;; Helper vars
 (define-data-var target-owner principal 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A) ;; 'SP000000000000000000002Q6VF78

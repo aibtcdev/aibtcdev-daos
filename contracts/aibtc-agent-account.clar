@@ -28,10 +28,10 @@
 ;; pre-approved contracts
 ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_contract
 (define-constant SBTC_TOKEN 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token) ;; sBTC token
-;; /g/.aibtc-token/dao_token_contract
-(define-constant DAO_TOKEN .aibtc-token) ;; DAO token
-;; /g/.aibtc-token-dex/dao_token_dex_contract
-(define-constant DAO_TOKEN_DEX .aibtc-token-dex) ;; DAO token DEX
+;; /g/.aibtc-faktory/dao_token_contract
+(define-constant DAO_TOKEN .aibtc-faktory) ;; DAO token
+;; /g/.aibtc-faktory-dex/dao_token_dex_contract
+(define-constant DAO_TOKEN_DEX .aibtc-faktory-dex) ;; DAO token DEX
 
 ;; error codes
 (define-constant ERR_UNAUTHORIZED (err u1100))

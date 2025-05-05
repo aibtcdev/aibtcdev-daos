@@ -58,8 +58,8 @@ epoch = 3.1
 
 # dao run cost (collects fee per proposal)
 
-[contracts.dao-run-cost]
-path = "contracts/dao-run-cost.clar"
+[contracts.aibtc-dao-run-cost]
+path = "contracts/aibtc-dao-run-cost.clar"
 clarity_version = 3
 epoch = 3.1
 
@@ -114,7 +114,7 @@ path = 'contracts/dao/extensions/aibtc-rewards-account.clar'
 clarity_version = 3
 epoch = 3.1
 
-[contracts.aibtc-token-owner]
+[contracts.aibtc-faktory-owner]
 path = 'contracts/dao/extensions/aibtc-token-owner.clar'
 clarity_version = 3
 epoch = 3.1
@@ -140,22 +140,22 @@ epoch = 3.1
 
 # faktory contracts
 
-[contracts.aibtc-token]
-path = 'contracts/dao/token/aibtc-token.clar'
+[contracts.aibtc-faktory]
+path = 'contracts/dao/token/aibtc-faktory.clar'
 clarity_version = 2
 epoch = 3.1
 
-[contracts.aibtc-pre-dex]
-path = 'contracts/dao/token/aibtc-pre-dex.clar'
+[contracts.aibtc-pre-faktory]
+path = 'contracts/dao/token/aibtc-pre-faktory.clar'
 clarity_version = 2
 epoch = 3.1
 
-[contracts.aibtc-token-dex]
-path = 'contracts/dao/token/aibtc-token-dex.clar'
+[contracts.aibtc-faktory-dex]
+path = 'contracts/dao/token/aibtc-faktory-dex.clar'
 clarity_version = 2
 epoch = 3.1
 
-[contracts.aibtc-bitflow-pool]
-path = 'contracts/dao/token/aibtc-bitflow-pool.clar'
+[contracts.xyk-pool-sbtc-aibtc-v-1-1]
+path = 'contracts/dao/token/xyk-pool-sbtc-aibtc-v-1-1.clar'
 clarity_version = 2
 epoch = 3.1

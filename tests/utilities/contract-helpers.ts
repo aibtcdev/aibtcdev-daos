@@ -6,7 +6,9 @@ import {
   TupleCV,
 } from "@stacks/transactions";
 
-export const SBTC_CONTRACT = `STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token`;
+export const DEVNET_DEPLOYER = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
+export const SBTC_CONTRACT =
+  "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token";
 
 // bigint replacer for json.stringify()
 export function bigIntReplacer(_key: string, value: any) {

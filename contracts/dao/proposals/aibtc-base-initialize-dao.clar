@@ -7,8 +7,8 @@
 
 ;; /g/dao mission goes here/dao_manifest
 (define-constant CFG_DAO_MANIFEST_TEXT "dao mission goes here")
-;; /g/.aibtc-token/dao_token_contract
-(define-constant CFG_DAO_TOKEN .aibtc-token)
+;; /g/.aibtc-faktory/dao_token_contract
+(define-constant CFG_DAO_TOKEN .aibtc-faktory)
 
 (define-public (execute (sender principal))
   (begin
@@ -27,8 +27,8 @@
         {extension: .aibtc-dao-users, enabled: true}
         ;; /g/.aibtc-onchain-messaging/dao_messaging_contract
         {extension: .aibtc-onchain-messaging, enabled: true}
-        ;; /g/.aibtc-token-owner/dao_token_owner_contract
-        {extension: .aibtc-token-owner, enabled: true}
+        ;; /g/.aibtc-faktory-owner/dao_token_owner_contract
+        {extension: .aibtc-faktory-owner, enabled: true}
         ;; /g/.aibtc-treasury/dao_treasury_contract
         {extension: .aibtc-treasury, enabled: true}
         ;; initial action proposals (as extensions)
