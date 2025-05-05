@@ -47,7 +47,7 @@ contract_id = 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1'
 # agent account
 
 [contracts.aibtc-agent-account]
-path = "contracts/aibtc-agent-account.clar"
+path = "contracts/agent/aibtc-agent-account.clar"
 clarity_version = 3
 epoch = 3.1
 
@@ -59,7 +59,7 @@ epoch = 3.1
 # dao run cost (collects fee per proposal)
 
 [contracts.aibtc-dao-run-cost]
-path = "contracts/aibtc-dao-run-cost.clar"
+path = "contracts/core/aibtc-dao-run-cost.clar"
 clarity_version = 3
 epoch = 3.1
 
