@@ -14,6 +14,7 @@ import { ProposalContract } from "../models/dao-proposal-contract";
 import { AgentContract } from "../models/agent-contract";
 import { CoreContract } from "../models/core-contract";
 import { ExternalContract } from "../models/external-contract";
+import { DEVNET_DEPLOYER } from "./contract-helpers";
 
 export function setupDaoContractRegistry(): ContractRegistry {
   const registry = new ContractRegistry();
@@ -67,6 +68,13 @@ export class ContractRegistry {
     return Array.from(this.contracts.values());
   }
 
+  // Get contract address
+  getContractAddress(name: string, deployer?: string): string | undefined {
+    const contract = this.contracts.get(name);
+    const contractDeployer = deployer ? deployer : DEVNET_DEPLOYER;
+    return contract ? `${contractDeployer}.${contract.name}` : undefined;
+  }
+
   // Get contracts by type
   getContractsByType(type: ContractType): ContractBase[] {
     return this.contractsByType.get(type) || [];
@@ -88,6 +96,18 @@ export class ContractRegistry {
   ): ContractBase | undefined {
     const contracts = this.getContractsBySubtype(type, subtype);
     return contracts.length > 0 ? contracts[0] : undefined;
+  }
+
+  // Get the contract address for a specific type and subtype
+  getContractAddressByTypeAndSubtype<T extends ContractType>(
+    type: T,
+    subtype: ContractSubtype<T>,
+    deployer?: string
+  ): string | undefined {
+    const contract = this.getContractByTypeAndSubtype(type, subtype);
+    return contract
+      ? this.getContractAddress(contract.name, deployer)
+      : undefined;
   }
 
   // Generate contract name with token symbol

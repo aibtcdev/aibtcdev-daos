@@ -8,22 +8,22 @@ import {
 } from "../../utilities/dao-helpers";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
 
-const registry = setupDaoContractRegistry();
-
+// setup accounts
 const accounts = simnet.getAccounts();
 const deployer = accounts.get("deployer")!;
 const address1 = accounts.get("wallet_1")!;
 const address2 = accounts.get("wallet_2")!;
 const address3 = accounts.get("wallet_3")!;
 
-const contractRecord = registry.getContractByTypeAndSubtype(
+// setup contract info for tests
+const registry = setupDaoContractRegistry();
+const contractAddressFromRegistry = registry.getContractAddressByTypeAndSubtype(
   "ACTIONS",
   "SEND_MESSAGE"
 );
-expect(contractRecord).toBeDefined();
-const contractName = contractRecord!.name;
-const contractAddress = `${deployer}.${contractName}`;
-
+expect(contractAddressFromRegistry).toBeDefined();
+const contractAddress = contractAddressFromRegistry!;
+const contractName = contractAddress.split(".")[1];
 const ErrCode = ErrCodeActionSendMessage;
 
 describe(`public functions: ${contractName}`, () => {
