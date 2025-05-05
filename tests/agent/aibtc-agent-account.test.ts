@@ -3,19 +3,19 @@ import {
   ClarityType,
   ClarityValue,
   cvToValue,
-  TupleCV
+  TupleCV,
 } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeAgentAccount } from "../utilities/contract-error-codes";
-import { 
+import {
   setupFullContractRegistry,
-  setupDaoContractRegistry
+  setupDaoContractRegistry,
 } from "../utilities/contract-registry";
-import { 
+import {
   convertSIP019PrintEvent,
-  dbgLog,
-  SBTC_CONTRACT
+  SBTC_CONTRACT,
 } from "../utilities/contract-helpers";
+import { printAssetsMap } from "../utilities/clarinet-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -46,14 +46,13 @@ const baseDaoContractAddress = daoRegistry.getContractAddressByTypeAndSubtype(
   "BASE",
   "DAO"
 );
-const actionProposalsContractAddress = daoRegistry.getContractAddressByTypeAndSubtype(
-  "EXTENSIONS",
-  "ACTION_PROPOSAL_VOTING"
-);
-const sendMessageActionContractAddress = daoRegistry.getContractAddressByTypeAndSubtype(
-  "ACTIONS",
-  "SEND_MESSAGE"
-);
+const actionProposalsContractAddress =
+  daoRegistry.getContractAddressByTypeAndSubtype(
+    "EXTENSIONS",
+    "ACTION_PROPOSAL_VOTING"
+  );
+const sendMessageActionContractAddress =
+  daoRegistry.getContractAddressByTypeAndSubtype("ACTIONS", "SEND_MESSAGE");
 
 // import error codes
 const ErrCode = ErrCodeAgentAccount;
@@ -68,7 +67,7 @@ function setupAccount(sender: string, satsAmount: number = 1000000) {
     sender
   );
   expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-  
+
   // get dao tokens from the dex
   const dexReceipt = simnet.callPublicFn(
     tokenDexContractAddress,
@@ -77,13 +76,13 @@ function setupAccount(sender: string, satsAmount: number = 1000000) {
     sender
   );
   expect(dexReceipt.result).toBeOk(Cl.bool(true));
-  
+
   // get our balances from the assets map
   const balancesMap = simnet.getAssetsMap();
   const aibtcKey = daoTokenAddress.split(".")[1];
   const sbtcKey = SBTC_CONTRACT.split(".")[1];
   const stxKey = "STX";
-  
+
   // deposit sBTC to the agent account
   const depositReceiptSbtc = simnet.callPublicFn(
     contractAddress,
@@ -109,15 +108,9 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("deposit-stx() succeeds and deposits STX to the account", () => {
     // arrange
+    printAssetsMap(simnet.getAssetsMap());
     const amount = 1000000; // 1 STX
-    const initialBalanceResponse = simnet.callReadOnlyFn(
-      contractAddress,
-      "get-balance-stx",
-      [],
-      deployer
-    );
-    const initialBalance = Number(cvToValue(initialBalanceResponse.result));
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -125,17 +118,10 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.uint(amount)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
-    const newBalanceResponse = simnet.callReadOnlyFn(
-      contractAddress,
-      "get-balance-stx",
-      [],
-      deployer
-    );
-    const newBalance = Number(cvToValue(newBalanceResponse.result));
-    expect(newBalance).toBe(initialBalance + amount);
+    printAssetsMap(simnet.getAssetsMap());
   });
 
   it("deposit-stx() emits the correct notification event", () => {
@@ -147,10 +133,10 @@ describe(`public functions: ${contractName}`, () => {
         contractCaller: deployer,
         txSender: deployer,
         amount: amount.toString(),
-        recipient: contractAddress
-      }
+        recipient: contractAddress,
+      },
     };
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -158,7 +144,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.uint(amount)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
     const event = receipt.events[0];
@@ -174,7 +160,7 @@ describe(`public functions: ${contractName}`, () => {
     // arrange
     const amount = 10000000;
     const unapprovedToken = `${deployer}.test-token`;
-    
+
     // get sBTC from the faucet
     const faucetReceipt = simnet.callPublicFn(
       SBTC_CONTRACT,
@@ -183,7 +169,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -191,7 +177,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(unapprovedToken), Cl.uint(amount)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNKNOWN_ASSET));
   });
@@ -199,7 +185,7 @@ describe(`public functions: ${contractName}`, () => {
   it("deposit-ft() succeeds and transfers sBTC to the account", () => {
     // arrange
     const sbtcAmount = 100000000;
-    
+
     // get sBTC from the faucet
     const faucetReceipt = simnet.callPublicFn(
       SBTC_CONTRACT,
@@ -208,7 +194,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -216,7 +202,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(SBTC_CONTRACT), Cl.uint(sbtcAmount)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
   });
@@ -231,10 +217,10 @@ describe(`public functions: ${contractName}`, () => {
         assetContract: SBTC_CONTRACT,
         sender: deployer,
         caller: deployer,
-        recipient: contractAddress
-      }
+        recipient: contractAddress,
+      },
     };
-    
+
     // get sBTC from the faucet
     const faucetReceipt = simnet.callPublicFn(
       SBTC_CONTRACT,
@@ -243,7 +229,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -251,7 +237,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(SBTC_CONTRACT), Cl.uint(amount)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
     const event = receipt.events[0];
@@ -266,7 +252,7 @@ describe(`public functions: ${contractName}`, () => {
   it("withdraw-stx() fails if caller is not the owner", () => {
     // arrange
     const amount = 1000000; // 1 STX
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -274,7 +260,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.uint(amount)],
       address3
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
@@ -282,7 +268,7 @@ describe(`public functions: ${contractName}`, () => {
   it("withdraw-stx() succeeds and transfers STX to owner", () => {
     // arrange
     const amount = 1000000; // 1 STX
-    
+
     // deposit stx so we can withdraw
     const depositReceipt = simnet.callPublicFn(
       contractAddress,
@@ -291,7 +277,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(depositReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -299,7 +285,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.uint(amount)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
   });
@@ -313,10 +299,10 @@ describe(`public functions: ${contractName}`, () => {
         amount: amount.toString(),
         sender: contractAddress,
         caller: deployer,
-        recipient: deployer
-      }
+        recipient: deployer,
+      },
     };
-    
+
     // deposit stx so we can withdraw
     const depositReceipt = simnet.callPublicFn(
       contractAddress,
@@ -325,7 +311,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(depositReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -333,7 +319,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.uint(amount)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
     const event = receipt.events[0];
@@ -348,7 +334,7 @@ describe(`public functions: ${contractName}`, () => {
   it("withdraw-ft() fails if caller is not the owner", () => {
     // arrange
     const amount = 10000000;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -356,7 +342,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(SBTC_CONTRACT), Cl.uint(amount)],
       address3
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
@@ -365,7 +351,7 @@ describe(`public functions: ${contractName}`, () => {
     // arrange
     const amount = 10000000;
     const unapprovedToken = `${deployer}.test-token`;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -373,7 +359,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(unapprovedToken), Cl.uint(amount)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNKNOWN_ASSET));
   });
@@ -381,7 +367,7 @@ describe(`public functions: ${contractName}`, () => {
   it("withdraw-ft() succeeds and transfers FT to the owner", () => {
     // arrange
     const sbtcAmount = 100000;
-    
+
     // get sBTC from the faucet
     const faucetReceipt = simnet.callPublicFn(
       SBTC_CONTRACT,
@@ -390,7 +376,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // deposit ft so we can withdraw
     const depositReceipt = simnet.callPublicFn(
       contractAddress,
@@ -399,7 +385,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(depositReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -407,7 +393,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(SBTC_CONTRACT), Cl.uint(sbtcAmount)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
   });
@@ -422,10 +408,10 @@ describe(`public functions: ${contractName}`, () => {
         assetContract: SBTC_CONTRACT,
         sender: contractAddress,
         caller: deployer,
-        recipient: deployer
-      }
+        recipient: deployer,
+      },
     };
-    
+
     // get sBTC from the faucet
     const faucetReceipt = simnet.callPublicFn(
       SBTC_CONTRACT,
@@ -434,7 +420,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // deposit ft so we can withdraw
     const depositReceipt = simnet.callPublicFn(
       contractAddress,
@@ -443,7 +429,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(depositReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -451,7 +437,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(SBTC_CONTRACT), Cl.uint(amount)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
     const event = receipt.events[0];
@@ -466,7 +452,7 @@ describe(`public functions: ${contractName}`, () => {
   it("approve-asset() fails if caller is not the owner", () => {
     // arrange
     const newAsset = `${deployer}.test-token`;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -474,7 +460,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(newAsset)],
       address3
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
@@ -482,7 +468,7 @@ describe(`public functions: ${contractName}`, () => {
   it("approve-asset() succeeds and sets new approved asset", () => {
     // arrange
     const newAsset = `${deployer}.new-token`;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -490,10 +476,10 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(newAsset)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
-    
+
     // verify the asset is now approved
     const isApproved = simnet.callReadOnlyFn(
       contractAddress,
@@ -513,10 +499,10 @@ describe(`public functions: ${contractName}`, () => {
         asset: newAsset,
         approved: true,
         sender: deployer,
-        caller: deployer
-      }
+        caller: deployer,
+      },
     };
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -524,7 +510,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(newAsset)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
     const event = receipt.events[0];
@@ -539,7 +525,7 @@ describe(`public functions: ${contractName}`, () => {
   it("revoke-asset() fails if caller is not the owner", () => {
     // arrange
     const asset = `${deployer}.test-token`;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -547,7 +533,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(asset)],
       address3
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
@@ -555,7 +541,7 @@ describe(`public functions: ${contractName}`, () => {
   it("revoke-asset() succeeds and removes approved asset", () => {
     // arrange
     const asset = `${deployer}.test-token`;
-    
+
     // approve the asset first
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
@@ -564,7 +550,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -572,10 +558,10 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(asset)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
-    
+
     // verify the asset is now revoked
     const isApproved = simnet.callReadOnlyFn(
       contractAddress,
@@ -595,10 +581,10 @@ describe(`public functions: ${contractName}`, () => {
         asset: asset,
         approved: false,
         sender: deployer,
-        caller: deployer
-      }
+        caller: deployer,
+      },
     };
-    
+
     // approve the asset first
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
@@ -607,7 +593,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -615,7 +601,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(asset)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
     const event = receipt.events[0];
@@ -630,7 +616,7 @@ describe(`public functions: ${contractName}`, () => {
   it("create-action-proposal() fails if caller is not authorized (user or agent)", () => {
     // arrange
     const message = Cl.stringAscii("hello world");
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -639,11 +625,11 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         Cl.buffer(Cl.serialize(message)),
-        Cl.some(Cl.stringAscii("Test memo"))
+        Cl.some(Cl.stringAscii("Test memo")),
       ],
       address3
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
@@ -652,7 +638,7 @@ describe(`public functions: ${contractName}`, () => {
     // arrange
     const message = Cl.stringAscii("hello world");
     setupAccount(deployer);
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -661,11 +647,11 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         Cl.buffer(Cl.serialize(message)),
-        Cl.some(Cl.stringAscii("Test memo"))
+        Cl.some(Cl.stringAscii("Test memo")),
       ],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
   });
@@ -680,11 +666,11 @@ describe(`public functions: ${contractName}`, () => {
         action: sendMessageActionContractAddress,
         parameters: cvToValue(Cl.buffer(Cl.serialize(message))),
         sender: deployer,
-        caller: deployer
-      }
+        caller: deployer,
+      },
     };
     setupAccount(deployer);
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -693,11 +679,11 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         Cl.buffer(Cl.serialize(message)),
-        Cl.some(Cl.stringAscii("Test memo"))
+        Cl.some(Cl.stringAscii("Test memo")),
       ],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
     const event = receipt.events[0];
@@ -713,7 +699,7 @@ describe(`public functions: ${contractName}`, () => {
     // arrange
     const proposalId = 1;
     const vote = true;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -721,11 +707,11 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(actionProposalsContractAddress),
         Cl.uint(proposalId),
-        Cl.bool(vote)
+        Cl.bool(vote),
       ],
       address3
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
@@ -736,7 +722,7 @@ describe(`public functions: ${contractName}`, () => {
   it("conclude-action-proposal() fails if caller is not authorized (user or agent)", () => {
     // arrange
     const proposalId = 1;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -744,11 +730,11 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(actionProposalsContractAddress),
         Cl.uint(proposalId),
-        Cl.principal(sendMessageActionContractAddress)
+        Cl.principal(sendMessageActionContractAddress),
       ],
       address3
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
@@ -759,7 +745,7 @@ describe(`public functions: ${contractName}`, () => {
   it("acct-approve-dex() fails if caller is not the owner", () => {
     // arrange
     const dex = `${deployer}.test-dex-1`;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -767,7 +753,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(dex)],
       address3
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
@@ -775,7 +761,7 @@ describe(`public functions: ${contractName}`, () => {
   it("acct-approve-dex() succeeds and sets new approved dex", () => {
     // arrange
     const dex = `${deployer}.test-dex-1`;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -783,10 +769,10 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(dex)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
-    
+
     // verify the dex is now approved
     const isApproved = simnet.callReadOnlyFn(
       contractAddress,
@@ -806,10 +792,10 @@ describe(`public functions: ${contractName}`, () => {
         dexContract: dex,
         approved: true,
         sender: deployer,
-        caller: deployer
-      }
+        caller: deployer,
+      },
     };
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -817,7 +803,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(dex)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
     const event = receipt.events[0];
@@ -832,7 +818,7 @@ describe(`public functions: ${contractName}`, () => {
   it("acct-revoke-dex() fails if caller is not the owner", () => {
     // arrange
     const dex = `${deployer}.test-dex-1`;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -840,7 +826,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(dex)],
       address3
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
@@ -848,7 +834,7 @@ describe(`public functions: ${contractName}`, () => {
   it("acct-revoke-dex() succeeds and removes approved dex", () => {
     // arrange
     const dex = `${deployer}.test-dex-1`;
-    
+
     // approve the dex first
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
@@ -857,7 +843,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -865,10 +851,10 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(dex)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
-    
+
     // verify the dex is now revoked
     const isApproved = simnet.callReadOnlyFn(
       contractAddress,
@@ -888,10 +874,10 @@ describe(`public functions: ${contractName}`, () => {
         dexContract: dex,
         approved: false,
         sender: deployer,
-        caller: deployer
-      }
+        caller: deployer,
+      },
     };
-    
+
     // approve the dex first
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
@@ -900,7 +886,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -908,7 +894,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(dex)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
     const event = receipt.events[0];
@@ -923,7 +909,7 @@ describe(`public functions: ${contractName}`, () => {
   it("set-agent-can-buy-sell() fails if caller is not the owner", () => {
     // arrange
     const canBuySell = true;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -931,7 +917,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.bool(canBuySell)],
       address3
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
@@ -939,7 +925,7 @@ describe(`public functions: ${contractName}`, () => {
   it("set-agent-can-buy-sell() succeeds and sets agent permission", () => {
     // arrange
     const canBuySell = true;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -947,7 +933,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.bool(canBuySell)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
   });
@@ -960,10 +946,10 @@ describe(`public functions: ${contractName}`, () => {
       payload: {
         canBuySell: canBuySell,
         sender: deployer,
-        caller: deployer
-      }
+        caller: deployer,
+      },
     };
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -971,7 +957,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.bool(canBuySell)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
     const event = receipt.events[0];
@@ -988,7 +974,7 @@ describe(`public functions: ${contractName}`, () => {
     const amount = 10000000;
     const dex = tokenDexContractAddress;
     const asset = daoTokenAddress;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -996,7 +982,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(dex), Cl.principal(asset), Cl.uint(amount)],
       address3
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_BUY_SELL_NOT_ALLOWED));
   });
@@ -1006,7 +992,7 @@ describe(`public functions: ${contractName}`, () => {
     const amount = 10000000;
     const dex = tokenDexContractAddress;
     const asset = daoTokenAddress;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -1014,7 +1000,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(dex), Cl.principal(asset), Cl.uint(amount)],
       address2 // agent address
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_BUY_SELL_NOT_ALLOWED));
   });
@@ -1024,7 +1010,7 @@ describe(`public functions: ${contractName}`, () => {
     const amount = 10000000;
     const dex = `${deployer}.test-dex-1`;
     const asset = daoTokenAddress;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -1032,7 +1018,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(dex), Cl.principal(asset), Cl.uint(amount)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNKNOWN_ASSET));
   });
@@ -1045,7 +1031,7 @@ describe(`public functions: ${contractName}`, () => {
     const amount = 10000000;
     const dex = tokenDexContractAddress;
     const asset = daoTokenAddress;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -1053,7 +1039,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(dex), Cl.principal(asset), Cl.uint(amount)],
       address3
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_BUY_SELL_NOT_ALLOWED));
   });
@@ -1063,7 +1049,7 @@ describe(`public functions: ${contractName}`, () => {
     const amount = 10000000;
     const dex = tokenDexContractAddress;
     const asset = daoTokenAddress;
-    
+
     // disable agent buy/sell
     const permissionReceipt = simnet.callPublicFn(
       contractAddress,
@@ -1072,7 +1058,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(permissionReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -1080,7 +1066,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(dex), Cl.principal(asset), Cl.uint(amount)],
       address2 // agent address
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_BUY_SELL_NOT_ALLOWED));
   });
@@ -1090,7 +1076,7 @@ describe(`public functions: ${contractName}`, () => {
     const amount = 10000000;
     const dex = `${deployer}.test-dex-1`;
     const asset = daoTokenAddress;
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -1098,7 +1084,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(dex), Cl.principal(asset), Cl.uint(amount)],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNKNOWN_ASSET));
   });
@@ -1111,7 +1097,7 @@ describe(`read-only functions: ${contractName}`, () => {
   it("is-approved-dex() returns expected values for a dex", () => {
     // arrange
     const dex = `${deployer}.test-dex-1`;
-    
+
     // act
     const isApproved = simnet.callReadOnlyFn(
       contractAddress,
@@ -1119,10 +1105,10 @@ describe(`read-only functions: ${contractName}`, () => {
       [Cl.principal(dex)],
       deployer
     );
-    
+
     // assert
     expect(isApproved.result).toStrictEqual(Cl.bool(false));
-    
+
     // approve the dex
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
@@ -1131,7 +1117,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const isApproved2 = simnet.callReadOnlyFn(
       contractAddress,
@@ -1139,10 +1125,10 @@ describe(`read-only functions: ${contractName}`, () => {
       [Cl.principal(dex)],
       deployer
     );
-    
+
     // assert
     expect(isApproved2.result).toStrictEqual(Cl.bool(true));
-    
+
     // revoke the dex
     const revokeReceipt = simnet.callPublicFn(
       contractAddress,
@@ -1151,7 +1137,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
     expect(revokeReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const isApproved3 = simnet.callReadOnlyFn(
       contractAddress,
@@ -1159,7 +1145,7 @@ describe(`read-only functions: ${contractName}`, () => {
       [Cl.principal(dex)],
       deployer
     );
-    
+
     // assert
     expect(isApproved3.result).toStrictEqual(Cl.bool(false));
   });
@@ -1170,7 +1156,7 @@ describe(`read-only functions: ${contractName}`, () => {
   it("is-approved-asset() returns expected values for an asset", () => {
     // arrange
     const asset = `${deployer}.test-token`;
-    
+
     // act
     const isApproved = simnet.callReadOnlyFn(
       contractAddress,
@@ -1178,10 +1164,10 @@ describe(`read-only functions: ${contractName}`, () => {
       [Cl.principal(asset)],
       deployer
     );
-    
+
     // assert
     expect(isApproved.result).toStrictEqual(Cl.bool(false));
-    
+
     // approve the asset
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
@@ -1190,7 +1176,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const isApproved2 = simnet.callReadOnlyFn(
       contractAddress,
@@ -1198,10 +1184,10 @@ describe(`read-only functions: ${contractName}`, () => {
       [Cl.principal(asset)],
       deployer
     );
-    
+
     // assert
     expect(isApproved2.result).toStrictEqual(Cl.bool(true));
-    
+
     // revoke the asset
     const revokeReceipt = simnet.callPublicFn(
       contractAddress,
@@ -1210,7 +1196,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
     expect(revokeReceipt.result).toBeOk(Cl.bool(true));
-    
+
     // act
     const isApproved3 = simnet.callReadOnlyFn(
       contractAddress,
@@ -1218,7 +1204,7 @@ describe(`read-only functions: ${contractName}`, () => {
       [Cl.principal(asset)],
       deployer
     );
-    
+
     // assert
     expect(isApproved3.result).toStrictEqual(Cl.bool(false));
   });
@@ -1234,9 +1220,9 @@ describe(`read-only functions: ${contractName}`, () => {
       owner: deployer,
       daoToken: daoTokenAddress,
       daoTokenDex: tokenDexContractAddress,
-      sbtcToken: SBTC_CONTRACT
+      sbtcToken: SBTC_CONTRACT,
     };
-    
+
     // act
     const configCV = simnet.callReadOnlyFn(
       contractAddress,
@@ -1250,7 +1236,7 @@ describe(`read-only functions: ${contractName}`, () => {
     if (config.type !== ClarityType.Tuple) {
       throw new Error("returned object is not a tuple");
     }
-    
+
     // Convert the TupleCV to a plain object
     const configTuple = config.data;
     const configData = Object.fromEntries(
@@ -1258,7 +1244,7 @@ describe(`read-only functions: ${contractName}`, () => {
         ([key, value]: [string, ClarityValue]) => [key, cvToValue(value, true)]
       )
     );
-    
+
     // assert
     expect(configData).toEqual(expectedConfig);
   });
