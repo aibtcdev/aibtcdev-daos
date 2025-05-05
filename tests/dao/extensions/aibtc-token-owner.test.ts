@@ -32,7 +32,6 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("callback() should respond with (ok true)", () => {
     // arrange
-    console.log("contractAddress: ", contractAddress);
 
     // act
     const callback = simnet.callPublicFn(
