@@ -2,16 +2,28 @@ import { bufferCVFromString, Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeBaseDao } from "../utilities/contract-error-codes";
 import { constructDao } from "../utilities/dao-helpers";
+import { setupDaoContractRegistry } from "../utilities/contract-registry";
 
+// setup accounts
 const accounts = simnet.getAccounts();
 const deployer = accounts.get("deployer")!;
 const address1 = accounts.get("wallet_1")!;
 
-const contractName = "aibtc-base-dao";
-const contractAddress = `${deployer}.${contractName}`;
-const treasuryContractAddress = `${deployer}.aibtc-treasury`;
-const bootstrapContractAddress = `${deployer}.aibtc-base-initialize-dao`;
+// setup contract info for tests
+const registry = setupDaoContractRegistry();
+const contractAddress = registry.getContractAddressByTypeAndSubtype(
+  "BASE",
+  "DAO"
+);
+const contractName = contractAddress.split(".")[1];
+const treasuryContractAddress = registry.getContractAddressByTypeAndSubtype(
+  "EXTENSIONS",
+  "TREASURY"
+);
+const initializeDaoContractAddress =
+  registry.getContractAddressByTypeAndSubtype("PROPOSALS", "INITIALIZE_DAO");
 
+// import error codes
 const ErrCode = ErrCodeBaseDao;
 
 describe(`public functions: ${contractName}`, () => {
@@ -24,7 +36,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "construct",
-      [Cl.principal(bootstrapContractAddress)],
+      [Cl.principal(initializeDaoContractAddress)],
       address1
     );
     // assert
@@ -36,7 +48,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "construct",
-      [Cl.principal(bootstrapContractAddress)],
+      [Cl.principal(initializeDaoContractAddress)],
       deployer
     );
     // assert
@@ -51,7 +63,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "execute",
-      [Cl.principal(bootstrapContractAddress), Cl.principal(address1)],
+      [Cl.principal(initializeDaoContractAddress), Cl.principal(address1)],
       address1
     );
     // assert
@@ -66,7 +78,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "set-extension",
-      [Cl.principal(bootstrapContractAddress), Cl.bool(true)],
+      [Cl.principal(initializeDaoContractAddress), Cl.bool(true)],
       address1
     );
     // assert
@@ -78,7 +90,7 @@ describe(`public functions: ${contractName}`, () => {
   it("set-extensions() fails if called directly", () => {
     // arrange
     const extension = Cl.tuple({
-      extension: Cl.principal(bootstrapContractAddress),
+      extension: Cl.principal(initializeDaoContractAddress),
       enabled: Cl.bool(true),
     });
     const extensionList = Cl.list([extension]);
@@ -176,7 +188,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const result = simnet.callReadOnlyFn(
       contractAddress,
       "executed-at",
-      [Cl.principal(bootstrapContractAddress)],
+      [Cl.principal(initializeDaoContractAddress)],
       deployer
     ).result;
     // assert
@@ -190,7 +202,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const result = simnet.callReadOnlyFn(
       contractAddress,
       "executed-at",
-      [Cl.principal(bootstrapContractAddress)],
+      [Cl.principal(initializeDaoContractAddress)],
       deployer
     ).result;
     // assert

@@ -69,10 +69,11 @@ export class ContractRegistry {
   }
 
   // Get contract address
-  getContractAddress(name: string, deployer?: string): string | undefined {
+  getContractAddress(name: string, deployer?: string): string {
     const contract = this.contracts.get(name);
+    if (!contract) throw new Error(`Contract ${name} not found`);
     const contractDeployer = deployer ? deployer : DEVNET_DEPLOYER;
-    return contract ? `${contractDeployer}.${contract.name}` : undefined;
+    return `${contractDeployer}.${contract.name}`;
   }
 
   // Get contracts by type
@@ -103,11 +104,10 @@ export class ContractRegistry {
     type: T,
     subtype: ContractSubtype<T>,
     deployer?: string
-  ): string | undefined {
+  ): string {
     const contract = this.getContractByTypeAndSubtype(type, subtype);
-    return contract
-      ? this.getContractAddress(contract.name, deployer)
-      : undefined;
+    if (!contract) throw new Error(`Contract ${type}/${subtype} not found`);
+    return this.getContractAddress(contract.name, deployer);
   }
 
   // Generate contract name with token symbol

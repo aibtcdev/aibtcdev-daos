@@ -1,14 +1,21 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeBaseDao } from "../../utilities/contract-error-codes";
+import { setupDaoContractRegistry } from "../../utilities/contract-registry";
 
+// setup accounts
 const accounts = simnet.getAccounts();
 const deployer = accounts.get("deployer")!;
 
-const contractName = "aibtc-base-initialize-dao";
-const contractAddress = `${deployer}.${contractName}`;
+// setup contract info for tests
+const registry = setupDaoContractRegistry();
+const contractAddress = registry.getContractAddressByTypeAndSubtype(
+  "PROPOSALS",
+  "INITIALIZE_DAO"
+);
+const contractName = contractAddress.split(".")[1];
 
-// first call to baes dao fails
+// import error codes (first call to baes dao fails)
 const expectedErr = Cl.uint(ErrCodeBaseDao.ERR_UNAUTHORIZED);
 
 describe(`public functions: ${contractName}`, () => {

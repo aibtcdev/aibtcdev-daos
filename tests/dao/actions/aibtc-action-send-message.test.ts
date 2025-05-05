@@ -17,13 +17,13 @@ const address3 = accounts.get("wallet_3")!;
 
 // setup contract info for tests
 const registry = setupDaoContractRegistry();
-const contractAddressFromRegistry = registry.getContractAddressByTypeAndSubtype(
+const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "ACTIONS",
   "SEND_MESSAGE"
 );
-expect(contractAddressFromRegistry).toBeDefined();
-const contractAddress = contractAddressFromRegistry!;
 const contractName = contractAddress.split(".")[1];
+
+// import error codes
 const ErrCode = ErrCodeActionSendMessage;
 
 describe(`public functions: ${contractName}`, () => {
