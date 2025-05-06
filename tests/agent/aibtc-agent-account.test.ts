@@ -6,10 +6,8 @@ import {
   convertSIP019PrintEvent,
   SBTC_CONTRACT,
 } from "../utilities/contract-helpers";
-import {
-  getBalancesForPrincipal,
-  printAssetsMap,
-} from "../utilities/clarinet-helpers";
+import { getBalancesForPrincipal } from "../utilities/clarinet-helpers";
+import { constructDao, fundVoters } from "../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -51,7 +49,7 @@ const sendMessageActionContractAddress =
 const ErrCode = ErrCodeAgentAccount;
 
 // Helper function to set up the account for testing
-function setupAccount(sender: string, satsAmount: number = 1000000) {
+function setupAgentAccount(sender: string, satsAmount: number = 1000000) {
   // get sBTC from the faucet
   const faucetReceipt = simnet.callPublicFn(
     SBTC_CONTRACT,
@@ -609,6 +607,9 @@ describe(`public functions: ${contractName}`, () => {
   it("create-action-proposal() fails if caller is not authorized (user or agent)", () => {
     // arrange
     const message = Cl.stringAscii("hello world");
+    setupAgentAccount(deployer);
+    fundVoters([deployer]);
+    constructDao(deployer);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -630,7 +631,7 @@ describe(`public functions: ${contractName}`, () => {
   it("create-action-proposal() succeeds when called by owner", () => {
     // arrange
     const message = Cl.stringAscii("hello world");
-    setupAccount(deployer);
+    setupAgentAccount(deployer);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -662,7 +663,7 @@ describe(`public functions: ${contractName}`, () => {
         caller: deployer,
       },
     };
-    setupAccount(deployer);
+    setupAgentAccount(deployer);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -964,6 +965,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("acct-buy-asset() fails if caller is not authorized", () => {
     // arrange
+    setupAgentAccount(deployer);
     const amount = 10000000;
     const dex = tokenDexContractAddress;
     const asset = daoTokenAddress;
@@ -982,6 +984,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("acct-buy-asset() fails if agent can't buy/sell", () => {
     // arrange
+    setupAgentAccount(deployer);
     const amount = 10000000;
     const dex = tokenDexContractAddress;
     const asset = daoTokenAddress;
@@ -1000,8 +1003,9 @@ describe(`public functions: ${contractName}`, () => {
 
   it("acct-buy-asset() fails if dex is not approved", () => {
     // arrange
+    setupAgentAccount(deployer);
     const amount = 10000000;
-    const dex = `${deployer}.aibtc-faktory-dex`;
+    const dex = `${deployer}.unknown-dex`;
     const asset = daoTokenAddress;
 
     // act
@@ -1021,6 +1025,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("acct-sell-asset() fails if caller is not authorized", () => {
     // arrange
+    setupAgentAccount(deployer);
     const amount = 10000000;
     const dex = tokenDexContractAddress;
     const asset = daoTokenAddress;
@@ -1039,6 +1044,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("acct-sell-asset() fails if agent can't buy/sell", () => {
     // arrange
+    setupAgentAccount(deployer);
     const amount = 10000000;
     const dex = tokenDexContractAddress;
     const asset = daoTokenAddress;
@@ -1066,8 +1072,9 @@ describe(`public functions: ${contractName}`, () => {
 
   it("acct-sell-asset() fails if dex is not approved", () => {
     // arrange
+    setupAgentAccount(deployer);
     const amount = 10000000;
-    const dex = `${deployer}.aibtc-faktory-dex`;
+    const dex = `${deployer}.unknown-dex`;
     const asset = daoTokenAddress;
 
     // act
@@ -1089,7 +1096,7 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("is-approved-dex() returns expected values for a dex", () => {
     // arrange
-    const dex = `${deployer}.aibtc-faktory-dex`;
+    const dex = `${deployer}.unknown-dex`;
 
     // act
     const isApproved = simnet.callReadOnlyFn(
