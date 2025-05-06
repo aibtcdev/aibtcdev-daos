@@ -1,21 +1,15 @@
-import {
-  Cl,
-  ClarityType,
-  ClarityValue,
-  cvToValue,
-  TupleCV,
-} from "@stacks/transactions";
+import { Cl, ClarityType, ClarityValue, cvToValue } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeAgentAccount } from "../utilities/contract-error-codes";
-import {
-  setupFullContractRegistry,
-  setupDaoContractRegistry,
-} from "../utilities/contract-registry";
+import { setupFullContractRegistry } from "../utilities/contract-registry";
 import {
   convertSIP019PrintEvent,
   SBTC_CONTRACT,
 } from "../utilities/contract-helpers";
-import { printAssetsMap } from "../utilities/clarinet-helpers";
+import {
+  getBalancesForPrincipal,
+  printAssetsMap,
+} from "../utilities/clarinet-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -26,7 +20,6 @@ const address3 = accounts.get("wallet_3")!;
 
 // setup contract info for tests
 const registry = setupFullContractRegistry();
-const daoRegistry = setupDaoContractRegistry();
 const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "AGENT",
   "AGENT_ACCOUNT"
@@ -34,25 +27,25 @@ const contractAddress = registry.getContractAddressByTypeAndSubtype(
 const contractName = contractAddress.split(".")[1];
 
 // DAO contract references
-const daoTokenAddress = daoRegistry.getContractAddressByTypeAndSubtype(
+const daoTokenAddress = registry.getContractAddressByTypeAndSubtype(
   "TOKEN",
   "DAO"
 );
-const tokenDexContractAddress = daoRegistry.getContractAddressByTypeAndSubtype(
+const tokenDexContractAddress = registry.getContractAddressByTypeAndSubtype(
   "TOKEN",
   "DEX"
 );
-const baseDaoContractAddress = daoRegistry.getContractAddressByTypeAndSubtype(
+const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
   "BASE",
   "DAO"
 );
 const actionProposalsContractAddress =
-  daoRegistry.getContractAddressByTypeAndSubtype(
+  registry.getContractAddressByTypeAndSubtype(
     "EXTENSIONS",
     "ACTION_PROPOSAL_VOTING"
   );
 const sendMessageActionContractAddress =
-  daoRegistry.getContractAddressByTypeAndSubtype("ACTIONS", "SEND_MESSAGE");
+  registry.getContractAddressByTypeAndSubtype("ACTIONS", "SEND_MESSAGE");
 
 // import error codes
 const ErrCode = ErrCodeAgentAccount;
@@ -77,12 +70,6 @@ function setupAccount(sender: string, satsAmount: number = 1000000) {
   );
   expect(dexReceipt.result).toBeOk(Cl.bool(true));
 
-  // get our balances from the assets map
-  const balancesMap = simnet.getAssetsMap();
-  const aibtcKey = daoTokenAddress.split(".")[1];
-  const sbtcKey = SBTC_CONTRACT.split(".")[1];
-  const stxKey = "STX";
-
   // deposit sBTC to the agent account
   const depositReceiptSbtc = simnet.callPublicFn(
     contractAddress,
@@ -106,9 +93,12 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // deposit-stx() tests
   ////////////////////////////////////////
-  it("deposit-stx() succeeds and deposits STX to the account", () => {
+  it("deposit-stx() succeeds and deposits STX to the agent account", () => {
     // arrange
-    printAssetsMap(simnet.getAssetsMap());
+    const agentAccountBalances = getBalancesForPrincipal(contractAddress);
+    const agentAccountStxBalance = agentAccountBalances.get("STX");
+    expect(agentAccountStxBalance).toBeUndefined();
+
     const amount = 1000000; // 1 STX
 
     // act
@@ -119,9 +109,12 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
 
+    const agentAccountBalances2 = getBalancesForPrincipal(contractAddress);
+    const agentAccountStxBalance2 = agentAccountBalances2.get("STX");
+    expect(agentAccountStxBalance2).toEqual(BigInt(amount));
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
-    printAssetsMap(simnet.getAssetsMap());
   });
 
   it("deposit-stx() emits the correct notification event", () => {
@@ -159,7 +152,7 @@ describe(`public functions: ${contractName}`, () => {
   it("deposit-ft() fails if asset is not approved", () => {
     // arrange
     const amount = 10000000;
-    const unapprovedToken = `${deployer}.test-token`;
+    const unapprovedToken = `${deployer}.unknown-token`;
 
     // get sBTC from the faucet
     const faucetReceipt = simnet.callPublicFn(
@@ -350,7 +343,7 @@ describe(`public functions: ${contractName}`, () => {
   it("withdraw-ft() fails if asset is not approved", () => {
     // arrange
     const amount = 10000000;
-    const unapprovedToken = `${deployer}.test-token`;
+    const unapprovedToken = `${deployer}.unknown-token`;
 
     // act
     const receipt = simnet.callPublicFn(
@@ -451,7 +444,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("approve-asset() fails if caller is not the owner", () => {
     // arrange
-    const newAsset = `${deployer}.test-token`;
+    const newAsset = `${deployer}.unknown-token`;
 
     // act
     const receipt = simnet.callPublicFn(
@@ -524,7 +517,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("revoke-asset() fails if caller is not the owner", () => {
     // arrange
-    const asset = `${deployer}.test-token`;
+    const asset = `${deployer}.unknown-token`;
 
     // act
     const receipt = simnet.callPublicFn(
@@ -540,7 +533,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("revoke-asset() succeeds and removes approved asset", () => {
     // arrange
-    const asset = `${deployer}.test-token`;
+    const asset = `${deployer}.unknown-token`;
 
     // approve the asset first
     const approveReceipt = simnet.callPublicFn(
@@ -574,7 +567,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("revoke-asset() emits the correct notification event", () => {
     // arrange
-    const asset = `${deployer}.test-token`;
+    const asset = `${deployer}.unknown-token`;
     const expectedEvent = {
       notification: "aibtc-agent-account/revoke-asset",
       payload: {
@@ -744,7 +737,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("acct-approve-dex() fails if caller is not the owner", () => {
     // arrange
-    const dex = `${deployer}.test-dex-1`;
+    const dex = `${deployer}.aibtc-faktory-dex`;
 
     // act
     const receipt = simnet.callPublicFn(
@@ -760,7 +753,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("acct-approve-dex() succeeds and sets new approved dex", () => {
     // arrange
-    const dex = `${deployer}.test-dex-1`;
+    const dex = `${deployer}.aibtc-faktory-dex`;
 
     // act
     const receipt = simnet.callPublicFn(
@@ -785,7 +778,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("acct-approve-dex() emits the correct notification event", () => {
     // arrange
-    const dex = `${deployer}.test-dex-2`;
+    const dex = `${deployer}.aibtc-faktory-dex`;
     const expectedEvent = {
       notification: "aibtc-agent-account/acct-approve-dex",
       payload: {
@@ -817,7 +810,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("acct-revoke-dex() fails if caller is not the owner", () => {
     // arrange
-    const dex = `${deployer}.test-dex-1`;
+    const dex = `${deployer}.aibtc-faktory-dex`;
 
     // act
     const receipt = simnet.callPublicFn(
@@ -833,7 +826,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("acct-revoke-dex() succeeds and removes approved dex", () => {
     // arrange
-    const dex = `${deployer}.test-dex-1`;
+    const dex = `${deployer}.aibtc-faktory-dex`;
 
     // approve the dex first
     const approveReceipt = simnet.callPublicFn(
@@ -867,7 +860,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("acct-revoke-dex() emits the correct notification event", () => {
     // arrange
-    const dex = `${deployer}.test-dex-1`;
+    const dex = `${deployer}.aibtc-faktory-dex`;
     const expectedEvent = {
       notification: "aibtc-agent-account/acct-revoke-dex",
       payload: {
@@ -1008,7 +1001,7 @@ describe(`public functions: ${contractName}`, () => {
   it("acct-buy-asset() fails if dex is not approved", () => {
     // arrange
     const amount = 10000000;
-    const dex = `${deployer}.test-dex-1`;
+    const dex = `${deployer}.aibtc-faktory-dex`;
     const asset = daoTokenAddress;
 
     // act
@@ -1074,7 +1067,7 @@ describe(`public functions: ${contractName}`, () => {
   it("acct-sell-asset() fails if dex is not approved", () => {
     // arrange
     const amount = 10000000;
-    const dex = `${deployer}.test-dex-1`;
+    const dex = `${deployer}.aibtc-faktory-dex`;
     const asset = daoTokenAddress;
 
     // act
@@ -1096,7 +1089,7 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("is-approved-dex() returns expected values for a dex", () => {
     // arrange
-    const dex = `${deployer}.test-dex-1`;
+    const dex = `${deployer}.aibtc-faktory-dex`;
 
     // act
     const isApproved = simnet.callReadOnlyFn(
@@ -1155,7 +1148,7 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("is-approved-asset() returns expected values for an asset", () => {
     // arrange
-    const asset = `${deployer}.test-token`;
+    const asset = `${deployer}.unknown-token`;
 
     // act
     const isApproved = simnet.callReadOnlyFn(
