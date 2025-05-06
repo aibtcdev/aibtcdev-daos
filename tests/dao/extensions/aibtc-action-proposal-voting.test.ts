@@ -2,7 +2,7 @@ import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeActionProposalVoting } from "../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
-import { constructDao } from "../../utilities/dao-helpers";
+import { constructDao, fundVoters } from "../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -18,9 +18,9 @@ const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "ACTION_PROPOSAL_VOTING"
 );
 const contractName = contractAddress.split(".")[1];
-const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
-  "BASE",
-  "DAO"
+const treasuryContractAddress = registry.getContractAddressByTypeAndSubtype(
+  "EXTENSIONS",
+  "TREASURY"
 );
 const actionContractAddress = registry.getContractAddressByTypeAndSubtype(
   "ACTIONS",
@@ -60,14 +60,33 @@ describe(`public functions: ${contractName}`, () => {
       contractAddress,
       "create-action-proposal",
       [
-        Cl.contractPrincipal(actionContractAddress.split(".")[0], actionContractAddress.split(".")[1]),
-        Cl.buffer(new Uint8Array(0)),
-        Cl.none()
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
       ],
       address1
     );
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INSUFFICIENT_BALANCE));
+  });
+
+  it("create-action-proposal() succeeds if called with sufficient balance", () => {
+    // arrange
+    fundVoters([deployer]);
+    constructDao(deployer);
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
   });
 
   ////////////////////////////////////////
@@ -111,10 +130,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "conclude-action-proposal",
-      [
-        Cl.uint(999),
-        Cl.contractPrincipal(actionContractAddress.split(".")[0], actionContractAddress.split(".")[1])
-      ],
+      [Cl.uint(999), Cl.principal(actionContractAddress)],
       address1
     );
     // assert
@@ -200,10 +216,12 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toStrictEqual(Cl.tuple({
-      voteRecord: Cl.none(),
-      vetoVoteRecord: Cl.none()
-    })); // or appropriate value
+    expect(result).toStrictEqual(
+      Cl.tuple({
+        voteRecord: Cl.none(),
+        vetoVoteRecord: Cl.none(),
+      })
+    ); // or appropriate value
   });
 
   ////////////////////////////////////////
@@ -219,13 +237,15 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toStrictEqual(Cl.tuple({
-      proposalCount: Cl.uint(0),
-      concludedProposalCount: Cl.uint(0),
-      executedProposalCount: Cl.uint(0),
-      lastProposalStacksBlock: Cl.uint(0),
-      lastProposalBitcoinBlock: Cl.uint(0)
-    })); // or appropriate value
+    expect(result).toStrictEqual(
+      Cl.tuple({
+        proposalCount: Cl.uint(0),
+        concludedProposalCount: Cl.uint(0),
+        executedProposalCount: Cl.uint(0),
+        lastProposalStacksBlock: Cl.uint(4), // deployed block
+        lastProposalBitcoinBlock: Cl.uint(4), // deployed block
+      })
+    ); // or appropriate value
   });
 
   ////////////////////////////////////////
@@ -241,18 +261,20 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toStrictEqual(Cl.tuple({
-      self: Cl.principal(contractAddress),
-      deployedBitcoinBlock: Cl.uint(0),
-      deployedStacksBlock: Cl.uint(0),
-      delay: Cl.uint(144),
-      period: Cl.uint(288),
-      quorum: Cl.uint(15),
-      threshold: Cl.uint(66),
-      treasury: Cl.principal(registry.getContractAddressByTypeAndSubtype("EXTENSIONS", "TREASURY")),
-      proposalBond: Cl.uint(500000000000),
-      proposalReward: Cl.uint(100000000000)
-    })); // or appropriate value
+    expect(result).toStrictEqual(
+      Cl.tuple({
+        self: Cl.principal(contractAddress),
+        deployedBitcoinBlock: Cl.uint(4),
+        deployedStacksBlock: Cl.uint(4),
+        delay: Cl.uint(144),
+        period: Cl.uint(288),
+        quorum: Cl.uint(15),
+        threshold: Cl.uint(66),
+        treasury: Cl.principal(treasuryContractAddress),
+        proposalBond: Cl.uint(500000000000),
+        proposalReward: Cl.uint(100000000000),
+      })
+    ); // or appropriate value
   });
 
   ////////////////////////////////////////
@@ -260,14 +282,18 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-liquid-supply() returns expected value", () => {
     // arrange
+    const expectedLiquidSupply = 20000000000000000n;
+    fundVoters([deployer]);
+    constructDao(deployer);
+    simnet.mineEmptyBlocks(10);
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
       "get-liquid-supply",
-      [Cl.uint(0)],
+      [Cl.uint(simnet.blockHeight - 1)],
       deployer
     ).result;
     // assert
-    expect(result).toBeErr(Cl.uint(ErrCode.ERR_RETRIEVING_START_BLOCK_HASH)); // or appropriate value
+    expect(result).toBeOk(Cl.uint(expectedLiquidSupply)); // or appropriate value
   });
 });

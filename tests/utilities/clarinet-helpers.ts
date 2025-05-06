@@ -35,10 +35,10 @@ export function getBalancesForPrincipal(
 ): Map<string, bigint> {
   const assetsMap = simnet.getAssetsMap();
   const balances = new Map<string, bigint>();
-  console.log(`Balances for principal: ${principal}`);
+  dbgLog(`Balances for principal: ${principal}`);
   for (const [assetType, principalsMap] of assetsMap) {
     const balance = principalsMap.get(principal);
-    console.log(`Asset type: ${assetType}, Balance: ${balance}`);
+    dbgLog(`Asset type: ${assetType}, Balance: ${balance}`);
     if (balance !== undefined) {
       balances.set(assetType, balance);
     }
