@@ -2,7 +2,7 @@ import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeDaoUsers } from "../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
-import { constructDao } from "../../utilities/dao-helpers";
+import { constructDao, fundVoters } from "../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -73,8 +73,21 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address1), Cl.uint(5)],
       address1
     );
+    // assert - if a user is not found this this error path first
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_USER_NOT_FOUND));
+
+    // arrange
+    fundVoters([deployer]);
+    constructDao(deployer);
+    // act
+    const receipt2 = simnet.callPublicFn(
+      contractAddress,
+      "get-or-create-user-index",
+      [Cl.principal(deployer)],
+      deployer
+    );
     // assert
-    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+    expect(receipt2.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
 
   ////////////////////////////////////////
@@ -89,8 +102,21 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address1), Cl.uint(5)],
       address1
     );
+    // assert - if a user is not found this this error path first
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_USER_NOT_FOUND));
+
+    // arrange
+    fundVoters([deployer]);
+    constructDao(deployer);
+    // act
+    const receipt2 = simnet.callPublicFn(
+      contractAddress,
+      "get-or-create-user-index",
+      [Cl.principal(deployer)],
+      deployer
+    );
     // assert
-    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+    expect(receipt2.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
 });
 

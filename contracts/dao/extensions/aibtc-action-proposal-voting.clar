@@ -146,9 +146,9 @@
   (let
     (
       (actionContract (contract-of action))
-      (sender tx-sender)
+      (caller contract-caller)
       ;; /g/.aibtc-dao-users/dao_users_contract
-      (userId (try! (as-contract (contract-call? .aibtc-dao-users get-or-create-user-index sender))))
+      (userId (try! (as-contract (contract-call? .aibtc-dao-users get-or-create-user-index caller))))
       (newId (+ (var-get proposalCount) u1))
       (createdStx (- stacks-block-height u1))
       (createdBtc burn-block-height)
@@ -158,7 +158,7 @@
       (execStart (+ voteEnd VOTING_DELAY))
       (execEnd (+ execStart VOTING_PERIOD))
       ;; /g/.aibtc-faktory/dao_token_contract
-      (senderBalance (unwrap! (contract-call? .aibtc-faktory get-balance tx-sender) ERR_FETCHING_TOKEN_DATA))
+      (senderBalance (unwrap! (contract-call? .aibtc-faktory get-balance caller) ERR_FETCHING_TOKEN_DATA))
       (validAction (is-action-valid action))
     )
     ;; liquidTokens is greater than zero
@@ -181,8 +181,8 @@
         action: actionContract,
         parameters: parameters,
         bond: VOTING_BOND,
-        caller: contract-caller,
-        creator: tx-sender,
+        caller: caller,
+        creator: caller,
         creatorUserId: userId,
         liquidTokens: liquidTokens,
         memo: (if (is-some memo) memo none),
@@ -205,8 +205,8 @@
       action: actionContract,
       parameters: parameters,
       bond: VOTING_BOND,
-      caller: contract-caller,
-      creator: tx-sender,
+      caller: caller,
+      creator: caller,
       creatorUserId: userId,
       liquidTokens: liquidTokens,
       memo: (if (is-some memo) memo none),
@@ -241,7 +241,7 @@
     ;; (ok (drip-rewards))
     ;; transfer the proposal bond to this contract
     ;; /g/.aibtc-faktory/dao_token_contract
-    (try! (contract-call? .aibtc-faktory transfer VOTING_BOND tx-sender SELF none))
+    (try! (contract-call? .aibtc-faktory transfer VOTING_BOND caller SELF none))
     ;; transfer the run cost fee to the run AIBTC dao cost contract
     (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-faktory AIBTC_DAO_RUN_COST_AMOUNT AIBTC_DAO_RUN_COST_CONTRACT)))
     ;; transfer reward to the dao rewards account
@@ -256,12 +256,12 @@
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
-      (sender tx-sender)
+      (caller contract-caller)
       ;; /g/.aibtc-faktory/dao_token_contract
-      (senderBalance (unwrap! (at-block proposalBlockHash (contract-call? .aibtc-faktory get-balance tx-sender)) ERR_FETCHING_TOKEN_DATA))
+      (senderBalance (unwrap! (at-block proposalBlockHash (contract-call? .aibtc-faktory get-balance caller)) ERR_FETCHING_TOKEN_DATA))
       ;; /g/.aibtc-dao-users/dao_users_contract
-      (userId (try! (as-contract (contract-call? .aibtc-dao-users get-or-create-user-index sender))))
-      (voterRecord (map-get? VoteRecords {proposalId: proposalId, voter: tx-sender}))
+      (userId (try! (as-contract (contract-call? .aibtc-dao-users get-or-create-user-index caller))))
+      (voterRecord (map-get? VoteRecords {proposalId: proposalId, voter: caller}))
       (previousVote (if (is-some voterRecord) (some (get vote (unwrap-panic voterRecord))) none))
       (previousVoteAmount (if (is-some voterRecord) (some (get amount (unwrap-panic voterRecord))) none))
     )
@@ -281,9 +281,9 @@
       ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-action-proposal-voting/vote-on-action-proposal",
       payload: {
-        contractCaller: contract-caller,
+        contractCaller: caller,
         txSender: tx-sender,
-        voter: tx-sender,
+        voter: caller,
         voterUserId: userId,
         proposalId: proposalId,
         amount: senderBalance,
@@ -307,7 +307,7 @@
       )
     )
     ;; record the vote for the sender
-    (ok (map-set VoteRecords {proposalId: proposalId, voter: tx-sender} {vote: vote, amount: senderBalance}))
+    (ok (map-set VoteRecords {proposalId: proposalId, voter: caller} {vote: vote, amount: senderBalance}))
   )
 )
 
@@ -318,11 +318,11 @@
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
-      (sender tx-sender)
+      (caller contract-caller)
       ;; /g/.aibtc-faktory/dao_token_contract
-      (senderBalance (unwrap! (at-block proposalBlockHash (contract-call? .aibtc-faktory get-balance tx-sender)) ERR_FETCHING_TOKEN_DATA))
+      (senderBalance (unwrap! (at-block proposalBlockHash (contract-call? .aibtc-faktory get-balance caller)) ERR_FETCHING_TOKEN_DATA))
       ;; /g/.aibtc-dao-users/dao_users_contract
-      (userId (try! (as-contract (contract-call? .aibtc-dao-users get-or-create-user-index sender))))
+      (userId (try! (as-contract (contract-call? .aibtc-dao-users get-or-create-user-index caller))))
     )
     ;; caller has the required balance
     (asserts! (> senderBalance u0) ERR_INSUFFICIENT_BALANCE)
@@ -332,7 +332,7 @@
     (asserts! (>= burn-block-height (get voteEnd proposalBlocks)) ERR_VOTE_TOO_SOON)
     (asserts! (< burn-block-height (get execStart proposalBlocks)) ERR_VOTE_TOO_LATE)
     ;; veto not already cast
-    (asserts! (is-none (map-get? VetoVoteRecords {proposalId: proposalId, voter: tx-sender})) ERR_ALREADY_VOTED)
+    (asserts! (is-none (map-get? VetoVoteRecords {proposalId: proposalId, voter: caller})) ERR_ALREADY_VOTED)
     ;; print veto event
     (print {
       ;; /g/aibtc/dao_token_symbol
@@ -340,7 +340,7 @@
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
-        vetoer: tx-sender,
+        vetoer: caller,
         vetoerUserId: userId,
         proposalId: proposalId,
         amount: senderBalance,
@@ -353,7 +353,7 @@
       })
     )
     ;; update the veto vote record for the sender
-    (ok (map-set VetoVoteRecords {proposalId: proposalId, voter: tx-sender} senderBalance))
+    (ok (map-set VetoVoteRecords {proposalId: proposalId, voter: caller} senderBalance))
   )
 )
 
@@ -361,7 +361,7 @@
   (let
     (
       (actionContract (contract-of action))
-      (sender tx-sender)
+      (caller contract-caller)
       (proposalDetails (unwrap! (map-get? ProposalDetails proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalRecord (unwrap! (map-get? ProposalRecords proposalId) ERR_PROPOSAL_NOT_FOUND))
@@ -402,13 +402,13 @@
     (asserts! (is-eq (get action proposalDetails) actionContract) ERR_INVALID_ACTION)
     ;; record user in dao if not already
     ;; /g/.aibtc-dao-users/dao_users_contract
-    (try! (as-contract (contract-call? .aibtc-dao-users get-or-create-user-index sender)))
+    (try! (as-contract (contract-call? .aibtc-dao-users get-or-create-user-index caller)))
     ;; print conclusion event
     (print {
       ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-action-proposal-voting/conclude-action-proposal",
       payload: {
-        contractCaller: contract-caller,
+        contractCaller: caller,
         txSender: tx-sender,
         action: actionContract,
         parameters: (get parameters proposalDetails),

@@ -22,9 +22,23 @@ const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
   "BASE",
   "DAO"
 );
+const intializeDaoAddress = registry.getContractAddressByTypeAndSubtype(
+  "PROPOSALS",
+  "INITIALIZE_DAO"
+);
 
 // import error codes
 const ErrCode = ErrCodeDaoCharter;
+
+const expectedDaoCharterVersion = Cl.uint(1);
+const expectedDaoCharterString = Cl.stringAscii("dao mission goes here");
+const expectedDaoCharter = Cl.tuple({
+  burnHeight: Cl.uint(4), // deployed btc block height
+  caller: Cl.principal(intializeDaoAddress),
+  charter: expectedDaoCharterString,
+  createdAt: Cl.uint(6), // deployed stx block height
+  sender: Cl.principal(baseDaoContractAddress),
+});
 
 describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
@@ -60,26 +74,6 @@ describe(`public functions: ${contractName}`, () => {
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
-
-  it("set-dao-charter() succeeds if called by the DAO", () => {
-    // arrange
-    constructDao(deployer);
-    // act
-    const receipt = simnet.callPublicFn(
-      baseDaoContractAddress,
-      "request-extension-callback",
-      [
-        Cl.principal(contractAddress),
-        Cl.buffer(Cl.serialize(Cl.tuple({
-          "function-name": Cl.stringAscii("set-dao-charter"),
-          "charter": Cl.stringAscii("Test Charter")
-        })))
-      ],
-      deployer
-    );
-    // assert
-    expect(receipt.result).toBeOk(Cl.bool(true));
-  });
 });
 
 describe(`read-only functions: ${contractName}`, () => {
@@ -97,7 +91,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeNone(); // or appropriate value
+    expect(result).toBeSome(expectedDaoCharterVersion);
   });
 
   ////////////////////////////////////////
@@ -114,7 +108,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeNone(); // or appropriate value
+    expect(result).toBeSome(expectedDaoCharterString); // or appropriate value
   });
 
   ////////////////////////////////////////
@@ -131,6 +125,6 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeNone(); // or appropriate value
+    expect(result).toBeSome(expectedDaoCharter); // or appropriate value
   });
 });

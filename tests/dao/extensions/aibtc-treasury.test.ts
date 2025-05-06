@@ -54,7 +54,10 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "allow-asset",
-      [Cl.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token"), Cl.bool(true)],
+      [
+        Cl.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token"),
+        Cl.bool(true),
+      ],
       address1
     );
     // assert
@@ -71,8 +74,8 @@ describe(`public functions: ${contractName}`, () => {
       contractAddress,
       "deposit-ft",
       [
-        Cl.contractPrincipal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM", "token"),
-        Cl.uint(100)
+        Cl.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.unknown-token"),
+        Cl.uint(100),
       ],
       address1
     );
@@ -90,9 +93,9 @@ describe(`public functions: ${contractName}`, () => {
       contractAddress,
       "withdraw-ft",
       [
-        Cl.contractPrincipal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM", "token"),
+        Cl.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.unknown-token"),
         Cl.uint(100),
-        Cl.principal(address1)
+        Cl.principal(address1),
       ],
       address1
     );
@@ -111,7 +114,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const result = simnet.callReadOnlyFn(
       contractAddress,
       "is-allowed-asset",
-      [Cl.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token")],
+      [Cl.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.unknown-token")],
       deployer
     ).result;
     // assert
@@ -147,10 +150,12 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toStrictEqual(Cl.tuple({
-      self: Cl.principal(contractAddress),
-      deployedBurnBlock: Cl.uint(0), // or appropriate value
-      deployedStacksBlock: Cl.uint(0) // or appropriate value
-    }));
+    expect(result).toStrictEqual(
+      Cl.tuple({
+        self: Cl.principal(contractAddress),
+        deployedBurnBlock: Cl.uint(4), // deployed btc block
+        deployedStacksBlock: Cl.uint(4), // or deployed stx block
+      })
+    );
   });
 });
