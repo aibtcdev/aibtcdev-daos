@@ -80,6 +80,18 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // get-current-dao-charter-version() tests
   ////////////////////////////////////////
+  it("get-current-dao-charter-version() returns none before initialized", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-current-dao-charter-version",
+      [],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeNone();
+  });
   it("get-current-dao-charter-version() returns expected value", () => {
     // arrange
     constructDao(deployer);
@@ -97,6 +109,18 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // get-current-dao-charter() tests
   ////////////////////////////////////////
+  it("get-current-dao-charter() returns none before initialized", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-current-dao-charter",
+      [],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeNone();
+  });
   it("get-current-dao-charter() returns expected value", () => {
     // arrange
     constructDao(deployer);
@@ -114,6 +138,18 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // get-dao-charter() tests
   ////////////////////////////////////////
+  it("get-dao-charter() returns none before initialized", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-dao-charter",
+      [Cl.uint(1)],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeNone();
+  });
   it("get-dao-charter() returns expected value", () => {
     // arrange
     constructDao(deployer);
