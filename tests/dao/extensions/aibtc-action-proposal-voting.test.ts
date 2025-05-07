@@ -66,6 +66,7 @@ describe(`public functions: ${contractName}`, () => {
       ],
       address1
     );
+    console.log(JSON.stringify(receipt));
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INSUFFICIENT_BALANCE));
   });

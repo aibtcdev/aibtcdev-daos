@@ -61,7 +61,7 @@
         recipient: SELF
       }
     })
-    (stx-transfer? amount tx-sender SELF)
+    (stx-transfer? amount contract-caller SELF)
   )
 )
 
@@ -78,7 +78,7 @@
         recipient: SELF
       }
     })
-    (contract-call? ft transfer amount tx-sender SELF none)
+    (contract-call? ft transfer amount contract-caller SELF none)
   )
 )
 
