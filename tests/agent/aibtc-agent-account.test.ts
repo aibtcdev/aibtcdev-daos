@@ -736,6 +736,98 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
 
+  it("vote-on-action-proposal() succeeds when called by owner", () => {
+    // arrange
+    const proposalId = 1;
+    const vote = true;
+    setupAgentAccount(deployer);
+    fundVoters([deployer]);
+    constructDao(deployer);
+
+    // Create a proposal first
+    const message = Cl.stringAscii("hello world");
+    const createProposalReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.principal(sendMessageActionContractAddress),
+        Cl.buffer(Cl.serialize(message)),
+        Cl.some(Cl.stringAscii("Test memo")),
+      ],
+      deployer
+    );
+    expect(createProposalReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(proposalId),
+        Cl.bool(vote),
+      ],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+  });
+
+  it("vote-on-action-proposal() emits the correct notification event", () => {
+    // arrange
+    const proposalId = 1;
+    const vote = true;
+    const expectedEvent = {
+      notification: "aibtc-agent-account/vote-on-action-proposal",
+      payload: {
+        proposalContract: actionProposalsContractAddress,
+        proposalId: proposalId,
+        vote: vote,
+        sender: deployer,
+        caller: deployer,
+      },
+    };
+    setupAgentAccount(deployer);
+    fundVoters([deployer]);
+    constructDao(deployer);
+
+    // Create a proposal first
+    const message = Cl.stringAscii("hello world");
+    const createProposalReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.principal(sendMessageActionContractAddress),
+        Cl.buffer(Cl.serialize(message)),
+        Cl.some(Cl.stringAscii("Test memo")),
+      ],
+      deployer
+    );
+    expect(createProposalReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(proposalId),
+        Cl.bool(vote),
+      ],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+    const event = receipt.events[0];
+    expect(event).toBeDefined();
+    const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    expect(printEvent).toStrictEqual(expectedEvent);
+  });
+
   ////////////////////////////////////////
   // conclude-action-proposal() tests
   ////////////////////////////////////////
@@ -757,6 +849,122 @@ describe(`public functions: ${contractName}`, () => {
 
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
+  });
+
+  it("conclude-action-proposal() succeeds when called by owner", () => {
+    // arrange
+    const proposalId = 1;
+    setupAgentAccount(deployer);
+    fundVoters([deployer]);
+    constructDao(deployer);
+
+    // Create a proposal first
+    const message = Cl.stringAscii("hello world");
+    const createProposalReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.principal(sendMessageActionContractAddress),
+        Cl.buffer(Cl.serialize(message)),
+        Cl.some(Cl.stringAscii("Test memo")),
+      ],
+      deployer
+    );
+    expect(createProposalReceipt.result).toBeOk(Cl.bool(true));
+
+    // Vote on the proposal
+    const voteReceipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(proposalId),
+        Cl.bool(true),
+      ],
+      deployer
+    );
+    expect(voteReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "conclude-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(proposalId),
+        Cl.principal(sendMessageActionContractAddress),
+      ],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+  });
+
+  it("conclude-action-proposal() emits the correct notification event", () => {
+    // arrange
+    const proposalId = 1;
+    const expectedEvent = {
+      notification: "aibtc-agent-account/conclude-action-proposal",
+      payload: {
+        proposalContract: actionProposalsContractAddress,
+        proposalId: proposalId,
+        action: sendMessageActionContractAddress,
+        sender: deployer,
+        caller: deployer,
+      },
+    };
+    setupAgentAccount(deployer);
+    fundVoters([deployer]);
+    constructDao(deployer);
+
+    // Create a proposal first
+    const message = Cl.stringAscii("hello world");
+    const createProposalReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.principal(sendMessageActionContractAddress),
+        Cl.buffer(Cl.serialize(message)),
+        Cl.some(Cl.stringAscii("Test memo")),
+      ],
+      deployer
+    );
+    expect(createProposalReceipt.result).toBeOk(Cl.bool(true));
+
+    // Vote on the proposal
+    const voteReceipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(proposalId),
+        Cl.bool(true),
+      ],
+      deployer
+    );
+    expect(voteReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "conclude-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(proposalId),
+        Cl.principal(sendMessageActionContractAddress),
+      ],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+    const event = receipt.events[0];
+    expect(event).toBeDefined();
+    const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    expect(printEvent).toStrictEqual(expectedEvent);
   });
 
   ////////////////////////////////////////
@@ -1046,6 +1254,76 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNKNOWN_ASSET));
   });
 
+  it("acct-buy-asset() succeeds when called by owner with approved dex", () => {
+    // arrange
+    setupAgentAccount(deployer);
+    const amount = 1000000;
+    const dex = tokenDexContractAddress;
+    const asset = daoTokenAddress;
+
+    // Enable agent buy/sell
+    const permissionReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-buy-sell",
+      [Cl.bool(true)],
+      deployer
+    );
+    expect(permissionReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "acct-buy-asset",
+      [Cl.principal(dex), Cl.principal(asset), Cl.uint(amount)],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+  });
+
+  it("acct-buy-asset() emits the correct notification event", () => {
+    // arrange
+    setupAgentAccount(deployer);
+    const amount = 1000000;
+    const dex = tokenDexContractAddress;
+    const asset = daoTokenAddress;
+    const expectedEvent = {
+      notification: "aibtc-agent-account/acct-buy-asset",
+      payload: {
+        dexContract: dex,
+        asset: asset,
+        amount: amount,
+        sender: deployer,
+        caller: deployer,
+      },
+    };
+
+    // Enable agent buy/sell
+    const permissionReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-buy-sell",
+      [Cl.bool(true)],
+      deployer
+    );
+    expect(permissionReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "acct-buy-asset",
+      [Cl.principal(dex), Cl.principal(asset), Cl.uint(amount)],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+    const event = receipt.events[0];
+    expect(event).toBeDefined();
+    const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    expect(printEvent).toStrictEqual(expectedEvent);
+  });
+
   ////////////////////////////////////////
   // acct-sell-asset() tests
   ////////////////////////////////////////
@@ -1113,6 +1391,76 @@ describe(`public functions: ${contractName}`, () => {
 
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNKNOWN_ASSET));
+  });
+
+  it("acct-sell-asset() succeeds when called by owner with approved dex", () => {
+    // arrange
+    setupAgentAccount(deployer);
+    const amount = 1000000;
+    const dex = tokenDexContractAddress;
+    const asset = daoTokenAddress;
+
+    // Enable agent buy/sell
+    const permissionReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-buy-sell",
+      [Cl.bool(true)],
+      deployer
+    );
+    expect(permissionReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "acct-sell-asset",
+      [Cl.principal(dex), Cl.principal(asset), Cl.uint(amount)],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+  });
+
+  it("acct-sell-asset() emits the correct notification event", () => {
+    // arrange
+    setupAgentAccount(deployer);
+    const amount = 1000000;
+    const dex = tokenDexContractAddress;
+    const asset = daoTokenAddress;
+    const expectedEvent = {
+      notification: "aibtc-agent-account/acct-sell-asset",
+      payload: {
+        dexContract: dex,
+        asset: asset,
+        amount: amount,
+        sender: deployer,
+        caller: deployer,
+      },
+    };
+
+    // Enable agent buy/sell
+    const permissionReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-buy-sell",
+      [Cl.bool(true)],
+      deployer
+    );
+    expect(permissionReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "acct-sell-asset",
+      [Cl.principal(dex), Cl.principal(asset), Cl.uint(amount)],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+    const event = receipt.events[0];
+    expect(event).toBeDefined();
+    const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    expect(printEvent).toStrictEqual(expectedEvent);
   });
 });
 
@@ -1273,5 +1621,72 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // assert
     expect(configData).toEqual(expectedConfig);
+  });
+
+  it("agent can call functions when authorized", () => {
+    // arrange
+    setupAgentAccount(deployer);
+    const amount = 1000000;
+    const dex = tokenDexContractAddress;
+    const asset = daoTokenAddress;
+
+    // Enable agent buy/sell
+    const permissionReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-buy-sell",
+      [Cl.bool(true)],
+      deployer
+    );
+    expect(permissionReceipt.result).toBeOk(Cl.bool(true));
+
+    // act - agent calls buy function
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "acct-buy-asset",
+      [Cl.principal(dex), Cl.principal(asset), Cl.uint(amount)],
+      address2 // agent address
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+  });
+
+  it("agent can vote on proposals", () => {
+    // arrange
+    const proposalId = 1;
+    const vote = true;
+    setupAgentAccount(deployer);
+    fundVoters([deployer]);
+    constructDao(deployer);
+
+    // Create a proposal first
+    const message = Cl.stringAscii("hello world");
+    const createProposalReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.principal(sendMessageActionContractAddress),
+        Cl.buffer(Cl.serialize(message)),
+        Cl.some(Cl.stringAscii("Test memo")),
+      ],
+      deployer
+    );
+    expect(createProposalReceipt.result).toBeOk(Cl.bool(true));
+
+    // act - agent votes on proposal
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(proposalId),
+        Cl.bool(vote),
+      ],
+      address2 // agent address
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
   });
 });
