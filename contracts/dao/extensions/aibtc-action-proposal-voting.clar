@@ -82,7 +82,7 @@
     parameters: (buff 2048), ;; parameters to pass to action contract
     bond: uint, ;; proposal bond amount
     caller: principal, ;; contract-caller
-    creator: principal, ;; tx-sender
+    creator: principal, ;; contract-caller
     creatorUserId: uint, ;; user index in DAO
     liquidTokens: uint, ;; liquid tokens
     memo: (optional (string-ascii 1024)), ;; memo for the proposal
