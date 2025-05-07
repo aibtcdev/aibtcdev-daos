@@ -153,3 +153,5 @@
     (is-eq confirmations (var-get confirmationsRequired))
   )
 )
+
+(map-set Owners contract-caller true)
