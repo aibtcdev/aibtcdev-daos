@@ -1,8 +1,9 @@
-import { Cl } from "@stacks/transactions";
+import { Cl, cvToValue } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeActionProposalVoting } from "../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
 import { constructDao, fundVoters } from "../../utilities/dao-helpers";
+import { dbgLog } from "../../utilities/debug-logging";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -66,7 +67,6 @@ describe(`public functions: ${contractName}`, () => {
       ],
       address1
     );
-    console.log(JSON.stringify(receipt));
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INSUFFICIENT_BALANCE));
   });

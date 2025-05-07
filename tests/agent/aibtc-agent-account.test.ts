@@ -4,10 +4,16 @@ import { ErrCodeAgentAccount } from "../utilities/contract-error-codes";
 import { setupFullContractRegistry } from "../utilities/contract-registry";
 import {
   convertSIP019PrintEvent,
+  DAO_TOKEN_ASSETS_MAP,
+  SBTC_ASSETS_MAP,
   SBTC_CONTRACT,
 } from "../utilities/contract-helpers";
-import { getBalancesForPrincipal } from "../utilities/clarinet-helpers";
+import {
+  getBalancesForPrincipal,
+  printAssetsMap,
+} from "../utilities/clarinet-helpers";
 import { constructDao, fundVoters } from "../utilities/dao-helpers";
+import { dbgLog } from "../utilities/debug-logging";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -57,6 +63,7 @@ function setupAgentAccount(sender: string, satsAmount: number = 1000000) {
     [],
     sender
   );
+  dbgLog(faucetReceipt, { titleBefore: "faucetReceipt" });
   expect(faucetReceipt.result).toBeOk(Cl.bool(true));
 
   // get dao tokens from the dex
@@ -66,13 +73,19 @@ function setupAgentAccount(sender: string, satsAmount: number = 1000000) {
     [Cl.principal(daoTokenAddress), Cl.uint(satsAmount)],
     sender
   );
+  dbgLog(dexReceipt, { titleBefore: "dexReceipt" });
   expect(dexReceipt.result).toBeOk(Cl.bool(true));
+
+  // get balances for dao token and sbtc
+  const senderBalances = getBalancesForPrincipal(sender);
+  const senderSbtcBalance = senderBalances.get(SBTC_ASSETS_MAP)!;
+  const senderDaoTokenBalance = senderBalances.get(DAO_TOKEN_ASSETS_MAP)!;
 
   // deposit sBTC to the agent account
   const depositReceiptSbtc = simnet.callPublicFn(
     contractAddress,
     "deposit-ft",
-    [Cl.principal(SBTC_CONTRACT), Cl.uint(satsAmount)],
+    [Cl.principal(SBTC_CONTRACT), Cl.uint(senderSbtcBalance)],
     sender
   );
   expect(depositReceiptSbtc.result).toBeOk(Cl.bool(true));
@@ -81,9 +94,12 @@ function setupAgentAccount(sender: string, satsAmount: number = 1000000) {
   const depositReceiptDao = simnet.callPublicFn(
     contractAddress,
     "deposit-ft",
-    [Cl.principal(daoTokenAddress), Cl.uint(satsAmount)],
+    [Cl.principal(daoTokenAddress), Cl.uint(senderDaoTokenBalance)],
     sender
   );
+  dbgLog(depositReceiptDao, {
+    titleBefore: "depositReceiptDao",
+  });
   expect(depositReceiptDao.result).toBeOk(Cl.bool(true));
 }
 
@@ -608,8 +624,6 @@ describe(`public functions: ${contractName}`, () => {
     // arrange
     const message = Cl.stringAscii("hello world");
     setupAgentAccount(deployer);
-    fundVoters([deployer]);
-    constructDao(deployer);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -632,6 +646,16 @@ describe(`public functions: ${contractName}`, () => {
     // arrange
     const message = Cl.stringAscii("hello world");
     setupAgentAccount(deployer);
+    fundVoters([deployer]);
+    constructDao(deployer);
+
+    const agentAccountBalances = getBalancesForPrincipal(contractAddress);
+    dbgLog(agentAccountBalances, {
+      titleBefore: "agentAccountBalances",
+      forceLog: true,
+    });
+
+    printAssetsMap({ forceLog: true });
 
     // act
     const receipt = simnet.callPublicFn(
@@ -664,6 +688,8 @@ describe(`public functions: ${contractName}`, () => {
       },
     };
     setupAgentAccount(deployer);
+    fundVoters([deployer]);
+    constructDao(deployer);
 
     // act
     const receipt = simnet.callPublicFn(

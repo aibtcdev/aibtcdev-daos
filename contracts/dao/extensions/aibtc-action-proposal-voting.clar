@@ -148,7 +148,7 @@
       (actionContract (contract-of action))
       (caller contract-caller)
       ;; /g/.aibtc-dao-users/dao_users_contract
-      (userId (try! (as-contract (contract-call? .aibtc-dao-users get-or-create-user-index caller))))
+      (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index caller)))
       (newId (+ (var-get proposalCount) u1))
       (createdStx (- stacks-block-height u1))
       (createdBtc burn-block-height)
@@ -260,7 +260,7 @@
       ;; /g/.aibtc-faktory/dao_token_contract
       (senderBalance (unwrap! (at-block proposalBlockHash (contract-call? .aibtc-faktory get-balance caller)) ERR_FETCHING_TOKEN_DATA))
       ;; /g/.aibtc-dao-users/dao_users_contract
-      (userId (try! (as-contract (contract-call? .aibtc-dao-users get-or-create-user-index caller))))
+      (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index caller)))
       (voterRecord (map-get? VoteRecords {proposalId: proposalId, voter: caller}))
       (previousVote (if (is-some voterRecord) (some (get vote (unwrap-panic voterRecord))) none))
       (previousVoteAmount (if (is-some voterRecord) (some (get amount (unwrap-panic voterRecord))) none))
@@ -322,7 +322,7 @@
       ;; /g/.aibtc-faktory/dao_token_contract
       (senderBalance (unwrap! (at-block proposalBlockHash (contract-call? .aibtc-faktory get-balance caller)) ERR_FETCHING_TOKEN_DATA))
       ;; /g/.aibtc-dao-users/dao_users_contract
-      (userId (try! (as-contract (contract-call? .aibtc-dao-users get-or-create-user-index caller))))
+      (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index caller)))
     )
     ;; caller has the required balance
     (asserts! (> senderBalance u0) ERR_INSUFFICIENT_BALANCE)
@@ -402,7 +402,7 @@
     (asserts! (is-eq (get action proposalDetails) actionContract) ERR_INVALID_ACTION)
     ;; record user in dao if not already
     ;; /g/.aibtc-dao-users/dao_users_contract
-    (try! (as-contract (contract-call? .aibtc-dao-users get-or-create-user-index caller)))
+    (try! (contract-call? .aibtc-dao-users get-or-create-user-index caller))
     ;; print conclusion event
     (print {
       ;; /g/aibtc/dao_token_symbol
@@ -451,9 +451,9 @@
     ;; update the users reputation based on outcome
     (if votePassed
       ;; /g/.aibtc-dao-users/dao_users_contract
-      (try! (as-contract (contract-call? .aibtc-dao-users increase-user-reputation creator REP_SUCCESS)))
+      (try! (contract-call? .aibtc-dao-users increase-user-reputation creator REP_SUCCESS))
       ;; /g/.aibtc-dao-users/dao_users_contract
-      (try! (as-contract (contract-call? .aibtc-dao-users decrease-user-reputation creator REP_FAILURE)))
+      (try! (contract-call? .aibtc-dao-users decrease-user-reputation creator REP_FAILURE))
     )
     ;; increment the concluded proposal count
     (var-set concludedProposalCount (+ (var-get concludedProposalCount) u1))

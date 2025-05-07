@@ -1,28 +1,31 @@
-import { dbgLog } from "./debug-logging";
+import { dbgLog, DbgLogParams } from "./debug-logging";
 
 /**
  *
  * Prints the contents of the assets map to the console.
  */
-export function printAssetsMap(): void {
+export function printAssetsMap(params?: DbgLogParams): void {
   const assetsMap = simnet.getAssetsMap();
-  dbgLog("===== Assets Map Contents =====");
+  dbgLog("===== Assets Map Contents =====", params);
   if (assetsMap.size === 0) {
-    dbgLog("(empty)");
+    dbgLog("(empty)", params);
     return;
   }
   for (const [assetType, principalsMap] of assetsMap) {
-    dbgLog(`Asset type: ${assetType}`);
+    dbgLog(`Asset type: ${assetType}`, params);
     if (principalsMap.size === 0) {
-      dbgLog("  (no balances)");
+      dbgLog("  (no balances)", params);
       continue;
     }
     for (const [principal, balance] of principalsMap) {
-      dbgLog(`  Principal: ${principal}, Balance: ${balance.toString()}`);
+      dbgLog(
+        `  Principal: ${principal}, Balance: ${balance.toString()}`,
+        params
+      );
     }
-    dbgLog("----------------------------");
+    dbgLog("----------------------------", params);
   }
-  dbgLog("==============================");
+  dbgLog("==============================", params);
 }
 
 /**
