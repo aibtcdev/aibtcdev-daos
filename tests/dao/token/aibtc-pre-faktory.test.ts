@@ -1,5 +1,5 @@
 import { Cl, cvToValue } from "@stacks/transactions";
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe, expect, it } from "vitest";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
 import { fundVoters } from "../../utilities/dao-helpers";
 
@@ -702,10 +702,10 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // assert
     expect(result.result).toBeOk();
-    
+
     // Convert the result to a usable value
     const isOpen = cvToValue(result.result);
-    
+
     // Check that the result is a boolean
     expect(typeof isOpen).toBe("boolean");
   });
@@ -726,10 +726,10 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // assert
     expect(result.result).toBeOk();
-    
+
     // Convert the result to a usable value
     const isActive = cvToValue(result.result);
-    
+
     // Check that the result is a boolean
     expect(typeof isActive).toBe("boolean");
   });
