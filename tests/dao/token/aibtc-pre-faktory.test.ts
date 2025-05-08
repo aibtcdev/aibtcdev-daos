@@ -21,7 +21,7 @@ const address10 = accounts.get("wallet_10")!;
 const registry = setupDaoContractRegistry();
 const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "TOKEN",
-  "PRE_FAKTORY"
+  "PRELAUNCH"
 );
 const contractName = contractAddress.split(".")[1];
 const tokenContractAddress = registry.getContractAddressByTypeAndSubtype(
@@ -50,34 +50,29 @@ const ERR_COOLDOWN_ACTIVE = 324;
 const ERR_TOTAL_SEATS_ZERO = 325;
 
 // Helper function to get sBTC for testing
-function getSbtc(address: string, amount: number = 10000000) {
-  const receipt = simnet.callPublicFn(
-    sbtcContract,
-    "faucet",
-    [],
-    address
-  );
+function getSbtc(address: string) {
+  const receipt = simnet.callPublicFn(sbtcContract, "faucet", [], address);
   return receipt;
 }
 
 // Helper function to buy seats for multiple users
 function buySeatsForUsers(userCount: number, seatsPerUser: number = 2) {
   const results = [];
-  
+
   for (let i = 1; i <= userCount; i++) {
     const address = accounts.get(`wallet_${i}`)!;
     getSbtc(address);
-    
+
     const result = simnet.callPublicFn(
       contractAddress,
       "buy-up-to",
       [Cl.uint(seatsPerUser)],
       address
     );
-    
+
     results.push(result);
   }
-  
+
   return results;
 }
 
@@ -87,24 +82,14 @@ function buyAllSeats() {
   for (let i = 1; i <= 8; i++) {
     const address = accounts.get(`wallet_${i}`)!;
     getSbtc(address);
-    
-    simnet.callPublicFn(
-      contractAddress,
-      "buy-up-to",
-      [Cl.uint(2)],
-      address
-    );
+
+    simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(2)], address);
   }
-  
+
   // Last user buys 3 seats to reach 19 total
   getSbtc(address9);
-  simnet.callPublicFn(
-    contractAddress,
-    "buy-up-to",
-    [Cl.uint(3)],
-    address9
-  );
-  
+  simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(3)], address9);
+
   // Final user buys the last seat to trigger distribution
   getSbtc(address10);
   const finalResult = simnet.callPublicFn(
@@ -113,7 +98,7 @@ function buyAllSeats() {
     [Cl.uint(1)],
     address10
   );
-  
+
   return finalResult;
 }
 
@@ -124,7 +109,7 @@ describe(`public functions: ${contractName}`, () => {
   it("buy-up-to() succeeds with valid parameters", () => {
     // arrange
     getSbtc(address1);
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -132,10 +117,10 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.uint(2)],
       address1
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
-    
+
     // Check that seats were assigned
     const userInfo = simnet.callReadOnlyFn(
       contractAddress,
@@ -143,18 +128,18 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address1)],
       deployer
     ).result;
-    
+
     expect(userInfo).toBeOk();
     if (userInfo.isOk) {
       const seatsOwned = userInfo.value.data["seats-owned"].value;
       expect(seatsOwned).toEqual(2n);
     }
   });
-  
+
   it("buy-up-to() fails with invalid seat count", () => {
     // arrange
     getSbtc(address2);
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -162,15 +147,15 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.uint(0)],
       address2
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ERR_INVALID_SEAT_COUNT));
   });
-  
+
   it("buy-up-to() updates total users and seats taken", () => {
     // arrange
     getSbtc(address3);
-    
+
     // Get initial values
     const initialStatus = simnet.callReadOnlyFn(
       contractAddress,
@@ -178,15 +163,15 @@ describe(`public functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-    
+
     let initialUsers = 0n;
     let initialSeats = 0n;
-    
+
     if (initialStatus.isOk) {
       initialUsers = initialStatus.value.data["total-users"].value;
       initialSeats = initialStatus.value.data["total-seats-taken"].value;
     }
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -194,10 +179,10 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.uint(3)],
       address3
     );
-    
+
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
-    
+
     // Check that total users and seats were updated
     const newStatus = simnet.callReadOnlyFn(
       contractAddress,
@@ -205,31 +190,26 @@ describe(`public functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-    
+
     if (newStatus.isOk) {
       const newUsers = newStatus.value.data["total-users"].value;
       const newSeats = newStatus.value.data["total-seats-taken"].value;
-      
+
       expect(newUsers).toEqual(initialUsers + 1n);
       expect(newSeats).toEqual(initialSeats + 3n);
     }
   });
-  
+
   ////////////////////////////////////////
   // refund() tests
   ////////////////////////////////////////
   it("refund() succeeds for seat owner", () => {
     // arrange
     getSbtc(address4);
-    
+
     // First buy some seats
-    simnet.callPublicFn(
-      contractAddress,
-      "buy-up-to",
-      [Cl.uint(2)],
-      address4
-    );
-    
+    simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(2)], address4);
+
     // Verify seats were purchased
     const userInfoBefore = simnet.callReadOnlyFn(
       contractAddress,
@@ -237,12 +217,12 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address4)],
       deployer
     ).result;
-    
+
     if (userInfoBefore.isOk) {
       const seatsOwned = userInfoBefore.value.data["seats-owned"].value;
       expect(seatsOwned).toEqual(2n);
     }
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -250,13 +230,13 @@ describe(`public functions: ${contractName}`, () => {
       [],
       address4
     );
-    
+
     // assert
     // Note: This might fail if distribution has already been initialized
     // or if the refund period has expired
     try {
       expect(receipt.result).toBeOk(Cl.bool(true));
-      
+
       // Check that seats were removed
       const userInfoAfter = simnet.callReadOnlyFn(
         contractAddress,
@@ -264,21 +244,23 @@ describe(`public functions: ${contractName}`, () => {
         [Cl.principal(address4)],
         deployer
       ).result;
-      
+
       if (userInfoAfter.isOk) {
         const seatsOwned = userInfoAfter.value.data["seats-owned"].value;
         expect(seatsOwned).toEqual(0n);
       }
     } catch (e) {
-      console.log("Refund test skipped - distribution may be initialized or refund period expired");
+      console.log(
+        "Refund test skipped - distribution may be initialized or refund period expired"
+      );
     }
   });
-  
+
   it("refund() fails for non-seat owner", () => {
     // arrange
     // Use an address that hasn't bought seats
     getSbtc(address5);
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -286,26 +268,21 @@ describe(`public functions: ${contractName}`, () => {
       [],
       address5
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ERR_NOT_SEAT_OWNER));
   });
-  
+
   ////////////////////////////////////////
   // claim() tests
   ////////////////////////////////////////
   it("claim() fails if distribution not initialized", () => {
     // arrange
     getSbtc(address6);
-    
+
     // Buy seats
-    simnet.callPublicFn(
-      contractAddress,
-      "buy-up-to",
-      [Cl.uint(2)],
-      address6
-    );
-    
+    simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(2)], address6);
+
     // Check if distribution is initialized
     const status = simnet.callReadOnlyFn(
       contractAddress,
@@ -313,30 +290,36 @@ describe(`public functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-    
+
     let distributionInitialized = false;
     if (status.isOk) {
-      distributionInitialized = status.value.data["distribution-height"].value > 0;
+      distributionInitialized =
+        status.value.data["distribution-height"].value > 0;
     }
-    
+
     // Skip test if distribution is already initialized
     if (distributionInitialized) {
       console.log("Skipping claim test - distribution already initialized");
       return;
     }
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "claim",
-      [Cl.contractPrincipal(tokenContractAddress.split(".")[0], tokenContractAddress.split(".")[1])],
+      [
+        Cl.contractPrincipal(
+          tokenContractAddress.split(".")[0],
+          tokenContractAddress.split(".")[1]
+        ),
+      ],
       address6
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ERR_DISTRIBUTION_NOT_INITIALIZED));
   });
-  
+
   it("claim() succeeds after distribution is initialized", () => {
     // arrange
     // First ensure distribution is initialized by buying all seats
@@ -345,7 +328,7 @@ describe(`public functions: ${contractName}`, () => {
     } catch (e) {
       // Distribution might already be initialized
     }
-    
+
     // Check if distribution is initialized
     const status = simnet.callReadOnlyFn(
       contractAddress,
@@ -353,32 +336,38 @@ describe(`public functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-    
+
     let distributionInitialized = false;
     if (status.isOk) {
-      distributionInitialized = status.value.data["distribution-height"].value > 0;
+      distributionInitialized =
+        status.value.data["distribution-height"].value > 0;
     }
-    
+
     // Skip test if distribution is not initialized
     if (!distributionInitialized) {
       console.log("Skipping claim test - could not initialize distribution");
       return;
     }
-    
+
     // Mine some blocks to reach first vesting period
     simnet.mineEmptyBurnBlocks(100);
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "claim",
-      [Cl.contractPrincipal(tokenContractAddress.split(".")[0], tokenContractAddress.split(".")[1])],
+      [
+        Cl.contractPrincipal(
+          tokenContractAddress.split(".")[0],
+          tokenContractAddress.split(".")[1]
+        ),
+      ],
       address1
     );
-    
+
     // assert
     expect(receipt.result).toBeOk();
-    
+
     // Check that claimed amount was updated
     const userInfo = simnet.callReadOnlyFn(
       contractAddress,
@@ -386,13 +375,13 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address1)],
       deployer
     ).result;
-    
+
     if (userInfo.isOk) {
       const claimedAmount = userInfo.value.data["amount-claimed"].value;
       expect(claimedAmount).toBeGreaterThan(0n);
     }
   });
-  
+
   ////////////////////////////////////////
   // claim-on-behalf() tests
   ////////////////////////////////////////
@@ -404,7 +393,7 @@ describe(`public functions: ${contractName}`, () => {
     } catch (e) {
       // Distribution might already be initialized
     }
-    
+
     // Check if distribution is initialized
     const status = simnet.callReadOnlyFn(
       contractAddress,
@@ -412,35 +401,41 @@ describe(`public functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-    
+
     let distributionInitialized = false;
     if (status.isOk) {
-      distributionInitialized = status.value.data["distribution-height"].value > 0;
+      distributionInitialized =
+        status.value.data["distribution-height"].value > 0;
     }
-    
+
     // Skip test if distribution is not initialized
     if (!distributionInitialized) {
-      console.log("Skipping claim-on-behalf test - distribution not initialized");
+      console.log(
+        "Skipping claim-on-behalf test - distribution not initialized"
+      );
       return;
     }
-    
+
     // Mine some blocks to reach next vesting period
     simnet.mineEmptyBurnBlocks(150);
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "claim-on-behalf",
       [
-        Cl.contractPrincipal(tokenContractAddress.split(".")[0], tokenContractAddress.split(".")[1]),
-        Cl.principal(address2)
+        Cl.contractPrincipal(
+          tokenContractAddress.split(".")[0],
+          tokenContractAddress.split(".")[1]
+        ),
+        Cl.principal(address2),
       ],
       address1
     );
-    
+
     // assert
     expect(receipt.result).toBeOk();
-    
+
     // Check that claimed amount was updated for address2
     const userInfo = simnet.callReadOnlyFn(
       contractAddress,
@@ -448,13 +443,13 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address2)],
       deployer
     ).result;
-    
+
     if (userInfo.isOk) {
       const claimedAmount = userInfo.value.data["amount-claimed"].value;
       expect(claimedAmount).toBeGreaterThan(0n);
     }
   });
-  
+
   ////////////////////////////////////////
   // trigger-fee-airdrop() tests
   ////////////////////////////////////////
@@ -466,7 +461,7 @@ describe(`public functions: ${contractName}`, () => {
     } catch (e) {
       // Distribution might already be initialized
     }
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -474,7 +469,7 @@ describe(`public functions: ${contractName}`, () => {
       [],
       address1
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ERR_NO_FEES_TO_DISTRIBUTE));
   });
@@ -486,7 +481,7 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-contract-status() returns valid data", () => {
     // arrange
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -494,13 +489,13 @@ describe(`read-only functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-    
+
     // assert
     expect(result).toBeOk();
-    
+
     if (result.isOk) {
       const data = result.value.data;
-      
+
       // Check that the result contains the expected fields
       expect(data.hasOwnProperty("is-period-1-expired")).toBe(true);
       expect(data.hasOwnProperty("is-distribution-period")).toBe(true);
@@ -515,7 +510,7 @@ describe(`read-only functions: ${contractName}`, () => {
       expect(data.hasOwnProperty("seat-holders")).toBe(true);
     }
   });
-  
+
   ////////////////////////////////////////
   // get-user-info() tests
   ////////////////////////////////////////
@@ -524,16 +519,11 @@ describe(`read-only functions: ${contractName}`, () => {
     // Ensure address1 has seats
     try {
       getSbtc(address1);
-      simnet.callPublicFn(
-        contractAddress,
-        "buy-up-to",
-        [Cl.uint(1)],
-        address1
-      );
+      simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(1)], address1);
     } catch (e) {
       // Address might already have seats
     }
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -541,26 +531,26 @@ describe(`read-only functions: ${contractName}`, () => {
       [Cl.principal(address1)],
       deployer
     ).result;
-    
+
     // assert
     expect(result).toBeOk();
-    
+
     if (result.isOk) {
       const data = result.value.data;
-      
+
       // Check that the result contains the expected fields
       expect(data.hasOwnProperty("seats-owned")).toBe(true);
       expect(data.hasOwnProperty("amount-claimed")).toBe(true);
       expect(data.hasOwnProperty("claimable-amount")).toBe(true);
     }
   });
-  
+
   ////////////////////////////////////////
   // get-remaining-seats() tests
   ////////////////////////////////////////
   it("get-remaining-seats() returns valid data", () => {
     // arrange
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -568,18 +558,18 @@ describe(`read-only functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-    
+
     // assert
     expect(result).toBeOk();
-    
+
     if (result.isOk) {
       const data = result.value.data;
-      
+
       // Check that the result contains the expected field
       expect(data.hasOwnProperty("remainin-seats")).toBe(true);
     }
   });
-  
+
   ////////////////////////////////////////
   // get-seats-owned() tests
   ////////////////////////////////////////
@@ -588,16 +578,11 @@ describe(`read-only functions: ${contractName}`, () => {
     // Ensure address1 has seats
     try {
       getSbtc(address1);
-      simnet.callPublicFn(
-        contractAddress,
-        "buy-up-to",
-        [Cl.uint(1)],
-        address1
-      );
+      simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(1)], address1);
     } catch (e) {
       // Address might already have seats
     }
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -605,24 +590,24 @@ describe(`read-only functions: ${contractName}`, () => {
       [Cl.principal(address1)],
       deployer
     ).result;
-    
+
     // assert
     expect(result).toBeOk();
-    
+
     if (result.isOk) {
       const data = result.value.data;
-      
+
       // Check that the result contains the expected field
       expect(data.hasOwnProperty("seats-owned")).toBe(true);
     }
   });
-  
+
   ////////////////////////////////////////
   // get-claimed-amount() tests
   ////////////////////////////////////////
   it("get-claimed-amount() returns valid data", () => {
     // arrange
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -630,24 +615,24 @@ describe(`read-only functions: ${contractName}`, () => {
       [Cl.principal(address1)],
       deployer
     ).result;
-    
+
     // assert
     expect(result).toBeOk();
-    
+
     if (result.isOk) {
       const data = result.value.data;
-      
+
       // Check that the result contains the expected field
       expect(data.hasOwnProperty("claimed-amount")).toBe(true);
     }
   });
-  
+
   ////////////////////////////////////////
   // get-vesting-schedule() tests
   ////////////////////////////////////////
   it("get-vesting-schedule() returns valid data", () => {
     // arrange
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -655,31 +640,31 @@ describe(`read-only functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-    
+
     // assert
     expect(result).toBeOk();
-    
+
     if (result.isOk) {
       const data = result.value.data;
-      
+
       // Check that the result contains the expected field
       expect(data.hasOwnProperty("vesting-schedule")).toBe(true);
-      
+
       // Check that vesting schedule is an array
       const schedule = data["vesting-schedule"];
       expect(schedule.type).toBe(11); // List type
-      
+
       // Check that the schedule has entries
       expect(schedule.list.length).toBeGreaterThan(0);
     }
   });
-  
+
   ////////////////////////////////////////
   // get-seat-holders() tests
   ////////////////////////////////////////
   it("get-seat-holders() returns valid data", () => {
     // arrange
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -687,24 +672,24 @@ describe(`read-only functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-    
+
     // assert
     expect(result).toBeOk();
-    
+
     if (result.isOk) {
       const data = result.value.data;
-      
+
       // Check that the result contains the expected field
       expect(data.hasOwnProperty("seat-holders")).toBe(true);
     }
   });
-  
+
   ////////////////////////////////////////
   // is-market-open() tests
   ////////////////////////////////////////
   it("is-market-open() returns valid data", () => {
     // arrange
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -712,22 +697,22 @@ describe(`read-only functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-    
+
     // assert
     expect(result).toBeOk();
-    
+
     // Check that the result is a boolean
     if (result.isOk) {
       expect(typeof result.value.value).toBe("boolean");
     }
   });
-  
+
   ////////////////////////////////////////
   // is-governance-active() tests
   ////////////////////////////////////////
   it("is-governance-active() returns valid data", () => {
     // arrange
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -735,22 +720,22 @@ describe(`read-only functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-    
+
     // assert
     expect(result).toBeOk();
-    
+
     // Check that the result is a boolean
     if (result.isOk) {
       expect(typeof result.value.value).toBe("boolean");
     }
   });
-  
+
   ////////////////////////////////////////
   // get-fee-distribution-info() tests
   ////////////////////////////////////////
   it("get-fee-distribution-info() returns valid data", () => {
     // arrange
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -758,13 +743,13 @@ describe(`read-only functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-    
+
     // assert
     expect(result).toBeOk();
-    
+
     if (result.isOk) {
       const data = result.value.data;
-      
+
       // Check that the result contains the expected fields
       expect(data.hasOwnProperty("accumulated-fees")).toBe(true);
       expect(data.hasOwnProperty("last-airdrop-height")).toBe(true);
@@ -774,7 +759,7 @@ describe(`read-only functions: ${contractName}`, () => {
       expect(data.hasOwnProperty("can-trigger-now")).toBe(true);
     }
   });
-  
+
   ////////////////////////////////////////
   // get-user-expected-share() tests
   ////////////////////////////////////////
@@ -783,16 +768,11 @@ describe(`read-only functions: ${contractName}`, () => {
     // Ensure address1 has seats
     try {
       getSbtc(address1);
-      simnet.callPublicFn(
-        contractAddress,
-        "buy-up-to",
-        [Cl.uint(1)],
-        address1
-      );
+      simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(1)], address1);
     } catch (e) {
       // Address might already have seats
     }
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -800,13 +780,13 @@ describe(`read-only functions: ${contractName}`, () => {
       [Cl.principal(address1)],
       deployer
     ).result;
-    
+
     // assert
     expect(result).toBeOk();
-    
+
     if (result.isOk) {
       const data = result.value.data;
-      
+
       // Check that the result contains the expected fields
       expect(data.hasOwnProperty("user")).toBe(true);
       expect(data.hasOwnProperty("user-seats")).toBe(true);
