@@ -8,7 +8,7 @@ import {
   SBTC_ASSETS_MAP,
   SBTC_CONTRACT,
 } from "../utilities/contract-helpers";
-import { getBalancesForPrincipal } from "../utilities/clarinet-helpers";
+import { getBalancesForPrincipal } from "../utilities/asset-helpers";
 import {
   constructDao,
   fundVoters,

@@ -1,8 +1,8 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it, beforeEach } from "vitest";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
-import { fundVoters } from "../../utilities/dao-helpers";
-import { getBalancesForPrincipal } from "../../utilities/clarinet-helpers";
+import { fundVoters, getDaoTokens } from "../../utilities/dao-helpers";
+import { getBalancesForPrincipal } from "../../utilities/asset-helpers";
 import { DAO_TOKEN_ASSETS_MAP } from "../../utilities/contract-helpers";
 
 // setup accounts
@@ -69,6 +69,10 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address2)],
       deployer
     ).result;
+    expect(initialBalance).toBeOk(Cl.uint(0));
+
+    // Get some tokens for address1
+    getDaoTokens(address1, 1000000);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -95,11 +99,7 @@ describe(`public functions: ${contractName}`, () => {
     ).result;
 
     // Verify the balance increased by the transferred amount
-    if (initialBalance.isOk && newBalance.isOk) {
-      const initialAmount = initialBalance.value.value;
-      const newAmount = newBalance.value.value;
-      expect(newAmount).toEqual(initialAmount + 10000n);
-    }
+    expect(newBalance).toBeOk(Cl.uint(10000));
   });
 
   it("transfer() handles memo correctly", () => {
@@ -176,6 +176,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address2)],
       deployer
     ).result;
+    expect(newBalance2).toBeOk(Cl.uint(5000));
 
     const newBalance3 = simnet.callReadOnlyFn(
       contractAddress,
@@ -183,19 +184,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address3)],
       deployer
     ).result;
-
-    // Verify the balances increased by the transferred amounts
-    if (initialBalance2.isOk && newBalance2.isOk) {
-      const initialAmount = initialBalance2.value.value;
-      const newAmount = newBalance2.value.value;
-      expect(newAmount).toEqual(initialAmount + 5000n);
-    }
-
-    if (initialBalance3.isOk && newBalance3.isOk) {
-      const initialAmount = initialBalance3.value.value;
-      const newAmount = newBalance3.value.value;
-      expect(newAmount).toEqual(initialAmount + 7500n);
-    }
+    expect(newBalance3).toBeOk(Cl.uint(7500));
   });
 
   it("send-many() fails if any transfer fails", () => {
@@ -207,14 +196,8 @@ describe(`public functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-
-    let excessiveAmount = 0n;
-    if (totalSupply.isOk) {
-      excessiveAmount = totalSupply.value.value + 1000000n;
-    } else {
-      excessiveAmount = 1000000000000000000n; // Just use a very large number
-    }
-
+    expect(totalSupply).toBeOk(Cl.uint(100000000000000000n));
+    const excessiveAmount = 100000000000000000n + 100000000000000000n; // 2x the total supply
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -237,7 +220,8 @@ describe(`public functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(receipt.result).toBeErr(Cl.uint(1)); // Generic error from ft-transfer?
+    // Generic error from ft-transfer?
+    expect(receipt.result).toBeErr(Cl.uint(1));
   });
   ////////////////////////////////////////
   // Initial token distribution tests
@@ -272,17 +256,9 @@ describe(`public functions: ${contractName}`, () => {
     ).result;
 
     // assert
-    if (treasuryBalance.isOk) {
-      expect(treasuryBalance.value.value).toEqual(treasuryExpected);
-    }
-
-    if (dexBalance.isOk) {
-      expect(dexBalance.value.value).toEqual(dexExpected);
-    }
-
-    if (preFaktoryBalance.isOk) {
-      expect(preFaktoryBalance.value.value).toEqual(preFaktoryExpected);
-    }
+    expect(treasuryBalance).toBeOk(Cl.uint(treasuryExpected));
+    expect(dexBalance).toBeOk(Cl.uint(dexExpected));
+    expect(preFaktoryBalance).toBeOk(Cl.uint(preFaktoryExpected));
   });
 });
 
