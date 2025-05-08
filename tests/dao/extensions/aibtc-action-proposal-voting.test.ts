@@ -428,6 +428,147 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_PROPOSAL_NOT_FOUND));
   });
 
+  it("veto-action-proposal() fails if proposal is already concluded", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    passActionProposal(
+      "SEND_MESSAGE",
+      Cl.stringAscii("test"),
+      deployer,
+      deployer,
+      [deployer]
+    );
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "veto-action-proposal",
+      [Cl.uint(1)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeErr(
+      Cl.uint(ErrCode.ERR_PROPOSAL_ALREADY_CONCLUDED)
+    );
+  });
+
+  it("veto-action-proposal() fails if veto vote is too early", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "veto-action-proposal",
+      [Cl.uint(1)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_VOTE_TOO_SOON));
+  });
+
+  it("veto-action-proposal() fails if veto vote is too late", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // progress chain past voting delay, voting period, and veto delay
+    simnet.mineEmptyBlocks(VOTING_DELAY + VOTING_PERIOD + VOTING_DELAY);
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "veto-action-proposal",
+      [Cl.uint(1)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_VOTE_TOO_LATE));
+  });
+
+  it("veto-action-proposal() fails if veto vote already recorded", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // progress chain past voting delay and period
+    simnet.mineEmptyBlocks(VOTING_DELAY + VOTING_PERIOD);
+    const setupReceipt2 = simnet.callPublicFn(
+      contractAddress,
+      "veto-action-proposal",
+      [Cl.uint(1)],
+      deployer
+    );
+    expect(setupReceipt2.result).toBeOk(Cl.bool(true));
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "veto-action-proposal",
+      [Cl.uint(1)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_ALREADY_VOTED));
+  });
+
+  it("veto-action-proposal() succeeds and records veto vote info", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // progress chain past voting delay and period
+    simnet.mineEmptyBlocks(VOTING_DELAY + VOTING_PERIOD);
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "veto-action-proposal",
+      [Cl.uint(1)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+  });
+
   ////////////////////////////////////////
   // conclude-action-proposal() tests
   ////////////////////////////////////////
@@ -444,7 +585,6 @@ describe(`public functions: ${contractName}`, () => {
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_PROPOSAL_NOT_FOUND));
   });
-});
 
 describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
