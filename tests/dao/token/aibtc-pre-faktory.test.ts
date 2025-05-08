@@ -814,6 +814,31 @@ describe(`read-only functions: ${contractName}`, () => {
   });
 
   ////////////////////////////////////////
+  // get-all-seat-holders() tests
+  ////////////////////////////////////////
+  it("get-all-seat-holders() returns valid data", () => {
+    // arrange
+    // Define the expected structure
+    const expectedStructure = expect.any(Array);
+
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-all-seat-holders",
+      [],
+      deployer
+    ).result;
+
+    // verify we got an ok result
+    if (result.type !== ClarityType.ResponseOk) {
+      throw new Error("get-all-seat-holders() failed when it shouldn't");
+    }
+
+    // Verify the result is an array
+    expect(result.value).toEqual(expectedStructure);
+  });
+
+  ////////////////////////////////////////
   // get-user-expected-share() tests
   ////////////////////////////////////////
   it("get-user-expected-share() returns valid data", () => {
