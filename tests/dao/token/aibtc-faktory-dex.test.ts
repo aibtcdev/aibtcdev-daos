@@ -1,4 +1,4 @@
-import { Cl } from "@stacks/transactions";
+import { Cl, cvToValue } from "@stacks/transactions";
 import { describe, expect, it, beforeEach } from "vitest";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
 import { fundVoters } from "../../utilities/dao-helpers";
@@ -48,21 +48,24 @@ function openMarket() {
     simnet.callPublicFn(preFaktoryAddress, "toggle-market-open", [], deployer);
   } catch (e) {
     // If toggle-market-open doesn't exist, try is-market-open
-    const marketOpen = simnet.callReadOnlyFn(
+    const marketOpenResult = simnet.callReadOnlyFn(
       preFaktoryAddress,
       "is-market-open",
       [],
       deployer
-    ).result;
+    );
     
     // If market is not open, we need to find a way to open it
-    if (marketOpen.isOk && !marketOpen.value.value) {
-      // Try different function names that might exist
-      try {
-        simnet.callPublicFn(preFaktoryAddress, "market-open", [], deployer);
-      } catch (e2) {
-        // If that fails too, try another approach
-        console.log("Warning: Could not open market in pre-faktory contract");
+    if (marketOpenResult.result.isOk) {
+      const marketOpen = cvToValue(marketOpenResult.result);
+      if (!marketOpen) {
+        // Try different function names that might exist
+        try {
+          simnet.callPublicFn(preFaktoryAddress, "market-open", [], deployer);
+        } catch (e2) {
+          // If that fails too, try another approach
+          console.log("Warning: Could not open market in pre-faktory contract");
+        }
       }
     }
   }
@@ -83,17 +86,19 @@ describe(`public functions: ${contractName}`, () => {
     // This test is conditional on being able to control the pre-faktory market state
     try {
       // Try to check if the market is open
-      const preMarketOpen = simnet.callReadOnlyFn(
+      const preMarketOpenResult = simnet.callReadOnlyFn(
         preFaktoryAddress,
         "is-market-open",
         [],
         deployer
-      ).result;
+      );
 
       // If we can check the market state, proceed with the test
-      if (preMarketOpen.isOk) {
+      if (preMarketOpenResult.result.isOk) {
+        const preMarketOpen = cvToValue(preMarketOpenResult.result);
+        
         // If market is open, try to close it
-        if (preMarketOpen.value.value === true) {
+        if (preMarketOpen === true) {
           try {
             simnet.callPublicFn(
               preFaktoryAddress,
@@ -132,17 +137,19 @@ describe(`public functions: ${contractName}`, () => {
     // This test is conditional on being able to control the pre-faktory market state
     try {
       // Try to check if the market is open
-      const preMarketOpen = simnet.callReadOnlyFn(
+      const preMarketOpenResult = simnet.callReadOnlyFn(
         preFaktoryAddress,
         "is-market-open",
         [],
         deployer
-      ).result;
+      );
 
       // If we can check the market state, proceed with the test
-      if (preMarketOpen.isOk) {
+      if (preMarketOpenResult.result.isOk) {
+        const preMarketOpen = cvToValue(preMarketOpenResult.result);
+        
         // If market is closed, try to open it
-        if (preMarketOpen.value.value === false) {
+        if (preMarketOpen === false) {
           try {
             simnet.callPublicFn(
               preFaktoryAddress,
@@ -169,14 +176,14 @@ describe(`public functions: ${contractName}`, () => {
         expect(receipt.result).toBeOk(Cl.bool(true));
 
         // Verify market is now open
-        const isOpen = simnet.callReadOnlyFn(
+        const isOpenResult = simnet.callReadOnlyFn(
           contractAddress,
           "get-open",
           [],
           deployer
-        ).result;
-
-        expect(isOpen).toBeOk(Cl.bool(true));
+        );
+        
+        expect(isOpenResult.result).toBeOk(Cl.bool(true));
       } else {
         // If we can't check the market state, skip this test
         console.log("Skipping test: Cannot check pre-faktory market state");
@@ -384,6 +391,28 @@ describe(`read-only functions: ${contractName}`, () => {
     
     // Just verify that we get a valid response
     expect(currentStatus.result).not.toBeUndefined();
+  });
+  
+  ////////////////////////////////////////
+  // is-market-open() tests
+  ////////////////////////////////////////
+  it("is-market-open() returns a valid boolean response", () => {
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "is-market-open",
+      [],
+      deployer
+    );
+    
+    // assert
+    expect(result.result).toBeOk();
+    
+    // Convert the result to a usable value
+    const isOpen = cvToValue(result.result);
+    
+    // Check that the result is a boolean
+    expect(typeof isOpen).toBe("boolean");
   });
 
   ////////////////////////////////////////
