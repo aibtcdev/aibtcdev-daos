@@ -445,7 +445,7 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("Expected result to be a tuple");
     }
 
-    const tupleData = result.data;
+    const tupleData = result.value;
     expect(tupleData).toStrictEqual(expectedContractInfo);
   });
 });

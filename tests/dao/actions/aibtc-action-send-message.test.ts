@@ -3,7 +3,7 @@ import { Cl } from "@stacks/transactions";
 import { ErrCodeActionSendMessage } from "../../utilities/contract-error-codes";
 import {
   constructDao,
-  fundVoters,
+  formatSerializedBuffer,
   passActionProposal,
 } from "../../utilities/dao-helpers";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
@@ -46,11 +46,11 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////
   it("run() fails if called directly", () => {
     // act
-    const message = "hello world";
+    const message = Cl.stringAscii("hello world");
     const receipt = simnet.callPublicFn(
       contractAddress,
       "run",
-      [Cl.buffer(Cl.serialize(Cl.stringAscii(message)))],
+      [formatSerializedBuffer(message)],
       deployer
     );
     // assert

@@ -36,7 +36,7 @@ export function convertSIP019PrintEvent(event: ClarityEvent): SIP019PrintEvent {
     throw new Error("Event data is not a tuple");
   }
   // verify the notification and payload keys exist
-  const tupleData = event.data.value.data;
+  const tupleData = event.data.value.value;
   if (!("notification" in tupleData) || !("payload" in tupleData)) {
     throw new Error(
       "Event data does not contain notification and payload keys"
@@ -44,8 +44,10 @@ export function convertSIP019PrintEvent(event: ClarityEvent): SIP019PrintEvent {
   }
   const payloadTuple = tupleData.payload as TupleCV;
   const payloadData = Object.fromEntries(
-    Object.entries(payloadTuple.data).map(
-      ([key, value]: [string, ClarityValue]) => [key, cvToValue(value, true)]
+    Object.entries(payloadTuple.value).map(
+      ([key, value]: [string, ClarityValue]) => {
+        return [key, cvToValue(value, true)];
+      }
     )
   );
   // return the typed event
