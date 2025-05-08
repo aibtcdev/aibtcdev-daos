@@ -358,7 +358,7 @@ describe(`public functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(receipt.result).toBeOk();
+    expect(receipt.result).toBeOk(Cl.uint(receipt.result.value.value));
 
     // Check that claimed amount was updated
     const userInfo = simnet.callReadOnlyFn(
@@ -425,7 +425,7 @@ describe(`public functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(receipt.result).toBeOk();
+    expect(receipt.result).toBeOk(Cl.uint(receipt.result.value.value));
 
     // Check that claimed amount was updated for address2
     const userInfo = simnet.callReadOnlyFn(
@@ -668,10 +668,8 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(result.result).toBeOk();
-
-    // Convert the result to a usable value
     const isOpen = cvToValue(result.result);
+    expect(result.result).toBeOk(Cl.bool(isOpen));
 
     // Check that the result is a boolean
     expect(typeof isOpen).toBe("boolean");
@@ -692,10 +690,8 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(result.result).toBeOk();
-
-    // Convert the result to a usable value
     const isActive = cvToValue(result.result);
+    expect(result.result).toBeOk(Cl.bool(isActive));
 
     // Check that the result is a boolean
     expect(typeof isActive).toBe("boolean");

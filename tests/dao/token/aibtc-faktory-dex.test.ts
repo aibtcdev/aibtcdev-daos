@@ -279,12 +279,13 @@ describe(`public functions: ${contractName}`, () => {
     getSbtc(address1);
 
     // Get initial balances
-    const initialTokenBalance = simnet.callReadOnlyFn(
+    const initialTokenBalanceResult = simnet.callReadOnlyFn(
       tokenContractAddress,
       "get-balance",
       [Cl.principal(address1)],
       deployer
-    ).result;
+    );
+    const initialTokenBalance = cvToValue(initialTokenBalanceResult.result);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -311,11 +312,12 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     ).result;
 
-    if (initialTokenBalance.isOk && newTokenBalance.isOk) {
-      expect(newTokenBalance.value.value).toBeGreaterThan(
-        initialTokenBalance.value.value
-      );
-    }
+    // Convert values to usable format
+    const initialBalanceValue = cvToValue(initialTokenBalance);
+    const newBalanceValue = cvToValue(newTokenBalance);
+    
+    // Verify the balance increased
+    expect(newBalanceValue).toBeGreaterThan(initialBalanceValue);
   });
 
   ////////////////////////////////////////
@@ -413,18 +415,16 @@ describe(`read-only functions: ${contractName}`, () => {
     // assert
     expect(result.result).not.toBeUndefined();
     
-    // If we got a valid result, check its structure
-    if (result.result && result.result.isOk) {
-      const data = result.result.value.data;
-      
-      // Check that the fee is 2% of the input amount
-      const fee = data["fee"].value;
-      expect(fee).toEqual(2000n); // 2% of 100000
-      
-      // Check that stx-in + fee = input amount
-      const stxIn = data["stx-in"].value;
-      expect(stxIn + fee).toEqual(100000n);
-    }
+    // Convert to usable data
+    const data = cvToValue(result.result);
+    
+    // Check that the fee is 2% of the input amount
+    const fee = data["fee"];
+    expect(fee).toEqual(2000n); // 2% of 100000
+    
+    // Check that stx-in + fee = input amount
+    const stxIn = data["stx-in"];
+    expect(stxIn + fee).toEqual(100000n);
   });
 
   ////////////////////////////////////////

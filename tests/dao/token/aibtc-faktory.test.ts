@@ -58,13 +58,13 @@ describe(`public functions: ${contractName}`, () => {
 
   it("transfer() succeeds with valid parameters", () => {
     // arrange
-    const initialBalance = simnet.callReadOnlyFn(
+    const initialBalanceResult = simnet.callReadOnlyFn(
       contractAddress,
       "get-balance",
       [Cl.principal(address2)],
       deployer
-    ).result;
-    expect(initialBalance).toBeOk(Cl.uint(0));
+    );
+    expect(initialBalanceResult.result).toBeOk(Cl.uint(0));
 
     // Get some tokens for address1
     getDaoTokens(address1, 1000000);
@@ -86,15 +86,15 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeOk(Cl.bool(true));
 
     // Check that the balance was updated
-    const newBalance = simnet.callReadOnlyFn(
+    const newBalanceResult = simnet.callReadOnlyFn(
       contractAddress,
       "get-balance",
       [Cl.principal(address2)],
       deployer
-    ).result;
+    );
 
     // Verify the balance increased by the transferred amount
-    expect(newBalance).toBeOk(Cl.uint(10000));
+    expect(newBalanceResult.result).toBeOk(Cl.uint(10000));
   });
 
   it("transfer() handles memo correctly", () => {
@@ -129,21 +129,21 @@ describe(`public functions: ${contractName}`, () => {
     // arrange
     getDaoTokens(address1, 1000000);
 
-    const initialBalance2 = simnet.callReadOnlyFn(
+    const initialBalance2Result = simnet.callReadOnlyFn(
       contractAddress,
       "get-balance",
       [Cl.principal(address2)],
       deployer
-    ).result;
-    expect(initialBalance2).toBeOk(Cl.uint(0));
+    );
+    expect(initialBalance2Result.result).toBeOk(Cl.uint(0));
 
-    const initialBalance3 = simnet.callReadOnlyFn(
+    const initialBalance3Result = simnet.callReadOnlyFn(
       contractAddress,
       "get-balance",
       [Cl.principal(address3)],
       deployer
-    ).result;
-    expect(initialBalance3).toBeOk(Cl.uint(0));
+    );
+    expect(initialBalance3Result.result).toBeOk(Cl.uint(0));
 
     // act
     const receipt = simnet.callPublicFn(
@@ -170,33 +170,33 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeOk(Cl.bool(true));
 
     // Check that balances were updated
-    const newBalance2 = simnet.callReadOnlyFn(
+    const newBalance2Result = simnet.callReadOnlyFn(
       contractAddress,
       "get-balance",
       [Cl.principal(address2)],
       deployer
-    ).result;
-    expect(newBalance2).toBeOk(Cl.uint(5000));
+    );
+    expect(newBalance2Result.result).toBeOk(Cl.uint(5000));
 
-    const newBalance3 = simnet.callReadOnlyFn(
+    const newBalance3Result = simnet.callReadOnlyFn(
       contractAddress,
       "get-balance",
       [Cl.principal(address3)],
       deployer
-    ).result;
-    expect(newBalance3).toBeOk(Cl.uint(7500));
+    );
+    expect(newBalance3Result.result).toBeOk(Cl.uint(7500));
   });
 
   it("send-many() fails if any transfer fails", () => {
     // arrange
     // Attempt to send more tokens than the sender has
-    const totalSupply = simnet.callReadOnlyFn(
+    const totalSupplyResult = simnet.callReadOnlyFn(
       contractAddress,
       "get-total-supply",
       [],
       deployer
-    ).result;
-    expect(totalSupply).toBeOk(Cl.uint(100000000000000000n));
+    );
+    expect(totalSupplyResult.result).toBeOk(Cl.uint(100000000000000000n));
     const excessiveAmount = 100000000000000000n + 100000000000000000n; // 2x the total supply
     // act
     const receipt = simnet.callPublicFn(
@@ -234,31 +234,31 @@ describe(`public functions: ${contractName}`, () => {
     const preFaktoryExpected = (totalSupply * 4n) / 100n; // 4%
 
     // act
-    const treasuryBalance = simnet.callReadOnlyFn(
+    const treasuryBalanceResult = simnet.callReadOnlyFn(
       contractAddress,
       "get-balance",
       [Cl.principal(treasuryAddress)],
       deployer
-    ).result;
+    );
 
-    const dexBalance = simnet.callReadOnlyFn(
+    const dexBalanceResult = simnet.callReadOnlyFn(
       contractAddress,
       "get-balance",
       [Cl.principal(dexAddress)],
       deployer
-    ).result;
+    );
 
-    const preFaktoryBalance = simnet.callReadOnlyFn(
+    const preFaktoryBalanceResult = simnet.callReadOnlyFn(
       contractAddress,
       "get-balance",
       [Cl.principal(preFaktoryAddress)],
       deployer
-    ).result;
+    );
 
     // assert
-    expect(treasuryBalance).toBeOk(Cl.uint(treasuryExpected));
-    expect(dexBalance).toBeOk(Cl.uint(dexExpected));
-    expect(preFaktoryBalance).toBeOk(Cl.uint(preFaktoryExpected));
+    expect(treasuryBalanceResult.result).toBeOk(Cl.uint(treasuryExpected));
+    expect(dexBalanceResult.result).toBeOk(Cl.uint(dexExpected));
+    expect(preFaktoryBalanceResult.result).toBeOk(Cl.uint(preFaktoryExpected));
   });
 });
 
@@ -275,10 +275,10 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-name",
       [],
       deployer
-    ).result;
+    );
 
     // assert
-    expect(result).toBeOk(Cl.stringAscii("SYMBOL-AIBTC-DAO"));
+    expect(result.result).toBeOk(Cl.stringAscii("SYMBOL-AIBTC-DAO"));
   });
 
   ////////////////////////////////////////
@@ -293,10 +293,10 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-symbol",
       [],
       deployer
-    ).result;
+    );
 
     // assert
-    expect(result).toBeOk(Cl.stringAscii("SYMBOL-AIBTC-DAO"));
+    expect(result.result).toBeOk(Cl.stringAscii("SYMBOL-AIBTC-DAO"));
   });
 
   ////////////////////////////////////////
@@ -311,10 +311,10 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-decimals",
       [],
       deployer
-    ).result;
+    );
 
     // assert
-    expect(result).toBeOk(Cl.uint(8));
+    expect(result.result).toBeOk(Cl.uint(8));
   });
 
   ////////////////////////////////////////
@@ -333,10 +333,10 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-balance",
       [Cl.principal(address1)],
       deployer
-    ).result;
+    );
 
     // assert
-    expect(result).toBeOk(Cl.uint(address1DaoBalance!));
+    expect(result.result).toBeOk(Cl.uint(address1DaoBalance!));
   });
 
   ////////////////////////////////////////
@@ -352,10 +352,10 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-total-supply",
       [],
       deployer
-    ).result;
+    );
 
     // assert
-    expect(result).toBeOk(Cl.uint(expectedSupply));
+    expect(result.result).toBeOk(Cl.uint(expectedSupply));
   });
 
   ////////////////////////////////////////
@@ -370,9 +370,9 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-token-uri",
       [],
       deployer
-    ).result;
+    );
 
     // assert
-    expect(result).toBeOk(Cl.some(Cl.stringUtf8(expectedUri)));
+    expect(result.result).toBeOk(Cl.some(Cl.stringUtf8(expectedUri)));
   });
 });
