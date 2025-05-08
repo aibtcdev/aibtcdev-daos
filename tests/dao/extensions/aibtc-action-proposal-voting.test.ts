@@ -1,4 +1,5 @@
 import { Cl } from "@stacks/transactions";
+import { tx } from "@hirosystems/clarinet-sdk";
 import { describe, expect, it } from "vitest";
 import {
   ErrCodeActionProposalVoting,
@@ -759,7 +760,7 @@ describe(`public functions: ${contractName}`, () => {
   it("conclude-action-proposal() succeeds and executes the action if all criteria are met", () => {
     // arrange
     constructDao(deployer);
-    fundVoters([deployer]);
+    fundVoters([deployer, address1, address2, address3]);
     const setupReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -773,13 +774,35 @@ describe(`public functions: ${contractName}`, () => {
     expect(setupReceipt).toBeOk(Cl.bool(true));
     // progress chain past voting delay
     simnet.mineEmptyBlocks(VOTING_DELAY);
-    const setupReceipt2 = simnet.callPublicFn(
+    // pass proposal with multiple votes
+    const voteReceipt1 = simnet.callPublicFn(
       contractAddress,
       "vote-on-action-proposal",
       [Cl.uint(1), Cl.bool(true)],
       deployer
-    );
-    expect(setupReceipt2.result).toBeOk(Cl.bool(true));
+    ).result;
+    expect(voteReceipt1).toBeOk(Cl.bool(true));
+    const voteReceipt2 = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      address1
+    ).result;
+    expect(voteReceipt2).toBeOk(Cl.bool(true));
+    const voteReceipt3 = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      address2
+    ).result;
+    expect(voteReceipt3).toBeOk(Cl.bool(true));
+    const voteReceipt4 = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      address3
+    ).result;
+    expect(voteReceipt4).toBeOk(Cl.bool(true));
     // progress chain past voting period and veto delay
     simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY);
     // act
