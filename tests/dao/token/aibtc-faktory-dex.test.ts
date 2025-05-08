@@ -42,40 +42,16 @@ function getSbtc(address: string, amount: number = 10000000) {
 
 // Helper function to open the market
 function openMarket() {
-  try {
-    // First, try to set the market as open in pre-faktory
-    // Check if the function exists before calling it
-    simnet.callPublicFn(preFaktoryAddress, "toggle-market-open", [], deployer);
-  } catch (e) {
-    // If toggle-market-open doesn't exist, try is-market-open
-    const marketOpenResult = simnet.callReadOnlyFn(
-      preFaktoryAddress,
-      "is-market-open",
-      [],
-      deployer
-    );
-
-    // If market is not open, we need to find a way to open it
-    if (marketOpenResult.result.isOk) {
-      const marketOpen = cvToValue(marketOpenResult.result);
-      if (!marketOpen) {
-        // Try different function names that might exist
-        try {
-          simnet.callPublicFn(preFaktoryAddress, "market-open", [], deployer);
-        } catch (e2) {
-          // If that fails too, try another approach
-          console.log("Warning: Could not open market in pre-faktory contract");
-        }
-      }
-    }
-  }
+  const marketOpenResult = simnet.callReadOnlyFn(
+    preFaktoryAddress,
+    "is-market-open",
+    [],
+    deployer
+  );
 
   // Then open the market in the DEX
-  try {
-    simnet.callPublicFn(contractAddress, "open-market", [], deployer);
-  } catch (e) {
-    console.log("Warning: Could not open market in DEX contract");
-  }
+  simnet.callPublicFn(contractAddress, "open-market", [], deployer);
+  expect(marketOpenResult.result).toBeOk(Cl.bool(true));
 }
 
 describe(`public functions: ${contractName}`, () => {
@@ -146,28 +122,21 @@ describe(`public functions: ${contractName}`, () => {
         deployer
       );
 
+      // verify we got an ok result
+      if (preMarketOpenResult.result.type !== ClarityType.ResponseOk) {
+        throw new Error("is-market-open() failed when it shouldn't");
+      }
+
+      // verify we got a boolean in ok result
+      if (preMarketOpenResult.result.value.type !== ClarityType.Bool) {
+        throw new Error("is-market-open() did not return a boolean");
+      }
+
+      // Convert the result to a boolean
+      const preMarketOpen = cvToValue(preMarketOpenResult.result) as boolean;
+
       // If we can check the market state, proceed with the test
-      if (preMarketOpenResult.result.isOk) {
-        const preMarketOpen = cvToValue(preMarketOpenResult.result);
-
-        // If market is closed, try to open it
-        if (preMarketOpen === false) {
-          try {
-            simnet.callPublicFn(
-              preFaktoryAddress,
-              "toggle-market-open",
-              [],
-              deployer
-            );
-          } catch (e) {
-            // If we can't toggle it, skip this test
-            console.log(
-              "Skipping test: Cannot control pre-faktory market state"
-            );
-            return;
-          }
-        }
-
+      if (preMarketOpen) {
         // Now try to open the DEX market
         const receipt = simnet.callPublicFn(
           contractAddress,
@@ -418,6 +387,20 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     // Open the market
     openMarket();
+    // Define the expected structure
+    const expectedStructure = {
+      fee: Cl.uint(2000n), // 2% of 100000
+      "stx-in": Cl.uint(98000n), // 100000 - 2000
+      "total-stx": Cl.uint(0n),
+      "total-stk": Cl.uint(1000000n),
+      "ft-balance": Cl.uint(16000000000000000n),
+      k: Cl.uint(16000000000000000000000n),
+      "new-stk": Cl.uint(1098000n),
+      "new-ft": Cl.uint(14571948998178506n),
+      "tokens-out": Cl.uint(1428051001821494n),
+      "new-stx": Cl.uint(98000n),
+      "stx-to-grad": Cl.uint(5150000n),
+    };
 
     // act
     const result = simnet.callReadOnlyFn(
@@ -441,44 +424,8 @@ describe(`read-only functions: ${contractName}`, () => {
     console.log(`get-in() result: ${JSON.stringify(result.value)}`);
     console.log(`get-in() tuple data: ${JSON.stringify(tupleData)}`);
 
-    // arrange
-    // exmaple
-    /*
-    
-{
-  "fee": {
-    "type": "uint",
-    "value": "2000"
-  },
-  "ft-balance": { "type": "uint", "value": "16000000000000000" },
-  "k": { "type": "uint", "value": "16000000000000000000000" },
-  "new-ft": { "type": "uint", "value": "14571948998178506" },
-  "new-stk": { "type": "uint", "value": "1098000" },
-  "new-stx": { "type": "uint", "value": "98000" },
-  "stx-in": { "type": "uint", "value": "98000" },
-  "stx-to-grad": { "type": "uint", "value": "5150000" },
-  "tokens-out": { "type": "uint", "value": "1428051001821494" },
-  "total-stk": { "type": "uint", "value": "1000000" },
-  "total-stx": { "type": "uint", "value": "0" }
-}
-
-    */
-    // Define the expected structure
-    const expectedStructure = {
-      fee: Cl.uint(2000n), // 2% of 100000
-      "stx-in": Cl.uint(98000n), // 100000 - 2000
-      "total-stx": Cl.uint(0n),
-      "total-stk": Cl.uint(1000000n),
-      "ft-balance": Cl.uint(16000000000000000n),
-      k: Cl.uint(16000000000000000000000n),
-      "new-stk": Cl.uint(1098000n),
-      "new-ft": Cl.uint(14571948998178506n),
-      "tokens-out": Cl.uint(1428051001821494n),
-      "new-stx": Cl.uint(98000n),
-      "stx-to-grad": Cl.uint(5150000n),
-    };
     // assert
-    expect(tupleData).toMatchObject(expectedStructure);
+    expect(tupleData).toStrictEqual(expectedStructure);
   });
 
   ////////////////////////////////////////

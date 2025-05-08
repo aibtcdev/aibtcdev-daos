@@ -1,4 +1,4 @@
-import { Cl, cvToValue } from "@stacks/transactions";
+import { Cl, ClarityType, cvToValue } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
 import { fundVoters } from "../../utilities/dao-helpers";
@@ -165,7 +165,7 @@ describe(`public functions: ${contractName}`, () => {
 
     expect(initialStatus.result).toBeDefined();
     const initialStatusData = cvToValue(initialStatus.result);
-    
+
     const initialUsers = initialStatusData["total-users"];
     const initialSeats = initialStatusData["total-seats-taken"];
 
@@ -191,7 +191,7 @@ describe(`public functions: ${contractName}`, () => {
     // Verify we got a valid response and extract the data
     expect(newStatus.result).toBeDefined();
     const newStatusData = cvToValue(newStatus.result);
-    
+
     expect(newStatusData["total-users"]).toEqual(initialUsers + 1n);
     expect(newStatusData["total-seats-taken"]).toEqual(initialSeats + 3n);
   });
@@ -493,15 +493,15 @@ describe(`read-only functions: ${contractName}`, () => {
       "accelerated-vesting",
       "market-open",
       "governance-active",
-      "seat-holders"
+      "seat-holders",
     ];
 
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-    
+
     // Check that all expected keys exist in the result
-    expectedKeys.forEach(key => {
+    expectedKeys.forEach((key) => {
       expect(data).toHaveProperty(key);
     });
   });
@@ -529,18 +529,14 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // arrange
     // Define the expected structure
-    const expectedKeys = [
-      "seats-owned",
-      "amount-claimed",
-      "claimable-amount"
-    ];
+    const expectedKeys = ["seats-owned", "amount-claimed", "claimable-amount"];
 
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-    
+
     // Verify the structure matches what we expect
-    expectedKeys.forEach(key => {
+    expectedKeys.forEach((key) => {
       expect(data).toHaveProperty(key);
     });
   });
@@ -562,13 +558,13 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     // Define the expected structure
     const expectedStructure = {
-      "remainin-seats": expect.any(BigInt)
+      "remainin-seats": expect.any(BigInt),
     };
 
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-    
+
     // Verify the structure matches what we expect
     expect(data).toMatchObject(expectedStructure);
   });
@@ -597,13 +593,13 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     // Define the expected structure
     const expectedStructure = {
-      "seats-owned": expect.any(Boolean)
+      "seats-owned": expect.any(Boolean),
     };
 
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-    
+
     // Verify the structure matches what we expect
     expect(data).toMatchObject(expectedStructure);
   });
@@ -625,13 +621,13 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     // Define the expected structure
     const expectedStructure = {
-      "claimed-amount": expect.any(BigInt)
+      "claimed-amount": expect.any(BigInt),
     };
 
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-    
+
     // Verify the structure matches what we expect
     expect(data).toMatchObject(expectedStructure);
   });
@@ -653,20 +649,20 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     // Define the expected structure
     const expectedStructure = {
-      "vesting-schedule": expect.any(Array)
+      "vesting-schedule": expect.any(Array),
     };
 
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-    
+
     // Verify the structure matches what we expect
     expect(data).toMatchObject(expectedStructure);
-    
+
     // Additional checks on the vesting schedule
     const schedule = data["vesting-schedule"];
     expect(schedule.length).toBeGreaterThan(0);
-    
+
     // Check the structure of the first entry in the schedule
     expect(schedule[0]).toHaveProperty("height");
     expect(schedule[0]).toHaveProperty("percent");
@@ -690,13 +686,13 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     // Define the expected structure
     const expectedStructure = {
-      "seat-holders": expect.any(Array)
+      "seat-holders": expect.any(Array),
     };
 
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-    
+
     // Verify the structure matches what we expect
     expect(data).toMatchObject(expectedStructure);
   });
@@ -767,13 +763,13 @@ describe(`read-only functions: ${contractName}`, () => {
       "current-height": expect.any(BigInt),
       "cooldown-period": expect.any(BigInt),
       "final-airdrop-mode": expect.any(Boolean),
-      "can-trigger-now": expect.any(Boolean)
+      "can-trigger-now": expect.any(Boolean),
     };
 
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-    
+
     // Verify the structure matches what we expect
     expect(data).toMatchObject(expectedStructure);
   });
@@ -783,13 +779,17 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-user-expected-share() returns valid data", () => {
     // arrange
-    // Ensure address1 has seats
-    try {
-      getSbtc(address1);
-      simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(1)], address1);
-    } catch (e) {
-      // Address might already have seats
-    }
+    getSbtc(address1);
+    simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(1)], address1);
+
+    // Define the expected structure
+    const expectedStructure = {
+      user: Cl.principal(address1),
+      "user-seats": Cl.uint(1n),
+      "total-seats": Cl.uint(1),
+      "total-accumulated-fees": Cl.uint(0),
+      "expected-share": Cl.uint(0),
+    };
 
     // act
     const result = simnet.callReadOnlyFn(
@@ -797,23 +797,19 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-user-expected-share",
       [Cl.principal(address1)],
       deployer
-    );
+    ).result;
 
-    // arrange
-    // Define the expected structure
-    const expectedStructure = {
-      "user": expect.any(String),
-      "user-seats": expect.any(BigInt),
-      "total-seats": expect.any(BigInt),
-      "total-accumulated-fees": expect.any(BigInt),
-      "expected-share": expect.any(BigInt)
-    };
+    // verify we got an ok result
+    if (result.type !== ClarityType.ResponseOk) {
+      throw new Error("get-user-expected-share() failed when it shouldn't");
+    }
 
-    // assert
-    expect(result.result).toBeDefined();
-    const data = cvToValue(result.result);
-    
+    // verify we got a tuple in ok result
+    if (result.value.type !== ClarityType.Tuple) {
+      throw new Error("get-user-expected-share() did not return a tuple");
+    }
+
     // Verify the structure matches what we expect
-    expect(data).toMatchObject(expectedStructure);
+    expect(result.value.value).toMatchObject(expectedStructure);
   });
 });
