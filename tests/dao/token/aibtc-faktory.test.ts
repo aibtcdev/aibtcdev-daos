@@ -1,4 +1,4 @@
-import { Cl } from "@stacks/transactions";
+import { Cl, cvToValue } from "@stacks/transactions";
 import { describe, expect, it, beforeEach } from "vitest";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
 import { fundVoters, getDaoTokens } from "../../utilities/dao-helpers";
@@ -33,11 +33,6 @@ const preFaktoryAddress = registry.getContractAddressByTypeAndSubtype(
 const ERR_NOT_AUTHORIZED = 401;
 
 describe(`public functions: ${contractName}`, () => {
-  beforeEach(() => {
-    // Fund users with tokens for testing
-    fundVoters([address1]);
-  });
-
   ////////////////////////////////////////
   // transfer() tests
   ////////////////////////////////////////
@@ -104,6 +99,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("transfer() handles memo correctly", () => {
     // arrange
+    getDaoTokens(address1, 1000000);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -131,12 +127,15 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("send-many() succeeds with multiple recipients", () => {
     // arrange
+    getDaoTokens(address1, 1000000);
+
     const initialBalance2 = simnet.callReadOnlyFn(
       contractAddress,
       "get-balance",
       [Cl.principal(address2)],
       deployer
     ).result;
+    expect(initialBalance2).toBeOk(Cl.uint(0));
 
     const initialBalance3 = simnet.callReadOnlyFn(
       contractAddress,
@@ -144,6 +143,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address3)],
       deployer
     ).result;
+    expect(initialBalance3).toBeOk(Cl.uint(0));
 
     // act
     const receipt = simnet.callPublicFn(
@@ -228,7 +228,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("tokens were properly distributed on deployment", () => {
     // arrange
-    const totalSupply = 100000000000000000n; // 100 million with 8 decimals
+    const totalSupply = 100000000000000000n; // 1B with 8 decimals
     const treasuryExpected = (totalSupply * 80n) / 100n; // 80%
     const dexExpected = (totalSupply * 16n) / 100n; // 16%
     const preFaktoryExpected = (totalSupply * 4n) / 100n; // 4%
