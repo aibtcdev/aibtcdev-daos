@@ -2,6 +2,7 @@ import { Cl, ClarityType, cvToValue, UIntCV } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
 import { fundVoters, getDaoTokens } from "../../utilities/dao-helpers";
+import { SBTC_CONTRACT } from "../../utilities/contract-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -174,13 +175,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy",
-      [
-        Cl.contractPrincipal(
-          tokenContractAddress.split(".")[0],
-          tokenContractAddress.split(".")[1]
-        ),
-        Cl.uint(0),
-      ],
+      [Cl.principal(tokenContractAddress), Cl.uint(0)],
       address1
     );
 
@@ -200,13 +195,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy",
-      [
-        Cl.contractPrincipal(
-          tokenContractAddress.split(".")[0],
-          tokenContractAddress.split(".")[1]
-        ),
-        Cl.uint(0),
-      ],
+      [Cl.principal(tokenContractAddress), Cl.uint(0)],
       address1
     );
 
@@ -227,13 +216,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy",
-      [
-        Cl.contractPrincipal(
-          "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2",
-          "sbtc-token"
-        ),
-        Cl.uint(100000),
-      ],
+      [Cl.principal(SBTC_CONTRACT), Cl.uint(100000)],
       address1
     );
 
@@ -255,20 +238,21 @@ describe(`public functions: ${contractName}`, () => {
       "get-balance",
       [Cl.principal(address1)],
       deployer
-    );
-    const initialTokenBalance = cvToValue(initialTokenBalanceResult.result);
+    ).result;
+
+    if (initialTokenBalanceResult.type !== ClarityType.ResponseOk) {
+      throw new Error("get-balance() failed when it shouldn't");
+    }
+
+    if (initialTokenBalanceResult.value.type !== ClarityType.UInt) {
+      throw new Error("get-balance() did not return a UInt");
+    }
 
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy",
-      [
-        Cl.contractPrincipal(
-          tokenContractAddress.split(".")[0],
-          tokenContractAddress.split(".")[1]
-        ),
-        Cl.uint(100000),
-      ],
+      [Cl.principal(tokenContractAddress), Cl.uint(100000)],
       address1
     );
 
@@ -276,19 +260,27 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeOk(Cl.bool(true));
 
     // Check that tokens were transferred to the buyer
-    const newTokenBalance = simnet.callReadOnlyFn(
+    const newTokenBalanceResult = simnet.callReadOnlyFn(
       tokenContractAddress,
       "get-balance",
       [Cl.principal(address1)],
       deployer
     ).result;
 
-    // Convert values to usable format
-    const initialBalanceValue = cvToValue(initialTokenBalance);
-    const newBalanceValue = cvToValue(newTokenBalance);
+    if (newTokenBalanceResult.type !== ClarityType.ResponseOk) {
+      throw new Error("get-balance() failed when it shouldn't");
+    }
+
+    if (newTokenBalanceResult.value.type !== ClarityType.UInt) {
+      throw new Error("get-balance() did not return a UInt");
+    }
 
     // Verify the balance increased
-    expect(newBalanceValue).toBeGreaterThan(initialBalanceValue);
+    const newTokenBalance = cvToValue(newTokenBalanceResult.value) as bigint;
+    const initialTokenBalance = cvToValue(
+      initialTokenBalanceResult.value
+    ) as bigint;
+    expect(newTokenBalance).toBeGreaterThan(initialTokenBalance);
   });
 
   ////////////////////////////////////////
@@ -309,13 +301,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "sell",
-      [
-        Cl.contractPrincipal(
-          tokenContractAddress.split(".")[0],
-          tokenContractAddress.split(".")[1]
-        ),
-        Cl.uint(0),
-      ],
+      [Cl.principal(tokenContractAddress), Cl.uint(0)],
       address1
     );
 
@@ -337,13 +323,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "sell",
-      [
-        Cl.contractPrincipal(
-          "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2",
-          "sbtc-token"
-        ),
-        Cl.uint(1000),
-      ],
+      [Cl.principal(SBTC_CONTRACT), Cl.uint(1000)],
       address1
     );
 
@@ -369,7 +349,7 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // Just verify that we get a valid response
-    expect(currentStatus.result).toBeDefined();
+    expect(currentStatus.result).toBeOk(Cl.bool(true));
   });
 
   ////////////////////////////////////////
@@ -381,17 +361,17 @@ describe(`read-only functions: ${contractName}`, () => {
     openMarket();
     // Define the expected structure
     const expectedStructure = {
-      fee: Cl.uint(2000n), // 2% of 100000
-      "stx-in": Cl.uint(98000n), // 100000 - 2000
-      "total-stx": Cl.uint(0n),
-      "total-stk": Cl.uint(1000000n),
-      "ft-balance": Cl.uint(16000000000000000n),
-      k: Cl.uint(16000000000000000000000n),
-      "new-stk": Cl.uint(1098000n),
-      "new-ft": Cl.uint(14571948998178506n),
-      "tokens-out": Cl.uint(1428051001821494n),
-      "new-stx": Cl.uint(98000n),
-      "stx-to-grad": Cl.uint(5150000n),
+      fee: Cl.uint(2000), // 2% of 100000
+      "stx-in": Cl.uint(98000), // 100000 - 2000
+      "total-stx": Cl.uint(0),
+      "total-stk": Cl.uint(1000000),
+      "ft-balance": Cl.uint("16000000000000000"),
+      k: Cl.uint("16000000000000000000000"),
+      "new-stk": Cl.uint("1098000"),
+      "new-ft": Cl.uint("14571948998178506"),
+      "tokens-out": Cl.uint("1428051001821494"),
+      "new-stx": Cl.uint(98000),
+      "stx-to-grad": Cl.uint(5150000),
     };
 
     // act
@@ -412,12 +392,8 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-in() did not return a tuple");
     }
 
-    const tupleData = cvToValue(result.value);
-    console.log(`get-in() result: ${JSON.stringify(result.value)}`);
-    console.log(`get-in() tuple data: ${JSON.stringify(tupleData)}`);
-
     // assert
-    expect(tupleData).toStrictEqual(expectedStructure);
+    expect(result.value.value).toStrictEqual(expectedStructure);
   });
 
   ////////////////////////////////////////
