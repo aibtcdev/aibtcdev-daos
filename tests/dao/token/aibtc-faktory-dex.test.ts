@@ -415,16 +415,30 @@ describe(`read-only functions: ${contractName}`, () => {
     // assert
     expect(result.result).not.toBeUndefined();
     
+    // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "fee": 2000n, // 2% of 100000
+      "stx-in": 98000n, // 100000 - 2000
+      "total-stx": expect.any(BigInt),
+      "total-stk": expect.any(BigInt),
+      "ft-balance": expect.any(BigInt),
+      "k": expect.any(BigInt),
+      "new-stk": expect.any(BigInt),
+      "new-ft": expect.any(BigInt),
+      "tokens-out": expect.any(BigInt),
+      "new-stx": expect.any(BigInt),
+      "stx-to-grad": expect.any(BigInt)
+    };
+
     // Convert to usable data
     const data = cvToValue(result.result);
     
-    // Check that the fee is 2% of the input amount
-    const fee = data["fee"];
-    expect(fee).toEqual(2000n); // 2% of 100000
+    // Verify the structure matches what we expect
+    expect(data).toMatchObject(expectedStructure);
     
-    // Check that stx-in + fee = input amount
-    const stxIn = data["stx-in"];
-    expect(stxIn + fee).toEqual(100000n);
+    // Additional checks
+    expect(data["stx-in"] + data["fee"]).toEqual(100000n);
   });
 
   ////////////////////////////////////////

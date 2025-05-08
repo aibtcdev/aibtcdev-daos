@@ -480,22 +480,30 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
 
+    // arrange
+    // Define the expected structure (actual values will vary)
+    const expectedKeys = [
+      "is-period-1-expired",
+      "is-distribution-period",
+      "total-users",
+      "total-seats-taken",
+      "deployment-height",
+      "expiration-period",
+      "distribution-height",
+      "accelerated-vesting",
+      "market-open",
+      "governance-active",
+      "seat-holders"
+    ];
+
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-
-    // Check that the result contains the expected fields
-    expect(data).toHaveProperty("is-period-1-expired");
-    expect(data).toHaveProperty("is-distribution-period");
-    expect(data).toHaveProperty("total-users");
-    expect(data).toHaveProperty("total-seats-taken");
-    expect(data).toHaveProperty("deployment-height");
-    expect(data).toHaveProperty("expiration-period");
-    expect(data).toHaveProperty("distribution-height");
-    expect(data).toHaveProperty("accelerated-vesting");
-    expect(data).toHaveProperty("market-open");
-    expect(data).toHaveProperty("governance-active");
-    expect(data).toHaveProperty("seat-holders");
+    
+    // Check that all expected keys exist in the result
+    expectedKeys.forEach(key => {
+      expect(data).toHaveProperty(key);
+    });
   });
 
   ////////////////////////////////////////
@@ -519,14 +527,22 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
 
+    // arrange
+    // Define the expected structure
+    const expectedKeys = [
+      "seats-owned",
+      "amount-claimed",
+      "claimable-amount"
+    ];
+
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-
-    // Check that the result contains the expected fields
-    expect(data).toHaveProperty("seats-owned");
-    expect(data).toHaveProperty("amount-claimed");
-    expect(data).toHaveProperty("claimable-amount");
+    
+    // Verify the structure matches what we expect
+    expectedKeys.forEach(key => {
+      expect(data).toHaveProperty(key);
+    });
   });
 
   ////////////////////////////////////////
@@ -543,12 +559,18 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
 
+    // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "remainin-seats": expect.any(BigInt)
+    };
+
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-
-    // Check that the result contains the expected field
-    expect(data).toHaveProperty("remainin-seats");
+    
+    // Verify the structure matches what we expect
+    expect(data).toMatchObject(expectedStructure);
   });
 
   ////////////////////////////////////////
@@ -572,12 +594,18 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
 
+    // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "seats-owned": expect.any(Boolean)
+    };
+
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-
-    // Check that the result contains the expected field
-    expect(data).toHaveProperty("seats-owned");
+    
+    // Verify the structure matches what we expect
+    expect(data).toMatchObject(expectedStructure);
   });
 
   ////////////////////////////////////////
@@ -594,12 +622,18 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
 
+    // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "claimed-amount": expect.any(BigInt)
+    };
+
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-
-    // Check that the result contains the expected field
-    expect(data).toHaveProperty("claimed-amount");
+    
+    // Verify the structure matches what we expect
+    expect(data).toMatchObject(expectedStructure);
   });
 
   ////////////////////////////////////////
@@ -616,19 +650,27 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
 
+    // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "vesting-schedule": expect.any(Array)
+    };
+
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-
-    // Check that the result contains the expected field
-    expect(data).toHaveProperty("vesting-schedule");
-
-    // Check that vesting schedule is an array
+    
+    // Verify the structure matches what we expect
+    expect(data).toMatchObject(expectedStructure);
+    
+    // Additional checks on the vesting schedule
     const schedule = data["vesting-schedule"];
-    expect(Array.isArray(schedule)).toBe(true);
-
-    // Check that the schedule has entries
     expect(schedule.length).toBeGreaterThan(0);
+    
+    // Check the structure of the first entry in the schedule
+    expect(schedule[0]).toHaveProperty("height");
+    expect(schedule[0]).toHaveProperty("percent");
+    expect(schedule[0]).toHaveProperty("id");
   });
 
   ////////////////////////////////////////
@@ -645,12 +687,18 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
 
+    // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "seat-holders": expect.any(Array)
+    };
+
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-
-    // Check that the result contains the expected field
-    expect(data).toHaveProperty("seat-holders");
+    
+    // Verify the structure matches what we expect
+    expect(data).toMatchObject(expectedStructure);
   });
 
   ////////////////////////////////////////
@@ -711,17 +759,23 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
 
+    // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "accumulated-fees": expect.any(BigInt),
+      "last-airdrop-height": expect.anything(),
+      "current-height": expect.any(BigInt),
+      "cooldown-period": expect.any(BigInt),
+      "final-airdrop-mode": expect.any(Boolean),
+      "can-trigger-now": expect.any(Boolean)
+    };
+
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-
-    // Check that the result contains the expected fields
-    expect(data).toHaveProperty("accumulated-fees");
-    expect(data).toHaveProperty("last-airdrop-height");
-    expect(data).toHaveProperty("current-height");
-    expect(data).toHaveProperty("cooldown-period");
-    expect(data).toHaveProperty("final-airdrop-mode");
-    expect(data).toHaveProperty("can-trigger-now");
+    
+    // Verify the structure matches what we expect
+    expect(data).toMatchObject(expectedStructure);
   });
 
   ////////////////////////////////////////
@@ -745,15 +799,21 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
 
+    // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "user": expect.any(String),
+      "user-seats": expect.any(BigInt),
+      "total-seats": expect.any(BigInt),
+      "total-accumulated-fees": expect.any(BigInt),
+      "expected-share": expect.any(BigInt)
+    };
+
     // assert
     expect(result.result).toBeDefined();
     const data = cvToValue(result.result);
-
-    // Check that the result contains the expected fields
-    expect(data).toHaveProperty("user");
-    expect(data).toHaveProperty("user-seats");
-    expect(data).toHaveProperty("total-seats");
-    expect(data).toHaveProperty("total-accumulated-fees");
-    expect(data).toHaveProperty("expected-share");
+    
+    // Verify the structure matches what we expect
+    expect(data).toMatchObject(expectedStructure);
   });
 });
