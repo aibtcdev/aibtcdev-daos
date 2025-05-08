@@ -1,19 +1,13 @@
-import { cloudflare } from "@cloudflare/vite-plugin";
-import build from "@hono/vite-build/cloudflare-workers";
 import { defineConfig } from "vite";
-import ssrHotReload from "vite-plugin-ssr-hot-reload";
+import build from "@hono/vite-build/cloudflare-workers";
 
 export default defineConfig(({ command, isSsrBuild }) => {
   if (command === "serve") {
-    return { 
-      plugins: [
-        ssrHotReload(), 
-        cloudflare({
-          wrangler: {
-            configPath: './wrangler.toml',
-          }
-        })
-      ] 
+    // Use a simple development server without Miniflare integration
+    return {
+      server: {
+        port: 3000
+      }
     };
   }
   return {
