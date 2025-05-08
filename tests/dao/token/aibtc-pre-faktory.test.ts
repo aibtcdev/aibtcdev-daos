@@ -129,11 +129,10 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
 
-    expect(userInfo.result).toBeOk();
-    if (userInfo.result.isOk) {
-      const seatsOwned = userInfo.result.value.data["seats-owned"].value;
-      expect(seatsOwned).toEqual(2n);
-    }
+    // Verify we got a valid response and extract the data
+    expect(userInfo.result).toBeDefined();
+    const userInfoData = cvToValue(userInfo.result);
+    expect(userInfoData["seats-owned"]).toEqual(2n);
   });
 
   it("buy-up-to() fails with invalid seat count", () => {
@@ -162,15 +161,13 @@ describe(`public functions: ${contractName}`, () => {
       "get-contract-status",
       [],
       deployer
-    ).result;
+    );
 
-    let initialUsers = 0n;
-    let initialSeats = 0n;
-
-    if (initialStatus.isOk) {
-      initialUsers = initialStatus.value.data["total-users"].value;
-      initialSeats = initialStatus.value.data["total-seats-taken"].value;
-    }
+    expect(initialStatus.result).toBeDefined();
+    const initialStatusData = cvToValue(initialStatus.result);
+    
+    const initialUsers = initialStatusData["total-users"];
+    const initialSeats = initialStatusData["total-seats-taken"];
 
     // act
     const receipt = simnet.callPublicFn(
@@ -189,15 +186,14 @@ describe(`public functions: ${contractName}`, () => {
       "get-contract-status",
       [],
       deployer
-    ).result;
+    );
 
-    if (newStatus.isOk) {
-      const newUsers = newStatus.value.data["total-users"].value;
-      const newSeats = newStatus.value.data["total-seats-taken"].value;
-
-      expect(newUsers).toEqual(initialUsers + 1n);
-      expect(newSeats).toEqual(initialSeats + 3n);
-    }
+    // Verify we got a valid response and extract the data
+    expect(newStatus.result).toBeDefined();
+    const newStatusData = cvToValue(newStatus.result);
+    
+    expect(newStatusData["total-users"]).toEqual(initialUsers + 1n);
+    expect(newStatusData["total-seats-taken"]).toEqual(initialSeats + 3n);
   });
 
   ////////////////////////////////////////
@@ -216,12 +212,11 @@ describe(`public functions: ${contractName}`, () => {
       "get-user-info",
       [Cl.principal(address4)],
       deployer
-    ).result;
+    );
 
-    if (userInfoBefore.isOk) {
-      const seatsOwned = userInfoBefore.value.data["seats-owned"].value;
-      expect(seatsOwned).toEqual(2n);
-    }
+    expect(userInfoBefore.result).toBeDefined();
+    const userInfoBeforeData = cvToValue(userInfoBefore.result);
+    expect(userInfoBeforeData["seats-owned"]).toEqual(2n);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -243,12 +238,11 @@ describe(`public functions: ${contractName}`, () => {
         "get-user-info",
         [Cl.principal(address4)],
         deployer
-      ).result;
+      );
 
-      if (userInfoAfter.isOk) {
-        const seatsOwned = userInfoAfter.value.data["seats-owned"].value;
-        expect(seatsOwned).toEqual(0n);
-      }
+      expect(userInfoAfter.result).toBeDefined();
+      const userInfoAfterData = cvToValue(userInfoAfter.result);
+      expect(userInfoAfterData["seats-owned"]).toEqual(0n);
     } catch (e) {
       console.log(
         "Refund test skipped - distribution may be initialized or refund period expired"
@@ -291,13 +285,11 @@ describe(`public functions: ${contractName}`, () => {
       "get-contract-status",
       [],
       deployer
-    ).result;
+    );
 
-    let distributionInitialized = false;
-    if (status.isOk) {
-      distributionInitialized =
-        status.value.data["distribution-height"].value > 0;
-    }
+    expect(status.result).toBeDefined();
+    const statusData = cvToValue(status.result);
+    const distributionInitialized = statusData["distribution-height"] > 0;
 
     // Skip test if distribution is already initialized
     if (distributionInitialized) {
@@ -337,13 +329,11 @@ describe(`public functions: ${contractName}`, () => {
       "get-contract-status",
       [],
       deployer
-    ).result;
+    );
 
-    let distributionInitialized = false;
-    if (status.isOk) {
-      distributionInitialized =
-        status.value.data["distribution-height"].value > 0;
-    }
+    expect(status.result).toBeDefined();
+    const statusData = cvToValue(status.result);
+    const distributionInitialized = statusData["distribution-height"] > 0;
 
     // Skip test if distribution is not initialized
     if (!distributionInitialized) {
@@ -376,12 +366,11 @@ describe(`public functions: ${contractName}`, () => {
       "get-user-info",
       [Cl.principal(address1)],
       deployer
-    ).result;
+    );
 
-    if (userInfo.isOk) {
-      const claimedAmount = userInfo.value.data["amount-claimed"].value;
-      expect(claimedAmount).toBeGreaterThan(0n);
-    }
+    expect(userInfo.result).toBeDefined();
+    const userInfoData = cvToValue(userInfo.result);
+    expect(userInfoData["amount-claimed"]).toBeGreaterThan(0n);
   });
 
   ////////////////////////////////////////
@@ -444,12 +433,11 @@ describe(`public functions: ${contractName}`, () => {
       "get-user-info",
       [Cl.principal(address2)],
       deployer
-    ).result;
+    );
 
-    if (userInfo.isOk) {
-      const claimedAmount = userInfo.value.data["amount-claimed"].value;
-      expect(claimedAmount).toBeGreaterThan(0n);
-    }
+    expect(userInfo.result).toBeDefined();
+    const userInfoData = cvToValue(userInfo.result);
+    expect(userInfoData["amount-claimed"]).toBeGreaterThan(0n);
   });
 
   ////////////////////////////////////////
@@ -493,24 +481,21 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(result.result).toBeOk();
+    expect(result.result).toBeDefined();
+    const data = cvToValue(result.result);
 
-    if (result.result.isOk) {
-      const data = result.result.value.data;
-
-      // Check that the result contains the expected fields
-      expect(data.hasOwnProperty("is-period-1-expired")).toBe(true);
-      expect(data.hasOwnProperty("is-distribution-period")).toBe(true);
-      expect(data.hasOwnProperty("total-users")).toBe(true);
-      expect(data.hasOwnProperty("total-seats-taken")).toBe(true);
-      expect(data.hasOwnProperty("deployment-height")).toBe(true);
-      expect(data.hasOwnProperty("expiration-period")).toBe(true);
-      expect(data.hasOwnProperty("distribution-height")).toBe(true);
-      expect(data.hasOwnProperty("accelerated-vesting")).toBe(true);
-      expect(data.hasOwnProperty("market-open")).toBe(true);
-      expect(data.hasOwnProperty("governance-active")).toBe(true);
-      expect(data.hasOwnProperty("seat-holders")).toBe(true);
-    }
+    // Check that the result contains the expected fields
+    expect(data).toHaveProperty("is-period-1-expired");
+    expect(data).toHaveProperty("is-distribution-period");
+    expect(data).toHaveProperty("total-users");
+    expect(data).toHaveProperty("total-seats-taken");
+    expect(data).toHaveProperty("deployment-height");
+    expect(data).toHaveProperty("expiration-period");
+    expect(data).toHaveProperty("distribution-height");
+    expect(data).toHaveProperty("accelerated-vesting");
+    expect(data).toHaveProperty("market-open");
+    expect(data).toHaveProperty("governance-active");
+    expect(data).toHaveProperty("seat-holders");
   });
 
   ////////////////////////////////////////
@@ -535,16 +520,13 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(result.result).toBeOk();
+    expect(result.result).toBeDefined();
+    const data = cvToValue(result.result);
 
-    if (result.result.isOk) {
-      const data = result.result.value.data;
-
-      // Check that the result contains the expected fields
-      expect(data.hasOwnProperty("seats-owned")).toBe(true);
-      expect(data.hasOwnProperty("amount-claimed")).toBe(true);
-      expect(data.hasOwnProperty("claimable-amount")).toBe(true);
-    }
+    // Check that the result contains the expected fields
+    expect(data).toHaveProperty("seats-owned");
+    expect(data).toHaveProperty("amount-claimed");
+    expect(data).toHaveProperty("claimable-amount");
   });
 
   ////////////////////////////////////////
@@ -562,14 +544,11 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(result.result).toBeOk();
+    expect(result.result).toBeDefined();
+    const data = cvToValue(result.result);
 
-    if (result.result.isOk) {
-      const data = result.result.value.data;
-
-      // Check that the result contains the expected field
-      expect(data.hasOwnProperty("remainin-seats")).toBe(true);
-    }
+    // Check that the result contains the expected field
+    expect(data).toHaveProperty("remainin-seats");
   });
 
   ////////////////////////////////////////
@@ -594,14 +573,11 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(result.result).toBeOk();
+    expect(result.result).toBeDefined();
+    const data = cvToValue(result.result);
 
-    if (result.result.isOk) {
-      const data = result.result.value.data;
-
-      // Check that the result contains the expected field
-      expect(data.hasOwnProperty("seats-owned")).toBe(true);
-    }
+    // Check that the result contains the expected field
+    expect(data).toHaveProperty("seats-owned");
   });
 
   ////////////////////////////////////////
@@ -619,14 +595,11 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(result.result).toBeOk();
+    expect(result.result).toBeDefined();
+    const data = cvToValue(result.result);
 
-    if (result.result.isOk) {
-      const data = result.result.value.data;
-
-      // Check that the result contains the expected field
-      expect(data.hasOwnProperty("claimed-amount")).toBe(true);
-    }
+    // Check that the result contains the expected field
+    expect(data).toHaveProperty("claimed-amount");
   });
 
   ////////////////////////////////////////
@@ -644,21 +617,18 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(result.result).toBeOk();
+    expect(result.result).toBeDefined();
+    const data = cvToValue(result.result);
 
-    if (result.result.isOk) {
-      const data = result.result.value.data;
+    // Check that the result contains the expected field
+    expect(data).toHaveProperty("vesting-schedule");
 
-      // Check that the result contains the expected field
-      expect(data.hasOwnProperty("vesting-schedule")).toBe(true);
+    // Check that vesting schedule is an array
+    const schedule = data["vesting-schedule"];
+    expect(Array.isArray(schedule)).toBe(true);
 
-      // Check that vesting schedule is an array
-      const schedule = data["vesting-schedule"];
-      expect(schedule.type).toBe(11); // List type
-
-      // Check that the schedule has entries
-      expect(schedule.list.length).toBeGreaterThan(0);
-    }
+    // Check that the schedule has entries
+    expect(schedule.length).toBeGreaterThan(0);
   });
 
   ////////////////////////////////////////
@@ -676,14 +646,11 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(result.result).toBeOk();
+    expect(result.result).toBeDefined();
+    const data = cvToValue(result.result);
 
-    if (result.result.isOk) {
-      const data = result.result.value.data;
-
-      // Check that the result contains the expected field
-      expect(data.hasOwnProperty("seat-holders")).toBe(true);
-    }
+    // Check that the result contains the expected field
+    expect(data).toHaveProperty("seat-holders");
   });
 
   ////////////////////////////////////////
@@ -749,19 +716,16 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(result.result).toBeOk();
+    expect(result.result).toBeDefined();
+    const data = cvToValue(result.result);
 
-    if (result.result.isOk) {
-      const data = result.result.value.data;
-
-      // Check that the result contains the expected fields
-      expect(data.hasOwnProperty("accumulated-fees")).toBe(true);
-      expect(data.hasOwnProperty("last-airdrop-height")).toBe(true);
-      expect(data.hasOwnProperty("current-height")).toBe(true);
-      expect(data.hasOwnProperty("cooldown-period")).toBe(true);
-      expect(data.hasOwnProperty("final-airdrop-mode")).toBe(true);
-      expect(data.hasOwnProperty("can-trigger-now")).toBe(true);
-    }
+    // Check that the result contains the expected fields
+    expect(data).toHaveProperty("accumulated-fees");
+    expect(data).toHaveProperty("last-airdrop-height");
+    expect(data).toHaveProperty("current-height");
+    expect(data).toHaveProperty("cooldown-period");
+    expect(data).toHaveProperty("final-airdrop-mode");
+    expect(data).toHaveProperty("can-trigger-now");
   });
 
   ////////////////////////////////////////
@@ -786,17 +750,14 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(result.result).toBeOk();
+    expect(result.result).toBeDefined();
+    const data = cvToValue(result.result);
 
-    if (result.result.isOk) {
-      const data = result.result.value.data;
-
-      // Check that the result contains the expected fields
-      expect(data.hasOwnProperty("user")).toBe(true);
-      expect(data.hasOwnProperty("user-seats")).toBe(true);
-      expect(data.hasOwnProperty("total-seats")).toBe(true);
-      expect(data.hasOwnProperty("total-accumulated-fees")).toBe(true);
-      expect(data.hasOwnProperty("expected-share")).toBe(true);
-    }
+    // Check that the result contains the expected fields
+    expect(data).toHaveProperty("user");
+    expect(data).toHaveProperty("user-seats");
+    expect(data).toHaveProperty("total-seats");
+    expect(data).toHaveProperty("total-accumulated-fees");
+    expect(data).toHaveProperty("expected-share");
   });
 });
