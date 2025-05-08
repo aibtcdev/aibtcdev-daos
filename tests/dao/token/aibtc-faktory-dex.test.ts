@@ -1,4 +1,4 @@
-import { Cl, cvToValue } from "@stacks/transactions";
+import { Cl, ClarityType, cvToValue, UIntCV } from "@stacks/transactions";
 import { describe, expect, it, beforeEach } from "vitest";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
 import { fundVoters } from "../../utilities/dao-helpers";
@@ -54,7 +54,7 @@ function openMarket() {
       [],
       deployer
     );
-    
+
     // If market is not open, we need to find a way to open it
     if (marketOpenResult.result.isOk) {
       const marketOpen = cvToValue(marketOpenResult.result);
@@ -96,7 +96,7 @@ describe(`public functions: ${contractName}`, () => {
       // If we can check the market state, proceed with the test
       if (preMarketOpenResult.result.isOk) {
         const preMarketOpen = cvToValue(preMarketOpenResult.result);
-        
+
         // If market is open, try to close it
         if (preMarketOpen === true) {
           try {
@@ -108,7 +108,9 @@ describe(`public functions: ${contractName}`, () => {
             );
           } catch (e) {
             // If we can't toggle it, skip this test
-            console.log("Skipping test: Cannot control pre-faktory market state");
+            console.log(
+              "Skipping test: Cannot control pre-faktory market state"
+            );
             return;
           }
         }
@@ -147,7 +149,7 @@ describe(`public functions: ${contractName}`, () => {
       // If we can check the market state, proceed with the test
       if (preMarketOpenResult.result.isOk) {
         const preMarketOpen = cvToValue(preMarketOpenResult.result);
-        
+
         // If market is closed, try to open it
         if (preMarketOpen === false) {
           try {
@@ -159,7 +161,9 @@ describe(`public functions: ${contractName}`, () => {
             );
           } catch (e) {
             // If we can't toggle it, skip this test
-            console.log("Skipping test: Cannot control pre-faktory market state");
+            console.log(
+              "Skipping test: Cannot control pre-faktory market state"
+            );
             return;
           }
         }
@@ -182,7 +186,7 @@ describe(`public functions: ${contractName}`, () => {
           [],
           deployer
         );
-        
+
         expect(isOpenResult.result).toBeOk(Cl.bool(true));
       } else {
         // If we can't check the market state, skip this test
@@ -262,7 +266,13 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy",
-      [Cl.contractPrincipal("STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2", "sbtc-token"), Cl.uint(100000)],
+      [
+        Cl.contractPrincipal(
+          "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2",
+          "sbtc-token"
+        ),
+        Cl.uint(100000),
+      ],
       address1
     );
 
@@ -315,7 +325,7 @@ describe(`public functions: ${contractName}`, () => {
     // Convert values to usable format
     const initialBalanceValue = cvToValue(initialTokenBalance);
     const newBalanceValue = cvToValue(newTokenBalance);
-    
+
     // Verify the balance increased
     expect(newBalanceValue).toBeGreaterThan(initialBalanceValue);
   });
@@ -366,7 +376,13 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "sell",
-      [Cl.contractPrincipal("STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2", "sbtc-token"), Cl.uint(1000)],
+      [
+        Cl.contractPrincipal(
+          "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2",
+          "sbtc-token"
+        ),
+        Cl.uint(1000),
+      ],
       address1
     );
 
@@ -390,11 +406,10 @@ describe(`read-only functions: ${contractName}`, () => {
       [],
       deployer
     );
-    
+
     // Just verify that we get a valid response
-    expect(currentStatus.result).not.toBeUndefined();
+    expect(currentStatus.result).toBeDefined();
   });
-  
 
   ////////////////////////////////////////
   // get-in() tests
@@ -410,35 +425,60 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-in",
       [Cl.uint(100000)],
       deployer
-    );
+    ).result;
 
-    // assert
-    expect(result.result).not.toBeUndefined();
-    
+    // verify we got an ok result
+    if (result.type !== ClarityType.ResponseOk) {
+      throw new Error("get-in() failed when it shouldn't");
+    }
+
+    // verify we got a tuple in ok result
+    if (result.value.type !== ClarityType.Tuple) {
+      throw new Error("get-in() did not return a tuple");
+    }
+
+    const tupleData = cvToValue(result.value);
+    console.log(`get-in() result: ${JSON.stringify(result.value)}`);
+    console.log(`get-in() tuple data: ${JSON.stringify(tupleData)}`);
+
     // arrange
+    // exmaple
+    /*
+    
+{
+  "fee": {
+    "type": "uint",
+    "value": "2000"
+  },
+  "ft-balance": { "type": "uint", "value": "16000000000000000" },
+  "k": { "type": "uint", "value": "16000000000000000000000" },
+  "new-ft": { "type": "uint", "value": "14571948998178506" },
+  "new-stk": { "type": "uint", "value": "1098000" },
+  "new-stx": { "type": "uint", "value": "98000" },
+  "stx-in": { "type": "uint", "value": "98000" },
+  "stx-to-grad": { "type": "uint", "value": "5150000" },
+  "tokens-out": { "type": "uint", "value": "1428051001821494" },
+  "total-stk": { "type": "uint", "value": "1000000" },
+  "total-stx": { "type": "uint", "value": "0" }
+}
+
+    */
     // Define the expected structure
     const expectedStructure = {
-      "fee": 2000n, // 2% of 100000
-      "stx-in": 98000n, // 100000 - 2000
-      "total-stx": expect.any(BigInt),
-      "total-stk": expect.any(BigInt),
-      "ft-balance": expect.any(BigInt),
-      "k": expect.any(BigInt),
-      "new-stk": expect.any(BigInt),
-      "new-ft": expect.any(BigInt),
-      "tokens-out": expect.any(BigInt),
-      "new-stx": expect.any(BigInt),
-      "stx-to-grad": expect.any(BigInt)
+      fee: Cl.uint(2000n), // 2% of 100000
+      "stx-in": Cl.uint(98000n), // 100000 - 2000
+      "total-stx": Cl.uint(0n),
+      "total-stk": Cl.uint(1000000n),
+      "ft-balance": Cl.uint(16000000000000000n),
+      k: Cl.uint(16000000000000000000000n),
+      "new-stk": Cl.uint(1098000n),
+      "new-ft": Cl.uint(14571948998178506n),
+      "tokens-out": Cl.uint(1428051001821494n),
+      "new-stx": Cl.uint(98000n),
+      "stx-to-grad": Cl.uint(5150000n),
     };
-
-    // Convert to usable data
-    const data = cvToValue(result.result);
-    
-    // Verify the structure matches what we expect
-    expect(data).toMatchObject(expectedStructure);
-    
-    // Additional checks
-    expect(data["stx-in"] + data["fee"]).toEqual(100000n);
+    // assert
+    expect(tupleData).toMatchObject(expectedStructure);
   });
 
   ////////////////////////////////////////
@@ -458,7 +498,7 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert - just check that we get a response
-    expect(result.result).not.toBeUndefined();
+    expect(result.result).toBeDefined();
   });
 
   ////////////////////////////////////////
@@ -466,12 +506,15 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("initial state variables are set correctly", () => {
     // We can't use simnet.reset(), so we'll just check the current state
-    
+
     // act
-    const fakUstx = simnet.getDataVar(contractAddress, "fak-ustx");
-    const ftBalance = simnet.getDataVar(contractAddress, "ft-balance");
-    const premium = simnet.getDataVar(contractAddress, "premium");
-    
+    const fakUstx = simnet.getDataVar(contractAddress, "fak-ustx") as UIntCV;
+    const ftBalance = simnet.getDataVar(
+      contractAddress,
+      "ft-balance"
+    ) as UIntCV;
+    const premium = simnet.getDataVar(contractAddress, "premium") as UIntCV;
+
     // assert - check that values match expected constants
     // Note: We're not checking openState since it might be true or false depending on previous tests
     expect(fakUstx.value).toEqual(1000000n); // FAK_STX constant
