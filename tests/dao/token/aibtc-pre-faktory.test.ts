@@ -659,11 +659,6 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-vesting-schedule() returns valid data", () => {
     // arrange
-    // Define the expected structure
-    const expectedStructure = {
-      "vesting-schedule": expect.any(Array)
-    };
-
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -682,18 +677,25 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-vesting-schedule() did not return a tuple");
     }
 
-    // Verify the structure matches what we expect
-    expect(result.value.value).toMatchObject(expectedStructure);
-
-    // Additional checks on the vesting schedule
-    const data = cvToValue(result);
-    const schedule = data["vesting-schedule"];
-    expect(schedule.length).toBeGreaterThan(0);
-
-    // Check the structure of the first entry in the schedule
-    expect(schedule[0]).toHaveProperty("height");
-    expect(schedule[0]).toHaveProperty("percent");
-    expect(schedule[0]).toHaveProperty("id");
+    // Verify the vesting-schedule exists and is a list
+    const vestingSchedule = result.value.value["vesting-schedule"];
+    expect(vestingSchedule).toBeDefined();
+    expect(vestingSchedule.type).toBe("list");
+    
+    // Verify the list has entries
+    expect(vestingSchedule.value.length).toBeGreaterThan(0);
+    
+    // Check the structure of the first entry
+    const firstEntry = vestingSchedule.value[0];
+    expect(firstEntry.type).toBe("tuple");
+    expect(firstEntry.value).toHaveProperty("height");
+    expect(firstEntry.value).toHaveProperty("percent");
+    expect(firstEntry.value).toHaveProperty("id");
+    
+    // Verify the types of the properties
+    expect(firstEntry.value.height.type).toBe("uint");
+    expect(firstEntry.value.percent.type).toBe("uint");
+    expect(firstEntry.value.id.type).toBe("uint");
   });
 
   ////////////////////////////////////////
