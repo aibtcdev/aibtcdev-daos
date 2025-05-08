@@ -471,6 +471,20 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-contract-status() returns valid data", () => {
     // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "is-period-1-expired": Cl.bool(false),
+      "is-distribution-period": Cl.bool(false),
+      "total-users": expect.any(BigInt),
+      "total-seats-taken": expect.any(BigInt),
+      "deployment-height": expect.any(BigInt),
+      "expiration-period": Cl.uint(2100),
+      "distribution-height": expect.any(BigInt),
+      "accelerated-vesting": Cl.bool(false),
+      "market-open": Cl.bool(false),
+      "governance-active": Cl.bool(false),
+      "seat-holders": expect.any(Array)
+    };
 
     // act
     const result = simnet.callReadOnlyFn(
@@ -478,32 +492,20 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-contract-status",
       [],
       deployer
-    );
+    ).result;
 
-    // arrange
-    // Define the expected structure (actual values will vary)
-    const expectedKeys = [
-      "is-period-1-expired",
-      "is-distribution-period",
-      "total-users",
-      "total-seats-taken",
-      "deployment-height",
-      "expiration-period",
-      "distribution-height",
-      "accelerated-vesting",
-      "market-open",
-      "governance-active",
-      "seat-holders",
-    ];
+    // verify we got an ok result
+    if (result.type !== ClarityType.ResponseOk) {
+      throw new Error("get-contract-status() failed when it shouldn't");
+    }
 
-    // assert
-    expect(result.result).toBeDefined();
-    const data = cvToValue(result.result);
+    // verify we got a tuple in ok result
+    if (result.value.type !== ClarityType.Tuple) {
+      throw new Error("get-contract-status() did not return a tuple");
+    }
 
-    // Check that all expected keys exist in the result
-    expectedKeys.forEach((key) => {
-      expect(data).toHaveProperty(key);
-    });
+    // Verify the structure matches what we expect
+    expect(result.value.value).toMatchObject(expectedStructure);
   });
 
   ////////////////////////////////////////
@@ -519,26 +521,33 @@ describe(`read-only functions: ${contractName}`, () => {
       // Address might already have seats
     }
 
+    // Define the expected structure
+    const expectedStructure = {
+      "seats-owned": expect.any(BigInt),
+      "amount-claimed": expect.any(BigInt),
+      "claimable-amount": expect.any(BigInt)
+    };
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
       "get-user-info",
       [Cl.principal(address1)],
       deployer
-    );
+    ).result;
 
-    // arrange
-    // Define the expected structure
-    const expectedKeys = ["seats-owned", "amount-claimed", "claimable-amount"];
+    // verify we got an ok result
+    if (result.type !== ClarityType.ResponseOk) {
+      throw new Error("get-user-info() failed when it shouldn't");
+    }
 
-    // assert
-    expect(result.result).toBeDefined();
-    const data = cvToValue(result.result);
+    // verify we got a tuple in ok result
+    if (result.value.type !== ClarityType.Tuple) {
+      throw new Error("get-user-info() did not return a tuple");
+    }
 
     // Verify the structure matches what we expect
-    expectedKeys.forEach((key) => {
-      expect(data).toHaveProperty(key);
-    });
+    expect(result.value.value).toMatchObject(expectedStructure);
   });
 
   ////////////////////////////////////////
@@ -546,6 +555,10 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-remaining-seats() returns valid data", () => {
     // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "remainin-seats": expect.any(BigInt)
+    };
 
     // act
     const result = simnet.callReadOnlyFn(
@@ -553,20 +566,20 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-remaining-seats",
       [],
       deployer
-    );
+    ).result;
 
-    // arrange
-    // Define the expected structure
-    const expectedStructure = {
-      "remainin-seats": expect.any(BigInt),
-    };
+    // verify we got an ok result
+    if (result.type !== ClarityType.ResponseOk) {
+      throw new Error("get-remaining-seats() failed when it shouldn't");
+    }
 
-    // assert
-    expect(result.result).toBeDefined();
-    const data = cvToValue(result.result);
+    // verify we got a tuple in ok result
+    if (result.value.type !== ClarityType.Tuple) {
+      throw new Error("get-remaining-seats() did not return a tuple");
+    }
 
     // Verify the structure matches what we expect
-    expect(data).toMatchObject(expectedStructure);
+    expect(result.value.value).toMatchObject(expectedStructure);
   });
 
   ////////////////////////////////////////
@@ -582,26 +595,31 @@ describe(`read-only functions: ${contractName}`, () => {
       // Address might already have seats
     }
 
+    // Define the expected structure
+    const expectedStructure = {
+      "seats-owned": Cl.bool(true)
+    };
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
       "get-seats-owned",
       [Cl.principal(address1)],
       deployer
-    );
+    ).result;
 
-    // arrange
-    // Define the expected structure
-    const expectedStructure = {
-      "seats-owned": expect.any(Boolean),
-    };
+    // verify we got an ok result
+    if (result.type !== ClarityType.ResponseOk) {
+      throw new Error("get-seats-owned() failed when it shouldn't");
+    }
 
-    // assert
-    expect(result.result).toBeDefined();
-    const data = cvToValue(result.result);
+    // verify we got a tuple in ok result
+    if (result.value.type !== ClarityType.Tuple) {
+      throw new Error("get-seats-owned() did not return a tuple");
+    }
 
     // Verify the structure matches what we expect
-    expect(data).toMatchObject(expectedStructure);
+    expect(result.value.value).toMatchObject(expectedStructure);
   });
 
   ////////////////////////////////////////
@@ -609,6 +627,10 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-claimed-amount() returns valid data", () => {
     // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "claimed-amount": expect.any(BigInt)
+    };
 
     // act
     const result = simnet.callReadOnlyFn(
@@ -616,20 +638,20 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-claimed-amount",
       [Cl.principal(address1)],
       deployer
-    );
+    ).result;
 
-    // arrange
-    // Define the expected structure
-    const expectedStructure = {
-      "claimed-amount": expect.any(BigInt),
-    };
+    // verify we got an ok result
+    if (result.type !== ClarityType.ResponseOk) {
+      throw new Error("get-claimed-amount() failed when it shouldn't");
+    }
 
-    // assert
-    expect(result.result).toBeDefined();
-    const data = cvToValue(result.result);
+    // verify we got a tuple in ok result
+    if (result.value.type !== ClarityType.Tuple) {
+      throw new Error("get-claimed-amount() did not return a tuple");
+    }
 
     // Verify the structure matches what we expect
-    expect(data).toMatchObject(expectedStructure);
+    expect(result.value.value).toMatchObject(expectedStructure);
   });
 
   ////////////////////////////////////////
@@ -637,6 +659,10 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-vesting-schedule() returns valid data", () => {
     // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "vesting-schedule": expect.any(Array)
+    };
 
     // act
     const result = simnet.callReadOnlyFn(
@@ -644,22 +670,23 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-vesting-schedule",
       [],
       deployer
-    );
+    ).result;
 
-    // arrange
-    // Define the expected structure
-    const expectedStructure = {
-      "vesting-schedule": expect.any(Array),
-    };
+    // verify we got an ok result
+    if (result.type !== ClarityType.ResponseOk) {
+      throw new Error("get-vesting-schedule() failed when it shouldn't");
+    }
 
-    // assert
-    expect(result.result).toBeDefined();
-    const data = cvToValue(result.result);
+    // verify we got a tuple in ok result
+    if (result.value.type !== ClarityType.Tuple) {
+      throw new Error("get-vesting-schedule() did not return a tuple");
+    }
 
     // Verify the structure matches what we expect
-    expect(data).toMatchObject(expectedStructure);
+    expect(result.value.value).toMatchObject(expectedStructure);
 
     // Additional checks on the vesting schedule
+    const data = cvToValue(result);
     const schedule = data["vesting-schedule"];
     expect(schedule.length).toBeGreaterThan(0);
 
@@ -674,6 +701,10 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-seat-holders() returns valid data", () => {
     // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "seat-holders": expect.any(Array)
+    };
 
     // act
     const result = simnet.callReadOnlyFn(
@@ -681,20 +712,20 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-seat-holders",
       [],
       deployer
-    );
+    ).result;
 
-    // arrange
-    // Define the expected structure
-    const expectedStructure = {
-      "seat-holders": expect.any(Array),
-    };
+    // verify we got an ok result
+    if (result.type !== ClarityType.ResponseOk) {
+      throw new Error("get-seat-holders() failed when it shouldn't");
+    }
 
-    // assert
-    expect(result.result).toBeDefined();
-    const data = cvToValue(result.result);
+    // verify we got a tuple in ok result
+    if (result.value.type !== ClarityType.Tuple) {
+      throw new Error("get-seat-holders() did not return a tuple");
+    }
 
     // Verify the structure matches what we expect
-    expect(data).toMatchObject(expectedStructure);
+    expect(result.value.value).toMatchObject(expectedStructure);
   });
 
   ////////////////////////////////////////
@@ -702,6 +733,7 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("is-market-open() returns valid data", () => {
     // arrange
+    const expectedValue = Cl.bool(false);
 
     // act
     const result = simnet.callReadOnlyFn(
@@ -711,8 +743,13 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
 
+    // verify we got an ok result
+    if (result.type !== ClarityType.ResponseOk) {
+      throw new Error("is-market-open() failed when it shouldn't");
+    }
+
     // assert
-    expect(result).toBeOk(Cl.bool(false));
+    expect(result.value).toEqual(expectedValue);
   });
 
   ////////////////////////////////////////
@@ -720,6 +757,7 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("is-governance-active() returns valid data", () => {
     // arrange
+    const expectedValue = Cl.bool(false);
 
     // act
     const result = simnet.callReadOnlyFn(
@@ -729,8 +767,13 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
 
+    // verify we got an ok result
+    if (result.type !== ClarityType.ResponseOk) {
+      throw new Error("is-governance-active() failed when it shouldn't");
+    }
+
     // assert
-    expect(result).toBeOk(Cl.bool(false));
+    expect(result.value).toEqual(expectedValue);
   });
 
   ////////////////////////////////////////
