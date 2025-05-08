@@ -709,14 +709,10 @@ describe(`read-only functions: ${contractName}`, () => {
       "is-market-open",
       [],
       deployer
-    );
+    ).result;
 
     // assert
-    const isOpen = cvToValue(result.result);
-    expect(result.result).toBeOk(Cl.bool(isOpen));
-
-    // Check that the result is a boolean
-    expect(typeof isOpen).toBe("boolean");
+    expect(result).toBeOk(Cl.bool(false));
   });
 
   ////////////////////////////////////////
@@ -731,14 +727,10 @@ describe(`read-only functions: ${contractName}`, () => {
       "is-governance-active",
       [],
       deployer
-    );
+    ).result;
 
     // assert
-    const isActive = cvToValue(result.result);
-    expect(result.result).toBeOk(Cl.bool(isActive));
-
-    // Check that the result is a boolean
-    expect(typeof isActive).toBe("boolean");
+    expect(result).toBeOk(Cl.bool(false));
   });
 
   ////////////////////////////////////////
@@ -746,6 +738,15 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-fee-distribution-info() returns valid data", () => {
     // arrange
+    // Define the expected structure
+    const expectedStructure = {
+      "accumulated-fees": Cl.uint(0),
+      "last-airdrop-height": expect.anything(),
+      "current-height": Cl.uint(4),
+      "cooldown-period": Cl.uint(2100),
+      "final-airdrop-mode": Cl.bool(false),
+      "can-trigger-now": Cl.bool(false),
+    };
 
     // act
     const result = simnet.callReadOnlyFn(
@@ -753,25 +754,20 @@ describe(`read-only functions: ${contractName}`, () => {
       "get-fee-distribution-info",
       [],
       deployer
-    );
+    ).result;
 
-    // arrange
-    // Define the expected structure
-    const expectedStructure = {
-      "accumulated-fees": expect.any(BigInt),
-      "last-airdrop-height": expect.anything(),
-      "current-height": expect.any(BigInt),
-      "cooldown-period": expect.any(BigInt),
-      "final-airdrop-mode": expect.any(Boolean),
-      "can-trigger-now": expect.any(Boolean),
-    };
+    // verify we got an ok result
+    if (result.type !== ClarityType.ResponseOk) {
+      throw new Error("get-fee-distribution-info() failed when it shouldn't");
+    }
 
-    // assert
-    expect(result.result).toBeDefined();
-    const data = cvToValue(result.result);
+    // verify we got a tuple in ok result
+    if (result.value.type !== ClarityType.Tuple) {
+      throw new Error("get-fee-distribution-info() did not return a tuple");
+    }
 
     // Verify the structure matches what we expect
-    expect(data).toMatchObject(expectedStructure);
+    expect(result.value.value).toMatchObject(expectedStructure);
   });
 
   ////////////////////////////////////////
