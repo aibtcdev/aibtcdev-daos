@@ -5,7 +5,16 @@ import ssrHotReload from "vite-plugin-ssr-hot-reload";
 
 export default defineConfig(({ command, isSsrBuild }) => {
   if (command === "serve") {
-    return { plugins: [ssrHotReload(), cloudflare()] };
+    return { 
+      plugins: [
+        ssrHotReload(), 
+        cloudflare({
+          wrangler: {
+            configPath: './wrangler.toml',
+          }
+        })
+      ] 
+    };
   }
   return {
     plugins: [
