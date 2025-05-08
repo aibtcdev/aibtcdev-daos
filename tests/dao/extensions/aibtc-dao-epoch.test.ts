@@ -57,7 +57,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeOk(Cl.uint(0)); // or appropriate value
+    expect(result).toBeOk(Cl.uint(0));
   });
 
   ////////////////////////////////////////
@@ -73,6 +73,6 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeOk(Cl.uint(4320)); // or appropriate value
+    expect(result).toBeOk(Cl.uint(4320));
   });
 });

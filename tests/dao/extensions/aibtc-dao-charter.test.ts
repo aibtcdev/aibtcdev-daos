@@ -132,7 +132,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeSome(expectedDaoCharterString); // or appropriate value
+    expect(result).toBeSome(expectedDaoCharterString);
   });
 
   ////////////////////////////////////////
@@ -161,6 +161,6 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeSome(expectedDaoCharter); // or appropriate value
+    expect(result).toBeSome(expectedDaoCharter);
   });
 });

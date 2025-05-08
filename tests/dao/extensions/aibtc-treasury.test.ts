@@ -118,7 +118,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toStrictEqual(Cl.bool(false)); // or appropriate value
+    expect(result).toStrictEqual(Cl.bool(false));
   });
 
   ////////////////////////////////////////
@@ -134,7 +134,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeNone(); // or appropriate value
+    expect(result).toBeNone();
   });
 
   ////////////////////////////////////////

@@ -134,7 +134,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toStrictEqual(Cl.uint(0)); // or appropriate value
+    expect(result).toStrictEqual(Cl.uint(0));
   });
 
   ////////////////////////////////////////
@@ -150,7 +150,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeNone(); // or appropriate value
+    expect(result).toBeNone();
   });
 
   ////////////////////////////////////////
@@ -166,7 +166,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeNone(); // or appropriate value
+    expect(result).toBeNone();
   });
 
   ////////////////////////////////////////
@@ -182,6 +182,6 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeNone(); // or appropriate value
+    expect(result).toBeNone();
   });
 });
