@@ -46,54 +46,20 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   ////////////////////////////////////////
-  // distribute-rewards() tests
+  // transfer-reward() tests
   ////////////////////////////////////////
-  it("distribute-rewards() fails if called directly", () => {
+  it("transfer-reward() fails if called directly", () => {
     // arrange
     // act
-    // const receipt = simnet.callPublicFn(
-    //   contractAddress,
-    //   "distribute-rewards",
-    //   [/* parameters */],
-    //   address1
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "transfer-reward",
+      [Cl.principal(address1), Cl.uint(100)],
+      address1
+    );
     // assert
-    // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
-  });
-
-  it("distribute-rewards() succeeds if called by the DAO", () => {
-    // arrange
-    // constructDao(deployer);
-    // act
-    // const receipt = simnet.callPublicFn(
-    //   baseDaoContractAddress,
-    //   "request-extension-callback",
-    //   [
-    //     Cl.principal(contractAddress),
-    //     Cl.buffer(Cl.serialize(/* parameters */))
-    //   ],
-    //   deployer
-    // );
-    // assert
-    // expect(receipt.result).toBeOk(Cl.bool(true));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
 });
 
-describe(`read-only functions: ${contractName}`, () => {
-  ////////////////////////////////////////
-  // get-rewards-balance() tests
-  ////////////////////////////////////////
-  it("get-rewards-balance() returns expected value", () => {
-    // arrange
-    // constructDao(deployer);
-    // act
-    // const result = simnet.callReadOnlyFn(
-    //   contractAddress,
-    //   "get-rewards-balance",
-    //   [/* parameters */],
-    //   deployer
-    // ).result;
-    // assert
-    // expect(result).toStrictEqual(/* expected value */);
-  });
-});
+// Note: There are no read-only functions in this contract that need testing

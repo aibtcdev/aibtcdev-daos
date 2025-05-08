@@ -1,5 +1,11 @@
 // set to true to enable logging
 const DEBUG_ENABLED = false;
+// interface for the dbgLog params
+export interface DbgLogParams {
+  forceLog?: boolean;
+  logType?: string;
+  titleBefore?: string;
+}
 // helper function to log messages to the console
 export function dbgLog(
   msg: unknown,

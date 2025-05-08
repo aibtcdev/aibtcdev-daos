@@ -46,102 +46,116 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   ////////////////////////////////////////
-  // transfer-stx() tests
+  // allow-asset() tests
   ////////////////////////////////////////
-  it("transfer-stx() fails if called directly", () => {
+  it("allow-asset() fails if called directly", () => {
     // arrange
     // act
-    // const receipt = simnet.callPublicFn(
-    //   contractAddress,
-    //   "transfer-stx",
-    //   [/* parameters */],
-    //   address1
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "allow-asset",
+      [
+        Cl.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token"),
+        Cl.bool(true),
+      ],
+      address1
+    );
     // assert
-    // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
-  });
-
-  it("transfer-stx() succeeds if called by the DAO", () => {
-    // arrange
-    // constructDao(deployer);
-    // act
-    // const receipt = simnet.callPublicFn(
-    //   baseDaoContractAddress,
-    //   "request-extension-callback",
-    //   [
-    //     Cl.principal(contractAddress),
-    //     Cl.buffer(Cl.serialize(/* parameters */))
-    //   ],
-    //   deployer
-    // );
-    // assert
-    // expect(receipt.result).toBeOk(Cl.bool(true));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
 
   ////////////////////////////////////////
-  // transfer-ft() tests
+  // deposit-ft() tests
   ////////////////////////////////////////
-  it("transfer-ft() fails if called directly", () => {
+  it("deposit-ft() fails if asset not allowed", () => {
     // arrange
     // act
-    // const receipt = simnet.callPublicFn(
-    //   contractAddress,
-    //   "transfer-ft",
-    //   [/* parameters */],
-    //   address1
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "deposit-ft",
+      [
+        Cl.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.unknown-token"),
+        Cl.uint(100),
+      ],
+      address1
+    );
     // assert
-    // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_ASSET_NOT_ALLOWED));
   });
 
   ////////////////////////////////////////
-  // transfer-nft() tests
+  // withdraw-ft() tests
   ////////////////////////////////////////
-  it("transfer-nft() fails if called directly", () => {
+  it("withdraw-ft() fails if called directly", () => {
     // arrange
     // act
-    // const receipt = simnet.callPublicFn(
-    //   contractAddress,
-    //   "transfer-nft",
-    //   [/* parameters */],
-    //   address1
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "withdraw-ft",
+      [
+        Cl.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.unknown-token"),
+        Cl.uint(100),
+        Cl.principal(address1),
+      ],
+      address1
+    );
     // assert
-    // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
 });
 
 describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
-  // get-balance() tests
+  // is-allowed-asset() tests
   ////////////////////////////////////////
-  it("get-balance() returns expected value", () => {
+  it("is-allowed-asset() returns expected value", () => {
     // arrange
-    // constructDao(deployer);
     // act
-    // const result = simnet.callReadOnlyFn(
-    //   contractAddress,
-    //   "get-balance",
-    //   [],
-    //   deployer
-    // ).result;
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "is-allowed-asset",
+      [Cl.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.unknown-token")],
+      deployer
+    ).result;
     // assert
-    // expect(result).toStrictEqual(/* expected value */);
+    expect(result).toStrictEqual(Cl.bool(false));
   });
 
   ////////////////////////////////////////
-  // get-ft-balance() tests
+  // get-allowed-asset() tests
   ////////////////////////////////////////
-  it("get-ft-balance() returns expected value", () => {
+  it("get-allowed-asset() returns expected value", () => {
     // arrange
     // act
-    // const result = simnet.callReadOnlyFn(
-    //   contractAddress,
-    //   "get-ft-balance",
-    //   [/* parameters */],
-    //   deployer
-    // ).result;
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-allowed-asset",
+      [Cl.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token")],
+      deployer
+    ).result;
     // assert
-    // expect(result).toStrictEqual(/* expected value */);
+    expect(result).toBeNone();
+  });
+
+  ////////////////////////////////////////
+  // get-contract-info() tests
+  ////////////////////////////////////////
+  it("get-contract-info() returns expected value", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-contract-info",
+      [],
+      deployer
+    ).result;
+    // assert
+    expect(result).toStrictEqual(
+      Cl.tuple({
+        self: Cl.principal(contractAddress),
+        deployedBurnBlock: Cl.uint(4), // deployed btc block
+        deployedStacksBlock: Cl.uint(4), // or deployed stx block
+      })
+    );
   });
 });

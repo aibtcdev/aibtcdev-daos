@@ -1,9 +1,10 @@
-;; title: dao-run-cost
+;; title: aibtc-dao-run-cost
 ;; version: 1.0.0
 ;; summary: A contract that holds and manages fees for AIBTC services.
 
 ;; funds are transferred to this contract every time a proposal is created
 ;; will be a mix of several different dao tokens over time
+;;
 ;; only allows withdrawal with 3-of-5 approval from an approved list of addresses
 ;; an approved address can add/remove other addresses with quorum
 
@@ -152,3 +153,9 @@
     (is-eq confirmations (var-get confirmationsRequired))
   )
 )
+
+(map-set Owners 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM true)
+(map-set Owners 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5 true)
+(map-set Owners 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true)
+(map-set Owners 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true)
+(map-set Owners 'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND true)

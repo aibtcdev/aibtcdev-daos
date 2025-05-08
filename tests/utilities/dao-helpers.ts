@@ -10,6 +10,11 @@ export const VOTING_PERIOD = 288;
 // Create a singleton registry instance for use in helpers
 const registry = setupDaoContractRegistry();
 
+// helper to get a random amount between min and max
+function getRandomAmount(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 // helper to get sBTC from faucet and buy DAO tokens from the token dex
 export function getDaoTokens(address: string, satsAmount: number) {
   // Get contract references from registry
@@ -71,8 +76,7 @@ export function fundVoters(voters: string[]) {
     simnet.mineEmptyBlocks(10);
 
     // generate an amount between 100k and 1M satoshis
-    const btcAmount =
-      Math.floor(Math.random() * (1000000 - 100000 + 1)) + 100000;
+    const btcAmount = getRandomAmount(100_000, 1_000_000);
     dbgLog(`btcAmount: ${btcAmount} satoshis`);
 
     // get dao tokens from the token dex
@@ -81,6 +85,56 @@ export function fundVoters(voters: string[]) {
     // progress chain for at-block calls
     simnet.mineEmptyBlocks(10);
   }
+}
+
+// helper to fund an agent account with random amounts of sBTC and DAO tokens
+export function fundAgentAccount() {
+  const agentAccountAddress = registry.getContractAddressByTypeAndSubtype(
+    "AGENT",
+    "AGENT_ACCOUNT"
+  );
+  const tokenContractAddress = registry.getContractAddressByTypeAndSubtype(
+    "TOKEN",
+    "DAO"
+  );
+  if (!agentAccountAddress) {
+    throw new Error("Required agent account not found in registry");
+  }
+  // get sbtc from the faucet
+  const faucetReceipt = simnet.callPublicFn(
+    SBTC_CONTRACT,
+    "faucet",
+    [],
+    agentAccountAddress
+  );
+  expect(faucetReceipt.result).toBeOk(Cl.bool(true));
+  // progress chain
+  simnet.mineEmptyBlocks(10);
+  // generate an amount between 100k and 1M satoshis
+  const btcAmount = getRandomAmount(100_000, 1_000_000);
+  dbgLog(`btcAmount: ${btcAmount} satoshis`);
+  // get dao tokens from the token dex
+  getDaoTokens(agentAccountAddress, btcAmount);
+  // progress chain
+  simnet.mineEmptyBlocks(10);
+  // deposit sbtc to the agent account
+  const depositSbtcReceipt = simnet.callPublicFn(
+    SBTC_CONTRACT,
+    "deposit-ft",
+    [Cl.principal(SBTC_CONTRACT), Cl.uint(btcAmount)],
+    agentAccountAddress
+  );
+  dbgLog(`depositSbtcReceipt: ${JSON.stringify(depositSbtcReceipt)}`);
+  expect(depositSbtcReceipt.result).toBeOk(Cl.bool(true));
+  // deposit dao tokens to the agent account
+  const depositTokensReceipt = simnet.callPublicFn(
+    tokenContractAddress,
+    "deposit-ft",
+    [Cl.uint(btcAmount)],
+    agentAccountAddress
+  );
+  dbgLog(`depositTokensReceipt: ${JSON.stringify(depositTokensReceipt)}`);
+  expect(depositTokensReceipt.result).toBeOk(Cl.bool(true));
 }
 
 // helper to construct a DAO so proposals can be created/executed
@@ -117,6 +171,7 @@ export function passActionProposal(
   voters: string[],
   memo?: string
 ) {
+  fundVoters(voters);
   // Get contract references from registry
   const actionProposalsContract = registry.getContractByTypeAndSubtype(
     "EXTENSIONS",
@@ -166,7 +221,7 @@ export function passActionProposal(
   }
 
   // progress past the voting period and execution delay
-  simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY);
+  simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY + 1);
 
   // conclude the proposal
   const concludeProposalReceipt = simnet.callPublicFn(
@@ -175,5 +230,6 @@ export function passActionProposal(
     [Cl.uint(1), Cl.principal(proposedActionContractAddress)],
     deployer
   );
+  dbgLog(concludeProposalReceipt);
   expect(concludeProposalReceipt.result).toBeOk(Cl.bool(true));
 }

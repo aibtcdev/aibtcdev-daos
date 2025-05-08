@@ -61,7 +61,6 @@ describe(`public functions: ${contractName}`, () => {
     const memo = "hello world";
     // fund accounts for creating and voting on proposals
     const voters = [deployer, address1, address2, address3];
-    fundVoters(voters);
     // construct the DAO
     constructDao(deployer);
     // pass the action proposal

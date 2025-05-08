@@ -2,7 +2,7 @@ import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeDaoUsers } from "../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
-import { constructDao } from "../../utilities/dao-helpers";
+import { constructDao, fundVoters } from "../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -46,54 +46,142 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   ////////////////////////////////////////
-  // set-user-data() tests
+  // get-or-create-user-index() tests
   ////////////////////////////////////////
-  it("set-user-data() fails if called directly", () => {
+  it("get-or-create-user-index() fails if called directly", () => {
     // arrange
     // act
-    // const receipt = simnet.callPublicFn(
-    //   contractAddress,
-    //   "set-user-data",
-    //   [/* parameters */],
-    //   address1
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "get-or-create-user-index",
+      [Cl.principal(address1)],
+      address1
+    );
     // assert
-    // expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
 
-  it("set-user-data() succeeds if called by the DAO", () => {
+  ////////////////////////////////////////
+  // increase-user-reputation() tests
+  ////////////////////////////////////////
+  it("increase-user-reputation() fails if called directly", () => {
     // arrange
-    // constructDao(deployer);
     // act
-    // const receipt = simnet.callPublicFn(
-    //   baseDaoContractAddress,
-    //   "request-extension-callback",
-    //   [
-    //     Cl.principal(contractAddress),
-    //     Cl.buffer(Cl.serialize(/* parameters */))
-    //   ],
-    //   deployer
-    // );
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "increase-user-reputation",
+      [Cl.principal(address1), Cl.uint(5)],
+      address1
+    );
+    // assert - if a user is not found this this error path first
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_USER_NOT_FOUND));
+
+    // arrange
+    fundVoters([deployer]);
+    constructDao(deployer);
+    // act
+    const receipt2 = simnet.callPublicFn(
+      contractAddress,
+      "get-or-create-user-index",
+      [Cl.principal(deployer)],
+      deployer
+    );
     // assert
-    // expect(receipt.result).toBeOk(Cl.bool(true));
+    expect(receipt2.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+  });
+
+  ////////////////////////////////////////
+  // decrease-user-reputation() tests
+  ////////////////////////////////////////
+  it("decrease-user-reputation() fails if called directly", () => {
+    // arrange
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "decrease-user-reputation",
+      [Cl.principal(address1), Cl.uint(5)],
+      address1
+    );
+    // assert - if a user is not found this this error path first
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_USER_NOT_FOUND));
+
+    // arrange
+    fundVoters([deployer]);
+    constructDao(deployer);
+    // act
+    const receipt2 = simnet.callPublicFn(
+      contractAddress,
+      "get-or-create-user-index",
+      [Cl.principal(deployer)],
+      deployer
+    );
+    // assert
+    expect(receipt2.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
 });
 
 describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
-  // get-user-data() tests
+  // get-user-count() tests
   ////////////////////////////////////////
-  it("get-user-data() returns expected value", () => {
+  it("get-user-count() returns expected value", () => {
     // arrange
-    // constructDao(deployer);
     // act
-    // const result = simnet.callReadOnlyFn(
-    //   contractAddress,
-    //   "get-user-data",
-    //   [/* parameters */],
-    //   deployer
-    // ).result;
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-user-count",
+      [],
+      deployer
+    ).result;
     // assert
-    // expect(result).toStrictEqual(/* expected value */);
+    expect(result).toStrictEqual(Cl.uint(0));
+  });
+
+  ////////////////////////////////////////
+  // get-user-index() tests
+  ////////////////////////////////////////
+  it("get-user-index() returns expected value", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-user-index",
+      [Cl.principal(address1)],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeNone();
+  });
+
+  ////////////////////////////////////////
+  // get-user-data-by-index() tests
+  ////////////////////////////////////////
+  it("get-user-data-by-index() returns expected value", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-user-data-by-index",
+      [Cl.uint(1)],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeNone();
+  });
+
+  ////////////////////////////////////////
+  // get-user-data-by-address() tests
+  ////////////////////////////////////////
+  it("get-user-data-by-address() returns expected value", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-user-data-by-address",
+      [Cl.principal(address1)],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeNone();
   });
 });

@@ -83,4 +83,5 @@ export enum ErrCodeTreasury {
 // aibtc-action-send-message.clar
 export enum ErrCodeActionSendMessage {
   ERR_NOT_DAO_OR_EXTENSION = 2000,
+  ERR_INVALID_PARAMETERS,
 }

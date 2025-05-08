@@ -40,5 +40,3 @@ jobs:
           files: ./lcov.info
           fail_ci_if_error: true
           verbose: true
-      - name: "Celebrate the win"
-        run: bash ./tests/chadsay.sh Looking good

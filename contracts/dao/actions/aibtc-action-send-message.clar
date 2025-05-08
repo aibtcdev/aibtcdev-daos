@@ -14,7 +14,7 @@
 ;;
 
 (define-constant ERR_NOT_DAO_OR_EXTENSION (err u2000))
-(define-constant ERR_INVALID_PARAMS (err u2001))
+(define-constant ERR_INVALID_PARAMETERS (err u2001))
 
 ;; public functions
 ;;
@@ -23,7 +23,7 @@
 
 (define-public (run (parameters (buff 2048)))
   (let
-    ((message (unwrap! (from-consensus-buff? (string-ascii 2043) parameters) ERR_INVALID_PARAMS)))
+    ((message (unwrap! (from-consensus-buff? (string-ascii 2043) parameters) ERR_INVALID_PARAMETERS)))
     (try! (is-dao-or-extension))
     ;; /g/.aibtc-onchain-messaging/dao_messaging_contract
     (contract-call? .aibtc-onchain-messaging send message)
@@ -32,9 +32,9 @@
 
 (define-public (check-parameters (parameters (buff 2048)))
   (let
-    ((message (unwrap! (from-consensus-buff? (string-ascii 2043) parameters) ERR_INVALID_PARAMS)))
+    ((message (unwrap! (from-consensus-buff? (string-ascii 2043) parameters) ERR_INVALID_PARAMETERS)))
     ;; check there is a message
-    (asserts! (> (len message) u0) ERR_INVALID_PARAMS)
+    (asserts! (> (len message) u0) ERR_INVALID_PARAMETERS)
     (ok true)
   )
 )
