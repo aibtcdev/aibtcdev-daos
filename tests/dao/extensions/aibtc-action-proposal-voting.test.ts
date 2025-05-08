@@ -586,6 +586,214 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_PROPOSAL_NOT_FOUND));
   });
 
+  it("conclude-action-proposal() fails if action is not an extension in the dao", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // progress chain past voting delay
+    simnet.mineEmptyBlocks(VOTING_DELAY);
+    const setupReceipt2 = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      deployer
+    );
+    expect(setupReceipt2.result).toBeOk(Cl.bool(true));
+    // progress chain past voting period
+    simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY);
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "conclude-action-proposal",
+      [Cl.uint(1), Cl.principal(`${deployer}.unknown-action`)],
+      address1
+    );
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INVALID_ACTION));
+  });
+
+  it("conclude-action-proposal() fails if proposal is already concluded", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    passActionProposal(
+      "SEND_MESSAGE",
+      Cl.stringAscii("test"),
+      deployer,
+      deployer,
+      [deployer]
+    );
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "conclude-action-proposal",
+      [Cl.uint(1), Cl.principal(actionContractAddress)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeErr(
+      Cl.uint(ErrCode.ERR_PROPOSAL_ALREADY_CONCLUDED)
+    );
+  });
+
+  it("conclude-action-proposal() fails if proposal is in voting period", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // progress chain past voting delay
+    simnet.mineEmptyBlocks(VOTING_DELAY);
+    const setupReceipt2 = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      deployer
+    );
+    expect(setupReceipt2.result).toBeOk(Cl.bool(true));
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "conclude-action-proposal",
+      [Cl.uint(1), Cl.principal(actionContractAddress)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_PROPOSAL_VOTING_ACTIVE));
+  });
+
+  it("conclude-action-proposal() fails if proposal is in veto period", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // progress chain past voting delay and period
+    simnet.mineEmptyBlocks(VOTING_DELAY + VOTING_PERIOD);
+    const setupReceipt2 = simnet.callPublicFn(
+      contractAddress,
+      "veto-action-proposal",
+      [Cl.uint(1)],
+      deployer
+    );
+    expect(setupReceipt2.result).toBeOk(Cl.bool(true));
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "conclude-action-proposal",
+      [Cl.uint(1), Cl.principal(actionContractAddress)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeErr(
+      Cl.uint(ErrCode.ERR_PROPOSAL_EXECUTION_DELAY)
+    );
+  });
+
+  it("conclude-action-proposal() fails if provided action does not match proposal action", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // progress chain past voting delay and period
+    simnet.mineEmptyBlocks(VOTING_DELAY);
+    const setupReceipt2 = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      deployer
+    );
+    expect(setupReceipt2.result).toBeOk(Cl.bool(true));
+    // progress chain past voting period and veto delay
+    simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY);
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "conclude-action-proposal",
+      [Cl.uint(1), Cl.principal(`${deployer}.unknown-action`)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INVALID_ACTION));
+  });
+
+  it("conclude-action-proposal() succeeds and executes the action if all criteria are met", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // progress chain past voting delay
+    simnet.mineEmptyBlocks(VOTING_DELAY);
+    const setupReceipt2 = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      deployer
+    );
+    expect(setupReceipt2.result).toBeOk(Cl.bool(true));
+    // progress chain past voting period and veto delay
+    simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY);
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "conclude-action-proposal",
+      [Cl.uint(1), Cl.principal(actionContractAddress)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+  });
+});
+
 describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // get-voting-power() tests
@@ -600,7 +808,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeErr(Cl.uint(ErrCode.ERR_PROPOSAL_NOT_FOUND)); // or appropriate value
+    expect(result).toBeErr(Cl.uint(ErrCode.ERR_PROPOSAL_NOT_FOUND));
   });
 
   ////////////////////////////////////////
@@ -616,7 +824,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeNone(); // or appropriate value
+    expect(result).toBeNone();
   });
 
   ////////////////////////////////////////
@@ -632,7 +840,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeNone(); // or appropriate value
+    expect(result).toBeNone();
   });
 
   ////////////////////////////////////////
@@ -648,7 +856,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeNone(); // or appropriate value
+    expect(result).toBeNone();
   });
 
   ////////////////////////////////////////
@@ -669,7 +877,7 @@ describe(`read-only functions: ${contractName}`, () => {
         voteRecord: Cl.none(),
         vetoVoteRecord: Cl.none(),
       })
-    ); // or appropriate value
+    );
   });
 
   ////////////////////////////////////////
@@ -693,7 +901,7 @@ describe(`read-only functions: ${contractName}`, () => {
         lastProposalStacksBlock: Cl.uint(4), // deployed block
         lastProposalBitcoinBlock: Cl.uint(4), // deployed block
       })
-    ); // or appropriate value
+    );
   });
 
   ////////////////////////////////////////
@@ -722,7 +930,7 @@ describe(`read-only functions: ${contractName}`, () => {
         proposalBond: Cl.uint(500000000000),
         proposalReward: Cl.uint(100000000000),
       })
-    ); // or appropriate value
+    );
   });
 
   ////////////////////////////////////////
@@ -742,6 +950,6 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeOk(Cl.uint(expectedLiquidSupply)); // or appropriate value
+    expect(result).toBeOk(Cl.uint(expectedLiquidSupply));
   });
 });
