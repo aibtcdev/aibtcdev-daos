@@ -171,6 +171,7 @@ export function passActionProposal(
   voters: string[],
   memo?: string
 ) {
+  fundVoters(voters);
   // Get contract references from registry
   const actionProposalsContract = registry.getContractByTypeAndSubtype(
     "EXTENSIONS",
@@ -220,7 +221,7 @@ export function passActionProposal(
   }
 
   // progress past the voting period and execution delay
-  simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY);
+  simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY + 1);
 
   // conclude the proposal
   const concludeProposalReceipt = simnet.callPublicFn(
@@ -229,5 +230,6 @@ export function passActionProposal(
     [Cl.uint(1), Cl.principal(proposedActionContractAddress)],
     deployer
   );
+  dbgLog(concludeProposalReceipt);
   expect(concludeProposalReceipt.result).toBeOk(Cl.bool(true));
 }

@@ -1,9 +1,17 @@
-import { Cl, cvToValue } from "@stacks/transactions";
+import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
-import { ErrCodeActionProposalVoting } from "../../utilities/contract-error-codes";
+import {
+  ErrCodeActionProposalVoting,
+  ErrCodeActionSendMessage,
+} from "../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
-import { constructDao, fundVoters } from "../../utilities/dao-helpers";
-import { dbgLog } from "../../utilities/debug-logging";
+import {
+  constructDao,
+  fundVoters,
+  passActionProposal,
+  VOTING_DELAY,
+  VOTING_PERIOD,
+} from "../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -30,6 +38,7 @@ const actionContractAddress = registry.getContractAddressByTypeAndSubtype(
 
 // import error codes
 const ErrCode = ErrCodeActionProposalVoting;
+const ActionErrCode = ErrCodeActionSendMessage;
 
 describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
@@ -53,7 +62,93 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // create-action-proposal() tests
   ////////////////////////////////////////
-  it("create-action-proposal() fails with insufficient balance", () => {
+
+  it("create-action-proposal() fails if action is not a dao extension", () => {
+    // arrange
+    constructDao(deployer);
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(`${deployer}.unknown-action`),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      address1
+    );
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INVALID_ACTION));
+  });
+
+  it("create-action-proposal() fails if parameters are not correctly formatted", () => {
+    // arrange
+    constructDao(deployer);
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.tuple({ test: Cl.list([Cl.uint(1)]) }))),
+        Cl.none(),
+      ],
+      address1
+    );
+    // assert
+    expect(receipt.result).toBeErr(
+      Cl.uint(ActionErrCode.ERR_INVALID_PARAMETERS)
+    );
+  });
+
+  it("create-action-proposal() fails if called twice in the same btc block", () => {
+    // arrange
+    fundVoters([deployer]);
+    constructDao(deployer);
+    // create first proposal
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    );
+    expect(receipt.result).toBeOk(Cl.bool(true));
+    // act
+    const receipt2 = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    );
+    // assert
+    expect(receipt2.result).toBeErr(Cl.uint(ErrCode.ERR_PROPOSAL_RATE_LIMIT));
+    // arrange
+    // progress chain to next burn block
+    simnet.mineEmptyBurnBlock();
+    // act
+    const receipt3 = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    );
+    // assert
+    expect(receipt3.result).toBeOk(Cl.bool(true));
+  });
+
+  it("create-action-proposal() fails if caller has an insufficient balance", () => {
     // arrange
     constructDao(deployer);
     // act
@@ -93,6 +188,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // vote-on-action-proposal() tests
   ////////////////////////////////////////
+
   it("vote-on-action-proposal() fails if proposal not found", () => {
     // arrange
     // act
@@ -106,9 +202,219 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_PROPOSAL_NOT_FOUND));
   });
 
+  it("vote-on-action-proposal() fails if voter has an insufficient balance", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      address1
+    );
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INSUFFICIENT_BALANCE));
+  });
+
+  it("vote-on-action-proposal() fails if proposal is already concluded", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    passActionProposal(
+      "SEND_MESSAGE",
+      Cl.stringAscii("test"),
+      deployer,
+      deployer,
+      [deployer]
+    );
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeErr(
+      Cl.uint(ErrCode.ERR_PROPOSAL_ALREADY_CONCLUDED)
+    );
+  });
+
+  it("vote-on-action-proposal() fails if proposal vote is too early", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_VOTE_TOO_SOON));
+  });
+
+  it("vote-on-action-proposal() fails if proposal vote is too late", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // progress chain past voting delay and period
+    simnet.mineEmptyBlocks(VOTING_DELAY + VOTING_PERIOD);
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_VOTE_TOO_LATE));
+  });
+
+  it("vote-on-action-proposal() fails if updated vote matches existing vote", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // progress chain past voting delay and period
+    simnet.mineEmptyBlocks(VOTING_DELAY);
+    const setupReceipt2 = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      deployer
+    );
+    expect(setupReceipt2.result).toBeOk(Cl.bool(true));
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_ALREADY_VOTED));
+  });
+
+  it("vote-on-action-proposal() succeeds and records vote info", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // progress chain past voting delay and period
+    simnet.mineEmptyBlocks(VOTING_DELAY);
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      deployer
+    );
+    expect(receipt.result).toBeOk(Cl.bool(true));
+  });
+
+  it("vote-on-action-proposal() succeeds if vote is cast then changed during vote window", () => {
+    // arrange
+    constructDao(deployer);
+    fundVoters([deployer]);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        Cl.buffer(Cl.serialize(Cl.stringAscii("test"))),
+        Cl.none(),
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+    // progress chain past voting delay and period
+    simnet.mineEmptyBlocks(VOTING_DELAY);
+    //
+    const setupReceipt2 = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      deployer
+    );
+    expect(setupReceipt2.result).toBeOk(Cl.bool(true));
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(false)],
+      deployer
+    );
+    expect(receipt.result).toBeOk(Cl.bool(true));
+    // act
+    const receipt2 = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(1), Cl.bool(true)],
+      deployer
+    );
+    expect(receipt2.result).toBeOk(Cl.bool(true));
+  });
+
   ////////////////////////////////////////
   // veto-action-proposal() tests
   ////////////////////////////////////////
+
   it("veto-action-proposal() fails if proposal not found", () => {
     // arrange
     // act
@@ -125,6 +431,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // conclude-action-proposal() tests
   ////////////////////////////////////////
+
   it("conclude-action-proposal() fails if proposal not found", () => {
     // arrange
     // act

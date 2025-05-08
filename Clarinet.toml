@@ -171,3 +171,8 @@ epoch = 3.1
 path = 'contracts/dao/token/aibtc-faktory-dex.clar'
 clarity_version = 2
 epoch = 3.1
+
+[contracts.unknown-action]
+path = 'contracts/dao/actions/aibtc-action-send-message.clar'
+clarity_version = 3
+epoch = 3.1
