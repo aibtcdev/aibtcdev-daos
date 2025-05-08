@@ -1,4 +1,4 @@
-import { Cl } from "@stacks/transactions";
+import { Cl, cvToValue } from "@stacks/transactions";
 import { describe, expect, it, beforeEach } from "vitest";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
 import { fundVoters } from "../../utilities/dao-helpers";
@@ -696,15 +696,16 @@ describe(`read-only functions: ${contractName}`, () => {
       "is-market-open",
       [],
       deployer
-    ).result;
+    );
 
     // assert
-    expect(result).toBeOk();
-
+    expect(result.result).toBeOk();
+    
+    // Convert the result to a usable value
+    const isOpen = cvToValue(result.result);
+    
     // Check that the result is a boolean
-    if (result.isOk) {
-      expect(typeof result.value.value).toBe("boolean");
-    }
+    expect(typeof isOpen).toBe("boolean");
   });
 
   ////////////////////////////////////////
@@ -719,15 +720,16 @@ describe(`read-only functions: ${contractName}`, () => {
       "is-governance-active",
       [],
       deployer
-    ).result;
+    );
 
     // assert
-    expect(result).toBeOk();
-
+    expect(result.result).toBeOk();
+    
+    // Convert the result to a usable value
+    const isActive = cvToValue(result.result);
+    
     // Check that the result is a boolean
-    if (result.isOk) {
-      expect(typeof result.value.value).toBe("boolean");
-    }
+    expect(typeof isActive).toBe("boolean");
   });
 
   ////////////////////////////////////////

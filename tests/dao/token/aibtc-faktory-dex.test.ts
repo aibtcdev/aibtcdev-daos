@@ -393,27 +393,6 @@ describe(`read-only functions: ${contractName}`, () => {
     expect(currentStatus.result).not.toBeUndefined();
   });
   
-  ////////////////////////////////////////
-  // is-market-open() tests
-  ////////////////////////////////////////
-  it("is-market-open() returns a valid boolean response", () => {
-    // act
-    const result = simnet.callReadOnlyFn(
-      contractAddress,
-      "is-market-open",
-      [],
-      deployer
-    );
-    
-    // assert
-    expect(result.result).toBeOk();
-    
-    // Convert the result to a usable value
-    const isOpen = cvToValue(result.result);
-    
-    // Check that the result is a boolean
-    expect(typeof isOpen).toBe("boolean");
-  });
 
   ////////////////////////////////////////
   // get-in() tests
