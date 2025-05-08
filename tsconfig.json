@@ -1,23 +1,23 @@
-
 {
   "compilerOptions": {
     "target": "ESNext",
-    "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": ["ESNext"],
-    "skipLibCheck": true,
-
     "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": ["ESNext"],
+    "types": ["vite/client"],
+    "useDefineForClassFields": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
     "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-
-    "strict": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true
   },
   "include": [
     "node_modules/@hirosystems/clarinet-sdk/vitest-helpers/src",
