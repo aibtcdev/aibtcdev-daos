@@ -42,6 +42,7 @@ describe(`public functions: ${contractName}`, () => {
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
   });
+
   it("construct() succeeds if called by the deployer", () => {
     // arrange
     // act
@@ -53,6 +54,28 @@ describe(`public functions: ${contractName}`, () => {
     );
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
+  });
+
+  it("construct() fails if called after succeeding once", () => {
+    // arrange
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "construct",
+      [Cl.principal(initializeDaoContractAddress)],
+      deployer
+    );
+    expect(setupReceipt.result).toBeOk(Cl.bool(true));
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "construct",
+      [Cl.principal(initializeDaoContractAddress)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeErr(
+      Cl.uint(ErrCode.ERR_DAO_ALREADY_CONSTRUCTED)
+    );
   });
   ////////////////////////////////////////
   // execute() tests

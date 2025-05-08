@@ -40,8 +40,8 @@
 (define-public (construct (proposal <proposal-trait>))
   (let
     ((sender tx-sender))
-    (asserts! (is-eq sender (var-get executive)) ERR_UNAUTHORIZED)
     (asserts! (not (var-get constructed)) ERR_DAO_ALREADY_CONSTRUCTED)
+    (asserts! (is-eq sender (var-get executive)) ERR_UNAUTHORIZED)
     (var-set constructed true)
     (var-set executive (as-contract tx-sender))
     (print {

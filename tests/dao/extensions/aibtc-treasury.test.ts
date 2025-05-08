@@ -2,7 +2,8 @@ import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeTreasury } from "../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
-import { constructDao } from "../../utilities/dao-helpers";
+import { constructDao, getDaoTokens } from "../../utilities/dao-helpers";
+import { SBTC_CONTRACT } from "../../utilities/contract-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -18,8 +19,8 @@ const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "TREASURY"
 );
 const contractName = contractAddress.split(".")[1];
-const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
-  "BASE",
+const tokenContractAddress = registry.getContractAddressByTypeAndSubtype(
+  "TOKEN",
   "DAO"
 );
 
@@ -81,6 +82,20 @@ describe(`public functions: ${contractName}`, () => {
     );
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_ASSET_NOT_ALLOWED));
+  });
+
+  it("deposit-ft() succeeds if asset allowed", () => {
+    // arrange
+    getDaoTokens(address1, 100_000);
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "deposit-ft",
+      [Cl.principal(tokenContractAddress), Cl.uint(100)],
+      address1
+    );
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
   });
 
   ////////////////////////////////////////

@@ -38,6 +38,8 @@
 
 ;; track allowed assets for deposit/transfer
 (define-map AllowedAssets principal bool)
+(map-set AllowedAssets CFG_SBTC_TOKEN true)
+(map-set AllowedAssets CFG_DAO_TOKEN true)
 
 ;; public functions
 ;;
