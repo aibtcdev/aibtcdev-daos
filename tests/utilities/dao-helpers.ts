@@ -199,7 +199,7 @@ export function passActionProposal(
     "create-action-proposal",
     [
       Cl.principal(proposedActionContractAddress),
-      Cl.buffer(Cl.serialize(proposalParams)),
+      formatSerializedBuffer(proposalParams),
       memo ? Cl.some(Cl.stringAscii(memo)) : Cl.none(),
     ],
     sender
@@ -232,4 +232,11 @@ export function passActionProposal(
   );
   dbgLog(concludeProposalReceipt);
   expect(concludeProposalReceipt.result).toBeOk(Cl.bool(true));
+}
+
+// helper to format the expected buffer format since stacks 7.X
+export function formatSerializedBuffer(value: ClarityValue): ClarityValue {
+  const serialized = Cl.serialize(value);
+  const buffer = Cl.bufferFromHex(serialized);
+  return buffer;
 }

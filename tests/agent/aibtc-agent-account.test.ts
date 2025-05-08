@@ -11,6 +11,7 @@ import {
 import { getBalancesForPrincipal } from "../utilities/asset-helpers";
 import {
   constructDao,
+  formatSerializedBuffer,
   fundVoters,
   VOTING_DELAY,
   VOTING_PERIOD,
@@ -634,7 +635,7 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
-        Cl.buffer(Cl.serialize(message)),
+        formatSerializedBuffer(message),
         Cl.some(Cl.stringAscii("Test memo")),
       ],
       address3
@@ -663,7 +664,7 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
-        Cl.buffer(Cl.serialize(message)),
+        formatSerializedBuffer(message),
         Cl.some(Cl.stringAscii("Test memo")),
       ],
       deployer
@@ -681,7 +682,7 @@ describe(`public functions: ${contractName}`, () => {
       payload: {
         proposalContract: actionProposalsContractAddress,
         action: sendMessageActionContractAddress,
-        parameters: cvToValue(Cl.buffer(Cl.serialize(message))),
+        parameters: cvToValue(formatSerializedBuffer(message)),
         sender: deployer,
         caller: deployer,
       },
@@ -697,7 +698,7 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
-        Cl.buffer(Cl.serialize(message)),
+        formatSerializedBuffer(message),
         Cl.some(Cl.stringAscii("Test memo")),
       ],
       deployer
@@ -751,7 +752,7 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
-        Cl.buffer(Cl.serialize(message)),
+        formatSerializedBuffer(message),
         Cl.some(Cl.stringAscii("Test memo")),
       ],
       deployer
@@ -803,7 +804,7 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
-        Cl.buffer(Cl.serialize(message)),
+        formatSerializedBuffer(message),
         Cl.some(Cl.stringAscii("Test memo")),
       ],
       deployer
@@ -871,7 +872,7 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
-        Cl.buffer(Cl.serialize(message)),
+        formatSerializedBuffer(message),
         Cl.some(Cl.stringAscii("Test memo")),
       ],
       deployer
@@ -938,7 +939,7 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
-        Cl.buffer(Cl.serialize(message)),
+        formatSerializedBuffer(message),
         Cl.some(Cl.stringAscii("Test memo")),
       ],
       deployer
@@ -1658,7 +1659,7 @@ describe(`read-only functions: ${contractName}`, () => {
     }
 
     // Convert the TupleCV to a plain object
-    const configTuple = config.data;
+    const configTuple = config.value;
     const configData = Object.fromEntries(
       Object.entries(configTuple).map(
         ([key, value]: [string, ClarityValue]) => [key, cvToValue(value, true)]
@@ -1713,7 +1714,7 @@ describe(`read-only functions: ${contractName}`, () => {
       [
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
-        Cl.buffer(Cl.serialize(message)),
+        formatSerializedBuffer(message),
         Cl.some(Cl.stringAscii("Test memo")),
       ],
       deployer

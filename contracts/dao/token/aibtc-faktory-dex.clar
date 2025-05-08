@@ -196,7 +196,7 @@
         (print { 
             type: "faktory-dex-trait-v1-1", 
             dexContract: (as-contract tx-sender),
-            ammReceiver: 'ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1.xyk-core-v-1-2, ;; 'SM1793C4R5PZ4NS4VQ4WMP7SKKYVH8JZEWSZ9HCCR.xyk-core-v-1-2
+            ammReceiver: 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2, ;; 'SM1793C4R5PZ4NS4VQ4WMP7SKKYVH8JZEWSZ9HCCR.xyk-core-v-1-2
             poolName: .aibtc-bitflow-pool ;; 'SPV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RCJDC22.xyk-pool-stx-NAME-v1-1
        })
       (ok true))

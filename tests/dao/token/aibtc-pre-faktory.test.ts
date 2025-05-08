@@ -1,7 +1,7 @@
 import { Cl, ClarityType, cvToValue } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
-import { fundVoters } from "../../utilities/dao-helpers";
+import { getDaoTokens } from "../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -16,6 +16,8 @@ const address7 = accounts.get("wallet_7")!;
 const address8 = accounts.get("wallet_8")!;
 const address9 = accounts.get("wallet_9")!;
 const address10 = accounts.get("wallet_10")!;
+
+const satsAmount = 1000000; // 1 million satoshis
 
 // setup contract info for tests
 const registry = setupDaoContractRegistry();
@@ -32,7 +34,6 @@ const dexContractAddress = registry.getContractAddressByTypeAndSubtype(
   "TOKEN",
   "DEX"
 );
-const sbtcContract = "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token";
 
 // Error codes
 const ERR_NO_SEATS_LEFT = 301;
@@ -49,19 +50,13 @@ const ERR_NO_FEES_TO_DISTRIBUTE = 323;
 const ERR_COOLDOWN_ACTIVE = 324;
 const ERR_TOTAL_SEATS_ZERO = 325;
 
-// Helper function to get sBTC for testing
-function getSbtc(address: string) {
-  const receipt = simnet.callPublicFn(sbtcContract, "faucet", [], address);
-  return receipt;
-}
-
 // Helper function to buy seats for multiple users
 function buySeatsForUsers(userCount: number, seatsPerUser: number = 2) {
   const results = [];
 
   for (let i = 1; i <= userCount; i++) {
     const address = accounts.get(`wallet_${i}`)!;
-    getSbtc(address);
+    getDaoTokens(address, satsAmount);
 
     const result = simnet.callPublicFn(
       contractAddress,
@@ -81,17 +76,17 @@ function buyAllSeats() {
   // Buy 19 seats with 9 users (2 seats each, except the last one with 3)
   for (let i = 1; i <= 8; i++) {
     const address = accounts.get(`wallet_${i}`)!;
-    getSbtc(address);
+    getDaoTokens(address, satsAmount);
 
     simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(2)], address);
   }
 
   // Last user buys 3 seats to reach 19 total
-  getSbtc(address9);
+  getDaoTokens(address9, satsAmount);
   simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(3)], address9);
 
   // Final user buys the last seat to trigger distribution
-  getSbtc(address10);
+  getDaoTokens(address10, satsAmount);
   const finalResult = simnet.callPublicFn(
     contractAddress,
     "buy-up-to",
@@ -108,7 +103,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("buy-up-to() succeeds with valid parameters", () => {
     // arrange
-    getSbtc(address1);
+    getDaoTokens(address1, satsAmount);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -137,7 +132,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("buy-up-to() fails with invalid seat count", () => {
     // arrange
-    getSbtc(address2);
+    getDaoTokens(address2, satsAmount);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -153,7 +148,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("buy-up-to() updates total users and seats taken", () => {
     // arrange
-    getSbtc(address3);
+    getDaoTokens(address3, satsAmount);
 
     // Get initial values
     const initialStatus = simnet.callReadOnlyFn(
@@ -192,8 +187,8 @@ describe(`public functions: ${contractName}`, () => {
     expect(newStatus.result).toBeDefined();
     const newStatusData = cvToValue(newStatus.result);
 
-    expect(newStatusData["total-users"]).toEqual(initialUsers + 1n);
-    expect(newStatusData["total-seats-taken"]).toEqual(initialSeats + 3n);
+    expect(newStatusData["total-users"]).toEqual(initialUsers + 1);
+    expect(newStatusData["total-seats-taken"]).toEqual(initialSeats + 3);
   });
 
   ////////////////////////////////////////
@@ -201,7 +196,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("refund() succeeds for seat owner", () => {
     // arrange
-    getSbtc(address4);
+    getDaoTokens(address4, satsAmount);
 
     // First buy some seats
     simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(2)], address4);
@@ -253,7 +248,7 @@ describe(`public functions: ${contractName}`, () => {
   it("refund() fails for non-seat owner", () => {
     // arrange
     // Use an address that hasn't bought seats
-    getSbtc(address5);
+    getDaoTokens(address5, satsAmount);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -274,7 +269,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("claim() fails if distribution not initialized", () => {
     // arrange
-    getSbtc(address6);
+    getDaoTokens(address6, satsAmount);
 
     // Buy seats
     simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(2)], address6);
@@ -301,12 +296,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "claim",
-      [
-        Cl.contractPrincipal(
-          tokenContractAddress.split(".")[0],
-          tokenContractAddress.split(".")[1]
-        ),
-      ],
+      [Cl.principal(tokenContractAddress)],
       address6
     );
 
@@ -348,17 +338,12 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "claim",
-      [
-        Cl.contractPrincipal(
-          tokenContractAddress.split(".")[0],
-          tokenContractAddress.split(".")[1]
-        ),
-      ],
+      [Cl.principal(tokenContractAddress)],
       address1
     );
 
     // assert
-    expect(receipt.result).toBeOk(Cl.uint(receipt.result.value.value));
+    expect(receipt.result).toBeOk(Cl.uint(0));
 
     // Check that claimed amount was updated
     const userInfo = simnet.callReadOnlyFn(
@@ -378,12 +363,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("claim-on-behalf() succeeds for valid holder", () => {
     // arrange
-    // First ensure distribution is initialized
-    try {
-      buyAllSeats();
-    } catch (e) {
-      // Distribution might already be initialized
-    }
+    buyAllSeats();
 
     // Check if distribution is initialized
     const status = simnet.callReadOnlyFn(
@@ -394,10 +374,19 @@ describe(`public functions: ${contractName}`, () => {
     ).result;
 
     let distributionInitialized = false;
-    if (status.isOk) {
-      distributionInitialized =
-        status.value.data["distribution-height"].value > 0;
+
+    // verify we got an ok result
+    if (status.type !== ClarityType.ResponseOk) {
+      throw new Error("get-contract-status() failed when it shouldn't");
     }
+
+    // verify we got a tuple in ok result
+    if (status.value.type !== ClarityType.Tuple) {
+      throw new Error("get-contract-status() did not return a tuple");
+    }
+
+    const tupleData = cvToValue(status.value);
+    distributionInitialized = tupleData["distribution-height"].value > 0;
 
     // Skip test if distribution is not initialized
     if (!distributionInitialized) {
@@ -414,13 +403,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "claim-on-behalf",
-      [
-        Cl.contractPrincipal(
-          tokenContractAddress.split(".")[0],
-          tokenContractAddress.split(".")[1]
-        ),
-        Cl.principal(address2),
-      ],
+      [Cl.principal(tokenContractAddress), Cl.principal(address2)],
       address1
     );
 
@@ -446,11 +429,7 @@ describe(`public functions: ${contractName}`, () => {
   it("trigger-fee-airdrop() fails with no fees to distribute", () => {
     // arrange
     // Ensure distribution is initialized
-    try {
-      buyAllSeats();
-    } catch (e) {
-      // Distribution might already be initialized
-    }
+    buyAllSeats();
 
     // act
     const receipt = simnet.callPublicFn(
@@ -475,15 +454,15 @@ describe(`read-only functions: ${contractName}`, () => {
     const expectedStructure = {
       "is-period-1-expired": Cl.bool(false),
       "is-distribution-period": Cl.bool(false),
-      "total-users": expect.any(BigInt),
-      "total-seats-taken": expect.any(BigInt),
-      "deployment-height": expect.any(BigInt),
+      "total-users": Cl.uint(0),
+      "total-seats-taken": Cl.uint(0),
+      "deployment-height": Cl.uint(4),
       "expiration-period": Cl.uint(2100),
-      "distribution-height": expect.any(BigInt),
+      "distribution-height": Cl.uint(0),
       "accelerated-vesting": Cl.bool(false),
       "market-open": Cl.bool(false),
       "governance-active": Cl.bool(false),
-      "seat-holders": expect.any(Array)
+      "seat-holders": Cl.list([]),
     };
 
     // act
@@ -515,7 +494,7 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     // Ensure address1 has seats
     try {
-      getSbtc(address1);
+      getDaoTokens(address1, satsAmount);
       simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(1)], address1);
     } catch (e) {
       // Address might already have seats
@@ -523,9 +502,9 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // Define the expected structure
     const expectedStructure = {
-      "seats-owned": expect.any(BigInt),
-      "amount-claimed": expect.any(BigInt),
-      "claimable-amount": expect.any(BigInt)
+      "seats-owned": Cl.uint(1),
+      "amount-claimed": Cl.uint(0),
+      "claimable-amount": Cl.uint(0),
     };
 
     // act
@@ -557,7 +536,7 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     // Define the expected structure
     const expectedStructure = {
-      "remainin-seats": expect.any(BigInt)
+      "remainin-seats": Cl.uint(20),
     };
 
     // act
@@ -589,7 +568,7 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     // Ensure address1 has seats
     try {
-      getSbtc(address1);
+      getDaoTokens(address1, satsAmount);
       simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(1)], address1);
     } catch (e) {
       // Address might already have seats
@@ -597,7 +576,7 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // Define the expected structure
     const expectedStructure = {
-      "seats-owned": Cl.bool(true)
+      "seats-owned": Cl.bool(true),
     };
 
     // act
@@ -629,7 +608,7 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     // Define the expected structure
     const expectedStructure = {
-      "claimed-amount": expect.any(BigInt)
+      "claimed-amount": Cl.uint(0),
     };
 
     // act
@@ -681,17 +660,17 @@ describe(`read-only functions: ${contractName}`, () => {
     const vestingSchedule = result.value.value["vesting-schedule"];
     expect(vestingSchedule).toBeDefined();
     expect(vestingSchedule.type).toBe("list");
-    
+
     // Verify the list has entries
     expect(vestingSchedule.value.length).toBeGreaterThan(0);
-    
+
     // Check the structure of the first entry
     const firstEntry = vestingSchedule.value[0];
     expect(firstEntry.type).toBe("tuple");
     expect(firstEntry.value).toHaveProperty("height");
     expect(firstEntry.value).toHaveProperty("percent");
     expect(firstEntry.value).toHaveProperty("id");
-    
+
     // Verify the types of the properties
     expect(firstEntry.value.height.type).toBe("uint");
     expect(firstEntry.value.percent.type).toBe("uint");
@@ -705,9 +684,8 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     // Define the expected structure
     const expectedStructure = {
-      "seat-holders": expect.any(Array)
+      "seat-holders": Cl.list([]),
     };
-
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -821,7 +799,7 @@ describe(`read-only functions: ${contractName}`, () => {
   it("get-all-seat-holders() returns valid data", () => {
     // arrange
     // Define the expected structure
-    const expectedStructure = expect.any(Array);
+    const expectedStructure = Cl.list([]);
 
     // act
     const result = simnet.callReadOnlyFn(
@@ -845,7 +823,7 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-user-expected-share() returns valid data", () => {
     // arrange
-    getSbtc(address1);
+    getDaoTokens(address1, satsAmount);
     simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(1)], address1);
 
     // Define the expected structure
@@ -853,8 +831,8 @@ describe(`read-only functions: ${contractName}`, () => {
       user: Cl.principal(address1),
       "user-seats": Cl.uint(1n),
       "total-seats": Cl.uint(1),
-      "total-accumulated-fees": Cl.uint(0),
-      "expected-share": Cl.uint(0),
+      "total-accumulated-fees": Cl.uint(8000),
+      "expected-share": Cl.uint(8000),
     };
 
     // act

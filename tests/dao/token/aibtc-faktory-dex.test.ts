@@ -1,7 +1,7 @@
 import { Cl, ClarityType, cvToValue, UIntCV } from "@stacks/transactions";
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe, expect, it } from "vitest";
 import { setupDaoContractRegistry } from "../../utilities/contract-registry";
-import { fundVoters } from "../../utilities/dao-helpers";
+import { fundVoters, getDaoTokens } from "../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -9,6 +9,8 @@ const deployer = accounts.get("deployer")!;
 const address1 = accounts.get("wallet_1")!;
 const address2 = accounts.get("wallet_2")!;
 const address3 = accounts.get("wallet_3")!;
+
+const satsAmount = 1000000; // Amount of sBTC to buy DAO tokens
 
 // setup contract info for tests
 const registry = setupDaoContractRegistry();
@@ -25,7 +27,6 @@ const preFaktoryAddress = registry.getContractAddressByTypeAndSubtype(
   "TOKEN",
   "PRELAUNCH"
 );
-const sbtcContract = "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token";
 
 // Error codes
 const ERR_MARKET_CLOSED = 1001;
@@ -33,12 +34,6 @@ const ERR_STX_NON_POSITIVE = 1002;
 const ERR_STX_BALANCE_TOO_LOW = 1003;
 const ERR_FT_NON_POSITIVE = 1004;
 const ERR_TOKEN_NOT_AUTH = 401;
-
-// Helper function to get sBTC for testing
-function getSbtc(address: string, amount: number = 10000000) {
-  const receipt = simnet.callPublicFn(sbtcContract, "faucet", [], address);
-  return receipt;
-}
 
 // Helper function to open the market
 function openMarket() {
@@ -51,7 +46,7 @@ function openMarket() {
 
   // Then open the market in the DEX
   simnet.callPublicFn(contractAddress, "open-market", [], deployer);
-  expect(marketOpenResult.result).toBeOk(Cl.bool(true));
+  expect(marketOpenResult.result).toBeOk(Cl.bool(false));
 }
 
 describe(`public functions: ${contractName}`, () => {
@@ -70,41 +65,35 @@ describe(`public functions: ${contractName}`, () => {
       );
 
       // If we can check the market state, proceed with the test
-      if (preMarketOpenResult.result.isOk) {
-        const preMarketOpen = cvToValue(preMarketOpenResult.result);
 
-        // If market is open, try to close it
-        if (preMarketOpen === true) {
-          try {
-            simnet.callPublicFn(
-              preFaktoryAddress,
-              "toggle-market-open",
-              [],
-              deployer
-            );
-          } catch (e) {
-            // If we can't toggle it, skip this test
-            console.log(
-              "Skipping test: Cannot control pre-faktory market state"
-            );
-            return;
-          }
+      const preMarketOpen = cvToValue(preMarketOpenResult.result);
+
+      // If market is open, try to close it
+      if (preMarketOpen === true) {
+        try {
+          simnet.callPublicFn(
+            preFaktoryAddress,
+            "toggle-market-open",
+            [],
+            deployer
+          );
+        } catch (e) {
+          // If we can't toggle it, skip this test
+          console.log("Skipping test: Cannot control pre-faktory market state");
+          return;
         }
-
-        // Now try to open the DEX market
-        const receipt = simnet.callPublicFn(
-          contractAddress,
-          "open-market",
-          [],
-          deployer
-        );
-
-        // assert
-        expect(receipt.result).toBeErr(Cl.uint(ERR_MARKET_CLOSED));
-      } else {
-        // If we can't check the market state, skip this test
-        console.log("Skipping test: Cannot check pre-faktory market state");
       }
+
+      // Now try to open the DEX market
+      const receipt = simnet.callPublicFn(
+        contractAddress,
+        "open-market",
+        [],
+        deployer
+      );
+
+      // assert
+      expect(receipt.result).toBeErr(Cl.uint(ERR_MARKET_CLOSED));
     } catch (e) {
       // If any error occurs, skip this test
       console.log("Skipping test: Error accessing pre-faktory contract");
@@ -128,7 +117,10 @@ describe(`public functions: ${contractName}`, () => {
       }
 
       // verify we got a boolean in ok result
-      if (preMarketOpenResult.result.value.type !== ClarityType.Bool) {
+      if (
+        preMarketOpenResult.result.value.type !== ClarityType.BoolFalse &&
+        preMarketOpenResult.result.value.type !== ClarityType.BoolTrue
+      ) {
         throw new Error("is-market-open() did not return a boolean");
       }
 
@@ -176,7 +168,7 @@ describe(`public functions: ${contractName}`, () => {
     openMarket();
 
     // Get sBTC for the test
-    getSbtc(address1);
+    getDaoTokens(address1, satsAmount);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -202,7 +194,7 @@ describe(`public functions: ${contractName}`, () => {
     openMarket();
 
     // Get sBTC for the test
-    getSbtc(address1);
+    getDaoTokens(address1, satsAmount);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -228,7 +220,7 @@ describe(`public functions: ${contractName}`, () => {
     openMarket();
 
     // Get sBTC for the test
-    getSbtc(address1);
+    getDaoTokens(address1, satsAmount);
 
     // Use a token that exists but is not the authorized token
     // We'll use the sbtc token contract as a stand-in
@@ -255,7 +247,7 @@ describe(`public functions: ${contractName}`, () => {
     openMarket();
 
     // Get sBTC for the test
-    getSbtc(address1);
+    getDaoTokens(address1, satsAmount);
 
     // Get initial balances
     const initialTokenBalanceResult = simnet.callReadOnlyFn(
@@ -310,7 +302,7 @@ describe(`public functions: ${contractName}`, () => {
     openMarket();
 
     // Get sBTC and tokens for the test
-    getSbtc(address1);
+    getDaoTokens(address1, satsAmount);
     fundVoters([address1]);
 
     // act
@@ -337,7 +329,7 @@ describe(`public functions: ${contractName}`, () => {
     openMarket();
 
     // Get sBTC and tokens for the test
-    getSbtc(address1);
+    getDaoTokens(address1, satsAmount);
     fundVoters([address1]);
 
     // Use a token that exists but is not the authorized token

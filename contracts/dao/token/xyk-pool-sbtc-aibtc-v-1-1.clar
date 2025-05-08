@@ -19,7 +19,7 @@
 (define-constant ERR_NOT_POOL_CONTRACT_DEPLOYER (err u3006))
 
 ;; XYK Core address and contract deployer address
-(define-constant CORE_ADDRESS 'ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1.xyk-core-v-1-2) ;; <%= it.bitflow_xyk_core_address %>
+(define-constant CORE_ADDRESS 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2) ;; <%= it.bitflow_xyk_core_address %>
 (define-constant CONTRACT_DEPLOYER .aibtc-faktory-dex) ;; <%= it.dex_contract %>
 
 ;; Define all pool data vars
