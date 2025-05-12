@@ -21,35 +21,44 @@ export function processContractTemplate(
     const currentLine = lines[i];
 
     // Check if the current line contains the special format indicator: ;; /g/KEY/value
-    const match = currentLine.match(/;;\s*\/g\/([^\/]+)\/([^\/]+)/);
-    if (match && i < lines.length - 1) {
-      const [_, replacementKey, valueKey] = match;
-      const nextLine = lines[i + 1];
+    const matches = Array.from(currentLine.matchAll(/;;\s*\/g\/([^\/]+)\/([^\/]+)/g));
+    
+    if (matches.length > 0 && i < lines.length - 1) {
+      // We found at least one replacement pattern
+      let nextLine = lines[i + 1];
+      let replacementMade = false;
 
-      const replacementMapKey = `${replacementKey}/${valueKey}`;
-      if (replacements.has(replacementMapKey)) {
-        const originalLine = nextLine;
-        const replacedLine = nextLine.replace(
-          replacementKey,
-          replacements.get(replacementMapKey)!
-        );
+      // Process all matches in the comment line
+      for (const match of matches) {
+        const replacementKey = match[1];
+        const valueKey = match[2];
+        const replacementMapKey = `${replacementKey}/${valueKey}`;
+        
+        if (replacements.has(replacementMapKey)) {
+          const originalLine = nextLine;
+          nextLine = nextLine.replace(
+            replacementKey,
+            replacements.get(replacementMapKey)!
+          );
+          replacementMade = true;
 
+          // Debug log the replacement
+          dbgLog(
+            {
+              action: "template_replacement",
+              key: replacementMapKey,
+              originalLine,
+              replacedLine: nextLine,
+            },
+            { titleBefore: "Template Replacement" }
+          );
+        }
+      }
+
+      if (replacementMade) {
         // Skip adding the comment line to processed lines (strip it out)
-
         // Add the replaced line
-        processedLines.push(replacedLine);
-
-        // Debug log the replacement
-        dbgLog(
-          {
-            action: "template_replacement",
-            key: replacementMapKey,
-            originalLine,
-            replacedLine,
-          },
-          { titleBefore: "Template Replacement" }
-        );
-
+        processedLines.push(nextLine);
         i++; // Skip the next line since we've processed it
       } else {
         // If no replacement found, keep the original line
