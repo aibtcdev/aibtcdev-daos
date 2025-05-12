@@ -7,3 +7,5 @@ declare namespace Cloudflare {
 }
 
 interface CloudflareBindings extends Cloudflare.Env {}
+
+export { CloudflareBindings, Cloudflare };
