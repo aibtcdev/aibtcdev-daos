@@ -18,5 +18,10 @@ export default defineConfig(({ command, isSsrBuild }) => {
         entryContentDefaultExportHook: () => "",
       }),
     ],
+    build: {
+      rollupOptions: {
+        external: ["cloudflare:workers"]
+      }
+    }
   };
 });
