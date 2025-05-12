@@ -129,7 +129,7 @@ export function createApiRouter(registry: ContractRegistry) {
 
     const contract = registry.getContractByTypeAndSubtype(
       type as ContractType,
-      subtype as ContractSubtype<typeof type>
+      subtype as ContractSubtype<ContractType>
     );
 
     if (!contract) {
@@ -169,7 +169,7 @@ export function createApiRouter(registry: ContractRegistry) {
       dependencies: {
         addresses: contract.requiredAddresses,
         traits: contract.requiredTraits,
-        contracts: contract.requiredContracts,
+        contracts: contract.requiredContractAddresses,
         runtimeValues: contract.requiredRuntimeValues,
       },
     });
