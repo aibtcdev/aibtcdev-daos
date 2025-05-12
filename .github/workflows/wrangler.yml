@@ -36,7 +36,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           environment: ${{ env.WRANGLER_ENV }}
-          wranglerVersion: "4.x"
+          wranglerVersion: "4.14.4"
 
       - name: Set Test URL for Preview
         if: github.event_name == 'pull_request'
