@@ -3,6 +3,11 @@ import {
   processContractTemplate,
   createReplacementsMap,
 } from "../../utilities/template-processor";
+import {
+  agentAccountTemplate,
+  initializeDaoTemplate,
+  tokenOwnerTemplate
+} from "./test-contract-templates";
 
 describe("Template Processor", () => {
   it("should process template and replace values", () => {
@@ -73,5 +78,107 @@ describe("Template Processor", () => {
 
     // The value should not be replaced
     expect(processed).toContain("(define-constant SOME_CONSTANT 'UNKNOWN_KEY)");
+  });
+
+  it("should process agent account contract template", () => {
+    const replacements = createReplacementsMap({
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/account_owner": "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
+      "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG/account_agent": "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
+      ".aibtc-faktory/dao_token_contract": ".test-token-contract",
+      ".aibtc-faktory-dex/dao_token_dex_contract": ".test-dex-contract",
+      "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_contract": "'ST000000000000000000002AMW42H.sbtc-token"
+    });
+
+    const processed = processContractTemplate(agentAccountTemplate, replacements);
+
+    // Check that the replacements were made
+    expect(processed).toContain("(define-constant ACCOUNT_OWNER 'ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP)");
+    expect(processed).toContain("(define-constant ACCOUNT_AGENT 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5)");
+    expect(processed).toContain("(define-constant DAO_TOKEN .test-token-contract)");
+    expect(processed).toContain("(define-constant DAO_TOKEN_DEX .test-dex-contract)");
+    expect(processed).toContain("(define-constant SBTC_TOKEN 'ST000000000000000000002AMW42H.sbtc-token)");
+  });
+
+  it("should process DAO initialize proposal template", () => {
+    const replacements = createReplacementsMap({
+      "dao mission goes here/dao_manifest": "The mission of this DAO is to test template processing",
+      ".aibtc-faktory/dao_token_contract": ".test-token-contract",
+      ".aibtc-base-dao/dao_base_contract": ".test-base-dao",
+      ".aibtc-action-proposal-voting/dao_action_proposal_voting_contract": ".test-proposal-voting",
+      ".aibtc-dao-charter/dao_charter_contract": ".test-dao-charter",
+      ".aibtc-dao-epoch/dao_epoch_contract": ".test-dao-epoch",
+      ".aibtc-dao-users/dao_users_contract": ".test-dao-users",
+      ".aibtc-onchain-messaging/dao_messaging_contract": ".test-messaging",
+      ".aibtc-token-owner/dao_token_owner_contract": ".test-token-owner",
+      ".aibtc-treasury/dao_treasury_contract": ".test-treasury",
+      ".aibtc-action-send-message/dao_action_send_message_contract": ".test-send-message",
+      "aibtc/dao_token_symbol": "TEST"
+    });
+
+    const processed = processContractTemplate(initializeDaoTemplate, replacements);
+
+    // Check that the replacements were made
+    expect(processed).toContain('(define-constant CFG_DAO_MANIFEST_TEXT "The mission of this DAO is to test template processing")');
+    expect(processed).toContain("(define-constant CFG_DAO_TOKEN .test-token-contract)");
+    expect(processed).toContain("(try! (contract-call? .test-base-dao set-extensions");
+    expect(processed).toContain("{extension: .test-proposal-voting, enabled: true}");
+    expect(processed).toContain("{extension: .test-dao-charter, enabled: true}");
+    expect(processed).toContain("notification: \"TEST-base-dao/execute\"");
+  });
+
+  it("should process token owner template", () => {
+    const replacements = createReplacementsMap({
+      ".aibtc-dao-traits.extension/dao_extension_trait": ".test-traits.extension",
+      ".aibtc-dao-traits.token-owner/dao_token_owner_trait": ".test-traits.token-owner",
+      ".aibtc-faktory/dao_token_contract": ".test-token-contract",
+      ".aibtc-base-dao/dao_base_contract": ".test-base-dao",
+      "aibtc/dao_token_symbol": "TEST"
+    });
+
+    const processed = processContractTemplate(tokenOwnerTemplate, replacements);
+
+    // Check that the replacements were made
+    expect(processed).toContain("(impl-trait .test-traits.extension)");
+    expect(processed).toContain("(impl-trait .test-traits.token-owner)");
+    expect(processed).toContain("(try! (as-contract (contract-call? .test-token-contract set-token-uri value)))");
+    expect(processed).toContain("(try! (as-contract (contract-call? .test-token-contract set-contract-owner new-owner)))");
+    expect(processed).toContain("notification: \"TEST-token-owner/set-token-uri\"");
+    expect(processed).toContain("(ok (asserts! (or (is-eq tx-sender .test-base-dao)");
+    expect(processed).toContain("(contract-call? .test-base-dao is-extension contract-caller))");
+  });
+
+  it("should handle multiple replacements in the same line", () => {
+    const template = `
+;; /g/TOKEN_NAME/token_name /g/TOKEN_SYMBOL/token_symbol
+(define-constant TOKEN_INFO {name: "TOKEN_NAME", symbol: "TOKEN_SYMBOL"})
+`;
+
+    const replacements = createReplacementsMap({
+      "TOKEN_NAME/token_name": "Test Token",
+      "TOKEN_SYMBOL/token_symbol": "TEST",
+    });
+
+    const processed = processContractTemplate(template, replacements);
+
+    // Check that both replacements were made
+    expect(processed).toContain('(define-constant TOKEN_INFO {name: "Test Token", symbol: "TEST"})');
+    expect(processed).not.toContain("TOKEN_NAME");
+    expect(processed).not.toContain("TOKEN_SYMBOL");
+  });
+
+  it("should handle replacements with special characters", () => {
+    const template = `
+;; /g/TOKEN_URI/token_uri
+(define-data-var token-uri (optional (string-utf8 256)) (some u"TOKEN_URI"))
+`;
+
+    const replacements = createReplacementsMap({
+      "TOKEN_URI/token_uri": "https://example.com/token.json?id=123&type=nft",
+    });
+
+    const processed = processContractTemplate(template, replacements);
+
+    // Check that the replacement with special characters was made correctly
+    expect(processed).toContain('(define-data-var token-uri (optional (string-utf8 256)) (some u"https://example.com/token.json?id=123&type=nft"))');
   });
 });
