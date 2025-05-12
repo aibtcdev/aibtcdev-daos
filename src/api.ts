@@ -31,17 +31,17 @@ export function createApiRouter(registry: ContractRegistry) {
   // Get all contracts in the registry
   api.get("/contracts", (c) => {
     const contracts = registry.getAllContracts();
-    const contractData = contracts.map(contract => ({
+    const contractData = contracts.map((contract) => ({
       name: contract.name,
       type: contract.type,
       subtype: contract.subtype,
       deploymentOrder: contract.deploymentOrder,
       isDeployed: contract.isDeployed,
     }));
-    
+
     return c.json({
       success: true,
-      contracts: contractData
+      contracts: contractData,
     });
   });
 
@@ -75,22 +75,22 @@ export function createApiRouter(registry: ContractRegistry) {
   // Get contracts by type
   api.get("/by-type/:type", (c) => {
     const { type } = c.req.param();
-    
+
     if (!CONTRACT_TYPES.includes(type as ContractType)) {
       return c.json({ error: `Invalid contract type: ${type}` }, 400);
     }
-    
+
     const contracts = registry.getContractsByType(type as ContractType);
-    
+
     return c.json({
       success: true,
       type,
-      contracts: contracts.map(contract => ({
+      contracts: contracts.map((contract) => ({
         name: contract.name,
         subtype: contract.subtype,
         deploymentOrder: contract.deploymentOrder,
-        isDeployed: contract.isDeployed
-      }))
+        isDeployed: contract.isDeployed,
+      })),
     });
   });
 
@@ -98,11 +98,11 @@ export function createApiRouter(registry: ContractRegistry) {
   api.get("/contract/:name", (c) => {
     const { name } = c.req.param();
     const contract = registry.getContract(name);
-    
+
     if (!contract) {
       return c.json({ error: `Contract not found: ${name}` }, 404);
     }
-    
+
     return c.json({
       success: true,
       contract: {
@@ -114,30 +114,33 @@ export function createApiRouter(registry: ContractRegistry) {
         isDeployed: contract.isDeployed,
         source: contract.source,
         hash: contract.hash,
-        deploymentResult: contract.deploymentResult
-      }
+        deploymentResult: contract.deploymentResult,
+      },
     });
   });
 
   // Get contract by type and subtype
   api.get("/by-type-subtype/:type/:subtype", (c) => {
     const { type, subtype } = c.req.param();
-    
+
     if (!CONTRACT_TYPES.includes(type as ContractType)) {
       return c.json({ error: `Invalid contract type: ${type}` }, 400);
     }
-    
+
     const contract = registry.getContractByTypeAndSubtype(
       type as ContractType,
       subtype as ContractSubtype<typeof type>
     );
-    
+
     if (!contract) {
-      return c.json({ 
-        error: `No contract found for type: ${type}, subtype: ${subtype}` 
-      }, 404);
+      return c.json(
+        {
+          error: `No contract found for type: ${type}, subtype: ${subtype}`,
+        },
+        404
+      );
     }
-    
+
     return c.json({
       success: true,
       contract: {
@@ -146,8 +149,8 @@ export function createApiRouter(registry: ContractRegistry) {
         subtype: contract.subtype,
         templatePath: contract.templatePath,
         deploymentOrder: contract.deploymentOrder,
-        isDeployed: contract.isDeployed
-      }
+        isDeployed: contract.isDeployed,
+      },
     });
   });
 
@@ -155,11 +158,11 @@ export function createApiRouter(registry: ContractRegistry) {
   api.get("/dependencies/:name", (c) => {
     const { name } = c.req.param();
     const contract = registry.getContract(name);
-    
+
     if (!contract) {
       return c.json({ error: `Contract not found: ${name}` }, 404);
     }
-    
+
     return c.json({
       success: true,
       name: contract.name,
@@ -167,8 +170,8 @@ export function createApiRouter(registry: ContractRegistry) {
         addresses: contract.requiredAddresses,
         traits: contract.requiredTraits,
         contracts: contract.requiredContracts,
-        runtimeValues: contract.requiredRuntimeValues
-      }
+        runtimeValues: contract.requiredRuntimeValues,
+      },
     });
   });
 
@@ -179,19 +182,13 @@ export function createApiRouter(registry: ContractRegistry) {
       const { name, replacements } = body;
 
       if (!name) {
-        return c.json(
-          { error: "Missing required parameter: name" },
-          400
-        );
+        return c.json({ error: "Missing required parameter: name" }, 400);
       }
 
       const contract = registry.getContract(name);
 
       if (!contract) {
-        return c.json(
-          { error: `Contract not found: ${name}` },
-          404
-        );
+        return c.json({ error: `Contract not found: ${name}` }, 404);
       }
 
       // Read the contract template content
@@ -218,7 +215,10 @@ export function createApiRouter(registry: ContractRegistry) {
         },
       });
     } catch (error) {
-      return c.json({ error: `Error processing request: ${error.message}` }, 500);
+      return c.json(
+        { error: `Error processing request: ${error.message}` },
+        500
+      );
     }
   });
 
