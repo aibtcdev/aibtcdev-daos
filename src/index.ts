@@ -37,6 +37,32 @@ app.get("/api/contract-types", (c) => {
   });
 });
 
+// Get all available contract subtypes for a specific type
+app.get("/api/contract-subtypes/:type", (c) => {
+  const { type } = c.req.param();
+  const subtypes = CONTRACT_SUBTYPES[type as ContractType];
+  if (!subtypes) {
+    return c.json(
+      { error: `No subtypes found for contract type: ${type}` },
+      404
+    );
+  }
+  return c.json({
+    success: true,
+    type,
+    subtypes: Object.values(subtypes),
+  });
+});
+
+// Get all available contract names
+app.get("/api/contract-names", (c) => {
+  const contractNames = registry.getAllContractNames();
+  return c.json({
+    success: true,
+    contractNames,
+  });
+});
+
 // Process a contract template with replacements
 app.post("/api/contract-template", async (c) => {
   try {
