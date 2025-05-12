@@ -1,7 +1,7 @@
 import { Cl, ClarityType, cvToValue, UIntCV } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
-import { setupDaoContractRegistry } from "../../utilities/contract-registry";
-import { getDaoTokens } from "../../utilities/dao-helpers";
+import { setupDaoContractRegistry } from "../../../utilities/contract-registry";
+import { getDaoTokens } from "../../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -707,12 +707,19 @@ describe(`read-only functions: ${contractName}`, () => {
     expect(vestingSchedule).toBeDefined();
     expect(vestingSchedule.type).toBe("list");
 
+    if (vestingSchedule.type !== ClarityType.List) {
+      throw new Error("vesting-schedule is not a list");
+    }
+
     // Verify the list has entries
     expect(vestingSchedule.value.length).toBeGreaterThan(0);
 
     // Check the structure of the first entry
     const firstEntry = vestingSchedule.value[0];
     expect(firstEntry.type).toBe("tuple");
+    if (firstEntry.type !== ClarityType.Tuple) {
+      throw new Error("first entry in vesting-schedule is not a tuple");
+    }
     expect(firstEntry.value).toHaveProperty("height");
     expect(firstEntry.value).toHaveProperty("percent");
     expect(firstEntry.value).toHaveProperty("id");

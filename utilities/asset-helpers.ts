@@ -1,5 +1,5 @@
 import { dbgLog, DbgLogParams } from "./debug-logging";
-
+import { simnet } from "./simnet";
 /**
  *
  * Prints the contents of the assets map to the console.

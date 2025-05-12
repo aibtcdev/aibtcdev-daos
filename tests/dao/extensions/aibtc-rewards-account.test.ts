@@ -1,8 +1,7 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
-import { ErrCodeRewardsAccount } from "../../utilities/contract-error-codes";
-import { setupDaoContractRegistry } from "../../utilities/contract-registry";
-import { constructDao } from "../../utilities/dao-helpers";
+import { ErrCodeRewardsAccount } from "../../../utilities/contract-error-codes";
+import { setupDaoContractRegistry } from "../../../utilities/contract-registry";
 
 // setup accounts
 const accounts = simnet.getAccounts();
