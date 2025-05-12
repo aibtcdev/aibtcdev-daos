@@ -11,9 +11,11 @@ import { getContractTemplateContent } from "../utilities/template-processor";
 import { ApiError } from "./utils/api-error";
 import { ErrorCode } from "./utils/error-catalog";
 import { handleRequest } from "./utils/request-handler";
+import { ContractGeneratorService } from "./services/contract-generator";
 
 export function createApiRouter(registry: ContractRegistry) {
   const api = new Hono<{ Bindings: CloudflareBindings }>();
+  const generatorService = new ContractGeneratorService();
 
   // Get all contract types and their subtypes
   api.get("/types", (c) => {
@@ -217,6 +219,37 @@ export function createApiRouter(registry: ContractRegistry) {
         });
       }
     }, { path: "/process-template", method: "POST" });
+  });
+
+  // Generate contract from template
+  api.post("/generate-contract", async (c) => {
+    return handleRequest(c, async () => {
+      const body = await c.req.json();
+      const { contractName, replacements } = body;
+      
+      if (!contractName) {
+        throw new ApiError(ErrorCode.INVALID_REQUEST, { reason: "Missing required parameter: contractName" });
+      }
+      
+      const contract = registry.getContract(contractName);
+      if (!contract) {
+        throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, { name: contractName });
+      }
+      
+      const generatedContract = await generatorService.generateContract(
+        contract,
+        replacements || {}
+      );
+      
+      return { 
+        contract: {
+          name: contract.name,
+          type: contract.type,
+          subtype: contract.subtype,
+          content: generatedContract
+        }
+      };
+    }, { path: "/generate-contract", method: "POST" });
   });
 
   return api;
