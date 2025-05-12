@@ -5,7 +5,7 @@ import path from "path";
 /**
  * Processes a contract template line by line and performs replacements
  * when specially formatted strings are encountered
- * 
+ *
  * Format: ;; /g/KEY/value
  * The line following this comment will have KEY replaced with the value from the replacements map
  * The comment line itself will be stripped from the output
@@ -14,36 +14,42 @@ export function processContractTemplate(
   templateContent: string,
   replacements: Map<string, string>
 ): string {
-  const lines = templateContent.split('\n');
+  const lines = templateContent.split("\n");
   const processedLines: string[] = [];
-  
+
   for (let i = 0; i < lines.length; i++) {
     const currentLine = lines[i];
-    
+
     // Check if the current line contains the special format indicator: ;; /g/KEY/value
     const match = currentLine.match(/;;\s*\/g\/([^\/]+)\/([^\/]+)/);
     if (match && i < lines.length - 1) {
       const [_, replacementKey, valueKey] = match;
       const nextLine = lines[i + 1];
-      
+
       const replacementMapKey = `${replacementKey}/${valueKey}`;
       if (replacements.has(replacementMapKey)) {
         const originalLine = nextLine;
-        const replacedLine = nextLine.replace(replacementKey, replacements.get(replacementMapKey)!);
-        
+        const replacedLine = nextLine.replace(
+          replacementKey,
+          replacements.get(replacementMapKey)!
+        );
+
         // Skip adding the comment line to processed lines (strip it out)
-        
+
         // Add the replaced line
         processedLines.push(replacedLine);
-        
+
         // Debug log the replacement
-        dbgLog({
-          action: "template_replacement",
-          key: replacementMapKey,
-          originalLine,
-          replacedLine
-        }, { titleBefore: "Template Replacement" });
-        
+        dbgLog(
+          {
+            action: "template_replacement",
+            key: replacementMapKey,
+            originalLine,
+            replacedLine,
+          },
+          { titleBefore: "Template Replacement" }
+        );
+
         i++; // Skip the next line since we've processed it
       } else {
         // If no replacement found, keep the original line
@@ -54,8 +60,8 @@ export function processContractTemplate(
       processedLines.push(currentLine);
     }
   }
-  
-  return processedLines.join('\n');
+
+  return processedLines.join("\n");
 }
 
 /**
@@ -70,15 +76,21 @@ export function createReplacementsMap(
 /**
  * Helper function to get template content from the contracts directory
  */
-export async function getContractTemplateContent(contract: any): Promise<string | null> {
+export async function getContractTemplateContent(
+  contract: any
+): Promise<string | null> {
   try {
     // Construct the path to the contract file
-    const contractPath = path.join('contracts', contract.templatePath);
+    const contractPath = path.join("contracts", contract.templatePath);
     // Read the file content
-    const content = await fs.promises.readFile(contractPath, 'utf-8');
+    const content = await fs.promises.readFile(contractPath, "utf-8");
     return content;
   } catch (error) {
-    console.error(`Error reading contract template: ${error.message}`);
+    console.error(
+      `Error reading contract template: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
     return null;
   }
 }
