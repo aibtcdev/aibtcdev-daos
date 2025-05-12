@@ -24,10 +24,10 @@ jobs:
             echo "WRANGLER_ENV=preview" >> $GITHUB_ENV
           elif [[ ${{ github.ref }} == 'refs/heads/staging' ]]; then
             echo "WRANGLER_ENV=staging" >> $GITHUB_ENV
-            echo "TEST_URL=https://cache-staging.aibtc.dev" >> $GITHUB_ENV
+            echo "TEST_URL=https://daos-staging.aibtc.dev" >> $GITHUB_ENV
           else
             echo "WRANGLER_ENV=production" >> $GITHUB_ENV
-            echo "TEST_URL=https://cache.aibtc.dev" >> $GITHUB_ENV
+            echo "TEST_URL=https://daos.aibtc.dev" >> $GITHUB_ENV
           fi
 
       - name: Deploy with Wrangler
