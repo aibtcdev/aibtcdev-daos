@@ -1,9 +1,9 @@
-import { Hono } from 'hono';
+import { Hono } from "hono";
 
 const app = new Hono();
 
-app.get('/', (c) => {
-  return c.text('Hello, AI-powered Bitcoin DAOs!');
+app.get("/", (c) => {
+  return c.text("AI-powered Bitcoin DAOs");
 });
 
 export default app;
