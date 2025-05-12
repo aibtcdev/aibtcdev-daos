@@ -1,6 +1,9 @@
 import { ContractBase } from "../../models/contract-template";
 import { getContractTemplateContent } from "../../utilities/template-processor";
-import { processContractTemplate, createReplacementsMap } from "../../utilities/template-processor";
+import {
+  processContractTemplate,
+  createReplacementsMap,
+} from "../../utilities/template-processor";
 
 export class ContractGeneratorService {
   /**
@@ -12,7 +15,12 @@ export class ContractGeneratorService {
   ): Promise<string> {
     // Get the template content
     const templateContent = await getContractTemplateContent(contract);
-    
+
+    // Check if the template content is empty
+    if (!templateContent) {
+      throw new Error(`Template content for ${contract} is empty`);
+    }
+
     // Process the template with replacements
     const replacementsMap = createReplacementsMap(replacements);
     return processContractTemplate(templateContent, replacementsMap);
