@@ -26,6 +26,7 @@ node_modules/
 **/settings/Testnet.toml
 .cache/**
 deployments/
+costs-reports.json
 
 # aider
 history.txt
