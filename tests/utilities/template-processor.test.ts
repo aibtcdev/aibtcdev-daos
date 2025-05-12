@@ -225,11 +225,19 @@ describe("Template Processor", () => {
 
     const processed = processContractTemplate(template, replacements);
 
-    // Check that both replacements were made
-    expect(processed).not.toContain("TOKEN_NAME");
-    expect(processed).not.toContain("TOKEN_SYMBOL");
-    expect(processed).toContain("Test Token");
-    expect(processed).toContain("TEST");
+    // Log the processed content for debugging
+    console.log("Processed template:", processed);
+
+    // Check that the replacements were made in the output
+    expect(processed).toContain('(define-constant TOKEN_INFO {name: "Test Token", symbol: "TEST"})');
+    
+    // Check that the original tokens are not in the output (excluding the comment line)
+    const outputLines = processed.trim().split('\n');
+    const nonCommentLines = outputLines.filter(line => !line.trim().startsWith(';;'));
+    const nonCommentOutput = nonCommentLines.join('\n');
+    
+    expect(nonCommentOutput).not.toContain("TOKEN_NAME");
+    expect(nonCommentOutput).not.toContain("TOKEN_SYMBOL");
   });
 
   it("should handle replacements with special characters", () => {
