@@ -44,7 +44,9 @@ jobs:
           PREVIEW_URL=$(echo "${{ steps.deploy.outputs.deployment-url }}" | sed 's/https:\/\///')
           echo "TEST_URL=https://$PREVIEW_URL" >> $GITHUB_ENV
 
-      - name: Test Endpoints (10s delay)
+      - name: Test Endpoints
         run: |
           chmod +x tests/check-endpoints.sh
+          chmod +x tests/run-endpoint-tests.sh
+          chmod +x tests/endpoints/*.sh
           ./tests/check-endpoints.sh ${{ env.TEST_URL }} true
