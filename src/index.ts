@@ -1,7 +1,12 @@
 import { Hono } from "hono";
 import { CloudflareBindings } from "./cf-types";
 import { setupFullContractRegistry } from "../utilities/contract-registry";
-import { ContractType, ContractSubtype, CONTRACT_TYPES, CONTRACT_SUBTYPES } from "../utilities/contract-types";
+import {
+  ContractType,
+  ContractSubtype,
+  CONTRACT_TYPES,
+  CONTRACT_SUBTYPES,
+} from "../utilities/contract-types";
 import { getContractTemplateContent } from "../utilities/template-processor";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
@@ -16,14 +21,16 @@ app.get("/", (c) => {
 // Get all available contract types and subtypes
 app.get("/api/contract-types", (c) => {
   const result: Record<string, string[]> = {};
-  
-  CONTRACT_TYPES.forEach(type => {
-    result[type] = CONTRACT_SUBTYPES[type];
+
+  CONTRACT_TYPES.forEach((type) => {
+    result[type] = CONTRACT_SUBTYPES[type]
+      ? Object.values(CONTRACT_SUBTYPES[type])
+      : [];
   });
-  
+
   return c.json({
     success: true,
-    types: result
+    types: result,
   });
 });
 
@@ -31,38 +38,44 @@ app.get("/api/contract-types", (c) => {
 app.post("/api/contract-template", async (c) => {
   try {
     const body = await c.req.json();
-    
+
     // Extract parameters from request body
     const { type, subtype, replacements } = body;
-    
+
     if (!type || !subtype) {
-      return c.json({ error: "Missing required parameters: type and subtype" }, 400);
+      return c.json(
+        { error: "Missing required parameters: type and subtype" },
+        400
+      );
     }
-    
+
     // Get the contract by type and subtype
     const contract = registry.getContractByTypeAndSubtype(
-      type as ContractType, 
+      type as ContractType,
       subtype as ContractSubtype<typeof type>
     );
-    
+
     if (!contract) {
-      return c.json({ error: `Contract not found for type: ${type}, subtype: ${subtype}` }, 404);
+      return c.json(
+        { error: `Contract not found for type: ${type}, subtype: ${subtype}` },
+        404
+      );
     }
-    
+
     // Read the contract template content from the contracts directory
     const templateContent = await getContractTemplateContent(contract);
-    
+
     if (!templateContent) {
       return c.json({ error: "Template content not available" }, 404);
     }
-    
+
     // Process the template with the provided replacements
     const processedContent = registry.processTemplate(
       contract,
       templateContent,
       replacements || {}
     );
-    
+
     // Return the processed template
     return c.json({
       success: true,
@@ -70,8 +83,8 @@ app.post("/api/contract-template", async (c) => {
         name: contract.name,
         type,
         subtype,
-        content: processedContent
-      }
+        content: processedContent,
+      },
     });
   } catch (error) {
     return c.json({ error: `Error processing request: ${error.message}` }, 500);
