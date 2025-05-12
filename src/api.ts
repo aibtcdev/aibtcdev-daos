@@ -8,218 +8,215 @@ import {
   CONTRACT_SUBTYPES,
 } from "../utilities/contract-types";
 import { getContractTemplateContent } from "../utilities/template-processor";
+import { ApiError } from "./utils/api-error";
+import { ErrorCode } from "./utils/error-catalog";
+import { handleRequest } from "./utils/request-handler";
 
 export function createApiRouter(registry: ContractRegistry) {
   const api = new Hono<{ Bindings: CloudflareBindings }>();
 
   // Get all contract types and their subtypes
   api.get("/types", (c) => {
-    const result: Record<string, string[]> = {};
+    return handleRequest(c, async () => {
+      const result: Record<string, string[]> = {};
 
-    CONTRACT_TYPES.forEach((type) => {
-      result[type] = CONTRACT_SUBTYPES[type]
-        ? Object.values(CONTRACT_SUBTYPES[type])
-        : [];
-    });
+      CONTRACT_TYPES.forEach((type) => {
+        result[type] = CONTRACT_SUBTYPES[type]
+          ? Object.values(CONTRACT_SUBTYPES[type])
+          : [];
+      });
 
-    return c.json({
-      success: true,
-      types: result,
-    });
+      return { types: result };
+    }, { path: "/types", method: "GET" });
   });
 
   // Get all contracts in the registry
   api.get("/contracts", (c) => {
-    const contracts = registry.getAllContracts();
-    const contractData = contracts.map((contract) => ({
-      name: contract.name,
-      type: contract.type,
-      subtype: contract.subtype,
-      deploymentOrder: contract.deploymentOrder,
-      isDeployed: contract.isDeployed,
-    }));
+    return handleRequest(c, async () => {
+      const contracts = registry.getAllContracts();
+      const contractData = contracts.map((contract) => ({
+        name: contract.name,
+        type: contract.type,
+        subtype: contract.subtype,
+        deploymentOrder: contract.deploymentOrder,
+        isDeployed: contract.isDeployed,
+      }));
 
-    return c.json({
-      success: true,
-      contracts: contractData,
-    });
+      return { contracts: contractData };
+    }, { path: "/contracts", method: "GET" });
   });
 
   // Get all contract names
   api.get("/names", (c) => {
-    const contractNames = registry.getAllContractNames();
-    return c.json({
-      success: true,
-      names: contractNames,
-    });
+    return handleRequest(c, async () => {
+      const contractNames = registry.getAllContractNames();
+      return { names: contractNames };
+    }, { path: "/names", method: "GET" });
   });
 
   // Get all available contract names (from CONTRACT_NAMES)
   api.get("/available-names", (c) => {
-    const availableNames = registry.getAllAvailableContractNames();
-    return c.json({
-      success: true,
-      names: availableNames,
-    });
+    return handleRequest(c, async () => {
+      const availableNames = registry.getAllAvailableContractNames();
+      return { names: availableNames };
+    }, { path: "/available-names", method: "GET" });
   });
 
   // Get all DAO contract names
   api.get("/dao-names", (c) => {
-    const daoNames = registry.getAllDaoContractNames();
-    return c.json({
-      success: true,
-      names: daoNames,
-    });
+    return handleRequest(c, async () => {
+      const daoNames = registry.getAllDaoContractNames();
+      return { names: daoNames };
+    }, { path: "/dao-names", method: "GET" });
   });
 
   // Get contracts by type
   api.get("/by-type/:type", (c) => {
-    const { type } = c.req.param();
+    return handleRequest(c, async () => {
+      const { type } = c.req.param();
 
-    if (!CONTRACT_TYPES.includes(type as ContractType)) {
-      return c.json({ error: `Invalid contract type: ${type}` }, 400);
-    }
+      if (!CONTRACT_TYPES.includes(type as ContractType)) {
+        throw new ApiError(ErrorCode.INVALID_CONTRACT_TYPE, { type });
+      }
 
-    const contracts = registry.getContractsByType(type as ContractType);
+      const contracts = registry.getContractsByType(type as ContractType);
 
-    return c.json({
-      success: true,
-      type,
-      contracts: contracts.map((contract) => ({
-        name: contract.name,
-        subtype: contract.subtype,
-        deploymentOrder: contract.deploymentOrder,
-        isDeployed: contract.isDeployed,
-      })),
-    });
+      return {
+        type,
+        contracts: contracts.map((contract) => ({
+          name: contract.name,
+          subtype: contract.subtype,
+          deploymentOrder: contract.deploymentOrder,
+          isDeployed: contract.isDeployed,
+        })),
+      };
+    }, { path: `/by-type/${c.req.param("type")}`, method: "GET" });
   });
 
   // Get contract by name
   api.get("/contract/:name", (c) => {
-    const { name } = c.req.param();
-    const contract = registry.getContract(name);
+    return handleRequest(c, async () => {
+      const { name } = c.req.param();
+      const contract = registry.getContract(name);
 
-    if (!contract) {
-      return c.json({ error: `Contract not found: ${name}` }, 404);
-    }
+      if (!contract) {
+        throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, { name });
+      }
 
-    return c.json({
-      success: true,
-      contract: {
-        name: contract.name,
-        type: contract.type,
-        subtype: contract.subtype,
-        templatePath: contract.templatePath,
-        deploymentOrder: contract.deploymentOrder,
-        isDeployed: contract.isDeployed,
-        source: contract.source,
-        hash: contract.hash,
-        deploymentResult: contract.deploymentResult,
-      },
-    });
+      return {
+        contract: {
+          name: contract.name,
+          type: contract.type,
+          subtype: contract.subtype,
+          templatePath: contract.templatePath,
+          deploymentOrder: contract.deploymentOrder,
+          isDeployed: contract.isDeployed,
+          source: contract.source,
+          hash: contract.hash,
+          deploymentResult: contract.deploymentResult,
+        },
+      };
+    }, { path: `/contract/${c.req.param("name")}`, method: "GET" });
   });
 
   // Get contract by type and subtype
   api.get("/by-type-subtype/:type/:subtype", (c) => {
-    const { type, subtype } = c.req.param();
+    return handleRequest(c, async () => {
+      const { type, subtype } = c.req.param();
 
-    if (!CONTRACT_TYPES.includes(type as ContractType)) {
-      return c.json({ error: `Invalid contract type: ${type}` }, 400);
-    }
+      if (!CONTRACT_TYPES.includes(type as ContractType)) {
+        throw new ApiError(ErrorCode.INVALID_CONTRACT_TYPE, { type });
+      }
 
-    const contract = registry.getContractByTypeAndSubtype(
-      type as ContractType,
-      subtype as ContractSubtype<ContractType>
-    );
-
-    if (!contract) {
-      return c.json(
-        {
-          error: `No contract found for type: ${type}, subtype: ${subtype}`,
-        },
-        404
+      const contract = registry.getContractByTypeAndSubtype(
+        type as ContractType,
+        subtype as ContractSubtype<ContractType>
       );
-    }
 
-    return c.json({
-      success: true,
-      contract: {
-        name: contract.name,
-        type: contract.type,
-        subtype: contract.subtype,
-        templatePath: contract.templatePath,
-        deploymentOrder: contract.deploymentOrder,
-        isDeployed: contract.isDeployed,
-      },
-    });
+      if (!contract) {
+        throw new ApiError(ErrorCode.INVALID_CONTRACT_SUBTYPE, { type, subtype });
+      }
+
+      return {
+        contract: {
+          name: contract.name,
+          type: contract.type,
+          subtype: contract.subtype,
+          templatePath: contract.templatePath,
+          deploymentOrder: contract.deploymentOrder,
+          isDeployed: contract.isDeployed,
+        },
+      };
+    }, { path: `/by-type-subtype/${c.req.param("type")}/${c.req.param("subtype")}`, method: "GET" });
   });
 
   // Get contract dependencies
   api.get("/dependencies/:name", (c) => {
-    const { name } = c.req.param();
-    const contract = registry.getContract(name);
+    return handleRequest(c, async () => {
+      const { name } = c.req.param();
+      const contract = registry.getContract(name);
 
-    if (!contract) {
-      return c.json({ error: `Contract not found: ${name}` }, 404);
-    }
+      if (!contract) {
+        throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, { name });
+      }
 
-    return c.json({
-      success: true,
-      name: contract.name,
-      dependencies: {
-        addresses: contract.requiredAddresses,
-        traits: contract.requiredTraits,
-        contracts: contract.requiredContractAddresses,
-        runtimeValues: contract.requiredRuntimeValues,
-      },
-    });
+      return {
+        name: contract.name,
+        dependencies: {
+          addresses: contract.requiredAddresses,
+          traits: contract.requiredTraits,
+          contracts: contract.requiredContractAddresses,
+          runtimeValues: contract.requiredRuntimeValues,
+        },
+      };
+    }, { path: `/dependencies/${c.req.param("name")}`, method: "GET" });
   });
 
   // Process a contract template with replacements
   api.post("/process-template", async (c) => {
-    try {
+    return handleRequest(c, async () => {
       const body = await c.req.json();
       const { name, replacements } = body;
 
       if (!name) {
-        return c.json({ error: "Missing required parameter: name" }, 400);
+        throw new ApiError(ErrorCode.INVALID_REQUEST, { reason: "Missing required parameter: name" });
       }
 
       const contract = registry.getContract(name);
 
       if (!contract) {
-        return c.json({ error: `Contract not found: ${name}` }, 404);
+        throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, { name });
       }
 
       // Read the contract template content
       const templateContent = await getContractTemplateContent(contract);
 
       if (!templateContent) {
-        return c.json({ error: "Template content not available" }, 404);
+        throw new ApiError(ErrorCode.TEMPLATE_NOT_FOUND, { name });
       }
 
-      // Process the template with the provided replacements
-      const processedContent = registry.processTemplate(
-        contract,
-        templateContent,
-        replacements || {}
-      );
+      try {
+        // Process the template with the provided replacements
+        const processedContent = registry.processTemplate(
+          contract,
+          templateContent,
+          replacements || {}
+        );
 
-      return c.json({
-        success: true,
-        contract: {
-          name: contract.name,
-          type: contract.type,
-          subtype: contract.subtype,
-          content: processedContent,
-        },
-      });
-    } catch (error) {
-      return c.json(
-        { error: `Error processing request: ${error.message}` },
-        500
-      );
-    }
+        return {
+          contract: {
+            name: contract.name,
+            type: contract.type,
+            subtype: contract.subtype,
+            content: processedContent,
+          },
+        };
+      } catch (error) {
+        throw new ApiError(ErrorCode.TEMPLATE_PROCESSING_ERROR, { 
+          reason: error instanceof Error ? error.message : String(error) 
+        });
+      }
+    }, { path: "/process-template", method: "POST" });
   });
 
   return api;
