@@ -1,4 +1,6 @@
 import { dbgLog } from "./debug-logging";
+import fs from "fs";
+import path from "path";
 
 /**
  * Processes a contract template line by line and performs replacements
@@ -63,4 +65,20 @@ export function createReplacementsMap(
   replacements: Record<string, string>
 ): Map<string, string> {
   return new Map(Object.entries(replacements));
+}
+
+/**
+ * Helper function to get template content from the contracts directory
+ */
+export async function getContractTemplateContent(contract: any): Promise<string | null> {
+  try {
+    // Construct the path to the contract file
+    const contractPath = path.join('contracts', contract.templatePath);
+    // Read the file content
+    const content = await fs.promises.readFile(contractPath, 'utf-8');
+    return content;
+  } catch (error) {
+    console.error(`Error reading contract template: ${error.message}`);
+    return null;
+  }
 }
