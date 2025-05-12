@@ -1,0 +1,50 @@
+name: Deploy to Cloudflare
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+  pull_request:
+    branches:
+      - staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy and Test
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Determine Environment
+        id: env
+        run: |
+          if [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            echo "WRANGLER_ENV=preview" >> $GITHUB_ENV
+          elif [[ ${{ github.ref }} == 'refs/heads/staging' ]]; then
+            echo "WRANGLER_ENV=staging" >> $GITHUB_ENV
+            echo "TEST_URL=https://cache-staging.aibtc.dev" >> $GITHUB_ENV
+          else
+            echo "WRANGLER_ENV=production" >> $GITHUB_ENV
+            echo "TEST_URL=https://cache.aibtc.dev" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy with Wrangler
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          environment: ${{ env.WRANGLER_ENV }}
+
+      - name: Set Test URL for Preview
+        if: github.event_name == 'pull_request'
+        run: |
+          # Extract the preview URL from Wrangler output
+          PREVIEW_URL=$(echo "${{ steps.deploy.outputs.deployment-url }}" | sed 's/https:\/\///')
+          echo "TEST_URL=https://$PREVIEW_URL" >> $GITHUB_ENV
+
+      - name: Test Endpoints (10s delay)
+        run: |
+          chmod +x tests/check-endpoints.sh
+          ./tests/check-endpoints.sh ${{ env.TEST_URL }} true
