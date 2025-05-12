@@ -1,7 +1,7 @@
 import { ClarityVersion } from "@stacks/transactions";
-import { KnownAddresses } from "../../utilities/known-addresses";
-import { ContractSubtype, ContractType } from "../../utilities/contract-types";
-import { KnownTraits } from "../../utilities/contract-traits";
+import { KnownAddresses } from "../utilities/known-addresses";
+import { ContractSubtype, ContractType } from "../utilities/contract-types";
+import { KnownTraits } from "../utilities/contract-traits";
 
 export interface AddressDependency {
   ref: keyof KnownAddresses; // key in ADDRESSES
