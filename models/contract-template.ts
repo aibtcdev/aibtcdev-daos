@@ -1,7 +1,7 @@
 import { ClarityVersion } from "@stacks/transactions";
 import { KnownAddresses } from "../utilities/known-addresses";
 import { ContractSubtype, ContractType } from "../utilities/contract-types";
-import { KnownTraits } from "../utilities/contract-traits";
+import { KnownTraits } from "../utilities/known-traits";
 
 export interface AddressDependency {
   ref: keyof KnownAddresses; // key in ADDRESSES
@@ -47,19 +47,19 @@ export abstract class ContractBase {
   static generateTemplatePath(type: ContractType, name: string): string {
     switch (type) {
       case "BASE":
-        return `${name}.clar`;
+        return `dao/${name}.clar`;
       case "ACTIONS":
-        return `actions/${name}.clar`;
+        return `dao/actions/${name}.clar`;
       case "EXTENSIONS":
-        return `extensions/${name}.clar`;
+        return `dao/extensions/${name}.clar`;
       case "PROPOSALS":
-        return `proposals/${name}.clar`;
+        return `dao/proposals/${name}.clar`;
       case "TOKEN":
-        return `tokens/${name}.clar`;
+        return `dao/token/${name}.clar`;
       case "AGENT":
-        return `${name}.clar`;
+        return `agent/${name}.clar`;
       case "CORE":
-        return `${name}.clar`;
+        return `core/${name}.clar`;
       case "EXTERNAL":
         return `external/${name}.clar`;
       default:

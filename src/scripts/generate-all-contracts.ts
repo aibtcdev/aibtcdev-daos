@@ -1,7 +1,7 @@
 import { ContractRegistry } from "../../utilities/contract-registry";
 import { ContractGeneratorService } from "../services/contract-generator";
 import { getKnownAddresses } from "../../utilities/known-addresses";
-import { getKnownTraits } from "../../utilities/contract-traits";
+import { getKnownTraits } from "../../utilities/known-traits";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -17,10 +17,7 @@ async function generateAllContracts() {
   const generatorService = new ContractGeneratorService();
 
   // Create output directory
-  const outputDir = path.join(
-    process.cwd(),
-    "generated-contracts"
-  );
+  const outputDir = path.join(process.cwd(), "generated-contracts");
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
@@ -36,25 +33,25 @@ async function generateAllContracts() {
       // Get addresses and traits for devnet
       const addresses = getKnownAddresses("devnet");
       const traits = getKnownTraits("devnet");
-      
+
       // Create replacements map
       const replacements: Record<string, string> = {
         // Contract addresses
         "contract.deployer": addresses.DEPLOYER,
         "contract.sbtc": addresses.SBTC,
         "contract.pox": addresses.POX,
-        
+
         // Traits
         "trait.sip009": traits.STANDARD_SIP009,
         "trait.sip010": traits.STANDARD_SIP010,
         "trait.faktory": traits.FAKTORY_SIP010,
-        
+
         // Contract references (with deployer prefix)
         "contract.base-dao": `${addresses.DEPLOYER}.aibtc-base-dao`,
         "contract.token": `${addresses.DEPLOYER}.aibtc-faktory`,
         "contract.dex": `${addresses.DEPLOYER}.aibtc-faktory-dex`,
       };
-      
+
       // Generate with replacements
       const generatedContent = await generatorService.generateContract(
         contract,
@@ -76,7 +73,9 @@ async function generateAllContracts() {
     }
   }
 
-  console.log(`Generated ${successCount}/${allContracts.length} contracts in: ${outputDir}`);
+  console.log(
+    `Generated ${successCount}/${allContracts.length} contracts in: ${outputDir}`
+  );
 }
 
 // Run the script
