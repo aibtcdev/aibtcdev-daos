@@ -36,8 +36,9 @@ export function processContractTemplate(
         
         if (replacements.has(replacementMapKey)) {
           const originalLine = nextLine;
+          // Use a global replace to catch all instances of the key in the line
           nextLine = nextLine.replace(
-            replacementKey,
+            new RegExp(replacementKey, 'g'),
             replacements.get(replacementMapKey)!
           );
           replacementMade = true;
