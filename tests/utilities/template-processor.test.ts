@@ -214,7 +214,8 @@ describe("Template Processor", () => {
 
   it("should handle multiple replacements in the same line", () => {
     const template = `
-;; /g/TOKEN_NAME/token_name /g/TOKEN_SYMBOL/token_symbol
+;; /g/TOKEN_NAME/token_name
+;; /g/TOKEN_SYMBOL/token_symbol
 (define-constant TOKEN_INFO {name: "TOKEN_NAME", symbol: "TOKEN_SYMBOL"})
 `;
 

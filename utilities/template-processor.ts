@@ -38,6 +38,7 @@ export function processContractTemplate(
       if (targetLineIndex < lines.length) {
         // Extract the replacement pattern
         const matches = Array.from(currentLine.matchAll(/;;\s*\/g\/([^\/]+)\/([^\/]+)/g));
+        let hasValidReplacement = false;
         
         // Apply each replacement to the target line
         for (const match of matches) {
@@ -46,6 +47,7 @@ export function processContractTemplate(
           const replacementMapKey = `${replacementKey}/${valueKey}`;
           
           if (replacements.has(replacementMapKey)) {
+            hasValidReplacement = true;
             const originalLine = lines[targetLineIndex];
             // Apply the replacement to the target line
             lines[targetLineIndex] = lines[targetLineIndex].replace(
@@ -66,8 +68,10 @@ export function processContractTemplate(
           }
         }
         
-        // Mark this comment line to be skipped
-        skipLines.add(i);
+        // Only skip the comment line if we had a valid replacement
+        if (hasValidReplacement) {
+          skipLines.add(i);
+        }
       }
     }
   }
