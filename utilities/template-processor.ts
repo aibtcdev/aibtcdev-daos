@@ -9,73 +9,76 @@ import path from "node:path";
  * Format: ;; /g/KEY/value
  * The line following this comment will have KEY replaced with the value from the replacements map
  * The comment line itself will be stripped from the output
+ * 
+ * Multiple comment lines can stack on top of a single target line
  */
 export function processContractTemplate(
   templateContent: string,
   replacements: Map<string, string>
 ): string {
-  // First, identify all the replacement patterns and their target lines
   const lines = templateContent.split("\n");
   const processedLines: string[] = [];
   const skipLines = new Set<number>();
-
-  // First pass: identify all replacement patterns and apply them
+  
+  // First pass: identify all replacement patterns
   for (let i = 0; i < lines.length; i++) {
     const currentLine = lines[i];
     
-    // Check if the current line contains the special format indicator: ;; /g/KEY/value
-    if (currentLine.trim().startsWith(";;") && currentLine.includes("/g/") && i < lines.length - 1) {
-      const matches = Array.from(currentLine.matchAll(/;;\s*\/g\/([^\/]+)\/([^\/]+)/g));
+    // Check if the current line is a replacement comment
+    if (currentLine.trim().startsWith(";;") && currentLine.includes("/g/")) {
+      // Find the target line - it's the next non-replacement-comment line
+      let targetLineIndex = i + 1;
+      while (targetLineIndex < lines.length && 
+             lines[targetLineIndex].trim().startsWith(";;") && 
+             lines[targetLineIndex].includes("/g/")) {
+        targetLineIndex++;
+      }
       
-      if (matches.length > 0) {
-        // We found at least one replacement pattern
-        let nextLine = lines[i + 1];
-        let replacementMade = false;
-
-        // Process all matches in the comment line
+      // If we found a valid target line
+      if (targetLineIndex < lines.length) {
+        // Extract the replacement pattern
+        const matches = Array.from(currentLine.matchAll(/;;\s*\/g\/([^\/]+)\/([^\/]+)/g));
+        
+        // Apply each replacement to the target line
         for (const match of matches) {
           const replacementKey = match[1];
           const valueKey = match[2];
           const replacementMapKey = `${replacementKey}/${valueKey}`;
           
           if (replacements.has(replacementMapKey)) {
-            // Use a global replace to catch all instances of the key in the line
-            nextLine = nextLine.replace(
+            const originalLine = lines[targetLineIndex];
+            // Apply the replacement to the target line
+            lines[targetLineIndex] = lines[targetLineIndex].replace(
               new RegExp(replacementKey, 'g'),
               replacements.get(replacementMapKey)!
             );
-            replacementMade = true;
             
             // Debug log the replacement
             dbgLog(
               {
                 action: "template_replacement",
                 key: replacementMapKey,
-                originalLine: lines[i + 1],
-                replacedLine: nextLine,
+                originalLine: originalLine,
+                replacedLine: lines[targetLineIndex],
               },
               { titleBefore: "Template Replacement" }
             );
           }
         }
-
-        if (replacementMade) {
-          // Mark the comment line to be skipped
-          skipLines.add(i);
-          // Update the next line with replacements
-          lines[i + 1] = nextLine;
-        }
+        
+        // Mark this comment line to be skipped
+        skipLines.add(i);
       }
     }
   }
-
-  // Second pass: build the final output, skipping marked comment lines
+  
+  // Second pass: build the output, skipping marked lines
   for (let i = 0; i < lines.length; i++) {
     if (!skipLines.has(i)) {
       processedLines.push(lines[i]);
     }
   }
-
+  
   return processedLines.join("\n");
 }
 
