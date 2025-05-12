@@ -9,6 +9,8 @@ import {
 } from "../utilities/contract-types";
 import { getContractTemplateContent } from "../utilities/template-processor";
 
+export { AIBTC_MCP_DO } from "../durable-objects/aibtc-mcp";
+
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
 // Create a shared registry instance
