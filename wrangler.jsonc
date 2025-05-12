@@ -1,8 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "aibtc-daos",
-  "compatibility_date": "2024-04-01",
-  "compatibility_flags": ["nodejs_compat"],
+  "name": "aibtcdev-daos",
+  "compatibility_date": "2025-05-01",
+  "compatibility_flags": ["nodejs_compat_v2"],
   "main": "./src/index.ts",
   "assets": {
     "directory": "./dist-server"
