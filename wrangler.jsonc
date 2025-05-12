@@ -9,7 +9,7 @@
   },
   "migrations": [
     {
-      "new_sqlite_classes": ["AIBTC_MCP_SQLITE"],
+      "new_sqlite_classes": ["AIBTC_MCP_DO"],
       "tag": "v1"
     }
   ],
