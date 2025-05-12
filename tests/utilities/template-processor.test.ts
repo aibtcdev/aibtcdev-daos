@@ -8,6 +8,7 @@ import {
   initializeDaoTemplate,
   tokenOwnerTemplate,
 } from "./test-contract-templates";
+import { dbgLog } from "../../utilities/debug-logging";
 
 describe("Template Processor", () => {
   it("should process template and replace values", () => {
@@ -113,10 +114,7 @@ describe("Template Processor", () => {
         "ST000000000000000000002AMW42H.sbtc-token",
     });
 
-    const processed = processContractTemplate(
-      testAgentTemplate,
-      replacements
-    );
+    const processed = processContractTemplate(testAgentTemplate, replacements);
 
     // Check that the replacements were made
     expect(processed).toContain(
@@ -227,16 +225,20 @@ describe("Template Processor", () => {
     const processed = processContractTemplate(template, replacements);
 
     // Log the processed content for debugging
-    console.log("Processed template:", processed);
+    dbgLog(`Processed template: ${processed}`);
 
     // Check that the replacements were made in the output
-    expect(processed).toContain('(define-constant TOKEN_INFO {name: "Test Token", symbol: "TEST"})');
-    
+    expect(processed).toContain(
+      '(define-constant TOKEN_INFO {name: "Test Token", symbol: "TEST"})'
+    );
+
     // Check that the original tokens are not in the output (excluding the comment line)
-    const outputLines = processed.trim().split('\n');
-    const nonCommentLines = outputLines.filter(line => !line.trim().startsWith(';;'));
-    const nonCommentOutput = nonCommentLines.join('\n');
-    
+    const outputLines = processed.trim().split("\n");
+    const nonCommentLines = outputLines.filter(
+      (line) => !line.trim().startsWith(";;")
+    );
+    const nonCommentOutput = nonCommentLines.join("\n");
+
     expect(nonCommentOutput).not.toContain("TOKEN_NAME");
     expect(nonCommentOutput).not.toContain("TOKEN_SYMBOL");
   });

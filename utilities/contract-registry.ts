@@ -15,7 +15,10 @@ import { AgentContract } from "../models/agent-contract";
 import { CoreContract } from "../models/core-contract";
 import { ExternalContract } from "../models/external-contract";
 import { DEVNET_DEPLOYER } from "./contract-helpers";
-import { processContractTemplate, createReplacementsMap } from "./template-processor";
+import {
+  processContractTemplate,
+  createReplacementsMap,
+} from "./template-processor";
 
 export function setupDaoContractRegistry(): ContractRegistry {
   const registry = new ContractRegistry();
@@ -379,11 +382,14 @@ export class ContractRegistry {
     replacements: Record<string, string>
   ): string {
     const replacementsMap = createReplacementsMap(replacements);
-    const processedContent = processContractTemplate(templateContent, replacementsMap);
-    
+    const processedContent = processContractTemplate(
+      templateContent,
+      replacementsMap
+    );
+
     // Set the processed content as the contract source
     contract.setSource(processedContent);
-    
+
     return processedContent;
   }
 }
