@@ -37,6 +37,11 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           environment: ${{ env.WRANGLER_ENV }}
           wranglerVersion: "4.14.4"
+          preCommands: |
+            # Install dependencies
+            npm install
+            # Build the project
+            npm run build
 
       - name: Set Test URL for Preview
         if: github.event_name == 'pull_request'
