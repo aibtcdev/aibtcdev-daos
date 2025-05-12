@@ -14,60 +14,65 @@ export function processContractTemplate(
   templateContent: string,
   replacements: Map<string, string>
 ): string {
+  // First, identify all the replacement patterns and their target lines
   const lines = templateContent.split("\n");
   const processedLines: string[] = [];
+  const skipLines = new Set<number>();
 
+  // First pass: identify all replacement patterns and apply them
   for (let i = 0; i < lines.length; i++) {
     const currentLine = lines[i];
-
-    // Check if the current line contains the special format indicator: ;; /g/KEY/value
-    const matches = Array.from(currentLine.matchAll(/;;\s*\/g\/([^\/]+)\/([^\/]+)/g));
     
-    if (matches.length > 0 && i < lines.length - 1) {
-      // We found at least one replacement pattern
-      let nextLine = lines[i + 1];
-      let replacementMade = false;
+    // Check if the current line contains the special format indicator: ;; /g/KEY/value
+    if (currentLine.trim().startsWith(";;") && currentLine.includes("/g/") && i < lines.length - 1) {
+      const matches = Array.from(currentLine.matchAll(/;;\s*\/g\/([^\/]+)\/([^\/]+)/g));
+      
+      if (matches.length > 0) {
+        // We found at least one replacement pattern
+        let nextLine = lines[i + 1];
+        let replacementMade = false;
 
-      // Process all matches in the comment line
-      for (const match of matches) {
-        const replacementKey = match[1];
-        const valueKey = match[2];
-        const replacementMapKey = `${replacementKey}/${valueKey}`;
-        
-        if (replacements.has(replacementMapKey)) {
-          const originalLine = nextLine;
-          // Use a global replace to catch all instances of the key in the line
-          nextLine = nextLine.replace(
-            new RegExp(replacementKey, 'g'),
-            replacements.get(replacementMapKey)!
-          );
-          replacementMade = true;
+        // Process all matches in the comment line
+        for (const match of matches) {
+          const replacementKey = match[1];
+          const valueKey = match[2];
+          const replacementMapKey = `${replacementKey}/${valueKey}`;
+          
+          if (replacements.has(replacementMapKey)) {
+            // Use a global replace to catch all instances of the key in the line
+            nextLine = nextLine.replace(
+              new RegExp(replacementKey, 'g'),
+              replacements.get(replacementMapKey)!
+            );
+            replacementMade = true;
+            
+            // Debug log the replacement
+            dbgLog(
+              {
+                action: "template_replacement",
+                key: replacementMapKey,
+                originalLine: lines[i + 1],
+                replacedLine: nextLine,
+              },
+              { titleBefore: "Template Replacement" }
+            );
+          }
+        }
 
-          // Debug log the replacement
-          dbgLog(
-            {
-              action: "template_replacement",
-              key: replacementMapKey,
-              originalLine,
-              replacedLine: nextLine,
-            },
-            { titleBefore: "Template Replacement" }
-          );
+        if (replacementMade) {
+          // Mark the comment line to be skipped
+          skipLines.add(i);
+          // Update the next line with replacements
+          lines[i + 1] = nextLine;
         }
       }
+    }
+  }
 
-      if (replacementMade) {
-        // Skip adding the comment line to processed lines (strip it out)
-        // Add the replaced line
-        processedLines.push(nextLine);
-        i++; // Skip the next line since we've processed it
-      } else {
-        // If no replacement found, keep the original line
-        processedLines.push(currentLine);
-      }
-    } else {
-      // No special format, keep the line as is
-      processedLines.push(currentLine);
+  // Second pass: build the final output, skipping marked comment lines
+  for (let i = 0; i < lines.length; i++) {
+    if (!skipLines.has(i)) {
+      processedLines.push(lines[i]);
     }
   }
 
