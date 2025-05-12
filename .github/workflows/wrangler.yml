@@ -53,6 +53,5 @@ jobs:
       - name: Test Endpoints
         run: |
           chmod +x tests/check-endpoints.sh
-          chmod +x tests/run-endpoint-tests.sh
           chmod +x tests/endpoints/*.sh
           ./tests/check-endpoints.sh ${{ env.TEST_URL }} true
