@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   ErrCodeActionProposalVoting,
   ErrCodeActionSendMessage,
-} from "../../utilities/contract-error-codes";
-import { setupDaoContractRegistry } from "../../utilities/contract-registry";
+} from "../../../utilities/contract-error-codes";
+import { setupDaoContractRegistry } from "../../../utilities/contract-registry";
 import {
   constructDao,
   formatSerializedBuffer,
@@ -12,7 +12,7 @@ import {
   passActionProposal,
   VOTING_DELAY,
   VOTING_PERIOD,
-} from "../../utilities/dao-helpers";
+} from "../../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();

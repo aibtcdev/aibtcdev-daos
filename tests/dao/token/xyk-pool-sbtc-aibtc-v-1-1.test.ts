@@ -1,6 +1,6 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
-import { setupDaoContractRegistry } from "../../utilities/contract-registry";
+import { setupDaoContractRegistry } from "../../../utilities/contract-registry";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -27,7 +27,6 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("add-to-position() succeeds with valid parameters", () => {
     // arrange
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   contractAddress,
@@ -35,7 +34,6 @@ describe(`public functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   address1
     // );
-    
     // assert
     // expect(receipt.result).toBeOk(/* expected value */);
   });
@@ -45,7 +43,6 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("reduce-position() succeeds with valid parameters", () => {
     // arrange
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   contractAddress,
@@ -53,7 +50,6 @@ describe(`public functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   address1
     // );
-    
     // assert
     // expect(receipt.result).toBeOk(/* expected value */);
   });
@@ -63,7 +59,6 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("swap-x-for-y() succeeds with valid parameters", () => {
     // arrange
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   contractAddress,
@@ -71,7 +66,6 @@ describe(`public functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   address1
     // );
-    
     // assert
     // expect(receipt.result).toBeOk(/* expected value */);
   });
@@ -81,7 +75,6 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("swap-y-for-x() succeeds with valid parameters", () => {
     // arrange
-    
     // act
     // const receipt = simnet.callPublicFn(
     //   contractAddress,
@@ -89,7 +82,6 @@ describe(`public functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   address1
     // );
-    
     // assert
     // expect(receipt.result).toBeOk(/* expected value */);
   });
@@ -101,7 +93,6 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-position() returns expected value", () => {
     // arrange
-    
     // act
     // const result = simnet.callReadOnlyFn(
     //   contractAddress,
@@ -109,7 +100,6 @@ describe(`read-only functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   deployer
     // ).result;
-    
     // assert
     // expect(result).toStrictEqual(/* expected value */);
   });
@@ -119,7 +109,6 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-pool-details() returns expected value", () => {
     // arrange
-    
     // act
     // const result = simnet.callReadOnlyFn(
     //   contractAddress,
@@ -127,7 +116,6 @@ describe(`read-only functions: ${contractName}`, () => {
     //   [],
     //   deployer
     // ).result;
-    
     // assert
     // expect(result).toStrictEqual(/* expected value */);
   });
@@ -137,7 +125,6 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-x-to-y-price() returns expected value", () => {
     // arrange
-    
     // act
     // const result = simnet.callReadOnlyFn(
     //   contractAddress,
@@ -145,7 +132,6 @@ describe(`read-only functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   deployer
     // ).result;
-    
     // assert
     // expect(result).toStrictEqual(/* expected value */);
   });
@@ -155,7 +141,6 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-y-to-x-price() returns expected value", () => {
     // arrange
-    
     // act
     // const result = simnet.callReadOnlyFn(
     //   contractAddress,
@@ -163,7 +148,6 @@ describe(`read-only functions: ${contractName}`, () => {
     //   [/* parameters */],
     //   deployer
     // ).result;
-    
     // assert
     // expect(result).toStrictEqual(/* expected value */);
   });

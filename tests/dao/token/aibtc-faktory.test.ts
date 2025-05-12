@@ -1,9 +1,9 @@
-import { Cl, cvToValue } from "@stacks/transactions";
-import { describe, expect, it, beforeEach } from "vitest";
-import { setupDaoContractRegistry } from "../../utilities/contract-registry";
-import { fundVoters, getDaoTokens } from "../../utilities/dao-helpers";
-import { getBalancesForPrincipal } from "../../utilities/asset-helpers";
-import { DAO_TOKEN_ASSETS_MAP } from "../../utilities/contract-helpers";
+import { Cl } from "@stacks/transactions";
+import { describe, expect, it } from "vitest";
+import { setupDaoContractRegistry } from "../../../utilities/contract-registry";
+import { fundVoters, getDaoTokens } from "../../../utilities/dao-helpers";
+import { getBalancesForPrincipal } from "../../../utilities/asset-helpers";
+import { DAO_TOKEN_ASSETS_MAP } from "../../../utilities/contract-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
