@@ -8,8 +8,8 @@ import {
   CONTRACT_SUBTYPES,
 } from "../utilities/contract-types";
 import { getContractTemplateContent } from "../utilities/template-processor";
-import { AIBTC_MCP_DO } from "../durable-objects/aibtc-mcp";
-export { AIBTC_MCP_DO as "AIBTC-MCP-DO" };
+import { AIBTC_MCP_DO } from "../durable-objects/aibtc-mcp-do";
+export { AIBTC_MCP_DO };
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 

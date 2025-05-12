@@ -9,14 +9,14 @@
   },
   "migrations": [
     {
-      "new_sqlite_classes": ["AIBTC-MCP"],
+      "new_sqlite_classes": ["AIBTC_MCP_SQLITE"],
       "tag": "v1"
     }
   ],
   "durable_objects": {
     "bindings": [
       {
-        "class_name": "AIBTC-MCP-DO",
+        "class_name": "AIBTC_MCP_DO",
         "name": "AIBTC_MCP_DO"
       }
     ]
