@@ -18,7 +18,7 @@ fi
 echo "Testing endpoints at: $API_URL"
 
 # Run the tests
-$(dirname "$0")/run-endpoint-tests.sh
+$(dirname "$0")/endpoints/run-endpoint-tests.sh
 
 # Exit with the same status as the test runner
 exit $?

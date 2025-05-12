@@ -8,18 +8,18 @@ export TOTAL_TESTS=0
 export FAILED_TESTS=0
 
 # Source utility functions
-source "$(dirname "$0")/endpoints/utils.sh"
+source "$(dirname "$0")/utils.sh"
 
 # Run all test modules
-source "$(dirname "$0")/endpoints/test-index.sh"
-source "$(dirname "$0")/endpoints/test-api-types.sh"
-source "$(dirname "$0")/endpoints/test-api-contracts.sh"
-source "$(dirname "$0")/endpoints/test-api-names.sh"
-source "$(dirname "$0")/endpoints/test-api-by-type.sh"
-source "$(dirname "$0")/endpoints/test-api-contract.sh"
-source "$(dirname "$0")/endpoints/test-api-by-type-subtype.sh"
-source "$(dirname "$0")/endpoints/test-api-dependencies.sh"
-source "$(dirname "$0")/endpoints/test-api-process-template.sh"
+source "$(dirname "$0")/test-index.sh"
+source "$(dirname "$0")/test-api-types.sh"
+source "$(dirname "$0")/test-api-contracts.sh"
+source "$(dirname "$0")/test-api-names.sh"
+source "$(dirname "$0")/test-api-by-type.sh"
+source "$(dirname "$0")/test-api-contract.sh"
+source "$(dirname "$0")/test-api-by-type-subtype.sh"
+source "$(dirname "$0")/test-api-dependencies.sh"
+source "$(dirname "$0")/test-api-process-template.sh"
 
 # Run all test functions
 test_index
