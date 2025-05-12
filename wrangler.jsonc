@@ -1,15 +1,19 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
+  "account_id": "96280594e2b905d4dc40b3c744149710",
   "name": "aibtcdev-daos",
+  "main": "./src/index.ts",
   "compatibility_date": "2025-05-01",
   "compatibility_flags": ["nodejs_compat_v2"],
-  "main": "./src/index.ts",
   "assets": {
     "directory": "./dist-server"
   },
+  "observability": {
+    "enabled": true
+  },
   "migrations": [
     {
-      "new_sqlite_classes": ["AIBTC_MCP_DO"],
+      "new_classes": ["AIBTC_MCP_DO"],
       "tag": "v1"
     }
   ],
@@ -21,7 +25,49 @@
       }
     ]
   },
-  "observability": {
-    "enabled": true
+  "env": {
+    "preview": {
+      "routes": [],
+      "durable_objects": {
+        "bindings": [
+          {
+            "class_name": "AIBTC_MCP_DO",
+            "name": "AIBTC_MCP_DO"
+          }
+        ]
+      }
+    },
+    "staging": {
+      "routes": [
+        {
+          "pattern": "daos-staging.aibtc.dev",
+          "custom_domain": true
+        }
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "class_name": "AIBTC_MCP_DO",
+            "name": "AIBTC_MCP_DO"
+          }
+        ]
+      }
+    },
+    "production": {
+      "routes": [
+        {
+          "pattern": "daos.aibtc.dev",
+          "custom_domain": true
+        }
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "class_name": "AIBTC_MCP_DO",
+            "name": "AIBTC_MCP_DO"
+          }
+        ]
+      }
+    }
   }
 }
