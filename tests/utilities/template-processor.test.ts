@@ -4,7 +4,6 @@ import {
   createReplacementsMap,
 } from "../../utilities/template-processor";
 import {
-  agentAccountTemplate,
   initializeDaoTemplate,
   tokenOwnerTemplate,
 } from "./test-contract-templates";

@@ -1,7 +1,7 @@
 import { Cl, ClarityType, ClarityValue, cvToValue } from "@stacks/transactions";
 import { describe, expect, it, beforeEach } from "vitest";
-import { setupFullContractRegistry } from "../../utilities/contract-registry";
-import { ErrCodeProtocolFeesAccount } from "../../utilities/contract-error-codes";
+import { setupFullContractRegistry } from "../../../utilities/contract-registry";
+import { ErrCodeProtocolFeesAccount } from "../../../utilities/contract-error-codes";
 
 // setup accounts
 const accounts = simnet.getAccounts();
