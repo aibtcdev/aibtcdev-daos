@@ -1,20 +1,3 @@
-import { describe, it, expect, beforeAll } from "vitest";
-import {
-  processContractTemplate,
-  createReplacementsMap,
-  getContractTemplateContent
-} from "../../utilities/template-processor";
-import {
-  initializeDaoTemplate,
-  tokenOwnerTemplate,
-  agentAccountTemplate
-} from "./test-contract-templates";
-
-// Helper function to process templates from test files
-async function processTestTemplate(templateContent: string, replacements: Record<string, string>): Promise<string> {
-  const replacementsMap = createReplacementsMap(replacements);
-  return processContractTemplate(templateContent, replacementsMap);
-}
 import { dbgLog } from "../../utilities/debug-logging";
 import { ContractRegistry } from "../../utilities/contract-registry";
 import { ContractGeneratorService } from "../../src/services/contract-generator";
@@ -278,47 +261,55 @@ describe("Contract Generator", () => {
   let registry: ContractRegistry;
   let generator: ContractGeneratorService;
   let outputDir: string;
-  
+
   // Standard replacements for tests
   const replacements: Record<string, string> = {
     // Account addresses
-    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/account_owner": "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
-    "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG/account_agent": "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
-    
+    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/account_owner":
+      "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
+    "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG/account_agent":
+      "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
+
     // Contract references
     ".aibtc-dao-traits.extension/dao_trait_extension": ".test-traits.extension",
-    ".aibtc-dao-traits.action/dao_trait_action_proposals_voting": ".test-traits.action-proposals-voting",
+    ".aibtc-dao-traits.action/dao_trait_action_proposals_voting":
+      ".test-traits.action-proposals-voting",
     ".aibtc-dao-traits.action/dao_trait_action": ".test-traits.action",
     ".aibtc-dao-traits.proposal/dao_trait_proposal": ".test-traits.proposal",
-    ".aibtc-dao-traits.token-owner/dao_token_owner_trait": ".test-traits.token-owner",
-    
+    ".aibtc-dao-traits.token-owner/dao_token_owner_trait":
+      ".test-traits.token-owner",
+
     // DAO contracts
     ".aibtc-dao-users/dao_contract_users": ".test-dao-users",
     ".aibtc-treasury/dao_contract_treasury": ".test-treasury",
     ".aibtc-faktory/dao_contract_token": ".test-token-contract",
     ".aibtc-faktory-dex/dao_contract_token_dex": ".test-dex-contract",
     ".aibtc-base-dao/dao_contract_base": ".test-base-dao",
-    ".aibtc-action-proposal-voting/dao_contract_action_proposal_voting": ".test-proposal-voting",
+    ".aibtc-action-proposal-voting/dao_contract_action_proposal_voting":
+      ".test-proposal-voting",
     ".aibtc-dao-charter/dao_contract_charter": ".test-dao-charter",
     ".aibtc-dao-epoch/dao_contract_epoch": ".test-dao-epoch",
     ".aibtc-onchain-messaging/dao_contract_messaging": ".test-messaging",
     ".aibtc-token-owner/dao_token_owner_contract": ".test-token-owner",
-    ".aibtc-action-send-message/dao_action_send_message_contract": ".test-send-message",
-    
+    ".aibtc-action-send-message/dao_action_send_message_contract":
+      ".test-send-message",
+
     // External contracts
-    "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_contract": "ST000000000000000000002AMW42H.sbtc-token",
-    
+    "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_contract":
+      "ST000000000000000000002AMW42H.sbtc-token",
+
     // Configuration values
-    "dao mission goes here/dao_manifest": "The mission of this DAO is to test template processing",
+    "dao mission goes here/dao_manifest":
+      "The mission of this DAO is to test template processing",
     "aibtc/dao_token_symbol": "TEST",
   };
 
   beforeAll(() => {
     registry = new ContractRegistry();
     registry.registerAllDefinedContracts();
-    
+
     generator = new ContractGeneratorService();
-    
+
     // Create output directory for test results
     outputDir = path.join(process.cwd(), "test-output");
     if (!fs.existsSync(outputDir)) {
@@ -329,16 +320,16 @@ describe("Contract Generator", () => {
   it("should process a single contract template", async () => {
     const contractName = "aibtc-base-dao";
     const contract = registry.getContract(contractName);
-    
+
     expect(contract).not.toBeUndefined();
-    
+
     if (contract) {
       const content = await generator.generateContract(contract, replacements);
-      
+
       // Basic validation
       expect(content).toBeTruthy();
       expect(content.length).toBeGreaterThan(0);
-      
+
       // Save for inspection
       const outputPath = path.join(outputDir, `${contract.name}.clar`);
       fs.writeFileSync(outputPath, content);
@@ -349,51 +340,65 @@ describe("Contract Generator", () => {
     const contractsToTest = [
       "aibtc-action-proposal-voting",
       "aibtc-agent-account",
-      "aibtc-base-initialize-dao"
+      "aibtc-base-initialize-dao",
     ];
-    
+
     // Add all the additional replacements needed for these specific contracts
     const extendedReplacements = {
       ...replacements,
       // Agent account traits
-      ".aibtc-agent-account-traits.aibtc-account/agent_account_trait_account": ".test-traits.agent-account",
-      ".aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals": ".test-traits.agent-proposals",
-      ".aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval": ".test-traits.faktory-dex-approval",
-      ".aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell": ".test-traits.faktory-buy-sell",
-      
+      ".aibtc-agent-account-traits.aibtc-account/agent_account_trait_account":
+        ".test-traits.agent-account",
+      ".aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals":
+        ".test-traits.agent-proposals",
+      ".aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval":
+        ".test-traits.faktory-dex-approval",
+      ".aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell":
+        ".test-traits.faktory-buy-sell",
+
       // SIP traits
-      "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait": ".test-traits.sip010",
-      "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait/faktory_trait": ".test-traits.faktory-token",
-      
+      "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait":
+        ".test-traits.sip010",
+      "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait/faktory_trait":
+        ".test-traits.faktory-token",
+
       // DAO traits
-      ".aibtc-dao-traits.action-proposals-voting/dao_trait_action_proposals_voting": ".test-traits.action-proposals-voting",
-      ".aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex": ".test-traits.faktory-dex",
-      
+      ".aibtc-dao-traits.action-proposals-voting/dao_trait_action_proposals_voting":
+        ".test-traits.action-proposals-voting",
+      ".aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex":
+        ".test-traits.faktory-dex",
+
       // Additional contracts
       ".dao-run-cost/base_dao_run_cost_contract": ".test-dao-run-cost",
-      ".aibtc-rewards-account/dao_contract_rewards_account": ".test-rewards-account"
+      ".aibtc-rewards-account/dao_contract_rewards_account":
+        ".test-rewards-account",
     };
-    
+
     for (const contractName of contractsToTest) {
       const contract = registry.getContract(contractName);
-      
+
       expect(contract).not.toBeUndefined();
-      
+
       if (contract) {
         try {
-          const content = await generator.generateContract(contract, extendedReplacements);
-          
+          const content = await generator.generateContract(
+            contract,
+            extendedReplacements
+          );
+
           // Basic validation
           expect(content).toBeTruthy();
           expect(content.length).toBeGreaterThan(0);
-          
+
           // Save for inspection
           const outputPath = path.join(outputDir, `${contract.name}.clar`);
           fs.writeFileSync(outputPath, content);
         } catch (error) {
           // Only show the error message without the stack trace
           if (error instanceof Error) {
-            console.error(`Error processing ${contractName}:\n${error.message}`);
+            console.error(
+              `Error processing ${contractName}:\n${error.message}`
+            );
           } else {
             console.error(`Error processing ${contractName}:`, error);
           }
@@ -405,24 +410,26 @@ describe("Contract Generator", () => {
 
   it("should generate a variable report", async () => {
     const report = await TemplateScanner.scanAllTemplates();
-    
+
     // Basic validation
     expect(report).toBeTruthy();
     expect(Object.keys(report).length).toBeGreaterThan(0);
-    
+
     // Format the report for better readability
     const formattedReport = {
       summary: {
         totalContracts: Object.keys(report).length,
-        totalUniqueVariables: [...new Set(Object.values(report).flat())].length
+        totalUniqueVariables: [...new Set(Object.values(report).flat())].length,
       },
-      contractVariables: report
+      contractVariables: report,
     };
-    
+
     // Save for inspection
     const outputPath = path.join(outputDir, "template-variables-report.json");
     fs.writeFileSync(outputPath, JSON.stringify(formattedReport, null, 2));
-    
-    console.log(`Variable report generated with ${formattedReport.summary.totalUniqueVariables} unique variables across ${formattedReport.summary.totalContracts} contracts`);
+
+    console.log(
+      `Variable report generated with ${formattedReport.summary.totalUniqueVariables} unique variables across ${formattedReport.summary.totalContracts} contracts`
+    );
   });
 });
