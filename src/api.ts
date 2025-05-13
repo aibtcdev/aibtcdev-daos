@@ -258,58 +258,6 @@ export function createApiRouter(registry: ContractRegistry) {
     );
   });
 
-  // Process a contract template with replacements
-  api.post("/process-template", (c) => {
-    return handleRequest(
-      c,
-      async () => {
-        const body = await c.req.json();
-        const { name, replacements } = body;
-
-        if (!name) {
-          throw new ApiError(ErrorCode.INVALID_REQUEST, {
-            reason: "Missing required parameter: name",
-          });
-        }
-
-        const contract = registry.getContract(name);
-
-        if (!contract) {
-          throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, { name });
-        }
-
-        // Read the contract template content
-        const templateContent = await getContractTemplateContent(contract);
-
-        if (!templateContent) {
-          throw new ApiError(ErrorCode.TEMPLATE_NOT_FOUND, { name });
-        }
-
-        try {
-          // Process the template with the provided replacements
-          const processedContent = registry.processTemplate(
-            contract,
-            templateContent,
-            replacements || {}
-          );
-
-          return {
-            contract: {
-              name: contract.name,
-              type: contract.type,
-              subtype: contract.subtype,
-              content: processedContent,
-            },
-          };
-        } catch (error) {
-          throw new ApiError(ErrorCode.TEMPLATE_PROCESSING_ERROR, {
-            reason: error instanceof Error ? error.message : String(error),
-          });
-        }
-      },
-      { path: "/process-template", method: "POST" }
-    );
-  });
 
   // Generate contract from template
   api.post("/generate-contract", async (c) => {
@@ -317,11 +265,13 @@ export function createApiRouter(registry: ContractRegistry) {
       c,
       async () => {
         const body = await c.req.json();
-        const { contractName, replacements } = body;
+        // Support both name and contractName parameters for backward compatibility
+        const contractName = body.contractName || body.name;
+        const replacements = body.replacements || {};
 
         if (!contractName) {
           throw new ApiError(ErrorCode.INVALID_REQUEST, {
-            reason: "Missing required parameter: contractName",
+            reason: "Missing required parameter: contractName or name",
           });
         }
 
@@ -332,19 +282,25 @@ export function createApiRouter(registry: ContractRegistry) {
           });
         }
 
-        const generatedContract = await generatorService.generateContract(
-          contract,
-          replacements || {}
-        );
+        try {
+          const generatedContract = await generatorService.generateContract(
+            contract,
+            replacements
+          );
 
-        return {
-          contract: {
-            name: contract.name,
-            type: contract.type,
-            subtype: contract.subtype,
-            content: generatedContract,
-          },
-        };
+          return {
+            contract: {
+              name: contract.name,
+              type: contract.type,
+              subtype: contract.subtype,
+              content: generatedContract,
+            },
+          };
+        } catch (error) {
+          throw new ApiError(ErrorCode.TEMPLATE_PROCESSING_ERROR, {
+            reason: error instanceof Error ? error.message : String(error),
+          });
+        }
       },
       { path: "/generate-contract", method: "POST" }
     );
