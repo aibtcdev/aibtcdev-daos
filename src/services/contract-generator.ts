@@ -47,7 +47,11 @@ export class ContractGeneratorService {
     // Check for missing variables
     const missingVars = uniqueVars.filter(v => !replacements[v]);
     if (missingVars.length > 0) {
-      console.warn(`Warning: Missing replacements for variables in ${contract.name}:`, missingVars);
+      console.warn(`Warning: Missing replacements in ${contract.name}:`);
+      for (const missingVar of missingVars) {
+        const [toReplace, keyName] = missingVar.split('/');
+        console.warn(`Not found\nTo replace: ${toReplace}\nWith key: ${keyName}`);
+      }
     }
     
     return processContractTemplate(templateContent, replacementsMap);
