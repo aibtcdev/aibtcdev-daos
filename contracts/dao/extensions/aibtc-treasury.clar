@@ -37,17 +37,26 @@
 ;;
 
 ;; track allowed assets for deposit/transfer
-(define-map AllowedAssets principal bool)
-(map-set AllowedAssets CFG_SBTC_TOKEN true)
-(map-set AllowedAssets CFG_DAO_TOKEN true)
-
-;; public functions
+(define-map AllowedAssets
+  principal
+  bool
+)
+(map-set AllowedAssets CFG_SBTC_TOKEN true) 
+(map-set AllowedAssets CFG_DAO_TOKEN true) ;; public functions
 ;;
 
-(define-public (callback (sender principal) (memo (buff 34))) (ok true))
+(define-public (callback
+    (sender principal)
+    (memo (buff 34))
+  )
+  (ok true)
+)
 
 ;; add or update an asset to the allowed list
-(define-public (allow-asset (token principal) (enabled bool))
+(define-public (allow-asset
+    (token principal)
+    (enabled bool)
+  )
   (begin
     (try! (is-dao-or-extension))
     (print {
@@ -57,15 +66,18 @@
         token: token,
         enabled: enabled,
         contractCaller: contract-caller,
-        txSender: tx-sender
-      }
+        txSender: tx-sender,
+      },
     })
     (ok (map-set AllowedAssets token enabled))
   )
 )
 
 ;; deposit FT to the treasury
-(define-public (deposit-ft (ft <sip010-trait>) (amount uint))
+(define-public (deposit-ft
+    (ft <sip010-trait>)
+    (amount uint)
+  )
   (begin
     ;; no auth - anyone can deposit if token allowed
     (asserts! (is-allowed-asset (contract-of ft)) ERR_ASSET_NOT_ALLOWED)
@@ -77,15 +89,19 @@
         recipient: SELF,
         assetContract: (contract-of ft),
         contractCaller: contract-caller,
-        txSender: tx-sender
-      }
+        txSender: tx-sender,
+      },
     })
     (contract-call? ft transfer amount tx-sender SELF none)
   )
 )
 
 ;; withdraw FT from the treasury
-(define-public (withdraw-ft (ft <sip010-trait>) (amount uint) (to principal))
+(define-public (withdraw-ft
+    (ft <sip010-trait>)
+    (amount uint)
+    (to principal)
+  )
   (begin
     ;; only DAO contract can withdraw if token allowed
     (try! (is-dao-or-extension))
@@ -98,8 +114,8 @@
         recipient: to,
         assetContract: (contract-of ft),
         contractCaller: contract-caller,
-        txSender: tx-sender
-      }
+        txSender: tx-sender,
+      },
     })
     (as-contract (contract-call? ft transfer amount SELF to none))
   )
@@ -129,8 +145,12 @@
 
 (define-private (is-dao-or-extension)
   ;; /g/.aibtc-base-dao/dao_base_contract
-  (ok (asserts! (or (is-eq tx-sender .aibtc-base-dao)
-    ;; /g/.aibtc-base-dao/dao_base_contract
-    (contract-call? .aibtc-base-dao is-extension contract-caller)) ERR_NOT_DAO_OR_EXTENSION
+  (ok (asserts!
+    (or
+      (is-eq tx-sender .aibtc-base-dao)
+      ;; /g/.aibtc-base-dao/dao_base_contract
+      (contract-call? .aibtc-base-dao is-extension contract-caller)
+    )
+    ERR_NOT_DAO_OR_EXTENSION
   ))
 )

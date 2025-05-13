@@ -18,7 +18,12 @@
 ;; public functions
 ;;
 
-(define-public (callback (sender principal) (memo (buff 34))) (ok true))
+(define-public (callback
+    (sender principal)
+    (memo (buff 34))
+  )
+  (ok true)
+)
 
 (define-public (set-token-uri (value (string-utf8 256)))
   (begin
@@ -34,8 +39,8 @@
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
-        value: value
-      }
+        value: value,
+      },
     })
     (ok true)
   )
@@ -56,8 +61,8 @@
       payload: {
         contractCaller: contract-caller,
         txSender: tx-sender,
-        newOwner: new-owner
-      }
+        newOwner: new-owner,
+      },
     })
     (ok true)
   )
@@ -68,8 +73,12 @@
 
 (define-private (is-dao-or-extension)
   ;; /g/.aibtc-base-dao/dao_base_contract
-  (ok (asserts! (or (is-eq tx-sender .aibtc-base-dao)
-    ;; /g/.aibtc-base-dao/dao_base_contract
-    (contract-call? .aibtc-base-dao is-extension contract-caller)) ERR_NOT_DAO_OR_EXTENSION
+  (ok (asserts!
+    (or
+      (is-eq tx-sender .aibtc-base-dao)
+      ;; /g/.aibtc-base-dao/dao_base_contract
+      (contract-call? .aibtc-base-dao is-extension contract-caller)
+    )
+    ERR_NOT_DAO_OR_EXTENSION
   ))
 )

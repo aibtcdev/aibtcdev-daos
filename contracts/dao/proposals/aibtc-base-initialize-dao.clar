@@ -18,24 +18,47 @@
       (list
         ;; initial DAO extensions (features)
         ;; /g/.aibtc-action-proposal-voting/dao_action_proposal_voting_contract
-        {extension: .aibtc-action-proposal-voting, enabled: true}
+        {
+          extension: .aibtc-action-proposal-voting,
+          enabled: true,
+        }
         ;; /g/.aibtc-dao-charter/dao_charter_contract
-        {extension: .aibtc-dao-charter, enabled: true}
+        {
+          extension: .aibtc-dao-charter,
+          enabled: true,
+        }
         ;; /g/.aibtc-dao-epoch/dao_epoch_contract
-        {extension: .aibtc-dao-epoch, enabled: true}
+        {
+          extension: .aibtc-dao-epoch,
+          enabled: true,
+        }
         ;; /g/.aibtc-dao-users/dao_users_contract
-        {extension: .aibtc-dao-users, enabled: true}
+        {
+          extension: .aibtc-dao-users,
+          enabled: true,
+        }
         ;; /g/.aibtc-onchain-messaging/dao_messaging_contract
-        {extension: .aibtc-onchain-messaging, enabled: true}
+        {
+          extension: .aibtc-onchain-messaging,
+          enabled: true,
+        }
         ;; /g/.aibtc-token-owner/dao_token_owner_contract
-        {extension: .aibtc-token-owner, enabled: true}
+        {
+          extension: .aibtc-token-owner,
+          enabled: true,
+        }
         ;; /g/.aibtc-treasury/dao_treasury_contract
-        {extension: .aibtc-treasury, enabled: true}
+        {
+          extension: .aibtc-treasury,
+          enabled: true,
+        }
         ;; initial action proposals (as extensions)
         ;; /g/.aibtc-action-send-message/dao_action_send_message_contract
-        {extension: .aibtc-action-send-message, enabled: true}
-      )
-    ))
+        {
+          extension: .aibtc-action-send-message,
+          enabled: true,
+        }
+      )))
     ;; allow asset in treasury
     ;; /g/.aibtc-treasury/dao_treasury_contract
     (try! (contract-call? .aibtc-treasury allow-asset CFG_DAO_TOKEN true))
@@ -53,8 +76,8 @@
         manifest: CFG_DAO_MANIFEST_TEXT,
         sender: sender,
         contractCaller: contract-caller,
-        txSender: tx-sender
-      }
+        txSender: tx-sender,
+      },
     })
     (ok true)
   )

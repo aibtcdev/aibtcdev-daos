@@ -19,11 +19,17 @@
 ;; public functions
 ;;
 
-(define-public (callback (sender principal) (memo (buff 34))) (ok true))
+(define-public (callback
+    (sender principal)
+    (memo (buff 34))
+  )
+  (ok true)
+)
 
 (define-public (run (parameters (buff 2048)))
-  (let
-    ((message (unwrap! (from-consensus-buff? (string-ascii 2043) parameters) ERR_INVALID_PARAMETERS)))
+  (let ((message (unwrap! (from-consensus-buff? (string-ascii 2043) parameters)
+      ERR_INVALID_PARAMETERS
+    )))
     (try! (is-dao-or-extension))
     ;; /g/.aibtc-onchain-messaging/dao_messaging_contract
     (contract-call? .aibtc-onchain-messaging send message)
@@ -31,8 +37,9 @@
 )
 
 (define-public (check-parameters (parameters (buff 2048)))
-  (let
-    ((message (unwrap! (from-consensus-buff? (string-ascii 2043) parameters) ERR_INVALID_PARAMETERS)))
+  (let ((message (unwrap! (from-consensus-buff? (string-ascii 2043) parameters)
+      ERR_INVALID_PARAMETERS
+    )))
     ;; check there is a message
     (asserts! (> (len message) u0) ERR_INVALID_PARAMETERS)
     (ok true)
@@ -44,8 +51,12 @@
 
 (define-private (is-dao-or-extension)
   ;; /g/.aibtc-base-dao/dao_base_contract
-  (ok (asserts! (or (is-eq tx-sender .aibtc-base-dao)
-    ;; /g/.aibtc-base-dao/dao_base_contract
-    (contract-call? .aibtc-base-dao is-extension contract-caller)) ERR_NOT_DAO_OR_EXTENSION
+  (ok (asserts!
+    (or
+      (is-eq tx-sender .aibtc-base-dao)
+      ;; /g/.aibtc-base-dao/dao_base_contract
+      (contract-call? .aibtc-base-dao is-extension contract-caller)
+    )
+    ERR_NOT_DAO_OR_EXTENSION
   ))
 )
