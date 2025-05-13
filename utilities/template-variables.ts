@@ -59,6 +59,11 @@ export function generateTemplateReplacements(
     
     // Configuration values
     [`dao mission goes here/dao_manifest`]: `The mission of the ${tokenSymbol.toUpperCase()} DAO is to...`,
+    
+    // Additional variables from the report
+    // These are specific to certain contracts and may need to be customized per deployment
+    [`'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait'`]: 
+      `'${traits.STANDARD_SIP010}'`,
   };
   
   // Merge with custom replacements

@@ -5,6 +5,8 @@ import {
   processContractTemplate,
   createReplacementsMap,
 } from "../../utilities/template-processor";
+import { generateTemplateReplacements } from "../../utilities/template-variables";
+import { StacksNetworkName } from "@stacks/network";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -95,5 +97,25 @@ export class ContractGeneratorService {
     }
 
     return processContractTemplate(templateContent, replacementsMap);
+  }
+
+  /**
+   * Generate a contract from a template using network-specific replacements
+   */
+  async generateContractForNetwork(
+    contract: ContractBase,
+    network: StacksNetworkName,
+    tokenSymbol: string = "aibtc",
+    customReplacements: Record<string, string> = {}
+  ): Promise<string> {
+    // Generate replacements for the specified network
+    const networkReplacements = generateTemplateReplacements(
+      network,
+      tokenSymbol,
+      customReplacements
+    );
+    
+    // Use the existing method to generate the contract
+    return this.generateContract(contract, networkReplacements);
   }
 }
