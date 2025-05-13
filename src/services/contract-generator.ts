@@ -40,19 +40,37 @@ export class ContractGeneratorService {
     const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
     
     const matches = [...templateContent.matchAll(variableRegex)];
-    const variables = matches.map(match => `${match[1]}/${match[2]}`);
     
-    const uniqueVars = [...new Set(variables)];
+    // Store variables with their line numbers
+    const variablesWithLineNumbers = matches.map(match => {
+      // Calculate line number by counting newlines before the match index
+      const lineNumber = templateContent.substring(0, match.index).split('\n').length;
+      return {
+        key: `${match[1]}/${match[2]}`,
+        line: lineNumber,
+        toReplace: match[1],
+        keyName: match[2]
+      };
+    });
+    
+    // Get unique variables (keeping the first occurrence for line number)
+    const uniqueVarsMap = new Map();
+    variablesWithLineNumbers.forEach(v => {
+      if (!uniqueVarsMap.has(v.key)) {
+        uniqueVarsMap.set(v.key, v);
+      }
+    });
+    
+    const uniqueVars = Array.from(uniqueVarsMap.values());
     
     // Check for missing variables
-    const missingVars = uniqueVars.filter(v => !replacements[v]);
+    const missingVars = uniqueVars.filter(v => !replacements[v.key]);
     if (missingVars.length > 0) {
       const missingDetails = missingVars.map(v => {
-        const [toReplace, keyName] = v.split('/');
-        return `Not found\nTo replace: ${toReplace}\nWith key: ${keyName}`;
-      }).join('\n');
+        return `LINE ${v.line} MISSING TEMPLATE VARIABLE\nkey: ${v.keyName}\nreplaces: ${v.toReplace}`;
+      }).join('\n\n');
       
-      throw new Error(`Missing required template variables in ${contract.name}:\n${missingDetails}`);
+      throw new Error(missingDetails);
     }
     
     return processContractTemplate(templateContent, replacementsMap);
