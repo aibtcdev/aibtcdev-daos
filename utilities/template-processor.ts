@@ -52,7 +52,7 @@ export function processContractTemplate(
             const originalLine = lines[targetLineIndex];
             // Apply the replacement to the target line
             lines[targetLineIndex] = lines[targetLineIndex].replace(
-              new RegExp(replacementKey, 'g'),
+              new RegExp(escapeRegExp(replacementKey), 'g'),
               replacements.get(replacementMapKey)!
             );
             
@@ -115,6 +115,13 @@ export function createReplacementsMap(
   replacements: Record<string, string>
 ): Map<string, string> {
   return new Map(Object.entries(replacements));
+}
+
+/**
+ * Helper function to escape special characters in a string for use in a regular expression
+ */
+function escapeRegExp(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
 /**
