@@ -16,6 +16,7 @@ export function processContractTemplate(
   templateContent: string,
   replacements: Map<string, string>
 ): string {
+  // First handle the special comment-based replacements
   const lines = templateContent.split("\n");
   const processedLines: string[] = [];
   const skipLines = new Set<number>();
@@ -83,7 +84,28 @@ export function processContractTemplate(
     }
   }
   
-  return processedLines.join("\n");
+  let processed = processedLines.join("\n");
+  
+  // Now handle the {{variable}} replacements
+  // Process multiple times to handle nested variables
+  let iterations = 0;
+  const maxIterations = 5; // Prevent infinite loops
+  
+  let madeReplacement = true;
+  while (madeReplacement && iterations < maxIterations) {
+    madeReplacement = false;
+    iterations++;
+    
+    for (const [key, value] of replacements.entries()) {
+      const pattern = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+      if (pattern.test(processed)) {
+        processed = processed.replace(pattern, value);
+        madeReplacement = true;
+      }
+    }
+  }
+  
+  return processed;
 }
 
 /**
@@ -103,7 +125,15 @@ export async function getContractTemplateContent(
 ): Promise<string | null> {
   try {
     // Construct the path to the contract file
-    const contractPath = path.join("contracts", contract.templatePath);
+    const contractPath = path.join(process.cwd(), "contracts", contract.templatePath);
+    console.log(`Looking for template at: ${contractPath}`);
+    
+    // Check if file exists
+    if (!fs.existsSync(contractPath)) {
+      console.error(`Template file not found: ${contractPath}`);
+      return null;
+    }
+    
     // Read the file content
     const content = await fs.promises.readFile(contractPath, "utf-8");
     return content;

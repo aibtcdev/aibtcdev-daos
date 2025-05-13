@@ -5,8 +5,11 @@
 ;; traits
 ;;
 
+;; /g/.aibtc-base-dao-trait.aibtc-base-dao/dao_base_trait
 (impl-trait .aibtc-base-dao-trait.aibtc-base-dao)
+;; /g/.aibtc-dao-traits.proposal/dao_proposal_trait
 (use-trait proposal-trait .aibtc-dao-traits.proposal)
+;; /g/.aibtc-dao-traits.extension/dao_extension_trait
 (use-trait extension-trait .aibtc-dao-traits.extension)
 
 ;; constants

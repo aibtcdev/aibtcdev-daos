@@ -1,7 +1,7 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
-import { setupDaoContractRegistry } from "../../../utilities/contract-registry";
-import { constructDao } from "../../../utilities/dao-helpers";
+import { ErrCodeOnchainMessaging } from "../../../../utilities/contract-error-codes";
+import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -14,13 +14,16 @@ const address3 = accounts.get("wallet_3")!;
 const registry = setupDaoContractRegistry();
 const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "EXTENSIONS",
-  "DAO_EPOCH"
+  "ONCHAIN_MESSAGING"
 );
 const contractName = contractAddress.split(".")[1];
 const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
   "BASE",
   "DAO"
 );
+
+// import error codes
+const ErrCode = ErrCodeOnchainMessaging;
 
 describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
@@ -40,39 +43,35 @@ describe(`public functions: ${contractName}`, () => {
     // assert
     expect(callback.result).toBeOk(Cl.bool(true));
   });
-});
-
-describe(`read-only functions: ${contractName}`, () => {
-  ////////////////////////////////////////
-  // get-current-dao-epoch() tests
-  ////////////////////////////////////////
-  it("get-current-dao-epoch() returns expected value", () => {
-    // arrange
-    constructDao(deployer);
-    // act
-    const result = simnet.callReadOnlyFn(
-      contractAddress,
-      "get-current-dao-epoch",
-      [],
-      deployer
-    ).result;
-    // assert
-    expect(result).toBeOk(Cl.uint(0));
-  });
 
   ////////////////////////////////////////
-  // get-dao-epoch-length() tests
+  // send() tests
   ////////////////////////////////////////
-  it("get-dao-epoch-length() returns expected value", () => {
+  it("send() fails with empty message", () => {
     // arrange
     // act
-    const result = simnet.callReadOnlyFn(
+    const receipt = simnet.callPublicFn(
       contractAddress,
-      "get-dao-epoch-length",
-      [],
-      deployer
-    ).result;
+      "send",
+      [Cl.stringAscii("")],
+      address1
+    );
     // assert
-    expect(result).toBeOk(Cl.uint(4320));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INVALID_INPUT));
+  });
+
+  it("send() succeeds with valid message", () => {
+    // arrange
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "send",
+      [Cl.stringAscii("Test message")],
+      address1
+    );
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
   });
 });
+
+// Note: There are no read-only functions in this contract

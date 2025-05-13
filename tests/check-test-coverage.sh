@@ -13,9 +13,9 @@ untested_contracts=0
 # Function to convert contract path to expected test path
 get_test_path() {
     local contract_path=$1
-    # Remove 'contracts/' prefix and replace with 'tests/'
+    # Remove 'contracts/' prefix and replace with 'tests/contracts/'
     # Replace .clar with .test.ts
-    echo "${contract_path/contracts\//tests\/}" | sed 's/\.clar$/.test.ts/'
+    echo "${contract_path/contracts\//tests/contracts\/}" | sed 's/\.clar$/.test.ts/'
 }
 
 # Debug: Print current directory

@@ -24,10 +24,10 @@ jobs:
             echo "WRANGLER_ENV=preview" >> $GITHUB_ENV
           elif [[ ${{ github.ref }} == 'refs/heads/staging' ]]; then
             echo "WRANGLER_ENV=staging" >> $GITHUB_ENV
-            echo "TEST_URL=https://cache-staging.aibtc.dev" >> $GITHUB_ENV
+            echo "TEST_URL=https://daos-staging.aibtc.dev" >> $GITHUB_ENV
           else
             echo "WRANGLER_ENV=production" >> $GITHUB_ENV
-            echo "TEST_URL=https://cache.aibtc.dev" >> $GITHUB_ENV
+            echo "TEST_URL=https://daos.aibtc.dev" >> $GITHUB_ENV
           fi
 
       - name: Deploy with Wrangler
@@ -36,6 +36,12 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           environment: ${{ env.WRANGLER_ENV }}
+          wranglerVersion: "4.14.4"
+          preCommands: |
+            # Install dependencies
+            npm install
+            # Build the project
+            npm run build
 
       - name: Set Test URL for Preview
         if: github.event_name == 'pull_request'
@@ -44,9 +50,13 @@ jobs:
           PREVIEW_URL=$(echo "${{ steps.deploy.outputs.deployment-url }}" | sed 's/https:\/\///')
           echo "TEST_URL=https://$PREVIEW_URL" >> $GITHUB_ENV
 
+      - name: Set Test URL for Staging/Production
+        if: github.event_name == 'push'
+        run: |
+          echo "TEST_URL=${{ env.TEST_URL }}" >> $GITHUB_ENV
+
       - name: Test Endpoints
         run: |
           chmod +x tests/check-endpoints.sh
-          chmod +x tests/run-endpoint-tests.sh
           chmod +x tests/endpoints/*.sh
           ./tests/check-endpoints.sh ${{ env.TEST_URL }} true

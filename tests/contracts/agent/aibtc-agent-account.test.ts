@@ -1,22 +1,22 @@
 import { Cl, ClarityType, ClarityValue, cvToValue } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
-import { ErrCodeAgentAccount } from "../../utilities/contract-error-codes";
-import { setupFullContractRegistry } from "../../utilities/contract-registry";
+import { ErrCodeAgentAccount } from "../../../utilities/contract-error-codes";
+import { setupFullContractRegistry } from "../../../utilities/contract-registry";
 import {
   convertSIP019PrintEvent,
   DAO_TOKEN_ASSETS_MAP,
   SBTC_ASSETS_MAP,
   SBTC_CONTRACT,
-} from "../../utilities/contract-helpers";
-import { getBalancesForPrincipal } from "../../utilities/asset-helpers";
+} from "../../../utilities/contract-helpers";
+import { getBalancesForPrincipal } from "../../../utilities/asset-helpers";
 import {
   constructDao,
   formatSerializedBuffer,
   fundVoters,
   VOTING_DELAY,
   VOTING_PERIOD,
-} from "../../utilities/dao-helpers";
-import { dbgLog } from "../../utilities/debug-logging";
+} from "../../../utilities/dao-helpers";
+import { dbgLog } from "../../../utilities/debug-logging";
 
 // setup accounts
 const accounts = simnet.getAccounts();

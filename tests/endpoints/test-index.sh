@@ -10,4 +10,9 @@ test_index() {
     test_endpoint "/" 200 "Root endpoint"
     test_cors "/invalid" "Invalid endpoint CORS"
     test_endpoint "/invalid" 404 "Invalid endpoint"
+    echo "===================="
+    echo "API Index Tests"
+    echo "===================="
+    test_cors "/api" "API Index endpoint CORS"
+    test_endpoint "/api" 200 "API Index endpoint"
 }
