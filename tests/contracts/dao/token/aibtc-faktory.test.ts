@@ -363,7 +363,7 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-token-uri() returns expected value", () => {
     // arrange
-    const expectedUri = "<%= it.token_uri %>";
+    const expectedUri = "";
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,

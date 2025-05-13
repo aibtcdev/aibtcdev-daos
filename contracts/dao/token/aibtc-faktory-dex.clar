@@ -1,9 +1,9 @@
 ;; 99af7ff63e5e4bd7542e55d88bacc25a7a6f79004f9937ea0bab3ca4c2438061
 ;; aibtc.dev DAO faktory.fun DEX @version 1.0
 
-(impl-trait .aibtc-dao-traits.faktory-dex) ;; <%= it.token_faktory_dex_trait %>
-(impl-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1.dex-trait) ;; <%= it.faktory_dex_trait %>
-(use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait) ;; <%= it.faktory_sip10_trait %>
+(impl-trait .aibtc-dao-traits.faktory-dex)
+(impl-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1.dex-trait)
+(use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait)
 
 (define-constant ERR-MARKET-CLOSED (err u1001))
 (define-constant ERR-STX-NON-POSITIVE (err u1002))
@@ -21,15 +21,15 @@
 (define-constant DEX-TOKEN .aibtc-faktory) ;; SPV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RCJDC22
 
 ;; token constants
-(define-constant TARGET_STX u5000000) ;; <%= it.stx_target_amount %>
-(define-constant FAK_STX u1000000) ;; <%= it.virtual_stx_value %> 1/5 of STX_TARGET_AMOUNT
-(define-constant GRAD-FEE u100000) ;; <%= it.complete_fee % > 2% of STX_TARGET_AMOUNT
+(define-constant TARGET_STX u5000000)
+(define-constant FAK_STX u1000000)
+(define-constant GRAD-FEE u100000)
 (define-constant DEX-AMOUNT u250000)
 
 ;; data vars
 (define-data-var open bool false)
 (define-data-var fak-ustx uint u0)
-(define-data-var ft-balance uint u0) ;; <%= it.token_max_supply %> match with the token's supply (use decimals)
+(define-data-var ft-balance uint u0)
 (define-data-var stx-balance uint u0)
 (define-data-var premium uint u25)
 
@@ -82,7 +82,6 @@
           (try! (as-contract (contract-call? ft transfer agent-amount tx-sender FAKTORY none)))
           (try! (as-contract (contract-call? ft transfer originator-amount tx-sender ORIGINATOR none)))
           ;; Call XYK Core v-1-2 pool by Bitflow
-          ;; <%= it.bitflow_core_contract %> <%= it.pool_contract %> <%= it.bitflow_stx_token_address %> <%= it.bitflow_fee_address %>
           (try! (as-contract (contract-call?
             'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2
             create-pool .xyk-pool-sbtc-aibtc-v-1-1

@@ -1,6 +1,6 @@
 ;; Implement XYK pool trait and use SIP 010 trait
-(impl-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-pool-trait-v-1-2.xyk-pool-trait) ;; <%= it.bitflow_pool_trait %>
-(use-trait sip-010-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.sip-010-trait-ft-standard.sip-010-trait) ;; <%= it.sip10_trait %>
+(impl-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-pool-trait-v-1-2.xyk-pool-trait)
+(use-trait sip-010-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; implement aibtcdev trait
 (impl-trait .aibtc-dao-traits.bitflow-pool)
@@ -19,8 +19,8 @@
 (define-constant ERR_NOT_POOL_CONTRACT_DEPLOYER (err u3006))
 
 ;; XYK Core address and contract deployer address
-(define-constant CORE_ADDRESS 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2) ;; <%= it.bitflow_xyk_core_address %>
-(define-constant CONTRACT_DEPLOYER .aibtc-faktory-dex) ;; <%= it.dex_contract %>
+(define-constant CORE_ADDRESS 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2)
+(define-constant CONTRACT_DEPLOYER .aibtc-faktory-dex)
 
 ;; Define all pool data vars
 (define-data-var pool-id uint u0)

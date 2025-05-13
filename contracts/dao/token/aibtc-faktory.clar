@@ -1,5 +1,5 @@
-;; <%= it.hash %>
-;; <%= it.token_symbol %> Powered By Faktory.fun v1.0 
+;; 99af7ff63e5e4bd7542e55d88bacc25a7a6f79004f9937ea0bab3ca4c2438061
+;; AIBTC Powered By Faktory.fun v1.0 
 
 (impl-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait) ;; 'SP3XXMS38VTAWTVPE5682XSBFXPTH7XCPEBTX8AN2
 (impl-trait .aibtc-dao-traits.token) ;; 'SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC
@@ -7,10 +7,10 @@
 (define-constant ERR-NOT-AUTHORIZED u401)
 (define-constant ERR-NOT-OWNER u402)
 
-(define-fungible-token SYMBOL-AIBTC-DAO MAX) ;; <%= it.token_symbol %>
-(define-constant MAX u100000000000000000) ;; <%= it.token_max_supply %>
-(define-data-var contract-owner principal .aibtc-token-owner) ;; <%= it.token_owner %>
-(define-data-var token-uri (optional (string-utf8 256)) (some u"<%= it.token_uri %>"))
+(define-fungible-token SYMBOL-AIBTC-DAO MAX)
+(define-constant MAX u100000000000000000)
+(define-data-var contract-owner principal .aibtc-token-owner)
+(define-data-var token-uri (optional (string-utf8 256)) (some u"link to json for token metadata"))
 
 ;; SIP-10 Functions
 (define-public (transfer
@@ -22,7 +22,7 @@
   (begin
     (asserts! (is-eq tx-sender sender) (err ERR-NOT-AUTHORIZED))
     (and (is-some memo) (is-some (print memo)))
-    (ft-transfer? SYMBOL-AIBTC-DAO amount sender recipient) ;; <%= it.token_symbol %>
+    (ft-transfer? SYMBOL-AIBTC-DAO amount sender recipient)
   )
 )
 
@@ -42,27 +42,22 @@
 
 (define-read-only (get-balance (account principal))
   (ok (ft-get-balance SYMBOL-AIBTC-DAO account))
-  ;; <%= it.token_symbol %>
 )
 
 (define-read-only (get-name)
   (ok "SYMBOL-AIBTC-DAO")
-  ;; <%= it.token_name %>
 )
 
 (define-read-only (get-symbol)
   (ok "SYMBOL-AIBTC-DAO")
-  ;; <%= it.token_symbol %>
 )
 
 (define-read-only (get-decimals)
   (ok u8)
-  ;; <%= it.token_decimals %>
 )
 
 (define-read-only (get-total-supply)
   (ok (ft-get-supply SYMBOL-AIBTC-DAO))
-  ;; <%= it.token_symbol %>
 )
 
 (define-read-only (get-token-uri)
@@ -127,13 +122,13 @@
   (try! (ft-mint? SYMBOL-AIBTC-DAO (/ (* MAX u4) u100) .aibtc-pre-faktory)) ;; 4% pre-launch SPVMS254T8Q0RXQP95Y01T7KBHZV91X88CDK48QH
   (print {
     type: "faktory-trait-v1",
-    name: "NAME", ;; <%= it.token_name %>
-    symbol: "SYMBOL-AIBTC-DAO", ;; <%= it.token_symbol %>
-    token-uri: u"<%= it.token_uri %>",
+    name: "NAME",
+    symbol: "SYMBOL-AIBTC-DAO",
+    token-uri: u"link to json for token metadata",
     tokenContract: (as-contract tx-sender),
     supply: MAX,
-    decimals: u8, ;; <%= it.token_decimals %>
-    targetStx: u5000000, ;; <%= it.target_stx %> 
+    decimals: u8,
+    targetStx: u5000000,
     tokenToDex: (/ (* MAX u16) u100),
     tokenToDeployer: (/ (* MAX u4) u100),
     stxToDex: u0,
