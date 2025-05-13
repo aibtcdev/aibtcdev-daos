@@ -21,53 +21,85 @@ export function processContractTemplate(
   const processedLines: string[] = [];
   const skipLines = new Set<number>();
   
-  // First pass: identify all replacement patterns
+  // Process all template variables
+  const templateVariables: {
+    lineIndex: number;
+    commentLineIndex: number;
+    key: string;
+    value: string;
+    replacementKey: string;
+  }[] = [];
+  
+  // First pass: identify all replacement patterns and their target lines
   for (let i = 0; i < lines.length; i++) {
     const currentLine = lines[i];
     
     // Check if the current line is a replacement comment
     const commentMatch = currentLine.match(/;;\s*\/g\/([^\/]+)\/([^\/]+)/);
     if (commentMatch) {
-      // Find the target line - it's the next non-replacement-comment line
-      let targetLineIndex = i + 1;
-      while (targetLineIndex < lines.length && 
-             lines[targetLineIndex].trim().match(/^;;\s*\/g\//)) {
-        targetLineIndex++;
-      }
+      const replacementKey = commentMatch[1];
+      const valueKey = commentMatch[2];
+      const replacementMapKey = `${replacementKey}/${valueKey}`;
       
-      // If we found a valid target line
-      if (targetLineIndex < lines.length) {
-        const replacementKey = commentMatch[1];
-        const valueKey = commentMatch[2];
-        const replacementMapKey = `${replacementKey}/${valueKey}`;
+      if (replacements.has(replacementMapKey)) {
+        // Find the target line - could be several lines down
+        // We need to find the first non-comment line after this comment
+        let targetLineIndex = i + 1;
+        while (targetLineIndex < lines.length) {
+          // Skip other template variable comments
+          if (lines[targetLineIndex].trim().match(/^;;\s*\/g\//)) {
+            targetLineIndex++;
+            continue;
+          }
+          
+          // Skip empty lines or regular comments
+          if (lines[targetLineIndex].trim() === '' || lines[targetLineIndex].trim().startsWith(';;')) {
+            targetLineIndex++;
+            continue;
+          }
+          
+          // Found a non-comment line
+          break;
+        }
         
-        if (replacements.has(replacementMapKey)) {
+        // If we found a valid target line
+        if (targetLineIndex < lines.length) {
+          templateVariables.push({
+            lineIndex: targetLineIndex,
+            commentLineIndex: i,
+            key: replacementKey,
+            value: replacements.get(replacementMapKey)!,
+            replacementKey: replacementMapKey
+          });
+          
           // Mark this comment line to be skipped
           skipLines.add(i);
-          
-          // Apply the replacement to the target line
-          const originalLine = lines[targetLineIndex];
-          lines[targetLineIndex] = lines[targetLineIndex].replace(
-            new RegExp(escapeRegExp(replacementKey), 'g'),
-            replacements.get(replacementMapKey)!
-          );
-          
-          // Debug log the replacement
-          dbgLog(
-            {
-              action: "template_replacement",
-              key: replacementMapKey,
-              originalLine: originalLine,
-              replacedLine: lines[targetLineIndex],
-            },
-            { titleBefore: "Template Replacement" }
-          );
         }
       }
     }
   }
   
-  // Second pass: build the output, skipping marked lines
+  // Second pass: apply all replacements
+  for (const variable of templateVariables) {
+    const originalLine = lines[variable.lineIndex];
+    lines[variable.lineIndex] = lines[variable.lineIndex].replace(
+      new RegExp(escapeRegExp(variable.key), 'g'),
+      variable.value
+    );
+    
+    // Debug log the replacement
+    dbgLog(
+      {
+        action: "template_replacement",
+        key: variable.replacementKey,
+        originalLine,
+        replacedLine: lines[variable.lineIndex],
+      },
+      { titleBefore: "Template Replacement" }
+    );
+  }
+  
+  // Third pass: build the output, skipping marked lines
   for (let i = 0; i < lines.length; i++) {
     if (!skipLines.has(i)) {
       processedLines.push(lines[i]);
