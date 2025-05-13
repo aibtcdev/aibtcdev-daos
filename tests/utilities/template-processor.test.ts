@@ -401,8 +401,18 @@ describe("Contract Generator", () => {
         } catch (error) {
           // Only show the error message without the stack trace
           if (error instanceof Error) {
+            // Extract just the missing variables part without the full contract code
+            const errorLines = error.message.split('\n');
+            const cleanedErrorMessage = errorLines
+              .filter(line => 
+                line.includes('MISSING TEMPLATE VARIABLE') || 
+                line.startsWith('key:') || 
+                line.startsWith('replaces:')
+              )
+              .join('\n');
+            
             console.error(
-              `Error processing ${contractName}:\n${error.message}`
+              `Error processing ${contractName}:\n${cleanedErrorMessage}`
             );
           } else {
             console.error(`Error processing ${contractName}:`, error);

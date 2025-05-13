@@ -46,33 +46,22 @@ export function processContractTemplate(
         let targetLineIndex = i + 1;
         let foundTarget = false;
         
-        while (targetLineIndex < lines.length && !foundTarget) {
-          // Skip other template variable comments
-          if (lines[targetLineIndex].trim().match(/^;;\s*\/g\//)) {
-            targetLineIndex++;
-            continue;
-          }
-          
-          // Skip empty lines or regular comments that don't contain the key
-          if (lines[targetLineIndex].trim() === '' || 
-              (lines[targetLineIndex].trim().startsWith(';;') && 
-               !lines[targetLineIndex].includes(replacementKey))) {
-            targetLineIndex++;
-            continue;
-          }
-          
-          // Check if this line contains the key to be replaced
-          if (lines[targetLineIndex].includes(replacementKey)) {
+        // First, skip any comment lines that might be stacked
+        while (targetLineIndex < lines.length && 
+               (lines[targetLineIndex].trim() === '' || 
+                lines[targetLineIndex].trim().match(/^;;\s*\/g\//) ||
+                lines[targetLineIndex].trim().startsWith(';;'))) {
+          targetLineIndex++;
+        }
+        
+        // Now look for the first line containing the key
+        const searchLimit = Math.min(targetLineIndex + 10, lines.length);
+        for (let j = targetLineIndex; j < searchLimit; j++) {
+          if (lines[j].includes(replacementKey)) {
+            targetLineIndex = j;
             foundTarget = true;
             break;
           }
-          
-          // If we've gone too far (e.g., 5 lines) without finding the key, stop searching
-          if (targetLineIndex > i + 5) {
-            break;
-          }
-          
-          targetLineIndex++;
         }
         
         // If we found a valid target line
