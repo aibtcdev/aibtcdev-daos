@@ -17,17 +17,17 @@
     (try! (contract-call? .aibtc-base-dao set-extensions
       (list
         ;; initial DAO extensions (features)
-        ;; /g/.aibtc-action-proposal-voting/dao_action_proposal_voting_contract
+        ;; /g/.aibtc-action-proposal-voting/dao_contract_action_proposal_voting
         {
           extension: .aibtc-action-proposal-voting,
           enabled: true,
         }
-        ;; /g/.aibtc-dao-charter/dao_charter_contract
+        ;; /g/.aibtc-dao-charter/dao_contract_charter
         {
           extension: .aibtc-dao-charter,
           enabled: true,
         }
-        ;; /g/.aibtc-dao-epoch/dao_epoch_contract
+        ;; /g/.aibtc-dao-epoch/dao_contract_epoch
         {
           extension: .aibtc-dao-epoch,
           enabled: true,
@@ -42,7 +42,7 @@
           extension: .aibtc-onchain-messaging,
           enabled: true,
         }
-        ;; /g/.aibtc-token-owner/dao_token_owner_contract
+        ;; /g/.aibtc-token-owner/dao_contract_token_owner
         {
           extension: .aibtc-token-owner,
           enabled: true,
@@ -53,7 +53,7 @@
           enabled: true,
         }
         ;; initial action proposals (as extensions)
-        ;; /g/.aibtc-action-send-message/dao_action_send_message_contract
+        ;; /g/.aibtc-action-send-message/dao_action_send_message
         {
           extension: .aibtc-action-send-message,
           enabled: true,
@@ -63,7 +63,7 @@
     ;; /g/.aibtc-treasury/dao_contract_treasury
     (try! (contract-call? .aibtc-treasury allow-asset CFG_DAO_TOKEN true))
     ;; set DAO manifest in dao-charter extension
-    ;; /g/.aibtc-dao-charter/dao_charter_contract
+    ;; /g/.aibtc-dao-charter/dao_contract_charter
     (try! (contract-call? .aibtc-dao-charter set-dao-charter CFG_DAO_MANIFEST_TEXT))
     ;; send DAO manifest as onchain message
     ;; /g/.aibtc-onchain-messaging/dao_contract_messaging

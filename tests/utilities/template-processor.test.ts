@@ -139,10 +139,10 @@ describe("Template Processor", () => {
         "The mission of this DAO is to test template processing",
       ".aibtc-faktory/dao_contract_token": ".test-token-contract",
       ".aibtc-base-dao/dao_contract_base": ".test-base-dao",
-      ".aibtc-action-proposal-voting/dao_action_proposal_voting_contract":
+      ".aibtc-action-proposal-voting/dao_contract_action_proposal_voting":
         ".test-proposal-voting",
-      ".aibtc-dao-charter/dao_charter_contract": ".test-dao-charter",
-      ".aibtc-dao-epoch/dao_epoch_contract": ".test-dao-epoch",
+      ".aibtc-dao-charter/dao_contract_charter": ".test-dao-charter",
+      ".aibtc-dao-epoch/dao_contract_epoch": ".test-dao-epoch",
       ".aibtc-dao-users/dao_contract_users": ".test-dao-users",
       ".aibtc-onchain-messaging/dao_contract_messaging": ".test-messaging",
       ".aibtc-token-owner/dao_token_owner_contract": ".test-token-owner",
