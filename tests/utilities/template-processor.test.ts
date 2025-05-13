@@ -1,9 +1,14 @@
+import fs from "node:fs";
+import path from "node:path";
+import { beforeAll, describe, expect, it } from "vitest";
 import { dbgLog } from "../../utilities/debug-logging";
 import { ContractRegistry } from "../../utilities/contract-registry";
 import { ContractGeneratorService } from "../../src/services/contract-generator";
 import { TemplateScanner } from "../../utilities/template-scanner";
-import fs from "node:fs";
-import path from "node:path";
+import {
+  createReplacementsMap,
+  processContractTemplate,
+} from "../../utilities/template-processor";
 
 describe("Template Processor", () => {
   it("should process template and replace values", () => {
@@ -311,7 +316,7 @@ describe("Contract Generator", () => {
     generator = new ContractGeneratorService();
 
     // Create output directory for test results
-    outputDir = path.join(process.cwd(), "test-output");
+    outputDir = path.join(process.cwd(), "generated-contracts/test-output");
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
