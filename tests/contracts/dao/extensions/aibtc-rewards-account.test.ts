@@ -1,7 +1,7 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
-import { ErrCodeOnchainMessaging } from "../../../utilities/contract-error-codes";
-import { setupDaoContractRegistry } from "../../../utilities/contract-registry";
+import { ErrCodeRewardsAccount } from "../../../../utilities/contract-error-codes";
+import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -14,7 +14,7 @@ const address3 = accounts.get("wallet_3")!;
 const registry = setupDaoContractRegistry();
 const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "EXTENSIONS",
-  "ONCHAIN_MESSAGING"
+  "REWARDS_ACCOUNT"
 );
 const contractName = contractAddress.split(".")[1];
 const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
@@ -23,7 +23,7 @@ const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
 );
 
 // import error codes
-const ErrCode = ErrCodeOnchainMessaging;
+const ErrCode = ErrCodeRewardsAccount;
 
 describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
@@ -45,33 +45,20 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   ////////////////////////////////////////
-  // send() tests
+  // transfer-reward() tests
   ////////////////////////////////////////
-  it("send() fails with empty message", () => {
+  it("transfer-reward() fails if called directly", () => {
     // arrange
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
-      "send",
-      [Cl.stringAscii("")],
+      "transfer-reward",
+      [Cl.principal(address1), Cl.uint(100)],
       address1
     );
     // assert
-    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INVALID_INPUT));
-  });
-
-  it("send() succeeds with valid message", () => {
-    // arrange
-    // act
-    const receipt = simnet.callPublicFn(
-      contractAddress,
-      "send",
-      [Cl.stringAscii("Test message")],
-      address1
-    );
-    // assert
-    expect(receipt.result).toBeOk(Cl.bool(true));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
 });
 
-// Note: There are no read-only functions in this contract
+// Note: There are no read-only functions in this contract that need testing

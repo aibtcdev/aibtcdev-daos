@@ -1,8 +1,8 @@
 import { Cl, ClarityType, cvToValue, UIntCV } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
-import { setupDaoContractRegistry } from "../../../utilities/contract-registry";
-import { fundVoters, getDaoTokens } from "../../../utilities/dao-helpers";
-import { SBTC_CONTRACT } from "../../../utilities/contract-helpers";
+import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
+import { fundVoters, getDaoTokens } from "../../../../utilities/dao-helpers";
+import { SBTC_CONTRACT } from "../../../../utilities/contract-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();

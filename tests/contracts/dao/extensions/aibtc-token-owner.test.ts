@@ -1,7 +1,7 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
-import { ErrCodeRewardsAccount } from "../../../utilities/contract-error-codes";
-import { setupDaoContractRegistry } from "../../../utilities/contract-registry";
+import { ErrCodeTokenOwner } from "../../../../utilities/contract-error-codes";
+import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -14,7 +14,7 @@ const address3 = accounts.get("wallet_3")!;
 const registry = setupDaoContractRegistry();
 const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "EXTENSIONS",
-  "REWARDS_ACCOUNT"
+  "TOKEN_OWNER"
 );
 const contractName = contractAddress.split(".")[1];
 const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
@@ -23,7 +23,7 @@ const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
 );
 
 // import error codes
-const ErrCode = ErrCodeRewardsAccount;
+const ErrCode = ErrCodeTokenOwner;
 
 describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
@@ -45,15 +45,31 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   ////////////////////////////////////////
-  // transfer-reward() tests
+  // set-token-uri() tests
   ////////////////////////////////////////
-  it("transfer-reward() fails if called directly", () => {
+  it("set-token-uri() fails if called directly", () => {
     // arrange
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
-      "transfer-reward",
-      [Cl.principal(address1), Cl.uint(100)],
+      "set-token-uri",
+      [Cl.stringUtf8("https://example.com/token.json")],
+      address1
+    );
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+  });
+
+  ////////////////////////////////////////
+  // transfer-ownership() tests
+  ////////////////////////////////////////
+  it("transfer-ownership() fails if called directly", () => {
+    // arrange
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "transfer-ownership",
+      [Cl.principal(address1)],
       address1
     );
     // assert

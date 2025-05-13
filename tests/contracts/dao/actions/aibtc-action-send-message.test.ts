@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { Cl } from "@stacks/transactions";
-import { ErrCodeActionSendMessage } from "../../../utilities/contract-error-codes";
+import { ErrCodeActionSendMessage } from "../../../../utilities/contract-error-codes";
 import {
   constructDao,
   formatSerializedBuffer,
   passActionProposal,
-} from "../../../utilities/dao-helpers";
-import { setupDaoContractRegistry } from "../../../utilities/contract-registry";
+} from "../../../../utilities/dao-helpers";
+import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 
 // setup accounts
 const accounts = simnet.getAccounts();

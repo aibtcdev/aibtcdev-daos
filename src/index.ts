@@ -3,6 +3,7 @@ import { CloudflareBindings } from "./cf-types";
 import { setupFullContractRegistry } from "../utilities/contract-registry";
 import { AIBTC_MCP_DO } from "../durable-objects/aibtc-mcp-do";
 import { createApiRouter } from "./api";
+import { corsHeaders } from "./utils/response-utils";
 
 export { AIBTC_MCP_DO };
 
@@ -11,8 +12,18 @@ const app = new Hono<{ Bindings: CloudflareBindings }>();
 // Create a shared registry instance
 const registry = setupFullContractRegistry();
 
+app.options("*", (c) => {
+  return c.text("ok", 200, {
+    ...corsHeaders(),
+    "Content-Type": "text/plain",
+  });
+});
+
 app.get("/", (c) => {
-  return c.text("AI-powered Bitcoin DAOs");
+  return c.json({ message: "AI-powered Bitcoin DAOs" }, 200, {
+    ...corsHeaders(),
+    "Content-Type": "application/json",
+  });
 });
 
 // Mount the API router
@@ -38,5 +49,13 @@ app.mount(
     replaceRequest: false,
   }
 );
+
+// 404
+app.all("*", (c) => {
+  return c.json({ error: "Not Found" }, 404, {
+    ...corsHeaders(),
+    "Content-Type": "application/json",
+  });
+});
 
 export default app;

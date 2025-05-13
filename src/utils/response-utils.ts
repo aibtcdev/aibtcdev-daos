@@ -1,6 +1,21 @@
-import { Context } from 'hono';
-import { ApiError } from './api-error';
-import { ErrorCode } from './error-catalog';
+import { Context } from "hono";
+import { ApiError } from "./api-error";
+import { UnofficialStatusCode } from "hono/utils/http-status";
+
+/**
+ * Creates CORS headers for cross-origin requests
+ *
+ * @param origin - Optional origin to allow, defaults to '*' (all origins)
+ * @returns HeadersInit object with CORS headers
+ */
+export function corsHeaders(origin?: string): HeadersInit {
+  return {
+    "Access-Control-Allow-Origin": origin || "*",
+    "Access-Control-Allow-Methods": "GET, HEAD, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Max-Age": "86400",
+  };
+}
 
 /**
  * Standard response format for all API responses
@@ -19,13 +34,20 @@ interface ApiResponse<T> {
 /**
  * Creates a standardized success response
  */
-export function createSuccessResponse<T>(c: Context, data: T, status = 200): Response {
+export function createSuccessResponse<T>(
+  c: Context,
+  data: T,
+  status = 200
+): Response {
   const body: ApiResponse<T> = {
     success: true,
     data,
   };
 
-  return c.json(body, status);
+  return c.json(body, status as UnofficialStatusCode, {
+    ...corsHeaders(),
+    "Content-Type": "application/json",
+  });
 }
 
 /**
@@ -54,13 +76,16 @@ export function createErrorResponse(c: Context, error: unknown): Response {
       success: false,
       error: {
         id: errorId,
-        code: 'INTERNAL_ERROR',
-        message: errorMessage || 'An unexpected error occurred',
+        code: "INTERNAL_ERROR",
+        message: errorMessage || "An unexpected error occurred",
       },
     };
   }
 
-  return c.json(body, status);
+  return c.json(body, status as UnofficialStatusCode, {
+    ...corsHeaders(),
+    "Content-Type": "application/json",
+  });
 }
 
 /**
@@ -68,8 +93,8 @@ export function createErrorResponse(c: Context, error: unknown): Response {
  */
 function generateErrorId(): string {
   // Use crypto.randomUUID() if available
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return crypto.randomUUID().split('-')[0]; // Use first segment for brevity
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID().split("-")[0]; // Use first segment for brevity
   }
 
   // Fallback to timestamp + random string

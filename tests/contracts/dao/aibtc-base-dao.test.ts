@@ -1,8 +1,8 @@
 import { bufferCVFromString, Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
-import { ErrCodeBaseDao } from "../../utilities/contract-error-codes";
-import { constructDao } from "../../utilities/dao-helpers";
-import { setupDaoContractRegistry } from "../../utilities/contract-registry";
+import { ErrCodeBaseDao } from "../../../utilities/contract-error-codes";
+import { constructDao } from "../../../utilities/dao-helpers";
+import { setupDaoContractRegistry } from "../../../utilities/contract-registry";
 
 // setup accounts
 const accounts = simnet.getAccounts();
