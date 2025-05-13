@@ -26,52 +26,42 @@ export function processContractTemplate(
     const currentLine = lines[i];
     
     // Check if the current line is a replacement comment
-    if (currentLine.trim().startsWith(";;") && currentLine.includes("/g/")) {
+    const commentMatch = currentLine.match(/;;\s*\/g\/([^\/]+)\/([^\/]+)/);
+    if (commentMatch) {
       // Find the target line - it's the next non-replacement-comment line
       let targetLineIndex = i + 1;
       while (targetLineIndex < lines.length && 
-             lines[targetLineIndex].trim().startsWith(";;") && 
-             lines[targetLineIndex].includes("/g/")) {
+             lines[targetLineIndex].trim().match(/^;;\s*\/g\//)) {
         targetLineIndex++;
       }
       
       // If we found a valid target line
       if (targetLineIndex < lines.length) {
-        // Extract the replacement pattern
-        const matches = Array.from(currentLine.matchAll(/;;\s*\/g\/([^\/]+)\/([^\/]+)/g));
-        let hasValidReplacement = false;
+        const replacementKey = commentMatch[1];
+        const valueKey = commentMatch[2];
+        const replacementMapKey = `${replacementKey}/${valueKey}`;
         
-        // Apply each replacement to the target line
-        for (const match of matches) {
-          const replacementKey = match[1];
-          const valueKey = match[2];
-          const replacementMapKey = `${replacementKey}/${valueKey}`;
-          
-          if (replacements.has(replacementMapKey)) {
-            hasValidReplacement = true;
-            const originalLine = lines[targetLineIndex];
-            // Apply the replacement to the target line
-            lines[targetLineIndex] = lines[targetLineIndex].replace(
-              new RegExp(escapeRegExp(replacementKey), 'g'),
-              replacements.get(replacementMapKey)!
-            );
-            
-            // Debug log the replacement
-            dbgLog(
-              {
-                action: "template_replacement",
-                key: replacementMapKey,
-                originalLine: originalLine,
-                replacedLine: lines[targetLineIndex],
-              },
-              { titleBefore: "Template Replacement" }
-            );
-          }
-        }
-        
-        // Only skip the comment line if we had a valid replacement
-        if (hasValidReplacement) {
+        if (replacements.has(replacementMapKey)) {
+          // Mark this comment line to be skipped
           skipLines.add(i);
+          
+          // Apply the replacement to the target line
+          const originalLine = lines[targetLineIndex];
+          lines[targetLineIndex] = lines[targetLineIndex].replace(
+            new RegExp(escapeRegExp(replacementKey), 'g'),
+            replacements.get(replacementMapKey)!
+          );
+          
+          // Debug log the replacement
+          dbgLog(
+            {
+              action: "template_replacement",
+              key: replacementMapKey,
+              originalLine: originalLine,
+              replacedLine: lines[targetLineIndex],
+            },
+            { titleBefore: "Template Replacement" }
+          );
         }
       }
     }
@@ -84,8 +74,7 @@ export function processContractTemplate(
     }
   }
   
-  let processed = processedLines.join("\n");
-  return processed;
+  return processedLines.join("\n");
 }
 
 /**
