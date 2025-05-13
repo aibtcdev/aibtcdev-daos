@@ -42,8 +42,7 @@ export function processContractTemplate(
       const replacementMapKey = `${replacementKey}/${valueKey}`;
       
       if (replacements.has(replacementMapKey)) {
-        // Find the target line - could be several lines down
-        // We need to find the first non-comment line after this comment that contains the key
+        // Find the target line - the first line after this comment that contains the key
         let targetLineIndex = i + 1;
         let foundTarget = false;
         
@@ -68,8 +67,8 @@ export function processContractTemplate(
             break;
           }
           
-          // If we've gone too far (e.g., 10 lines) without finding the key, stop searching
-          if (targetLineIndex > i + 10) {
+          // If we've gone too far (e.g., 5 lines) without finding the key, stop searching
+          if (targetLineIndex > i + 5) {
             break;
           }
           
