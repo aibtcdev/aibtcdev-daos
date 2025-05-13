@@ -9,7 +9,7 @@ test_api_process_template() {
     
     # Test POST endpoint with valid data for aibtc-base-dao
     local valid_data='{
-        "contractName":"aibtc-base-dao",
+        "name":"aibtc-base-dao",
         "replacements":{
             "aibtc/dao_token_symbol":"FACES",
             "aibtc-base-dao-trait.aibtc-base-dao":"aibtc-dao-traits-v3.dao-base",
@@ -21,9 +21,9 @@ test_api_process_template() {
     # Ensure proper URL formatting
     local url
     if [[ "$API_URL" == */ ]]; then
-        url="${API_URL}api/generate-contract"
+        url="${API_URL}api/process-template"
     else
-        url="${API_URL}/api/generate-contract"
+        url="${API_URL}/api/process-template"
     fi
     
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
