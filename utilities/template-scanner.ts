@@ -23,18 +23,14 @@ export class TemplateScanner {
         if (fs.existsSync(templatePath)) {
           const templateContent = fs.readFileSync(templatePath, "utf8");
           
-          // Check for both variable formats
-          const variableRegex1 = /\{\{([^}]+)\}\}/g;
-          const variableRegex2 = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
+          // Only check for /g/ format
+          const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
           
-          const matches1 = [...templateContent.matchAll(variableRegex1)];
-          const matches2 = [...templateContent.matchAll(variableRegex2)];
-          
-          const variables1 = matches1.map(match => match[1]);
-          const variables2 = matches2.map(match => `${match[1]}/${match[2]}`);
+          const matches = [...templateContent.matchAll(variableRegex)];
+          const variables = matches.map(match => `${match[1]}/${match[2]}`);
           
           // Store unique variables
-          report[`${contract.type}/${contract.name}`] = [...new Set([...variables1, ...variables2])];
+          report[`${contract.type}/${contract.name}`] = [...new Set(variables)];
         } else {
           console.error(`Template not found for ${contract.name}: ${templatePath}`);
         }

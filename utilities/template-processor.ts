@@ -85,26 +85,6 @@ export function processContractTemplate(
   }
   
   let processed = processedLines.join("\n");
-  
-  // Now handle the {{variable}} replacements
-  // Process multiple times to handle nested variables
-  let iterations = 0;
-  const maxIterations = 5; // Prevent infinite loops
-  
-  let madeReplacement = true;
-  while (madeReplacement && iterations < maxIterations) {
-    madeReplacement = false;
-    iterations++;
-    
-    for (const [key, value] of replacements.entries()) {
-      const pattern = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
-      if (pattern.test(processed)) {
-        processed = processed.replace(pattern, value);
-        madeReplacement = true;
-      }
-    }
-  }
-  
   return processed;
 }
 

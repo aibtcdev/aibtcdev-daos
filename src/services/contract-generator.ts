@@ -36,17 +36,13 @@ export class ContractGeneratorService {
     const replacementsMap = createReplacementsMap(replacements);
     
     // Extract all variables from template to check for missing replacements
-    // Check for both {{variable}} format and /g/KEY/value format
-    const variableRegex1 = /\{\{([^}]+)\}\}/g;
-    const variableRegex2 = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
+    // Only check for /g/KEY/value format
+    const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
     
-    const matches1 = [...templateContent.matchAll(variableRegex1)];
-    const matches2 = [...templateContent.matchAll(variableRegex2)];
+    const matches = [...templateContent.matchAll(variableRegex)];
+    const variables = matches.map(match => `${match[1]}/${match[2]}`);
     
-    const variables1 = matches1.map(match => match[1]);
-    const variables2 = matches2.map(match => `${match[1]}/${match[2]}`);
-    
-    const uniqueVars = [...new Set([...variables1, ...variables2])];
+    const uniqueVars = [...new Set(variables)];
     
     // Check for missing variables
     const missingVars = uniqueVars.filter(v => !replacements[v]);
