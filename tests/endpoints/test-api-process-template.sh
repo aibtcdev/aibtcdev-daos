@@ -8,7 +8,7 @@ test_api_process_template() {
     echo "===================="
     
     # Test POST endpoint with valid data
-    local valid_data='{"name":"dao-core","replacements":{"KEY":"value"}}'
+    local valid_data='{"name":"aibtc-base-dao","replacements":{"KEY":"value"}}'
     
     # Ensure proper URL formatting
     local url

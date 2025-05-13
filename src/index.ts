@@ -20,7 +20,10 @@ app.options("*", (c) => {
 });
 
 app.get("/", (c) => {
-  return c.text("AI-powered Bitcoin DAOs");
+  return c.text("AI-powered Bitcoin DAOs", 200, {
+    ...corsHeaders(),
+    "Content-Type": "text/plain",
+  });
 });
 
 // Mount the API router
@@ -46,5 +49,13 @@ app.mount(
     replaceRequest: false,
   }
 );
+
+// 404
+app.all("*", (c) => {
+  return c.text("Not Found", 404, {
+    ...corsHeaders(),
+    "Content-Type": "text/plain",
+  });
+});
 
 export default app;
