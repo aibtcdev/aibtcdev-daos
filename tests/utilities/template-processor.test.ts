@@ -141,7 +141,7 @@ describe("Template Processor", () => {
       name: "aibtc-base-initialize-dao",
       type: "PROPOSALS",
       subtype: "INITIALIZE_DAO",
-      templatePath: "dao/proposals/aibtc-base-initialize-dao.clar"
+      templatePath: "dao/proposals/aibtc-base-initialize-dao.clar",
     };
 
     // Read the template content directly
@@ -165,10 +165,7 @@ describe("Template Processor", () => {
       "aibtc/dao_token_symbol": "TEST",
     });
 
-    const processed = processContractTemplate(
-      templateContent,
-      replacements
-    );
+    const processed = processContractTemplate(templateContent!, replacements);
 
     // Check that the replacements were made
     expect(processed).toContain(
@@ -195,7 +192,7 @@ describe("Template Processor", () => {
       name: "aibtc-token-owner",
       type: "EXTENSIONS",
       subtype: "TOKEN_OWNER",
-      templatePath: "dao/extensions/aibtc-token-owner.clar"
+      templatePath: "dao/extensions/aibtc-token-owner.clar",
     };
 
     // Read the template content directly
@@ -211,7 +208,7 @@ describe("Template Processor", () => {
       "aibtc/dao_token_symbol": "TEST",
     });
 
-    const processed = processContractTemplate(templateContent, replacements);
+    const processed = processContractTemplate(templateContent!, replacements);
 
     // Check that the replacements were made
     expect(processed).toContain("(impl-trait .test-traits.extension)");
@@ -355,13 +352,18 @@ describe("Contract Generator", () => {
       // Add all necessary replacements for this contract
       const singleContractReplacements = {
         ...replacements,
-        ".aibtc-base-dao-trait.aibtc-base-dao/dao_trait_base": ".test-traits.base-dao",
-        ".aibtc-dao-traits.extension/dao_trait_extension": ".test-traits.extension",
+        ".aibtc-base-dao-trait.aibtc-base-dao/dao_trait_base":
+          ".test-traits.base-dao",
+        ".aibtc-dao-traits.extension/dao_trait_extension":
+          ".test-traits.extension",
         "aibtc/dao_token_symbol": "TEST",
       };
 
       try {
-        const content = await generator.generateContract(contract, singleContractReplacements);
+        const content = await generator.generateContract(
+          contract,
+          singleContractReplacements
+        );
 
         // Basic validation
         expect(content).toBeTruthy();
@@ -373,15 +375,16 @@ describe("Contract Generator", () => {
       } catch (error) {
         // Format error message consistently
         if (error instanceof Error) {
-          const errorLines = error.message.split('\n');
+          const errorLines = error.message.split("\n");
           const cleanedErrorMessage = errorLines
-            .filter(line => 
-              line.includes('MISSING TEMPLATE VARIABLE') || 
-              line.startsWith('key:') || 
-              line.startsWith('replaces:')
+            .filter(
+              (line) =>
+                line.includes("MISSING TEMPLATE VARIABLE") ||
+                line.startsWith("key:") ||
+                line.startsWith("replaces:")
             )
-            .join('\n');
-          
+            .join("\n");
+
           console.error(
             `Error processing ${contractName}:\n${cleanedErrorMessage}`
           );
@@ -404,10 +407,12 @@ describe("Contract Generator", () => {
     const extendedReplacements = {
       ...replacements,
       // Base traits
-      ".aibtc-base-dao-trait.aibtc-base-dao/dao_trait_base": ".test-traits.base-dao",
-      
+      ".aibtc-base-dao-trait.aibtc-base-dao/dao_trait_base":
+        ".test-traits.base-dao",
+
       // Extension traits
-      ".aibtc-dao-traits.extension/dao_trait_extension": ".test-traits.extension",
+      ".aibtc-dao-traits.extension/dao_trait_extension":
+        ".test-traits.extension",
       ".aibtc-dao-traits.action/dao_trait_action": ".test-traits.action",
       ".aibtc-dao-traits.action-proposals-voting/dao_trait_action_proposals_voting":
         ".test-traits.action-proposals-voting",
@@ -416,7 +421,7 @@ describe("Contract Generator", () => {
       ".aibtc-dao-traits.token-owner/dao_token_owner_trait":
         ".test-traits.token-owner",
       ".aibtc-dao-traits.proposal/dao_trait_proposal": ".test-traits.proposal",
-      
+
       // Agent account traits
       ".aibtc-agent-account-traits.aibtc-account/agent_account_trait_account":
         ".test-traits.agent-account",
@@ -439,8 +444,9 @@ describe("Contract Generator", () => {
       ".aibtc-treasury/dao_contract_treasury": ".test-treasury",
       ".aibtc-dao-users/dao_contract_users": ".test-dao-users",
       ".dao-run-cost/base_dao_run_cost_contract": ".test-dao-run-cost",
-      ".aibtc-rewards-account/dao_contract_rewards_account": ".test-rewards-account",
-      
+      ".aibtc-rewards-account/dao_contract_rewards_account":
+        ".test-rewards-account",
+
       // Token symbol
       "aibtc/dao_token_symbol": "TEST",
     };
@@ -468,15 +474,16 @@ describe("Contract Generator", () => {
           // Only show the error message without the stack trace
           if (error instanceof Error) {
             // Extract just the missing variables part without the full contract code
-            const errorLines = error.message.split('\n');
+            const errorLines = error.message.split("\n");
             const cleanedErrorMessage = errorLines
-              .filter(line => 
-                line.includes('MISSING TEMPLATE VARIABLE') || 
-                line.startsWith('key:') || 
-                line.startsWith('replaces:')
+              .filter(
+                (line) =>
+                  line.includes("MISSING TEMPLATE VARIABLE") ||
+                  line.startsWith("key:") ||
+                  line.startsWith("replaces:")
               )
-              .join('\n');
-            
+              .join("\n");
+
             console.error(
               `Error processing ${contractName}:\n${cleanedErrorMessage}`
             );
