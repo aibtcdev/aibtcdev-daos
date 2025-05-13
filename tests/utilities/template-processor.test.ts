@@ -8,6 +8,7 @@ import { TemplateScanner } from "../../utilities/template-scanner";
 import {
   createReplacementsMap,
   processContractTemplate,
+  getContractTemplateContent,
 } from "../../utilities/template-processor";
 
 describe("Template Processor", () => {
@@ -134,7 +135,18 @@ describe("Template Processor", () => {
     );
   });
 
-  it("should process DAO initialize proposal template", () => {
+  it("should process DAO initialize proposal template", async () => {
+    // Create a mock contract object
+    const mockContract = {
+      name: "aibtc-base-initialize-dao",
+      type: "PROPOSALS",
+      subtype: "INITIALIZE_DAO",
+      templatePath: "dao/proposals/aibtc-base-initialize-dao.clar"
+    };
+
+    // Read the template content directly
+    const templateContent = await getContractTemplateContent(mockContract);
+
     const replacements = createReplacementsMap({
       "dao mission goes here/dao_manifest":
         "The mission of this DAO is to test template processing",
@@ -154,7 +166,7 @@ describe("Template Processor", () => {
     });
 
     const processed = processContractTemplate(
-      initializeDaoTemplate,
+      templateContent,
       replacements
     );
 
@@ -177,7 +189,18 @@ describe("Template Processor", () => {
     expect(processed).toContain('notification: "TEST-base-dao/execute"');
   });
 
-  it("should process token owner template", () => {
+  it("should process token owner template", async () => {
+    // Create a mock contract object
+    const mockContract = {
+      name: "aibtc-token-owner",
+      type: "EXTENSIONS",
+      subtype: "TOKEN_OWNER",
+      templatePath: "dao/extensions/aibtc-token-owner.clar"
+    };
+
+    // Read the template content directly
+    const templateContent = await getContractTemplateContent(mockContract);
+
     const replacements = createReplacementsMap({
       ".aibtc-dao-traits.extension/dao_trait_extension":
         ".test-traits.extension",
@@ -188,7 +211,7 @@ describe("Template Processor", () => {
       "aibtc/dao_token_symbol": "TEST",
     });
 
-    const processed = processContractTemplate(tokenOwnerTemplate, replacements);
+    const processed = processContractTemplate(templateContent, replacements);
 
     // Check that the replacements were made
     expect(processed).toContain("(impl-trait .test-traits.extension)");
@@ -329,7 +352,15 @@ describe("Contract Generator", () => {
     expect(contract).not.toBeUndefined();
 
     if (contract) {
-      const content = await generator.generateContract(contract, replacements);
+      // Add all necessary replacements for this contract
+      const singleContractReplacements = {
+        ...replacements,
+        ".aibtc-base-dao-trait.aibtc-base-dao/dao_trait_base": ".test-traits.base-dao",
+        ".aibtc-dao-traits.extension/dao_trait_extension": ".test-traits.extension",
+        "aibtc/dao_token_symbol": "TEST",
+      };
+
+      const content = await generator.generateContract(contract, singleContractReplacements);
 
       // Basic validation
       expect(content).toBeTruthy();
@@ -351,6 +382,20 @@ describe("Contract Generator", () => {
     // Add all the additional replacements needed for these specific contracts
     const extendedReplacements = {
       ...replacements,
+      // Base traits
+      ".aibtc-base-dao-trait.aibtc-base-dao/dao_trait_base": ".test-traits.base-dao",
+      
+      // Extension traits
+      ".aibtc-dao-traits.extension/dao_trait_extension": ".test-traits.extension",
+      ".aibtc-dao-traits.action/dao_trait_action": ".test-traits.action",
+      ".aibtc-dao-traits.action-proposals-voting/dao_trait_action_proposals_voting":
+        ".test-traits.action-proposals-voting",
+      ".aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex":
+        ".test-traits.faktory-dex",
+      ".aibtc-dao-traits.token-owner/dao_token_owner_trait":
+        ".test-traits.token-owner",
+      ".aibtc-dao-traits.proposal/dao_trait_proposal": ".test-traits.proposal",
+      
       // Agent account traits
       ".aibtc-agent-account-traits.aibtc-account/agent_account_trait_account":
         ".test-traits.agent-account",
@@ -367,16 +412,16 @@ describe("Contract Generator", () => {
       "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait/faktory_trait":
         ".test-traits.faktory-token",
 
-      // DAO traits
-      ".aibtc-dao-traits.action-proposals-voting/dao_trait_action_proposals_voting":
-        ".test-traits.action-proposals-voting",
-      ".aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex":
-        ".test-traits.faktory-dex",
-
-      // Additional contracts
+      // Contract references
+      ".aibtc-base-dao/dao_contract_base": ".test-base-dao",
+      ".aibtc-faktory/dao_contract_token": ".test-token-contract",
+      ".aibtc-treasury/dao_contract_treasury": ".test-treasury",
+      ".aibtc-dao-users/dao_contract_users": ".test-dao-users",
       ".dao-run-cost/base_dao_run_cost_contract": ".test-dao-run-cost",
-      ".aibtc-rewards-account/dao_contract_rewards_account":
-        ".test-rewards-account",
+      ".aibtc-rewards-account/dao_contract_rewards_account": ".test-rewards-account",
+      
+      // Token symbol
+      "aibtc/dao_token_symbol": "TEST",
     };
 
     for (const contractName of contractsToTest) {
