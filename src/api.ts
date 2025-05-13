@@ -3,7 +3,6 @@ import { CloudflareBindings } from "./cf-types";
 import { ContractRegistry } from "../utilities/contract-registry";
 import {
   ContractType,
-  ContractSubtype,
   CONTRACT_TYPES,
   CONTRACT_SUBTYPES,
 } from "../utilities/contract-types";
