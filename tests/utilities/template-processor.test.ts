@@ -360,15 +360,36 @@ describe("Contract Generator", () => {
         "aibtc/dao_token_symbol": "TEST",
       };
 
-      const content = await generator.generateContract(contract, singleContractReplacements);
+      try {
+        const content = await generator.generateContract(contract, singleContractReplacements);
 
-      // Basic validation
-      expect(content).toBeTruthy();
-      expect(content.length).toBeGreaterThan(0);
+        // Basic validation
+        expect(content).toBeTruthy();
+        expect(content.length).toBeGreaterThan(0);
 
-      // Save for inspection
-      const outputPath = path.join(outputDir, `${contract.name}.clar`);
-      fs.writeFileSync(outputPath, content);
+        // Save for inspection
+        const outputPath = path.join(outputDir, `${contract.name}.clar`);
+        fs.writeFileSync(outputPath, content);
+      } catch (error) {
+        // Format error message consistently
+        if (error instanceof Error) {
+          const errorLines = error.message.split('\n');
+          const cleanedErrorMessage = errorLines
+            .filter(line => 
+              line.includes('MISSING TEMPLATE VARIABLE') || 
+              line.startsWith('key:') || 
+              line.startsWith('replaces:')
+            )
+            .join('\n');
+          
+          console.error(
+            `Error processing ${contractName}:\n${cleanedErrorMessage}`
+          );
+        } else {
+          console.error(`Error processing ${contractName}:`, error);
+        }
+        throw error; // Re-throw to fail the test
+      }
     }
   });
 
