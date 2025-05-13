@@ -82,6 +82,7 @@ export class ContractGeneratorService {
     if (missingVars.length > 0) {
       const missingDetails = missingVars
         .map((v) => {
+          // Extract just the key name and what it replaces, without including surrounding code
           return `LINE ${v.line} MISSING TEMPLATE VARIABLE\nkey: ${v.keyName}\nreplaces: ${v.toReplace}`;
         })
         .join("\n\n");

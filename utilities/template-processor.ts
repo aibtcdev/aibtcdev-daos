@@ -43,27 +43,41 @@ export function processContractTemplate(
       
       if (replacements.has(replacementMapKey)) {
         // Find the target line - could be several lines down
-        // We need to find the first non-comment line after this comment
+        // We need to find the first non-comment line after this comment that contains the key
         let targetLineIndex = i + 1;
-        while (targetLineIndex < lines.length) {
+        let foundTarget = false;
+        
+        while (targetLineIndex < lines.length && !foundTarget) {
           // Skip other template variable comments
           if (lines[targetLineIndex].trim().match(/^;;\s*\/g\//)) {
             targetLineIndex++;
             continue;
           }
           
-          // Skip empty lines or regular comments
-          if (lines[targetLineIndex].trim() === '' || lines[targetLineIndex].trim().startsWith(';;')) {
+          // Skip empty lines or regular comments that don't contain the key
+          if (lines[targetLineIndex].trim() === '' || 
+              (lines[targetLineIndex].trim().startsWith(';;') && 
+               !lines[targetLineIndex].includes(replacementKey))) {
             targetLineIndex++;
             continue;
           }
           
-          // Found a non-comment line
-          break;
+          // Check if this line contains the key to be replaced
+          if (lines[targetLineIndex].includes(replacementKey)) {
+            foundTarget = true;
+            break;
+          }
+          
+          // If we've gone too far (e.g., 10 lines) without finding the key, stop searching
+          if (targetLineIndex > i + 10) {
+            break;
+          }
+          
+          targetLineIndex++;
         }
         
         // If we found a valid target line
-        if (targetLineIndex < lines.length) {
+        if (foundTarget && targetLineIndex < lines.length) {
           templateVariables.push({
             lineIndex: targetLineIndex,
             commentLineIndex: i,
@@ -74,6 +88,16 @@ export function processContractTemplate(
           
           // Mark this comment line to be skipped
           skipLines.add(i);
+        } else {
+          // Log a warning if we couldn't find the target line
+          dbgLog(
+            {
+              action: "template_replacement_warning",
+              key: replacementMapKey,
+              message: `Could not find target line containing key '${replacementKey}' for comment at line ${i+1}`,
+            },
+            { titleBefore: "Template Replacement Warning", forceLog: true }
+          );
         }
       }
     }
