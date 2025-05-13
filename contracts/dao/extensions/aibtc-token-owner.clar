@@ -5,7 +5,7 @@
 ;; traits
 ;;
 
-;; /g/.aibtc-dao-traits.extension/dao_extension_trait
+;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
 ;; /g/.aibtc-dao-traits.token-owner/dao_token_owner_trait
 (impl-trait .aibtc-dao-traits.token-owner)
@@ -30,7 +30,7 @@
     ;; check if caller is authorized
     (try! (is-dao-or-extension))
     ;; update token uri
-    ;; /g/.aibtc-faktory/dao_token_contract
+    ;; /g/.aibtc-faktory/dao_contract_token
     (try! (as-contract (contract-call? .aibtc-faktory set-token-uri value)))
     ;; print event
     (print {
@@ -52,7 +52,7 @@
     ;; check if caller is authorized
     (try! (is-dao-or-extension))
     ;; transfer ownership
-    ;; /g/.aibtc-faktory/dao_token_contract
+    ;; /g/.aibtc-faktory/dao_contract_token
     (try! (as-contract (contract-call? .aibtc-faktory set-contract-owner new-owner)))
     ;; print event
     (print {
@@ -72,11 +72,11 @@
 ;;
 
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_base_contract
+  ;; /g/.aibtc-base-dao/dao_contract_base
   (ok (asserts!
     (or
       (is-eq tx-sender .aibtc-base-dao)
-      ;; /g/.aibtc-base-dao/dao_base_contract
+      ;; /g/.aibtc-base-dao/dao_contract_base
       (contract-call? .aibtc-base-dao is-extension contract-caller)
     )
     ERR_NOT_DAO_OR_EXTENSION

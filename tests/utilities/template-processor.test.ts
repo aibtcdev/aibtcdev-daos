@@ -96,9 +96,9 @@ describe("Template Processor", () => {
 ;; pre-approved contracts
 ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_contract
 (define-constant SBTC_TOKEN 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token) ;; sBTC token
-;; /g/.aibtc-faktory/dao_token_contract
+;; /g/.aibtc-faktory/dao_contract_token
 (define-constant DAO_TOKEN .aibtc-faktory) ;; DAO token
-;; /g/.aibtc-faktory-dex/dao_token_dex_contract
+;; /g/.aibtc-faktory-dex/dao_contract_token_dex
 (define-constant DAO_TOKEN_DEX .aibtc-faktory-dex) ;; DAO token DEX
 `;
 
@@ -107,8 +107,8 @@ describe("Template Processor", () => {
         "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
       "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG/account_agent":
         "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
-      ".aibtc-faktory/dao_token_contract": ".test-token-contract",
-      ".aibtc-faktory-dex/dao_token_dex_contract": ".test-dex-contract",
+      ".aibtc-faktory/dao_contract_token": ".test-token-contract",
+      ".aibtc-faktory-dex/dao_contract_token_dex": ".test-dex-contract",
       "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_contract":
         "ST000000000000000000002AMW42H.sbtc-token",
     });
@@ -137,16 +137,16 @@ describe("Template Processor", () => {
     const replacements = createReplacementsMap({
       "dao mission goes here/dao_manifest":
         "The mission of this DAO is to test template processing",
-      ".aibtc-faktory/dao_token_contract": ".test-token-contract",
-      ".aibtc-base-dao/dao_base_contract": ".test-base-dao",
+      ".aibtc-faktory/dao_contract_token": ".test-token-contract",
+      ".aibtc-base-dao/dao_contract_base": ".test-base-dao",
       ".aibtc-action-proposal-voting/dao_action_proposal_voting_contract":
         ".test-proposal-voting",
       ".aibtc-dao-charter/dao_charter_contract": ".test-dao-charter",
       ".aibtc-dao-epoch/dao_epoch_contract": ".test-dao-epoch",
-      ".aibtc-dao-users/dao_users_contract": ".test-dao-users",
-      ".aibtc-onchain-messaging/dao_messaging_contract": ".test-messaging",
+      ".aibtc-dao-users/dao_contract_users": ".test-dao-users",
+      ".aibtc-onchain-messaging/dao_contract_messaging": ".test-messaging",
       ".aibtc-token-owner/dao_token_owner_contract": ".test-token-owner",
-      ".aibtc-treasury/dao_treasury_contract": ".test-treasury",
+      ".aibtc-treasury/dao_contract_treasury": ".test-treasury",
       ".aibtc-action-send-message/dao_action_send_message_contract":
         ".test-send-message",
       "aibtc/dao_token_symbol": "TEST",
@@ -178,12 +178,12 @@ describe("Template Processor", () => {
 
   it("should process token owner template", () => {
     const replacements = createReplacementsMap({
-      ".aibtc-dao-traits.extension/dao_extension_trait":
+      ".aibtc-dao-traits.extension/dao_trait_extension":
         ".test-traits.extension",
       ".aibtc-dao-traits.token-owner/dao_token_owner_trait":
         ".test-traits.token-owner",
-      ".aibtc-faktory/dao_token_contract": ".test-token-contract",
-      ".aibtc-base-dao/dao_base_contract": ".test-base-dao",
+      ".aibtc-faktory/dao_contract_token": ".test-token-contract",
+      ".aibtc-base-dao/dao_contract_base": ".test-base-dao",
       "aibtc/dao_token_symbol": "TEST",
     });
 

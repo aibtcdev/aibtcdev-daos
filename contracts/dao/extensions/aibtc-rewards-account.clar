@@ -10,7 +10,7 @@
 ;; traits
 ;;
 
-;; /g/.aibtc-dao-traits.extension/dao_extension_trait
+;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
 ;; /g/.aibtc-dao-traits.rewards-account/dao_rewards_account_trait
 ;; (impl-trait .aibtc-dao-traits.rewards-account)
@@ -71,11 +71,11 @@
 ;;
 
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_base_contract
+  ;; /g/.aibtc-base-dao/dao_contract_base
   (ok (asserts!
     (or
       (is-eq tx-sender .aibtc-base-dao)
-      ;; /g/.aibtc-base-dao/dao_base_contract
+      ;; /g/.aibtc-base-dao/dao_contract_base
       (contract-call? .aibtc-base-dao is-extension contract-caller)
     )
     ERR_NOT_DAO_OR_EXTENSION

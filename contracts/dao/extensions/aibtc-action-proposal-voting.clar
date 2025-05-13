@@ -5,11 +5,11 @@
 ;; traits
 ;;
 
-;; /g/.aibtc-dao-traits.extension/dao_extension_trait
+;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.action/dao_action_proposals_voting_trait
+;; /g/.aibtc-dao-traits.action/dao_trait_action_proposals_voting
 (impl-trait .aibtc-dao-traits.action-proposals-voting)
-;; /g/.aibtc-dao-traits.action/dao_action_trait
+;; /g/.aibtc-dao-traits.action/dao_trait_action
 (use-trait action-trait .aibtc-dao-traits.action)
 
 ;; constants
@@ -36,8 +36,10 @@
 (define-constant ERR_INVALID_ACTION (err u1313))
 
 (define-constant AIBTC_DAO_RUN_COST_AMOUNT u10000000000) ;; 100 DAO tokens w/ 8 decimals
+
+;; /g/.dao-run-cost/base_dao_run_cost_contract
 (define-constant AIBTC_DAO_RUN_COST_CONTRACT .dao-run-cost) ;; AIBTC dao run cost contract
-;; /g/.aibtc-rewards-account/dao_rewards_account_contract
+;; /g/.aibtc-rewards-account/dao_contract_rewards_account
 (define-constant DAO_REWARDS_ACCOUNT .aibtc-rewards-account) ;; rewards account for the DAO
 
 ;; voting configuration
@@ -45,7 +47,7 @@
 (define-constant VOTING_THRESHOLD u66) ;; 66% of votes must be in favor
 (define-constant VOTING_BOND u500000000000) ;; action proposal bond, 5,000 DAO tokens w/ 8 decimals
 (define-constant VOTING_REWARD u100000000000) ;; action proposal reward, 1,000 DAO tokens w/ 8 decimals
-;; /g/.aibtc-treasury/dao_treasury_contract
+;; /g/.aibtc-treasury/dao_contract_treasury
 (define-constant VOTING_TREASURY .aibtc-treasury) ;; used to calculate liquid supply
 
 ;; set voting delay
@@ -154,7 +156,7 @@
   )
   (let (
       (actionContract (contract-of action))
-      ;; /g/.aibtc-dao-users/dao_users_contract
+      ;; /g/.aibtc-dao-users/dao_contract_users
       (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index contract-caller)))
       (newId (+ (var-get proposalCount) u1))
       (createdStx (- stacks-block-height u1))
@@ -164,7 +166,7 @@
       (voteEnd (+ voteStart VOTING_PERIOD))
       (execStart (+ voteEnd VOTING_DELAY))
       (execEnd (+ execStart VOTING_PERIOD))
-      ;; /g/.aibtc-faktory/dao_token_contract
+      ;; /g/.aibtc-faktory/dao_contract_token
       (senderBalance (unwrap! (contract-call? .aibtc-faktory get-balance contract-caller)
         ERR_FETCHING_TOKEN_DATA
       ))
@@ -266,7 +268,7 @@
     ;; increment proposal count
     (var-set proposalCount newId)
     ;; transfer the proposal bond to this contract
-    ;; /g/.aibtc-faktory/dao_token_contract
+    ;; /g/.aibtc-faktory/dao_contract_token
     (try! (contract-call? .aibtc-faktory transfer VOTING_BOND contract-caller SELF none))
     ;; transfer the run cost fee to the run AIBTC dao cost contract
     (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-faktory
@@ -288,14 +290,14 @@
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
-      ;; /g/.aibtc-faktory/dao_token_contract
+      ;; /g/.aibtc-faktory/dao_contract_token
       (senderBalance (unwrap!
         (at-block proposalBlockHash
           (contract-call? .aibtc-faktory get-balance contract-caller)
         )
         ERR_FETCHING_TOKEN_DATA
       ))
-      ;; /g/.aibtc-dao-users/dao_users_contract
+      ;; /g/.aibtc-dao-users/dao_contract_users
       (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index contract-caller)))
       (voterRecord (map-get? VoteRecords {
         proposalId: proposalId,
@@ -374,14 +376,14 @@
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
-      ;; /g/.aibtc-faktory/dao_token_contract
+      ;; /g/.aibtc-faktory/dao_contract_token
       (senderBalance (unwrap!
         (at-block proposalBlockHash
           (contract-call? .aibtc-faktory get-balance contract-caller)
         )
         ERR_FETCHING_TOKEN_DATA
       ))
-      ;; /g/.aibtc-dao-users/dao_users_contract
+      ;; /g/.aibtc-dao-users/dao_contract_users
       (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index contract-caller)))
     )
     ;; caller has the required balance
@@ -488,7 +490,7 @@
       ERR_INVALID_ACTION
     )
     ;; record user in dao if not already
-    ;; /g/.aibtc-dao-users/dao_users_contract
+    ;; /g/.aibtc-dao-users/dao_contract_users
     (try! (contract-call? .aibtc-dao-users get-or-create-user-index contract-caller))
     ;; print conclusion event
     (print {
@@ -529,22 +531,22 @@
     )
     ;; transfer the bond based on the outcome
     (if votePassed
-      ;; /g/.aibtc-faktory/dao_token_contract
+      ;; /g/.aibtc-faktory/dao_contract_token
       (try! (as-contract (contract-call? .aibtc-faktory transfer (get bond proposalDetails) SELF
         creator none
       )))
-      ;; /g/.aibtc-faktory/dao_token_contract
+      ;; /g/.aibtc-faktory/dao_contract_token
       (try! (as-contract (contract-call? .aibtc-faktory transfer (get bond proposalDetails) SELF
         VOTING_TREASURY none
       )))
     )
     ;; update the users reputation based on outcome
     (if votePassed
-      ;; /g/.aibtc-dao-users/dao_users_contract
+      ;; /g/.aibtc-dao-users/dao_contract_users
       (try! (contract-call? .aibtc-dao-users increase-user-reputation creator
         REP_SUCCESS
       ))
-      ;; /g/.aibtc-dao-users/dao_users_contract
+      ;; /g/.aibtc-dao-users/dao_contract_users
       (try! (contract-call? .aibtc-dao-users decrease-user-reputation creator
         REP_FAILURE
       ))
@@ -602,7 +604,7 @@
         ERR_RETRIEVING_START_BLOCK_HASH
       ))
     )
-    ;; /g/.aibtc-faktory/dao_token_contract
+    ;; /g/.aibtc-faktory/dao_contract_token
     (at-block proposalBlockHash (contract-call? .aibtc-faktory get-balance voter))
   )
 )
@@ -676,12 +678,12 @@
 (define-read-only (get-liquid-supply (blockHeight uint))
   (let (
       (blockHash (unwrap! (get-block-hash blockHeight) ERR_RETRIEVING_START_BLOCK_HASH))
-      ;; /g/.aibtc-faktory/dao_token_contract
+      ;; /g/.aibtc-faktory/dao_contract_token
       (totalSupply (unwrap!
         (at-block blockHash (contract-call? .aibtc-faktory get-total-supply))
         ERR_FETCHING_TOKEN_DATA
       ))
-      ;; /g/.aibtc-faktory/dao_token_contract
+      ;; /g/.aibtc-faktory/dao_contract_token
       (treasuryBalance (unwrap!
         (at-block blockHash
           (contract-call? .aibtc-faktory get-balance VOTING_TREASURY)
@@ -696,11 +698,11 @@
 ;; private functions
 ;;
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_base_contract
+  ;; /g/.aibtc-base-dao/dao_contract_base
   (ok (asserts!
     (or
       (is-eq tx-sender .aibtc-base-dao)
-      ;; /g/.aibtc-base-dao/dao_base_contract
+      ;; /g/.aibtc-base-dao/dao_contract_base
       (contract-call? .aibtc-base-dao is-extension contract-caller)
     )
     ERR_NOT_DAO_OR_EXTENSION
@@ -710,7 +712,7 @@
 (define-private (is-action-valid (action <action-trait>))
   (let (
       (extensionActive (is-ok (as-contract (is-dao-or-extension))))
-      ;; /g/.aibtc-base-dao/dao_base_contract
+      ;; /g/.aibtc-base-dao/dao_contract_base
       (actionActive (contract-call? .aibtc-base-dao is-extension (contract-of action)))
     )
     (and extensionActive actionActive)

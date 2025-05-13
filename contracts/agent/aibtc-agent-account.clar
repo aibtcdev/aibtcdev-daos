@@ -38,9 +38,9 @@
 ;; pre-approved contracts
 ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_sbtc_contract
 (define-constant SBTC_TOKEN 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token) ;; sBTC token
-;; /g/.aibtc-faktory/dao_token_contract
+;; /g/.aibtc-faktory/dao_contract_token
 (define-constant DAO_TOKEN .aibtc-faktory) ;; DAO token
-;; /g/.aibtc-faktory-dex/dao_token_dex_contract
+;; /g/.aibtc-faktory-dex/dao_contract_token_dex
 (define-constant DAO_TOKEN_DEX .aibtc-faktory-dex) ;; DAO token DEX
 
 ;; error codes

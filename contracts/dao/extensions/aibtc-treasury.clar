@@ -5,9 +5,9 @@
 ;; traits
 ;;
 
-;; /g/.aibtc-dao-traits.extension/dao_extension_trait
+;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.treasury/dao_treasury_trait
+;; /g/.aibtc-dao-traits.treasury/dao_trait_treasury
 (impl-trait .aibtc-dao-traits.treasury)
 
 ;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait
@@ -30,7 +30,7 @@
 
 ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_token_contract
 (define-constant CFG_SBTC_TOKEN 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token)
-;; /g/.aibtc-faktory/dao_token_contract
+;; /g/.aibtc-faktory/dao_contract_token
 (define-constant CFG_DAO_TOKEN .aibtc-faktory)
 
 ;; data maps
@@ -42,9 +42,7 @@
   bool
 )
 (map-set AllowedAssets CFG_SBTC_TOKEN true) 
-(map-set AllowedAssets CFG_DAO_TOKEN true) ;; public functions
-;;
-
+(map-set AllowedAssets CFG_DAO_TOKEN true) ;; public functions;;
 (define-public (callback
     (sender principal)
     (memo (buff 34))
@@ -144,11 +142,11 @@
 ;;
 
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_base_contract
+  ;; /g/.aibtc-base-dao/dao_contract_base
   (ok (asserts!
     (or
       (is-eq tx-sender .aibtc-base-dao)
-      ;; /g/.aibtc-base-dao/dao_base_contract
+      ;; /g/.aibtc-base-dao/dao_contract_base
       (contract-call? .aibtc-base-dao is-extension contract-caller)
     )
     ERR_NOT_DAO_OR_EXTENSION
