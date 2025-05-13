@@ -4,7 +4,7 @@ source "$(dirname "$0")/utils.sh"
 
 test_api_process_template() {
     echo "===================="
-    echo "API Process Template Tests"
+    echo "API Generate Contract Tests"
     echo "===================="
     
     # Test POST endpoint with valid data for aibtc-base-dao
@@ -21,9 +21,9 @@ test_api_process_template() {
     # Ensure proper URL formatting
     local url
     if [[ "$API_URL" == */ ]]; then
-        url="${API_URL}api/process-template"
+        url="${API_URL}api/generate-contract"
     else
-        url="${API_URL}/api/process-template"
+        url="${API_URL}/api/generate-contract"
     fi
     
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
@@ -36,9 +36,9 @@ test_api_process_template() {
     status=$(echo "$response" | tail -n1)
     
     if [ "$status" -eq 200 ]; then
-        echo -e "${GREEN}✓${NC} Process template endpoint with valid data - Status: $status"
+        echo -e "${GREEN}✓${NC} Generate contract endpoint with valid data - Status: $status"
     else
-        echo -e "${RED}✗${NC} Process template endpoint with valid data - Expected status 200, got $status"
+        echo -e "${RED}✗${NC} Generate contract endpoint with valid data - Expected status 200, got $status"
         FAILED_TESTS=$((FAILED_TESTS + 1))
     fi
     
@@ -55,9 +55,9 @@ test_api_process_template() {
     status=$(echo "$response" | tail -n1)
     
     if [ "$status" -eq 400 ]; then
-        echo -e "${GREEN}✓${NC} Process template endpoint with invalid data - Status: $status"
+        echo -e "${GREEN}✓${NC} Generate contract endpoint with invalid data - Status: $status"
     else
-        echo -e "${RED}✗${NC} Process template endpoint with invalid data - Expected status 400, got $status"
+        echo -e "${RED}✗${NC} Generate contract endpoint with invalid data - Expected status 400, got $status"
         FAILED_TESTS=$((FAILED_TESTS + 1))
     fi
 }
