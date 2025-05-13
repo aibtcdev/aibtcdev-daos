@@ -7,8 +7,16 @@ test_api_process_template() {
     echo "API Process Template Tests"
     echo "===================="
     
-    # Test POST endpoint with valid data
-    local valid_data='{"contractName":"aibtc-base-dao","replacements":{"KEY":"value"}}'
+    # Test POST endpoint with valid data for aibtc-base-dao
+    local valid_data='{
+        "contractName":"aibtc-base-dao",
+        "replacements":{
+            "aibtc/dao_token_symbol":"AIBTC",
+            "aibtc-base-dao-trait.aibtc-base-dao":"aibtc-dao-traits-v3.dao-base",
+            "aibtc-dao-traits.proposal":"aibtc-dao-traits-v3.proposal",
+            "aibtc-dao-traits.extension":"aibtc-dao-traits-v3.extension"
+        }
+    }'
     
     # Ensure proper URL formatting
     local url
