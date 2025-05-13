@@ -27,6 +27,7 @@ export class TemplateScanner {
           const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
           
           const matches = [...templateContent.matchAll(variableRegex)];
+          // Only store the key/value pairs, not the surrounding content
           const variables = matches.map(match => `${match[1]}/${match[2]}`);
           
           // Store unique variables

@@ -397,8 +397,19 @@ describe("Contract Generator", () => {
     expect(report).toBeTruthy();
     expect(Object.keys(report).length).toBeGreaterThan(0);
     
+    // Format the report for better readability
+    const formattedReport = {
+      summary: {
+        totalContracts: Object.keys(report).length,
+        totalUniqueVariables: [...new Set(Object.values(report).flat())].length
+      },
+      contractVariables: report
+    };
+    
     // Save for inspection
     const outputPath = path.join(outputDir, "template-variables-report.json");
-    fs.writeFileSync(outputPath, JSON.stringify(report, null, 2));
+    fs.writeFileSync(outputPath, JSON.stringify(formattedReport, null, 2));
+    
+    console.log(`Variable report generated with ${formattedReport.summary.totalUniqueVariables} unique variables across ${formattedReport.summary.totalContracts} contracts`);
   });
 });
