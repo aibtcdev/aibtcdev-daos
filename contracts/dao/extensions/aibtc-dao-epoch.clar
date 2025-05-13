@@ -24,7 +24,12 @@
 ;; public functions
 ;;
 
-(define-public (callback (sender principal) (memo (buff 34))) (ok true))
+(define-public (callback
+    (sender principal)
+    (memo (buff 34))
+  )
+  (ok true)
+)
 
 ;; read only functions
 ;;

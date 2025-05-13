@@ -32,17 +32,22 @@
 ;;
 
 ;; tracks block height of executed proposals
-(define-map ExecutedProposals principal uint)
+(define-map ExecutedProposals
+  principal
+  uint
+)
 ;; tracks enabled status of extensions
-(define-map Extensions principal bool)
+(define-map Extensions
+  principal
+  bool
+)
 
 ;; public functions
 ;;
 
 ;; initial construction of the DAO
 (define-public (construct (proposal <proposal-trait>))
-  (let
-    ((sender tx-sender))
+  (let ((sender tx-sender))
     (asserts! (not (var-get constructed)) ERR_DAO_ALREADY_CONSTRUCTED)
     (asserts! (is-eq sender (var-get executive)) ERR_UNAUTHORIZED)
     (var-set constructed true)
@@ -53,31 +58,40 @@
       payload: {
         proposal: (contract-of proposal),
         sender: sender,
-      }
+      },
     })
     (as-contract (execute proposal sender))
   )
 )
 
 ;; execute Clarity code in a proposal
-(define-public (execute (proposal <proposal-trait>) (sender principal))
+(define-public (execute
+    (proposal <proposal-trait>)
+    (sender principal)
+  )
   (begin
     (try! (is-self-or-extension))
-    (asserts! (map-insert ExecutedProposals (contract-of proposal) stacks-block-height) ERR_ALREADY_EXECUTED)
+    (asserts!
+      (map-insert ExecutedProposals (contract-of proposal) stacks-block-height)
+      ERR_ALREADY_EXECUTED
+    )
     (print {
       ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-base-dao/execute",
       payload: {
         proposal: proposal,
         sender: sender,
-      }
+      },
     })
     (as-contract (contract-call? proposal execute sender))
   )
 )
 
 ;; add an extension or update the status of an existing one
-(define-public (set-extension (extension principal) (enabled bool))
+(define-public (set-extension
+    (extension principal)
+    (enabled bool)
+  )
   (begin
     (try! (is-self-or-extension))
     (print {
@@ -86,14 +100,17 @@
       payload: {
         enabled: enabled,
         extension: extension,
-      }
+      },
     })
     (ok (map-set Extensions extension enabled))
   )
 )
 
 ;; add multiple extensions or update the status of existing ones
-(define-public (set-extensions (extensionList (list 200 {extension: principal, enabled: bool})))
+(define-public (set-extensions (extensionList (list 200 {
+  extension: principal,
+  enabled: bool,
+})))
   (begin
     (try! (is-self-or-extension))
     (asserts! (> (len extensionList) u0) ERR_NO_EMPTY_LISTS)
@@ -102,11 +119,15 @@
 )
 
 ;; request a callback from an extension
-(define-public (request-extension-callback (extension <extension-trait>) (memo (buff 34)))
-  (let
-    ((sender tx-sender))
+(define-public (request-extension-callback
+    (extension <extension-trait>)
+    (memo (buff 34))
+  )
+  (let ((sender tx-sender))
     (asserts! (is-extension contract-caller) ERR_INVALID_EXTENSION)
-    (asserts! (is-eq contract-caller (contract-of extension)) ERR_INVALID_EXTENSION)
+    (asserts! (is-eq contract-caller (contract-of extension))
+      ERR_INVALID_EXTENSION
+    )
     (print {
       ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-base-dao/request-extension-callback",
@@ -114,7 +135,7 @@
         extension: extension,
         memo: memo,
         sender: sender,
-      }
+      },
     })
     (as-contract (contract-call? extension callback sender memo))
   )
@@ -140,11 +161,17 @@
 
 ;; authorization check
 (define-private (is-self-or-extension)
-  (ok (asserts! (or (is-eq tx-sender (as-contract tx-sender)) (is-extension contract-caller)) ERR_UNAUTHORIZED))
+  (ok (asserts!
+    (or (is-eq tx-sender (as-contract tx-sender)) (is-extension contract-caller))
+    ERR_UNAUTHORIZED
+  ))
 )
 
 ;; set-extensions helper function
-(define-private (set-extensions-iter (item {extension: principal, enabled: bool}))
+(define-private (set-extensions-iter (item {
+  extension: principal,
+  enabled: bool,
+}))
   (begin
     (print {
       ;; /g/aibtc/dao_token_symbol
@@ -152,7 +179,7 @@
       payload: {
         enabled: (get enabled item),
         extension: (get extension item),
-      }
+      },
     })
     (map-set Extensions (get extension item) (get enabled item))
   )

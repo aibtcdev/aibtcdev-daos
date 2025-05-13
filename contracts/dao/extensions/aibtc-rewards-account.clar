@@ -39,13 +39,18 @@
 ;; public functions
 ;;
 
-(define-public (callback (sender principal) (memo (buff 34))) (ok true))
+(define-public (callback
+    (sender principal)
+    (memo (buff 34))
+  )
+  (ok true)
+)
 
-(define-public (transfer-reward (recipient principal) (amount uint))
-  (let
-    (
-      (contractBalance (unwrap-panic (contract-call? .aibtc-faktory get-balance SELF)))
-    )
+(define-public (transfer-reward
+    (recipient principal)
+    (amount uint)
+  )
+  (let ((contractBalance (unwrap-panic (contract-call? .aibtc-faktory get-balance SELF))))
     (try! (is-dao-or-extension))
     (asserts! (>= contractBalance amount) ERR_INSUFFICIENT_BALANCE)
     (print {
@@ -55,8 +60,8 @@
         recipient: recipient,
         amount: amount,
         contractCaller: contract-caller,
-        txSender: tx-sender
-      }
+        txSender: tx-sender,
+      },
     })
     (as-contract (contract-call? .aibtc-faktory transfer amount SELF recipient none))
   )
@@ -67,8 +72,12 @@
 
 (define-private (is-dao-or-extension)
   ;; /g/.aibtc-base-dao/dao_base_contract
-  (ok (asserts! (or (is-eq tx-sender .aibtc-base-dao)
-    ;; /g/.aibtc-base-dao/dao_base_contract
-    (contract-call? .aibtc-base-dao is-extension contract-caller)) ERR_NOT_DAO_OR_EXTENSION
+  (ok (asserts!
+    (or
+      (is-eq tx-sender .aibtc-base-dao)
+      ;; /g/.aibtc-base-dao/dao_base_contract
+      (contract-call? .aibtc-base-dao is-extension contract-caller)
+    )
+    ERR_NOT_DAO_OR_EXTENSION
   ))
 )

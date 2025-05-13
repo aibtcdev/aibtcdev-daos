@@ -40,16 +40,45 @@
 ;; data maps
 ;;
 
-(define-map Owners principal bool)
-(define-map OwnerConfirmations { id: uint, nonce: uint, owner: principal } bool)
-(define-map ConfirmationNonces { id: uint, nonce: uint } bool)
-(define-map TotalConfirmations { id: uint, nonce: uint } uint)
-(define-map AllowedAssets principal bool)
+(define-map Owners
+  principal
+  bool
+)
+(define-map OwnerConfirmations
+  {
+    id: uint,
+    nonce: uint,
+    owner: principal,
+  }
+  bool
+)
+(define-map ConfirmationNonces
+  {
+    id: uint,
+    nonce: uint,
+  }
+  bool
+)
+(define-map TotalConfirmations
+  {
+    id: uint,
+    nonce: uint,
+  }
+  uint
+)
+(define-map AllowedAssets
+  principal
+  bool
+)
 
 ;; public functions
 ;;
 
-(define-public (set-owner (nonce uint) (who principal) (status bool))
+(define-public (set-owner
+    (nonce uint)
+    (who principal)
+    (status bool)
+  )
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
     (print {
@@ -58,14 +87,18 @@
         who: who,
         status: status,
         contractCaller: contract-caller,
-        txSender: tx-sender
-      }
+        txSender: tx-sender,
+      },
     })
     (ok (and (is-confirmed SET_OWNER nonce) (map-set Owners who status)))
   )
 )
 
-(define-public (set-asset (nonce uint) (token principal) (enabled bool))
+(define-public (set-asset
+    (nonce uint)
+    (token principal)
+    (enabled bool)
+  )
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
     (print {
@@ -74,14 +107,19 @@
         token: token,
         enabled: enabled,
         contractCaller: contract-caller,
-        txSender: tx-sender
-      }
+        txSender: tx-sender,
+      },
     })
     (ok (and (is-confirmed SET_ASSET nonce) (map-set AllowedAssets token enabled)))
   )
 )
 
-(define-public (transfer-dao-token (nonce uint) (ft <sip010-trait>) (amount uint) (to principal))
+(define-public (transfer-dao-token
+    (nonce uint)
+    (ft <sip010-trait>)
+    (amount uint)
+    (to principal)
+  )
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
     (asserts! (is-allowed-asset (contract-of ft)) ERR_ASSET_NOT_ALLOWED)
@@ -92,8 +130,8 @@
         recipient: to,
         assetContract: (contract-of ft),
         contractCaller: contract-caller,
-        txSender: tx-sender
-      }
+        txSender: tx-sender,
+      },
     })
     (ok (and (is-confirmed TRANSFER nonce) (try! (as-contract (contract-call? ft transfer amount SELF to none)))))
   )
@@ -114,12 +152,30 @@
   (var-get confirmationsRequired)
 )
 
-(define-read-only (has-confirmed (id uint) (nonce uint) (who principal))
-  (default-to false (map-get? OwnerConfirmations { id: id, nonce: nonce, owner: who }))
+(define-read-only (has-confirmed
+    (id uint)
+    (nonce uint)
+    (who principal)
+  )
+  (default-to false
+    (map-get? OwnerConfirmations {
+      id: id,
+      nonce: nonce,
+      owner: who,
+    })
+  )
 )
 
-(define-read-only (get-confirmations (id uint) (nonce uint))
-  (default-to u0 (map-get? TotalConfirmations { id: id, nonce: nonce }))
+(define-read-only (get-confirmations
+    (id uint)
+    (nonce uint)
+  )
+  (default-to u0
+    (map-get? TotalConfirmations {
+      id: id,
+      nonce: nonce,
+    })
+  )
 )
 
 (define-read-only (is-allowed-asset (assetContract principal))
@@ -143,19 +199,34 @@
 
 ;; TODO: needs nonce tracking (last nonce per ID) to prevent arbitrary values
 ;; or a better way to track confirmations for each action
-(define-private (is-confirmed (id uint) (nonce uint))
-  (let
-    (
-      (confirmations (+ (get-confirmations id nonce) (if (has-confirmed id nonce contract-caller) u0 u1)))
+(define-private (is-confirmed
+    (id uint)
+    (nonce uint)
+  )
+  (let ((confirmations (+ (get-confirmations id nonce)
+      (if (has-confirmed id nonce contract-caller)
+        u0
+        u1
+      ))))
+    (map-set OwnerConfirmations {
+      id: id,
+      nonce: nonce,
+      owner: contract-caller,
+    }
+      true
     )
-    (map-set OwnerConfirmations { id: id, nonce: nonce, owner: contract-caller } true)
-    (map-set TotalConfirmations { id: id, nonce: nonce } confirmations)
+    (map-set TotalConfirmations {
+      id: id,
+      nonce: nonce,
+    }
+      confirmations
+    )
     (is-eq confirmations (var-get confirmationsRequired))
   )
 )
 
-(map-set Owners 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM true)
-(map-set Owners 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5 true)
-(map-set Owners 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true)
-(map-set Owners 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true)
+(map-set Owners 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM true) 
+(map-set Owners 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5 true) 
+(map-set Owners 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true) 
+(map-set Owners 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true) 
 (map-set Owners 'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND true)

@@ -40,8 +40,14 @@
 (define-constant ERR_BUY_SELL_NOT_ALLOWED (err u1103))
 
 ;; data maps
-(define-map ApprovedAssets principal bool)
-(define-map ApprovedDexes principal bool)
+(define-map ApprovedAssets
+  principal
+  bool
+)
+(define-map ApprovedDexes
+  principal
+  bool
+)
 
 ;; data vars
 (define-data-var agentCanBuySell bool false)
@@ -58,14 +64,17 @@
         contractCaller: contract-caller,
         txSender: tx-sender,
         amount: amount,
-        recipient: SELF
-      }
+        recipient: SELF,
+      },
     })
     (stx-transfer? amount contract-caller SELF)
   )
 )
 
-(define-public (deposit-ft (ft <ft-trait>) (amount uint))
+(define-public (deposit-ft
+    (ft <ft-trait>)
+    (amount uint)
+  )
   (begin
     (asserts! (is-approved-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
     (print {
@@ -75,8 +84,8 @@
         assetContract: (contract-of ft),
         sender: tx-sender,
         caller: contract-caller,
-        recipient: SELF
-      }
+        recipient: SELF,
+      },
     })
     (contract-call? ft transfer amount contract-caller SELF none)
   )
@@ -91,14 +100,17 @@
         amount: amount,
         sender: SELF,
         caller: contract-caller,
-        recipient: ACCOUNT_OWNER
-      }
+        recipient: ACCOUNT_OWNER,
+      },
     })
     (as-contract (stx-transfer? amount SELF ACCOUNT_OWNER))
   )
 )
 
-(define-public (withdraw-ft (ft <ft-trait>) (amount uint))
+(define-public (withdraw-ft
+    (ft <ft-trait>)
+    (amount uint)
+  )
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (asserts! (is-approved-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
@@ -109,8 +121,8 @@
         assetContract: (contract-of ft),
         sender: SELF,
         caller: contract-caller,
-        recipient: ACCOUNT_OWNER
-      }
+        recipient: ACCOUNT_OWNER,
+      },
     })
     (as-contract (contract-call? ft transfer amount SELF ACCOUNT_OWNER none))
   )
@@ -125,8 +137,8 @@
         asset: asset,
         approved: true,
         sender: tx-sender,
-        caller: contract-caller
-      }
+        caller: contract-caller,
+      },
     })
     (ok (map-set ApprovedAssets asset true))
   )
@@ -141,8 +153,8 @@
         asset: asset,
         approved: false,
         sender: tx-sender,
-        caller: contract-caller
-      }
+        caller: contract-caller,
+      },
     })
     (ok (map-set ApprovedAssets asset false))
   )
@@ -150,7 +162,12 @@
 
 ;; DAO Interaction Functions
 
-(define-public (create-action-proposal (voting-contract <action-proposals-voting-trait>) (action <action-trait>) (parameters (buff 2048)) (memo (optional (string-ascii 1024))))
+(define-public (create-action-proposal
+    (voting-contract <action-proposals-voting-trait>)
+    (action <action-trait>)
+    (parameters (buff 2048))
+    (memo (optional (string-ascii 1024)))
+  )
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
@@ -160,14 +177,18 @@
         action: (contract-of action),
         parameters: parameters,
         sender: tx-sender,
-        caller: contract-caller
-      }
+        caller: contract-caller,
+      },
     })
     (as-contract (contract-call? voting-contract create-action-proposal action parameters memo))
   )
 )
 
-(define-public (vote-on-action-proposal (voting-contract <action-proposals-voting-trait>) (proposalId uint) (vote bool))
+(define-public (vote-on-action-proposal
+    (voting-contract <action-proposals-voting-trait>)
+    (proposalId uint)
+    (vote bool)
+  )
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
@@ -177,14 +198,18 @@
         proposalId: proposalId,
         vote: vote,
         sender: tx-sender,
-        caller: contract-caller
-      }
+        caller: contract-caller,
+      },
     })
     (as-contract (contract-call? voting-contract vote-on-action-proposal proposalId vote))
   )
 )
 
-(define-public (conclude-action-proposal (voting-contract <action-proposals-voting-trait>) (proposalId uint) (action <action-trait>))
+(define-public (conclude-action-proposal
+    (voting-contract <action-proposals-voting-trait>)
+    (proposalId uint)
+    (action <action-trait>)
+  )
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
@@ -194,8 +219,8 @@
         proposalId: proposalId,
         action: (contract-of action),
         sender: tx-sender,
-        caller: contract-caller
-      }
+        caller: contract-caller,
+      },
     })
     (as-contract (contract-call? voting-contract conclude-action-proposal proposalId action))
   )
@@ -203,7 +228,11 @@
 
 ;; Faktory DEX Trading Functions
 
-(define-public (acct-buy-asset (faktory-dex <dao-faktory-dex>) (asset <faktory-token>) (amount uint))
+(define-public (acct-buy-asset
+    (faktory-dex <dao-faktory-dex>)
+    (asset <faktory-token>)
+    (amount uint)
+  )
   (begin
     (asserts! (buy-sell-allowed) ERR_BUY_SELL_NOT_ALLOWED)
     (asserts! (is-approved-dex (contract-of faktory-dex)) ERR_UNKNOWN_ASSET)
@@ -214,14 +243,18 @@
         asset: (contract-of asset),
         amount: amount,
         sender: tx-sender,
-        caller: contract-caller
-      }
+        caller: contract-caller,
+      },
     })
     (as-contract (contract-call? faktory-dex buy asset amount))
   )
 )
 
-(define-public (acct-sell-asset (faktory-dex <dao-faktory-dex>) (asset <faktory-token>) (amount uint))
+(define-public (acct-sell-asset
+    (faktory-dex <dao-faktory-dex>)
+    (asset <faktory-token>)
+    (amount uint)
+  )
   (begin
     (asserts! (buy-sell-allowed) ERR_BUY_SELL_NOT_ALLOWED)
     (asserts! (is-approved-dex (contract-of faktory-dex)) ERR_UNKNOWN_ASSET)
@@ -232,8 +265,8 @@
         asset: (contract-of asset),
         amount: amount,
         sender: tx-sender,
-        caller: contract-caller
-      }
+        caller: contract-caller,
+      },
     })
     (as-contract (contract-call? faktory-dex sell asset amount))
   )
@@ -248,8 +281,8 @@
         dexContract: (contract-of faktory-dex),
         approved: true,
         sender: tx-sender,
-        caller: contract-caller
-      }
+        caller: contract-caller,
+      },
     })
     (ok (map-set ApprovedDexes (contract-of faktory-dex) true))
   )
@@ -264,8 +297,8 @@
         dexContract: (contract-of faktory-dex),
         approved: false,
         sender: tx-sender,
-        caller: contract-caller
-      }
+        caller: contract-caller,
+      },
     })
     (ok (map-set ApprovedDexes (contract-of faktory-dex) false))
   )
@@ -279,8 +312,8 @@
       payload: {
         canBuySell: canBuySell,
         sender: tx-sender,
-        caller: contract-caller
-      }
+        caller: contract-caller,
+      },
     })
     (ok (var-set agentCanBuySell canBuySell))
   )
@@ -326,12 +359,10 @@
 )
 
 ;; initialize approved contracts
-(map-set ApprovedAssets SBTC_TOKEN true)
-(map-set ApprovedAssets DAO_TOKEN true)
-(map-set ApprovedDexes DAO_TOKEN_DEX true)
-
-;; print creation event
+(map-set ApprovedAssets SBTC_TOKEN true) 
+(map-set ApprovedAssets DAO_TOKEN true) 
+(map-set ApprovedDexes DAO_TOKEN_DEX true) ;; print creation event
 (print {
   notification: "aibtc-agent-account/user-agent-account-created",
-  payload: (get-configuration)
+  payload: (get-configuration),
 })
