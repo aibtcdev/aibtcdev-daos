@@ -8,14 +8,14 @@ test_api_process_template() {
     echo "===================="
     
     # Test POST endpoint with valid data
-    local valid_data='{"name":"aibtc-base-dao","replacements":{"KEY":"value"}}'
+    local valid_data='{"contractName":"aibtc-base-dao","replacements":{"KEY":"value"}}'
     
     # Ensure proper URL formatting
     local url
     if [[ "$API_URL" == */ ]]; then
-        url="${API_URL}api/process-template"
+        url="${API_URL}api/generate-contract"
     else
-        url="${API_URL}/api/process-template"
+        url="${API_URL}/api/generate-contract"
     fi
     
     TOTAL_TESTS=$((TOTAL_TESTS + 1))

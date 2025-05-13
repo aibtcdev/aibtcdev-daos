@@ -20,9 +20,9 @@ app.options("*", (c) => {
 });
 
 app.get("/", (c) => {
-  return c.text("AI-powered Bitcoin DAOs", 200, {
+  return c.json({ message: "AI-powered Bitcoin DAOs" }, 200, {
     ...corsHeaders(),
-    "Content-Type": "text/plain",
+    "Content-Type": "application/json",
   });
 });
 
@@ -52,9 +52,9 @@ app.mount(
 
 // 404
 app.all("*", (c) => {
-  return c.text("Not Found", 404, {
+  return c.json({ error: "Not Found" }, 404, {
     ...corsHeaders(),
-    "Content-Type": "text/plain",
+    "Content-Type": "application/json",
   });
 });
 

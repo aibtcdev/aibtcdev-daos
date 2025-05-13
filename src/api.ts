@@ -184,9 +184,10 @@ export function createApiRouter(registry: ContractRegistry) {
             (knownSubtype) => knownSubtype === subtype
           );
           if (!knownSubtype) {
-            throw new ApiError(ErrorCode.INVALID_CONTRACT_SUBTYPE, {
+            throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, {
               type,
               subtype,
+              message: `No contract found for type ${type} and subtype ${subtype}`,
             });
           }
           const contract = registry.getContractByTypeAndSubtype(
@@ -259,7 +260,7 @@ export function createApiRouter(registry: ContractRegistry) {
   });
 
   // Process a contract template with replacements
-  api.post("/process-template", async (c) => {
+  api.post("/process-template", (c) => {
     return handleRequest(
       c,
       async () => {
