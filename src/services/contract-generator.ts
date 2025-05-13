@@ -44,7 +44,7 @@ export class ContractGeneratorService {
     // Store variables with their line numbers
     const variablesWithLineNumbers = matches.map(match => {
       // Calculate line number by counting newlines before the match index
-      const lineNumber = templateContent.substring(0, match.index).split('\n').length;
+      const lineNumber = templateContent.substring(0, match.index || 0).split('\n').length;
       return {
         key: `${match[1]}/${match[2]}`,
         line: lineNumber,

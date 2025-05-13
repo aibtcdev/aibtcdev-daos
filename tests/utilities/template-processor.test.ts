@@ -380,15 +380,25 @@ describe("Contract Generator", () => {
       expect(contract).not.toBeUndefined();
       
       if (contract) {
-        const content = await generator.generateContract(contract, extendedReplacements);
-        
-        // Basic validation
-        expect(content).toBeTruthy();
-        expect(content.length).toBeGreaterThan(0);
-        
-        // Save for inspection
-        const outputPath = path.join(outputDir, `${contract.name}.clar`);
-        fs.writeFileSync(outputPath, content);
+        try {
+          const content = await generator.generateContract(contract, extendedReplacements);
+          
+          // Basic validation
+          expect(content).toBeTruthy();
+          expect(content.length).toBeGreaterThan(0);
+          
+          // Save for inspection
+          const outputPath = path.join(outputDir, `${contract.name}.clar`);
+          fs.writeFileSync(outputPath, content);
+        } catch (error) {
+          // Only show the error message without the stack trace
+          if (error instanceof Error) {
+            console.error(`Error processing ${contractName}:\n${error.message}`);
+          } else {
+            console.error(`Error processing ${contractName}:`, error);
+          }
+          throw error; // Re-throw to fail the test
+        }
       }
     }
   });
