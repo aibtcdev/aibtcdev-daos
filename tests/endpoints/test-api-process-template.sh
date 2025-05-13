@@ -11,7 +11,7 @@ test_api_process_template() {
     local valid_data='{
         "contractName":"aibtc-base-dao",
         "replacements":{
-            "aibtc/dao_token_symbol":"AIBTC",
+            "aibtc/dao_token_symbol":"FACES",
             "aibtc-base-dao-trait.aibtc-base-dao":"aibtc-dao-traits-v3.dao-base",
             "aibtc-dao-traits.proposal":"aibtc-dao-traits-v3.proposal",
             "aibtc-dao-traits.extension":"aibtc-dao-traits-v3.extension"
