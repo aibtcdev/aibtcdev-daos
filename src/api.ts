@@ -16,6 +16,16 @@ import { ContractGeneratorService } from "./services/contract-generator";
 export function createApiRouter(registry: ContractRegistry) {
   const api = new Hono<{ Bindings: CloudflareBindings }>();
   const generatorService = new ContractGeneratorService();
+  
+  // Root endpoint
+  api.get("/", (c) => {
+    return handleRequest(c, async () => {
+      return { 
+        status: "ok", 
+        message: "API is running" 
+      };
+    }, { path: "/", method: "GET" });
+  });
 
   // Get all contract types and their subtypes
   api.get("/types", (c) => {
@@ -130,25 +140,43 @@ export function createApiRouter(registry: ContractRegistry) {
         throw new ApiError(ErrorCode.INVALID_CONTRACT_TYPE, { type });
       }
 
-      const contract = registry.getContractByTypeAndSubtype(
-        type as ContractType,
-        subtype as ContractSubtype<ContractType>
-      );
+      try {
+        // Check if the type has the given subtype
+        const subtypes = CONTRACT_SUBTYPES[type as ContractType];
+        if (!subtypes.includes(subtype as any)) {
+          throw new ApiError(ErrorCode.INVALID_CONTRACT_SUBTYPE, { type, subtype });
+        }
 
-      if (!contract) {
+        const contract = registry.getContractByTypeAndSubtype(
+          type as ContractType,
+          subtype as ContractSubtype<ContractType>
+        );
+
+        if (!contract) {
+          throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, { 
+            type, 
+            subtype,
+            message: `No contract found for type ${type} and subtype ${subtype}`
+          });
+        }
+
+        return {
+          contract: {
+            name: contract.name,
+            type: contract.type,
+            subtype: contract.subtype,
+            templatePath: contract.templatePath,
+            deploymentOrder: contract.deploymentOrder,
+            isDeployed: contract.isDeployed,
+          },
+        };
+      } catch (error) {
+        // If it's already an ApiError, rethrow it
+        if (error instanceof ApiError) throw error;
+        
+        // Otherwise, throw a more specific error
         throw new ApiError(ErrorCode.INVALID_CONTRACT_SUBTYPE, { type, subtype });
       }
-
-      return {
-        contract: {
-          name: contract.name,
-          type: contract.type,
-          subtype: contract.subtype,
-          templatePath: contract.templatePath,
-          deploymentOrder: contract.deploymentOrder,
-          isDeployed: contract.isDeployed,
-        },
-      };
     }, { path: `/by-type-subtype/${c.req.param("type")}/${c.req.param("subtype")}`, method: "GET" });
   });
 
