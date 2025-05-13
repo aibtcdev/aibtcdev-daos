@@ -14,6 +14,14 @@ The API provides a programmatic interface for interacting with the AIBTC DAO con
 - `services/` - Service implementations including contract generation
 - `utils/` - API-specific utilities for error handling, request processing, etc.
 
+## Utilities
+
+- `request-helpers.ts` - Functions for parsing and validating API requests
+- `response-formatters.ts` - Standardized response formatting utilities
+- `error-handlers.ts` - Error handling and reporting utilities
+- `cache-helpers.ts` - Utilities for response caching and optimization
+- `auth-utils.ts` - Authentication and authorization utilities
+
 ## Usage
 
 The API is deployed as a Cloudflare Worker and provides endpoints for:

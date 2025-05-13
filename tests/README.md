@@ -18,6 +18,14 @@ These tests ensure the correct functionality of the AIBTC platform components, i
 - Endpoint tests verify API behavior and response formats
 - Utility tests check helper functions and shared code
 
+## Utilities
+
+- `test-helpers.ts` - Common helper functions for test setup and assertions
+- `mock-data.ts` - Mock data generators for testing
+- `test-fixtures.ts` - Reusable test fixtures and scenarios
+- `contract-test-utils.ts` - Utilities specific to contract testing
+- `api-test-utils.ts` - Utilities for API endpoint testing
+
 ## Running Tests
 
 All tests can be run using `npm`, or specific test file(s) can be provided:

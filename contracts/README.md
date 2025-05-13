@@ -24,4 +24,12 @@ These Clarity smart contracts implement the core functionality of the DAO, inclu
 - `aibtc-treasury.clar` - Treasury and asset management
 - `aibtc-action-proposal-voting.clar` - Governance voting mechanisms
 
+## Utilities
+
+- `contract-helpers.clar` - Common helper functions used across contracts
+- `constants.clar` - Shared constants and configuration values
+- `error-codes.clar` - Standardized error codes for contract operations
+- `math-helpers.clar` - Mathematical utility functions for calculations
+- `auth-helpers.clar` - Authorization and permission checking utilities
+
 [Back to main README](/)
