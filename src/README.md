@@ -4,7 +4,7 @@ This directory contains the main application source code for the AIBTC platform 
 
 ## Purpose
 
-The API provides a programmatic interface for interacting with the AIBTC DAO contracts, enabling frontend applications and services to communicate with the blockchain in a structured way.
+The API provides a programmatic interface for interacting with the AIBTC DAO contracts, enabling frontend and backend applications and services to communicate with the blockchain in a structured way.
 
 ## Key Components
 
@@ -17,6 +17,7 @@ The API provides a programmatic interface for interacting with the AIBTC DAO con
 ## Usage
 
 The API is deployed as a Cloudflare Worker and provides endpoints for:
+
 - Contract information retrieval
 - Contract generation with custom parameters
 - Dependency analysis

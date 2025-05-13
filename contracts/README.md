@@ -8,8 +8,8 @@ These Clarity smart contracts implement the core functionality of the DAO, inclu
 
 ## Structure
 
-- [/agent](/contracts/agent) - Agent automation contracts for autonomous operations
-- [/core](/contracts/core) - Core system contracts that handle fundamental operations
+- [/agent](/contracts/agent) - Agent automation contracts for user custody + autonomous operations
+- [/core](/contracts/core) - Core system contracts that handle fundamental operations across all DAOs
 - [/dao](/contracts/dao) - Main DAO functionality
   - [/actions](/contracts/dao/actions) - Action contracts that implement specific DAO operations
   - [/extensions](/contracts/dao/extensions) - Extension contracts that add functionality to the base DAO
@@ -20,7 +20,7 @@ These Clarity smart contracts implement the core functionality of the DAO, inclu
 ## Key Contracts
 
 - `aibtc-base-dao.clar` - The foundational DAO contract
-- `aibtc-dao-users.clar` - User management and permissions
+- `aibtc-dao-users.clar` - User management and reputation tracking
 - `aibtc-treasury.clar` - Treasury and asset management
 - `aibtc-action-proposal-voting.clar` - Governance voting mechanisms
 

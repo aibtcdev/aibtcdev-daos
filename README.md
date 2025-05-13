@@ -1,6 +1,6 @@
 # AIBTC DAO Platform
 
-A decentralized autonomous organization (DAO) platform built on the Stacks blockchain, designed to manage the AIBTC token and community governance.
+A decentralized autonomous organization (DAO) platform built on the Stacks blockchain.
 
 ## Purpose
 
@@ -13,12 +13,12 @@ This platform provides the infrastructure for decentralized governance of the AI
 - Treasury management for multiple assets
 - Reward distribution mechanisms
 - Agent-based automation capabilities
-- Cloudflare Workers-based API for contract interaction
+- MCP and API for contract interaction
 
 ## Repository Structure
 
 - [/contracts](/contracts) - Smart contracts organized by type (DAO core, extensions, actions, etc.)
-- [/durable-objects](/durable-objects) - Cloudflare Durable Objects for persistent state management
+- [/durable-objects](/durable-objects) - Cloudflare Durable Objects for Remote MCP
 - [/models](/models) - Contract model definitions and abstractions
 - [/src](/src) - Hosted API implementation and endpoints
 - [/tests](/tests) - Test suite for contracts and API functionality

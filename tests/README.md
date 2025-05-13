@@ -8,7 +8,7 @@ These tests ensure the correct functionality of the AIBTC platform components, i
 
 ## Structure
 
-- `/contracts` - Tests for smart contracts, organized to mirror the contract directory structure
+- `/contracts` - Clarinet SDK Tests for smart contracts, mirrors contract directory structure
 - `/endpoints` - Tests for API endpoints
 - `/utilities` - Tests for utility functions
 
@@ -20,14 +20,24 @@ These tests ensure the correct functionality of the AIBTC platform components, i
 
 ## Running Tests
 
-Contract tests can be run using Clarinet:
+All tests can be run using `npm`, or specific test file(s) can be provided:
+
 ```bash
-clarinet test
+npm run test
+npm run test tests/contracts/dao/aibtc-base-dao.test.ts
 ```
 
-API endpoint tests can be run using the test scripts:
+All Clarity contract files should have a corresponding test file, checked by this script:
+
 ```bash
-./tests/endpoints/run-endpoint-tests.sh
+bash ./tests/check-test-coverage.sh
+```
+
+API endpoint tests can be run using the test scripts, with an optional URL and flag to disable the 10s delay:
+
+```bash
+bash ./tests/check-endpoints.sh
+bash ./tests/check-endpoints.sh https://aibtcdev-daos-preview.hosting-962.workers.dev/ true
 ```
 
 [Back to main README](/)
