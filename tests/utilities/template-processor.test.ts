@@ -89,6 +89,14 @@ describe("Template Processor", () => {
 ;; version: 1.0.0
 ;; summary: A special account contract between a user and an agent for managing assets and DAO interactions.
 
+;; traits
+;; /g/.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account
+(impl-trait .aibtc-agent-account-traits.aibtc-account)
+;; /g/.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval
+(impl-trait .aibtc-agent-account-traits.aibtc-faktory-dex)
+;; /g/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait
+(use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+
 ;; owner and agent addresses
 ;; /g/ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/account_owner
 (define-constant ACCOUNT_OWNER 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; owner (user/creator of account, full access)
@@ -102,6 +110,12 @@ describe("Template Processor", () => {
 (define-constant DAO_TOKEN .aibtc-faktory) ;; DAO token
 ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
 (define-constant DAO_TOKEN_DEX .aibtc-faktory-dex) ;; DAO token DEX
+;; /g/.aibtc-dao-traits.proposal/dao_trait_proposal
+(use-trait proposal-trait .aibtc-dao-traits.proposal)
+;; /g/.aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex
+(use-trait dao-faktory-dex .aibtc-dao-traits.faktory-dex)
+;; /g/aibtc/dao_token_symbol
+(define-constant TOKEN_SYMBOL "aibtc")
 `;
 
     const replacements = createReplacementsMap({
@@ -113,6 +127,17 @@ describe("Template Processor", () => {
       ".aibtc-faktory-dex/dao_contract_token_dex": ".test-dex-contract",
       "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_contract":
         "ST000000000000000000002AMW42H.sbtc-token",
+      ".aibtc-agent-account-traits.aibtc-account/agent_account_trait_account":
+        ".test-traits.agent-account",
+      ".aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval":
+        ".test-traits.faktory-dex-approval",
+      "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait":
+        ".test-traits.sip010",
+      ".aibtc-dao-traits.proposal/dao_trait_proposal":
+        ".test-traits.proposal",
+      ".aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex":
+        ".test-traits.faktory-dex",
+      "aibtc/dao_token_symbol": "TEST",
     });
 
     const processed = processContractTemplate(testAgentTemplate, replacements);
@@ -280,6 +305,45 @@ describe("Template Processor", () => {
       '(define-data-var token-uri (optional (string-utf8 256)) (some u"https://example.com/token.json?id=123&type=nft"))'
     );
   });
+  it("should generate template replacements for different networks", () => {
+    const { generateTemplateReplacements } = require("../../utilities/template-variables");
+    
+    // Test for different networks
+    const mainnetReplacements = generateTemplateReplacements("mainnet", "aibtc");
+    const testnetReplacements = generateTemplateReplacements("testnet", "aibtc");
+    const devnetReplacements = generateTemplateReplacements("devnet", "aibtc");
+    
+    // Verify network-specific values are different
+    expect(mainnetReplacements[".aibtc-dao-traits.extension/dao_trait_extension"])
+      .not.toEqual(testnetReplacements[".aibtc-dao-traits.extension/dao_trait_extension"]);
+    
+    // Verify token symbol is used correctly
+    expect(mainnetReplacements["aibtc/dao_token_symbol"]).toBe("AIBTC");
+    
+    // Test with custom token symbol
+    const customReplacements = generateTemplateReplacements("devnet", "test");
+    expect(customReplacements["test/dao_token_symbol"]).toBe("TEST");
+    expect(customReplacements[".aibtc-faktory/dao_contract_token"]).toBe(".test-faktory");
+    
+    // Test with custom replacements
+    const withCustom = generateTemplateReplacements("devnet", "aibtc", {
+      "custom/variable": "custom-value",
+      "aibtc/dao_token_symbol": "OVERRIDE"
+    });
+    
+    expect(withCustom["custom/variable"]).toBe("custom-value");
+    expect(withCustom["aibtc/dao_token_symbol"]).toBe("OVERRIDE");
+    
+    // Save the replacements for inspection
+    const outputPath = path.join(outputDir, "template-replacements.json");
+    fs.writeFileSync(outputPath, JSON.stringify({
+      mainnet: mainnetReplacements,
+      testnet: testnetReplacements,
+      devnet: devnetReplacements,
+      custom: customReplacements,
+      withCustomOverrides: withCustom
+    }, null, 2));
+  });
 });
 
 describe("Contract Generator", () => {
@@ -295,7 +359,7 @@ describe("Contract Generator", () => {
     "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG/account_agent":
       "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
 
-    // Contract references
+    // DAO Trait references
     ".aibtc-dao-traits.extension/dao_trait_extension": ".test-traits.extension",
     ".aibtc-dao-traits.action/dao_trait_action_proposals_voting":
       ".test-traits.action-proposals-voting",
@@ -303,6 +367,26 @@ describe("Contract Generator", () => {
     ".aibtc-dao-traits.proposal/dao_trait_proposal": ".test-traits.proposal",
     ".aibtc-dao-traits.token-owner/dao_token_owner_trait":
       ".test-traits.token-owner",
+    ".aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex":
+      ".test-traits.faktory-dex",
+    ".aibtc-base-dao-trait.aibtc-base-dao/dao_trait_base":
+      ".test-traits.base-dao",
+
+    // Agent Trait references
+    ".aibtc-agent-account-traits.aibtc-account/agent_account_trait_account":
+      ".test-traits.agent-account",
+    ".aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval":
+      ".test-traits.faktory-dex-approval",
+    ".aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals":
+      ".test-traits.agent-proposals",
+    ".aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell":
+      ".test-traits.faktory-buy-sell",
+
+    // SIP Trait references
+    "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait":
+      ".test-traits.sip010",
+    "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait/faktory_trait":
+      ".test-traits.faktory-token",
 
     // DAO contracts
     ".aibtc-dao-users/dao_contract_users": ".test-dao-users",
@@ -318,6 +402,9 @@ describe("Contract Generator", () => {
     ".aibtc-token-owner/dao_token_owner_contract": ".test-token-owner",
     ".aibtc-action-send-message/dao_action_send_message_contract":
       ".test-send-message",
+    ".dao-run-cost/base_dao_run_cost_contract": ".test-dao-run-cost",
+    ".aibtc-rewards-account/dao_contract_rewards_account":
+      ".test-rewards-account",
 
     // External contracts
     "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_contract":
@@ -403,53 +490,9 @@ describe("Contract Generator", () => {
       "aibtc-base-initialize-dao",
     ];
 
-    // Add all the additional replacements needed for these specific contracts
-    const extendedReplacements = {
-      ...replacements,
-      // Base traits
-      ".aibtc-base-dao-trait.aibtc-base-dao/dao_trait_base":
-        ".test-traits.base-dao",
-
-      // Extension traits
-      ".aibtc-dao-traits.extension/dao_trait_extension":
-        ".test-traits.extension",
-      ".aibtc-dao-traits.action/dao_trait_action": ".test-traits.action",
-      ".aibtc-dao-traits.action-proposals-voting/dao_trait_action_proposals_voting":
-        ".test-traits.action-proposals-voting",
-      ".aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex":
-        ".test-traits.faktory-dex",
-      ".aibtc-dao-traits.token-owner/dao_token_owner_trait":
-        ".test-traits.token-owner",
-      ".aibtc-dao-traits.proposal/dao_trait_proposal": ".test-traits.proposal",
-
-      // Agent account traits
-      ".aibtc-agent-account-traits.aibtc-account/agent_account_trait_account":
-        ".test-traits.agent-account",
-      ".aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals":
-        ".test-traits.agent-proposals",
-      ".aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval":
-        ".test-traits.faktory-dex-approval",
-      ".aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell":
-        ".test-traits.faktory-buy-sell",
-
-      // SIP traits
-      "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait":
-        ".test-traits.sip010",
-      "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait/faktory_trait":
-        ".test-traits.faktory-token",
-
-      // Contract references
-      ".aibtc-base-dao/dao_contract_base": ".test-base-dao",
-      ".aibtc-faktory/dao_contract_token": ".test-token-contract",
-      ".aibtc-treasury/dao_contract_treasury": ".test-treasury",
-      ".aibtc-dao-users/dao_contract_users": ".test-dao-users",
-      ".dao-run-cost/base_dao_run_cost_contract": ".test-dao-run-cost",
-      ".aibtc-rewards-account/dao_contract_rewards_account":
-        ".test-rewards-account",
-
-      // Token symbol
-      "aibtc/dao_token_symbol": "TEST",
-    };
+    // Since we've updated the standard replacements to be comprehensive,
+    // we can just use them directly
+    const extendedReplacements = replacements;
 
     for (const contractName of contractsToTest) {
       const contract = registry.getContract(contractName);
@@ -503,12 +546,23 @@ describe("Contract Generator", () => {
     expect(report).toBeTruthy();
     expect(Object.keys(report).length).toBeGreaterThan(0);
 
+    // Get the unique variables
+    const uniqueVariables = [...new Set(Object.values(report).flat())];
+    const knownVariables = TemplateScanner.getKnownTemplateVariables();
+    const unknownVariables = uniqueVariables.filter(
+      variable => !knownVariables.includes(variable)
+    );
+
     // Format the report for better readability
     const formattedReport = {
       summary: {
         totalContracts: Object.keys(report).length,
-        totalUniqueVariables: [...new Set(Object.values(report).flat())].length,
+        totalUniqueVariables: uniqueVariables.length,
+        knownVariables: knownVariables.length,
+        unknownVariables: unknownVariables.length
       },
+      knownVariables: knownVariables,
+      unknownVariables: unknownVariables,
       contractVariables: report,
     };
 
@@ -519,5 +573,10 @@ describe("Contract Generator", () => {
     console.log(
       `Variable report generated with ${formattedReport.summary.totalUniqueVariables} unique variables across ${formattedReport.summary.totalContracts} contracts`
     );
+    
+    if (unknownVariables.length > 0) {
+      console.log(`Found ${unknownVariables.length} unknown variables:`);
+      console.log(unknownVariables);
+    }
   });
 });
