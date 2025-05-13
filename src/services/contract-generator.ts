@@ -56,9 +56,11 @@ export class ContractGeneratorService {
       const lineNumber = templateContent
         .substring(0, match.index || 0)
         .split("\n").length;
-      dbgLog(`Found variable ${match[1]}/${match[2]} at line ${lineNumber}`, {
-        forceLog: true,
-      });
+      const toReplace = match[1];
+      const keyName = match[2].split("\n")[0];
+      dbgLog(
+        `Found ${toReplace} to replace with ${keyName} at line ${lineNumber}`
+      );
       return {
         key: `${match[1]}/${match[2]}`,
         line: lineNumber,
@@ -83,7 +85,9 @@ export class ContractGeneratorService {
       const missingDetails = missingVars
         .map((v) => {
           // Extract just the key name and what it replaces, without including surrounding code
-          return `LINE ${v.line} MISSING TEMPLATE VARIABLE\nkey: ${v.keyName}\nreplaces: ${v.toReplace}`;
+          return `LINE ${v.line} MISSING TEMPLATE VARIABLE\n${
+            v.keyName.split("\n")[0]
+          }\n${v.toReplace}`;
         })
         .join("\n\n");
 
