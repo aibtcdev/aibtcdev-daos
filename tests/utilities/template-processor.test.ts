@@ -352,9 +352,26 @@ describe("Contract Generator", () => {
       "aibtc-base-initialize-dao"
     ];
     
-    const results = {
-      success: [] as string[],
-      failure: [] as {name: string, error: string}[]
+    // Add all the additional replacements needed for these specific contracts
+    const extendedReplacements = {
+      ...replacements,
+      // Agent account traits
+      ".aibtc-agent-account-traits.aibtc-account/agent_account_trait_account": ".test-traits.agent-account",
+      ".aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals": ".test-traits.agent-proposals",
+      ".aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval": ".test-traits.faktory-dex-approval",
+      ".aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell": ".test-traits.faktory-buy-sell",
+      
+      // SIP traits
+      "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait": ".test-traits.sip010",
+      "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait/faktory_trait": ".test-traits.faktory-token",
+      
+      // DAO traits
+      ".aibtc-dao-traits.action-proposals-voting/dao_trait_action_proposals_voting": ".test-traits.action-proposals-voting",
+      ".aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex": ".test-traits.faktory-dex",
+      
+      // Additional contracts
+      ".dao-run-cost/base_dao_run_cost_contract": ".test-dao-run-cost",
+      ".aibtc-rewards-account/dao_contract_rewards_account": ".test-rewards-account"
     };
     
     for (const contractName of contractsToTest) {
@@ -363,31 +380,17 @@ describe("Contract Generator", () => {
       expect(contract).not.toBeUndefined();
       
       if (contract) {
-        try {
-          const content = await generator.generateContract(contract, replacements);
-          
-          // Basic validation
-          expect(content).toBeTruthy();
-          expect(content.length).toBeGreaterThan(0);
-          
-          results.success.push(contract.name);
-          
-          // Save for inspection
-          const outputPath = path.join(outputDir, `${contract.name}.clar`);
-          fs.writeFileSync(outputPath, content);
-          
-        } catch (error) {
-          results.failure.push({
-            name: contract.name,
-            error: error instanceof Error ? error.message : String(error)
-          });
-        }
+        const content = await generator.generateContract(contract, extendedReplacements);
+        
+        // Basic validation
+        expect(content).toBeTruthy();
+        expect(content.length).toBeGreaterThan(0);
+        
+        // Save for inspection
+        const outputPath = path.join(outputDir, `${contract.name}.clar`);
+        fs.writeFileSync(outputPath, content);
       }
     }
-    
-    // Verify all contracts were processed successfully
-    expect(results.failure.length).toBe(0);
-    expect(results.success.length).toBe(contractsToTest.length);
   });
 
   it("should generate a variable report", async () => {
