@@ -44,7 +44,6 @@ jobs:
             npm run build
 
       - name: Set Test URL for Preview
-        if: github.event_name == 'pull_request'
         run: |
           # Extract the preview URL from Wrangler output
           PREVIEW_URL=$(echo "${{ steps.deploy.outputs.deployment-url }}" | sed 's/https:\/\///')
