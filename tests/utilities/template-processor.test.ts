@@ -133,8 +133,7 @@ describe("Template Processor", () => {
         ".test-traits.faktory-dex-approval",
       "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait":
         ".test-traits.sip010",
-      ".aibtc-dao-traits.proposal/dao_trait_proposal":
-        ".test-traits.proposal",
+      ".aibtc-dao-traits.proposal/dao_trait_proposal": ".test-traits.proposal",
       ".aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex":
         ".test-traits.faktory-dex",
       "aibtc/dao_token_symbol": "TEST",
@@ -306,43 +305,67 @@ describe("Template Processor", () => {
     );
   });
   it("should generate template replacements for different networks", () => {
-    const { generateTemplateReplacements } = require("../../utilities/template-variables");
-    
+    const {
+      generateTemplateReplacements,
+    } = require("../../utilities/template-variables");
+
     // Test for different networks
-    const mainnetReplacements = generateTemplateReplacements("mainnet", "aibtc");
-    const testnetReplacements = generateTemplateReplacements("testnet", "aibtc");
+    const mainnetReplacements = generateTemplateReplacements(
+      "mainnet",
+      "aibtc"
+    );
+    const testnetReplacements = generateTemplateReplacements(
+      "testnet",
+      "aibtc"
+    );
     const devnetReplacements = generateTemplateReplacements("devnet", "aibtc");
-    
+
     // Verify network-specific values are different
-    expect(mainnetReplacements[".aibtc-dao-traits.extension/dao_trait_extension"])
-      .not.toEqual(testnetReplacements[".aibtc-dao-traits.extension/dao_trait_extension"]);
-    
+    expect(
+      mainnetReplacements[".aibtc-dao-traits.extension/dao_trait_extension"]
+    ).not.toEqual(
+      testnetReplacements[".aibtc-dao-traits.extension/dao_trait_extension"]
+    );
+
     // Verify token symbol is used correctly
     expect(mainnetReplacements["aibtc/dao_token_symbol"]).toBe("AIBTC");
-    
+
     // Test with custom token symbol
     const customReplacements = generateTemplateReplacements("devnet", "test");
     expect(customReplacements["test/dao_token_symbol"]).toBe("TEST");
-    expect(customReplacements[".aibtc-faktory/dao_contract_token"]).toBe(".test-faktory");
-    
+    expect(customReplacements[".aibtc-faktory/dao_contract_token"]).toBe(
+      ".test-faktory"
+    );
+
     // Test with custom replacements
     const withCustom = generateTemplateReplacements("devnet", "aibtc", {
       "custom/variable": "custom-value",
-      "aibtc/dao_token_symbol": "OVERRIDE"
+      "aibtc/dao_token_symbol": "OVERRIDE",
     });
-    
+
     expect(withCustom["custom/variable"]).toBe("custom-value");
     expect(withCustom["aibtc/dao_token_symbol"]).toBe("OVERRIDE");
-    
+
     // Save the replacements for inspection
+    const outputDir = path.join(
+      process.cwd(),
+      "generated-contracts/test-output"
+    );
     const outputPath = path.join(outputDir, "template-replacements.json");
-    fs.writeFileSync(outputPath, JSON.stringify({
-      mainnet: mainnetReplacements,
-      testnet: testnetReplacements,
-      devnet: devnetReplacements,
-      custom: customReplacements,
-      withCustomOverrides: withCustom
-    }, null, 2));
+    fs.writeFileSync(
+      outputPath,
+      JSON.stringify(
+        {
+          mainnet: mainnetReplacements,
+          testnet: testnetReplacements,
+          devnet: devnetReplacements,
+          custom: customReplacements,
+          withCustomOverrides: withCustom,
+        },
+        null,
+        2
+      )
+    );
   });
 });
 
@@ -550,7 +573,7 @@ describe("Contract Generator", () => {
     const uniqueVariables = [...new Set(Object.values(report).flat())];
     const knownVariables = TemplateScanner.getKnownTemplateVariables();
     const unknownVariables = uniqueVariables.filter(
-      variable => !knownVariables.includes(variable)
+      (variable) => !knownVariables.includes(variable)
     );
 
     // Format the report for better readability
@@ -559,7 +582,7 @@ describe("Contract Generator", () => {
         totalContracts: Object.keys(report).length,
         totalUniqueVariables: uniqueVariables.length,
         knownVariables: knownVariables.length,
-        unknownVariables: unknownVariables.length
+        unknownVariables: unknownVariables.length,
       },
       knownVariables: knownVariables,
       unknownVariables: unknownVariables,
@@ -573,7 +596,7 @@ describe("Contract Generator", () => {
     console.log(
       `Variable report generated with ${formattedReport.summary.totalUniqueVariables} unique variables across ${formattedReport.summary.totalContracts} contracts`
     );
-    
+
     if (unknownVariables.length > 0) {
       console.log(`Found ${unknownVariables.length} unknown variables:`);
       console.log(unknownVariables);
