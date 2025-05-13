@@ -26,9 +26,19 @@ The API provides a programmatic interface for interacting with the AIBTC DAO con
 
 The API is deployed as a Cloudflare Worker and provides endpoints for:
 
-- Contract information retrieval
-- Contract generation with custom parameters
-- Dependency analysis
-- Type and subtype information
+### GET Endpoints
+- `/` - API status check
+- `/types` - Get all contract types and their subtypes
+- `/contracts` - Get all contracts in the registry
+- `/names` - Get all contract names
+- `/available-names` - Get all available contract names
+- `/dao-names` - Get all DAO contract names
+- `/by-type/:type` - Get contracts by type
+- `/contract/:name` - Get contract by name
+- `/by-type-subtype/:type/:subtype` - Get contract by type and subtype
+- `/dependencies/:name` - Get contract dependencies
+
+### POST Endpoints
+- `/generate-contract` - Generate a contract from template with custom parameters
 
 [Back to main README](/)
