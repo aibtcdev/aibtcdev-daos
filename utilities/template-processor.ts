@@ -1,6 +1,7 @@
 import { dbgLog } from "./debug-logging";
 import fs from "node:fs";
 import path from "node:path";
+import { Request } from "@cloudflare/workers-types";
 
 /**
  * Processes a contract template line by line and performs replacements
@@ -187,7 +188,10 @@ export async function getContractTemplateContent(
   try {
     if (env && env.AIBTC_ASSETS) {
       // We need to use the current request URL as the base for our asset URLs
-      const assetUrl = `/contracts/${contract.templatePath}`;
+      const assetUrl = new URL(
+        `/contracts/${contract.templatePath}`,
+        "https://assets.local"
+      );
       const request = new Request(assetUrl);
       const response = await env.AIBTC_ASSETS.fetch(request);
 
@@ -208,7 +212,10 @@ export async function getContractTemplateContent(
         dbgLog(`Found template in assets at: ${assetUrl}`);
         const content = await response.text();
         dbgLog(
-          `Fetched template content from assets: ${content.substring(0, 100)}...`,
+          `Fetched template content from assets: ${content.substring(
+            0,
+            100
+          )}...`,
           { forceLog: true }
         );
         return content;
@@ -216,12 +223,12 @@ export async function getContractTemplateContent(
 
       // If the response is not OK, throw the error
       throw new Error(
-        `Failed to fetch template from assets: ${assetUrl} ${
-          response.status
-        } ${response.statusText}`
+        `Failed to fetch template from assets: ${assetUrl} ${response.status} ${response.statusText}`
       );
     } else {
-      dbgLog("AIBTC_ASSETS environment binding is not available", { forceLog: true });
+      dbgLog("AIBTC_ASSETS environment binding is not available", {
+        forceLog: true,
+      });
     }
   } catch (fetchError) {
     dbgLog(
