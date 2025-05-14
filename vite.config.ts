@@ -7,8 +7,8 @@ export default defineConfig(({ command, isSsrBuild }) => {
     // Use a simple development server without Miniflare integration
     return {
       server: {
-        port: 3000
-      }
+        port: 3000,
+      },
     };
   }
   return {
@@ -21,16 +21,16 @@ export default defineConfig(({ command, isSsrBuild }) => {
       viteStaticCopy({
         targets: [
           {
-            src: 'contracts/**/*',
-            dest: '.'
-          }
-        ]
-      })
+            src: "contracts/**/*",
+            dest: "./contracts",
+          },
+        ],
+      }),
     ],
     build: {
       rollupOptions: {
-        external: ["cloudflare:workers"]
-      }
-    }
+        external: ["cloudflare:workers"],
+      },
+    },
   };
 });
