@@ -366,5 +366,68 @@ export function createApiRouter(registry: ContractRegistry) {
     );
   });
 
+  // Generate all DAO contracts for a network
+  api.post("/generate-dao-contracts", async (c) => {
+    return handleRequest(
+      c,
+      async () => {
+        const body = await c.req.json();
+        const network = body.network || "devnet";
+        const tokenSymbol = body.tokenSymbol || "aibtc";
+        const customReplacements = body.customReplacements || {};
+
+        // Validate network
+        const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
+        if (!validNetworks.includes(network)) {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(", ")}`,
+          });
+        }
+
+        // Get all DAO contract names
+        const daoContractNames = registry.getAllDaoContractNames();
+        
+        // Generate each contract
+        const generatedContracts = [];
+        const errors = [];
+        
+        for (const contractName of daoContractNames) {
+          const contract = registry.getContract(contractName);
+          if (contract) {
+            try {
+              const generatedContract = await generatorService.generateContractForNetwork(
+                contract,
+                network as StacksNetworkName,
+                tokenSymbol,
+                customReplacements
+              );
+              
+              generatedContracts.push({
+                name: contract.name,
+                type: contract.type,
+                subtype: contract.subtype,
+                content: generatedContract,
+              });
+            } catch (error) {
+              // Track errors but continue with other contracts
+              errors.push({
+                name: contract.name,
+                error: error instanceof Error ? error.message : String(error)
+              });
+            }
+          }
+        }
+
+        return {
+          network,
+          tokenSymbol,
+          contracts: generatedContracts,
+          errors: errors.length > 0 ? errors : undefined,
+        };
+      },
+      { path: "/generate-dao-contracts", method: "POST" }
+    );
+  });
+
   return api;
 }
