@@ -119,24 +119,17 @@ describe("Template Processor", () => {
 `;
 
     const replacements = createReplacementsMap({
-      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/account_owner":
-        "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
-      "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG/account_agent":
-        "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
-      ".aibtc-faktory/dao_contract_token": ".test-token-contract",
-      ".aibtc-faktory-dex/dao_contract_token_dex": ".test-dex-contract",
-      "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_contract":
-        "ST000000000000000000002AMW42H.sbtc-token",
-      ".aibtc-agent-account-traits.aibtc-account/agent_account_trait_account":
-        ".test-traits.agent-account",
-      ".aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval":
-        ".test-traits.faktory-dex-approval",
-      "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010":
-        ".test-traits.sip010",
-      ".aibtc-dao-traits.proposal/dao_trait_proposal": ".test-traits.proposal",
-      ".aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex":
-        ".test-traits.faktory-dex",
-      "aibtc/dao_token_symbol": "TEST",
+      "account_owner": "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
+      "account_agent": "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
+      "dao_contract_token": ".test-token-contract",
+      "dao_contract_token_dex": ".test-dex-contract",
+      "sbtc_contract": "ST000000000000000000002AMW42H.sbtc-token",
+      "agent_account_trait_account": ".test-traits.agent-account",
+      "agent_account_trait_faktory_dex_approval": ".test-traits.faktory-dex-approval",
+      "base_trait_sip010": ".test-traits.sip010",
+      "dao_trait_proposal": ".test-traits.proposal",
+      "dao_trait_faktory_dex": ".test-traits.faktory-dex",
+      "dao_token_symbol": "TEST",
     });
 
     const processed = processContractTemplate(testAgentTemplate, replacements);
@@ -172,21 +165,18 @@ describe("Template Processor", () => {
     const templateContent = await getContractTemplateContent(mockContract);
 
     const replacements = createReplacementsMap({
-      "dao mission goes here/dao_manifest":
-        "The mission of this DAO is to test template processing",
-      ".aibtc-faktory/dao_contract_token": ".test-token-contract",
-      ".aibtc-base-dao/dao_contract_base": ".test-base-dao",
-      ".aibtc-action-proposal-voting/dao_contract_action_proposal_voting":
-        ".test-proposal-voting",
-      ".aibtc-dao-charter/dao_contract_charter": ".test-dao-charter",
-      ".aibtc-dao-epoch/dao_contract_epoch": ".test-dao-epoch",
-      ".aibtc-dao-users/dao_contract_users": ".test-dao-users",
-      ".aibtc-onchain-messaging/dao_contract_messaging": ".test-messaging",
-      ".aibtc-token-owner/dao_token_owner_contract": ".test-token-owner",
-      ".aibtc-treasury/dao_contract_treasury": ".test-treasury",
-      ".aibtc-action-send-message/dao_action_send_message_contract":
-        ".test-send-message",
-      "aibtc/dao_token_symbol": "TEST",
+      "dao_manifest": "The mission of this DAO is to test template processing",
+      "dao_contract_token": ".test-token-contract",
+      "dao_contract_base": ".test-base-dao",
+      "dao_contract_action_proposal_voting": ".test-proposal-voting",
+      "dao_contract_charter": ".test-dao-charter",
+      "dao_contract_epoch": ".test-dao-epoch",
+      "dao_contract_users": ".test-dao-users",
+      "dao_contract_messaging": ".test-messaging",
+      "dao_token_owner_contract": ".test-token-owner",
+      "dao_contract_treasury": ".test-treasury",
+      "dao_action_send_message_contract": ".test-send-message",
+      "dao_token_symbol": "TEST",
     });
 
     const processed = processContractTemplate(templateContent!, replacements);
@@ -223,13 +213,11 @@ describe("Template Processor", () => {
     const templateContent = await getContractTemplateContent(mockContract);
 
     const replacements = createReplacementsMap({
-      ".aibtc-dao-traits.extension/dao_trait_extension":
-        ".test-traits.extension",
-      ".aibtc-dao-traits.token-owner/dao_trait_token_owner":
-        ".test-traits.token-owner",
-      ".aibtc-faktory/dao_contract_token": ".test-token-contract",
-      ".aibtc-base-dao/dao_contract_base": ".test-base-dao",
-      "aibtc/dao_token_symbol": "TEST",
+      "dao_trait_extension": ".test-traits.extension",
+      "dao_trait_token_owner": ".test-traits.token-owner",
+      "dao_contract_token": ".test-token-contract",
+      "dao_contract_base": ".test-base-dao",
+      "dao_token_symbol": "TEST",
     });
 
     const processed = processContractTemplate(templateContent!, replacements);
