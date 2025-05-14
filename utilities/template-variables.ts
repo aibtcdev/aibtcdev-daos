@@ -13,12 +13,18 @@ export function generateTemplateReplacements(
   const traits = getKnownTraits(network);
   const addresses = getKnownAddresses(network);
 
+  // Always use "aibtc" for template keys since that's what's in the template files
+  const templateKeySymbol = "aibtc";
+  
+  // But use the provided tokenSymbol for the actual values
+  const displaySymbol = tokenSymbol.toUpperCase();
+
   // Base replacements
   const replacements: Record<string, string> = {
     // Token info
-    [`${tokenSymbol}/dao_token_symbol`]: tokenSymbol.toUpperCase(),
-    [`${tokenSymbol}/dao_token_name`]: `${tokenSymbol.toUpperCase()} DAO Token`,
-    [`${tokenSymbol}/dao_token_decimals`]: "6",
+    [`${templateKeySymbol}/dao_token_symbol`]: displaySymbol,
+    [`${templateKeySymbol}/dao_token_name`]: `${displaySymbol} DAO Token`,
+    [`${templateKeySymbol}/dao_token_decimals`]: "6",
 
     // Account addresses
     [`${addresses.DEPLOYER}/account_owner`]: addresses.DEPLOYER,
@@ -77,7 +83,7 @@ export function generateTemplateReplacements(
     [`STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc`]: addresses.SBTC,
 
     // Configuration values
-    [`dao mission goes here/dao_manifest`]: `The mission of the ${tokenSymbol.toUpperCase()} DAO is to...`,
+    [`dao mission goes here/dao_manifest`]: `The mission of the ${displaySymbol} DAO is to...`,
   };
 
   // Merge with custom replacements

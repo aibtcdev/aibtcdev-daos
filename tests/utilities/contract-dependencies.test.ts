@@ -186,12 +186,13 @@ describe("Contract Dependencies", () => {
       contractsToGenerate: ["aibtc-base-dao", "aibtc-base-initialize-dao", "aibtc-action-send-message"]
     };
     
-    // Get base replacements for the network
-    const baseReplacements = generateTemplateReplacements("devnet", apiRequest.tokenSymbol);
+    // Get base replacements for the network, but keep using "aibtc" for template keys
+    // This is important because the template files still use "aibtc" in their variable references
+    const baseReplacements = generateTemplateReplacements("devnet", "aibtc");
     
     // Override with API-provided values
     const customReplacements = {
-      [`${apiRequest.tokenSymbol.toLowerCase()}/dao_token_symbol`]: apiRequest.tokenSymbol.toUpperCase(),
+      "aibtc/dao_token_symbol": apiRequest.tokenSymbol.toUpperCase(),
       "dao mission goes here/dao_manifest": apiRequest.manifest
     };
     
