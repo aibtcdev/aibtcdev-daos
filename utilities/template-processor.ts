@@ -183,16 +183,9 @@ export async function getContractTemplateContent(
 
   try {
     // We need to use the current request URL as the base for our asset URLs
-    const assetUrl = new URL(
-      `contracts/${contract.templatePath}`,
-      "https://aibtcdev-daos-preview.hosting-962.workers.dev/"
-    );
+    const assetUrl = `contracts/${contract.templatePath}`;
 
-    dbgLog(`Fetching contract: ${assetUrl.toString()}`, {
-      forceLog: true,
-    });
-
-    // Try to fetch the asset directly
+    // TODO: need to use Env.AIBTC_ASSETS instead of fetch
     const response = await fetch(assetUrl);
 
     dbgLog(
@@ -209,26 +202,8 @@ export async function getContractTemplateContent(
       { forceLog: true }
     );
 
-    const response2 = await fetch(assetUrl.toString());
-
-    dbgLog(
-      {
-        debug: {
-          action: "fetch_template",
-          url: assetUrl.toString(),
-          isOk: response2.ok,
-          status: response2.status,
-          statusText: response2.statusText,
-          text: await response2.text(),
-        },
-      },
-      { forceLog: true }
-    );
-
     if (response.ok) {
-      dbgLog(`Found template in assets at: ${assetUrl}`, {
-        forceLog: true,
-      });
+      dbgLog(`Found template in assets at: ${assetUrl}`);
       const content = await response.text();
       dbgLog(
         `Fetched template content from assets: ${content.substring(0, 100)}...`,

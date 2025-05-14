@@ -1,8 +1,9 @@
-import { DurableObjectNamespace } from "@cloudflare/workers-types";
+import { DurableObjectNamespace, Fetcher } from "@cloudflare/workers-types";
 
 declare namespace Cloudflare {
   interface Env {
     AIBTC_MCP_DO: DurableObjectNamespace;
+    AIBTC_ASSETS: Fetcher;
   }
 }
 
