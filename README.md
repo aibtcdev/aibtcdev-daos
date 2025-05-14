@@ -23,3 +23,22 @@ This platform provides the infrastructure for decentralized governance of the AI
 - [/src](/src) - Hosted API implementation and endpoints
 - [/tests](/tests) - Test suite for contracts and API functionality
 - [/utilities](/utilities) - Reusable helper code and shared utilities
+
+## API Types
+
+TypeScript type definitions for the API are available as a separate npm package:
+
+```bash
+npm install @aibtcdev/daos-types
+```
+
+Usage example:
+
+```typescript
+import { ApiResponse, ContractInfo } from '@aibtcdev/daos-types';
+
+async function fetchContract(name: string): Promise<ApiResponse<ContractInfo>> {
+  const response = await fetch(`https://api.aibtc.dev/api/contracts/${name}`);
+  return response.json();
+}
+```
