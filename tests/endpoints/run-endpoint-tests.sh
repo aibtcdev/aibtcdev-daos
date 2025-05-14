@@ -32,7 +32,7 @@ test_api_by_type
 test_api_contract
 test_api_by_type_subtype
 test_api_dependencies
-test_api_generate_contract
+test_api_process_template
 
 # Print summary
 echo ""
