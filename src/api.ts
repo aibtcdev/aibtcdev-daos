@@ -394,8 +394,16 @@ export function createApiRouter(registry: ContractRegistry) {
         const daoContractNames = registry.getAllDaoContractNames();
 
         // Generate each contract
-        const generatedContracts = [];
-        const errors = [];
+        const generatedContracts: Array<{
+          name: string;
+          type: ContractType;
+          subtype: string;
+          content: string;
+        }> = [];
+        const errors: Array<{
+          name: string;
+          error: string;
+        }> = [];
 
         for (const contractName of daoContractNames) {
           const contract = registry.getContract(contractName);
