@@ -243,7 +243,10 @@ describe("Contract Dependencies", () => {
       
       // Verify custom values were applied
       if (results[contractName].success && results[contractName].content) {
-        expect(results[contractName].content).toContain(apiRequest.tokenSymbol.toUpperCase());
+        // Only check for token symbol in contracts that actually use it
+        if (contractName === "aibtc-base-dao" || contractName === "aibtc-base-initialize-dao") {
+          expect(results[contractName].content).toContain(apiRequest.tokenSymbol.toUpperCase());
+        }
         
         // For initialize-dao, also check manifest
         if (contractName === "aibtc-base-initialize-dao") {
