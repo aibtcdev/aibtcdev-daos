@@ -175,9 +175,9 @@ test_api_generate_dao_contracts() {
             return
         fi
         echo "Current response body:"
-        echo "$body" | jq -e '.success'
-        echo "$body" | jq -e '.data'
-        echo "$body" | jq -e '.data.contracts'
+        echo "$body"
+        echo "$body" | jq '.success'
+        #echo "$body" | jq '.data.contracts'
         # Check if the response contains the expected keys
         if ! echo "$body" | jq -e '.success, .data.contracts' >/dev/null 2>&1; then
             echo -e "${RED}✗${NC} Response does not contain expected keys"
