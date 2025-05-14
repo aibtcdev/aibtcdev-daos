@@ -420,13 +420,6 @@ describe("Contract Generator", () => {
     // External contracts
     "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_contract":
       "ST000000000000000000002AMW42H.sbtc-token",
-    
-    // DAO contracts with explicit paths
-    ".dao-run-cost/base_contract_dao_run_cost": ".test-dao-run-cost",
-    ".aibtc-treasury/dao_contract_treasury": ".test-treasury",
-    ".aibtc-faktory/dao_contract_token": ".test-token-contract",
-    ".aibtc-dao-users/dao_contract_users": ".test-dao-users",
-    ".aibtc-base-dao/dao_contract_base": ".test-base-dao",
 
     // Configuration values
     "dao mission goes here/dao_manifest":
