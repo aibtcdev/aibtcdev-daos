@@ -10,6 +10,7 @@ import {
   processContractTemplate,
   getContractTemplateContent,
 } from "../../utilities/template-processor";
+import { generateTemplateReplacements } from "../../utilities/template-variables";
 
 describe("Template Processor", () => {
   it("should process template and replace values", () => {
@@ -25,8 +26,8 @@ describe("Template Processor", () => {
 `;
 
     const replacements = createReplacementsMap({
-      "account_owner": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
-      "account_agent": "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
+      account_owner: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+      account_agent: "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
     });
 
     const processed = processContractTemplate(template, replacements);
@@ -119,17 +120,18 @@ describe("Template Processor", () => {
 `;
 
     const replacements = createReplacementsMap({
-      "account_owner": "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
-      "account_agent": "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
-      "dao_contract_token": ".test-token-contract",
-      "dao_contract_token_dex": ".test-dex-contract",
-      "sbtc_contract": "ST000000000000000000002AMW42H.sbtc-token",
-      "agent_account_trait_account": ".test-traits.agent-account",
-      "agent_account_trait_faktory_dex_approval": ".test-traits.faktory-dex-approval",
-      "base_trait_sip010": ".test-traits.sip010",
-      "dao_trait_proposal": ".test-traits.proposal",
-      "dao_trait_faktory_dex": ".test-traits.faktory-dex",
-      "dao_token_symbol": "TEST",
+      account_owner: "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
+      account_agent: "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
+      dao_contract_token: ".test-token-contract",
+      dao_contract_token_dex: ".test-dex-contract",
+      sbtc_contract: "ST000000000000000000002AMW42H.sbtc-token",
+      agent_account_trait_account: ".test-traits.agent-account",
+      agent_account_trait_faktory_dex_approval:
+        ".test-traits.faktory-dex-approval",
+      base_trait_sip010: ".test-traits.sip010",
+      dao_trait_proposal: ".test-traits.proposal",
+      dao_trait_faktory_dex: ".test-traits.faktory-dex",
+      dao_token_symbol: "TEST",
     });
 
     const processed = processContractTemplate(testAgentTemplate, replacements);
@@ -165,18 +167,18 @@ describe("Template Processor", () => {
     const templateContent = await getContractTemplateContent(mockContract);
 
     const replacements = createReplacementsMap({
-      "dao_manifest": "The mission of this DAO is to test template processing",
-      "dao_contract_token": ".test-token-contract",
-      "dao_contract_base": ".test-base-dao",
-      "dao_contract_action_proposal_voting": ".test-proposal-voting",
-      "dao_contract_charter": ".test-dao-charter",
-      "dao_contract_epoch": ".test-dao-epoch",
-      "dao_contract_users": ".test-dao-users",
-      "dao_contract_messaging": ".test-messaging",
-      "dao_token_owner_contract": ".test-token-owner",
-      "dao_contract_treasury": ".test-treasury",
-      "dao_action_send_message_contract": ".test-send-message",
-      "dao_token_symbol": "TEST",
+      dao_manifest: "The mission of this DAO is to test template processing",
+      dao_contract_token: ".test-token-contract",
+      dao_contract_base: ".test-base-dao",
+      dao_contract_action_proposal_voting: ".test-proposal-voting",
+      dao_contract_charter: ".test-dao-charter",
+      dao_contract_epoch: ".test-dao-epoch",
+      dao_contract_users: ".test-dao-users",
+      dao_contract_messaging: ".test-messaging",
+      dao_token_owner_contract: ".test-token-owner",
+      dao_contract_treasury: ".test-treasury",
+      dao_action_send_message_contract: ".test-send-message",
+      dao_token_symbol: "TEST",
     });
 
     const processed = processContractTemplate(templateContent!, replacements);
@@ -191,12 +193,8 @@ describe("Template Processor", () => {
     expect(processed).toContain(
       "(try! (contract-call? .test-base-dao set-extensions"
     );
-    expect(processed).toContain(
-      "extension: .test-proposal-voting"
-    );
-    expect(processed).toContain(
-      "enabled: true"
-    );
+    expect(processed).toContain("extension: .test-proposal-voting");
+    expect(processed).toContain("enabled: true");
     expect(processed).toContain(
       "{extension: .test-dao-charter, enabled: true}"
     );
@@ -216,11 +214,11 @@ describe("Template Processor", () => {
     const templateContent = await getContractTemplateContent(mockContract);
 
     const replacements = createReplacementsMap({
-      "dao_trait_extension": ".test-traits.extension",
-      "dao_trait_token_owner": ".test-traits.token-owner",
-      "dao_contract_token": ".test-token-contract",
-      "dao_contract_base": ".test-base-dao",
-      "dao_token_symbol": "TEST",
+      dao_trait_extension: ".test-traits.extension",
+      dao_trait_token_owner: ".test-traits.token-owner",
+      dao_contract_token: ".test-token-contract",
+      dao_contract_base: ".test-base-dao",
+      dao_token_symbol: "TEST",
     });
 
     const processed = processContractTemplate(templateContent!, replacements);
@@ -237,9 +235,7 @@ describe("Template Processor", () => {
     expect(processed).toContain(
       'notification: "TEST-token-owner/set-token-uri"'
     );
-    expect(processed).toContain(
-      "is-eq tx-sender .test-base-dao"
-    );
+    expect(processed).toContain("is-eq tx-sender .test-base-dao");
     expect(processed).toContain(
       "contract-call? .test-base-dao is-extension contract-caller"
     );
@@ -256,8 +252,8 @@ describe("Template Processor", () => {
 `;
 
     const replacements = createReplacementsMap({
-      "token_name": "Test Token",
-      "token_symbol": "TEST",
+      token_name: "Test Token",
+      token_symbol: "TEST",
     });
 
     const processed = processContractTemplate(template, replacements);
@@ -288,7 +284,7 @@ describe("Template Processor", () => {
 `;
 
     const replacements = createReplacementsMap({
-      "token_uri": "https://example.com/token.json?id=123&type=nft",
+      token_uri: "https://example.com/token.json?id=123&type=nft",
     });
 
     const processed = processContractTemplate(template, replacements);
@@ -299,11 +295,6 @@ describe("Template Processor", () => {
     );
   });
   it("should generate template replacements for different networks", () => {
-    import {
-      generateTemplateReplacements,
-      getAllKnownTemplateVariables,
-    } from "../../utilities/template-variables";
-
     // Test for different networks
     const mainnetReplacements = generateTemplateReplacements(
       "mainnet",
@@ -432,32 +423,33 @@ describe("Contract Generator", () => {
     "dao mission goes here/dao_manifest":
       "The mission of this DAO is to test template processing",
     "aibtc/dao_token_symbol": "TEST",
-    
+
     // Simplified keys for template variables
-    "dao_trait_extension": ".test-traits.extension",
-    "dao_trait_action": ".test-traits.action",
-    "base_contract_dao_run_cost": ".test-dao-run-cost",
-    "dao_contract_treasury": ".test-treasury",
-    "dao_contract_token": ".test-token-contract",
-    "dao_contract_users": ".test-dao-users",
-    "dao_contract_base": ".test-base-dao",
-    "dao_token_symbol": "TEST",
-    "dao_trait_base": ".test-traits.base-dao",
-    "dao_contract_action_proposal_voting": ".test-proposal-voting",
-    "dao_contract_epoch": ".test-dao-epoch",
-    "dao_contract_messaging": ".test-messaging",
-    "dao_contract_charter": ".test-dao-charter",
-    "dao_token_owner_contract": ".test-token-owner",
-    "dao_action_send_message_contract": ".test-send-message",
-    
+    dao_trait_extension: ".test-traits.extension",
+    dao_trait_action: ".test-traits.action",
+    base_contract_dao_run_cost: ".test-dao-run-cost",
+    dao_contract_treasury: ".test-treasury",
+    dao_contract_token: ".test-token-contract",
+    dao_contract_users: ".test-dao-users",
+    dao_contract_base: ".test-base-dao",
+    dao_token_symbol: "TEST",
+    dao_trait_base: ".test-traits.base-dao",
+    dao_contract_action_proposal_voting: ".test-proposal-voting",
+    dao_contract_epoch: ".test-dao-epoch",
+    dao_contract_messaging: ".test-messaging",
+    dao_contract_charter: ".test-dao-charter",
+    dao_token_owner_contract: ".test-token-owner",
+    dao_action_send_message_contract: ".test-send-message",
+
     // Agent account simplified keys
-    "agent_account_trait_account": ".test-traits.agent-account",
-    "agent_account_trait_faktory_dex_approval": ".test-traits.faktory-dex-approval",
-    "base_trait_sip010": ".test-traits.sip010",
-    "dao_trait_proposal": ".test-traits.proposal",
-    "dao_trait_faktory_dex": ".test-traits.faktory-dex",
-    "account_owner": "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
-    "account_agent": "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
+    agent_account_trait_account: ".test-traits.agent-account",
+    agent_account_trait_faktory_dex_approval:
+      ".test-traits.faktory-dex-approval",
+    base_trait_sip010: ".test-traits.sip010",
+    dao_trait_proposal: ".test-traits.proposal",
+    dao_trait_faktory_dex: ".test-traits.faktory-dex",
+    account_owner: "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
+    account_agent: "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
   };
 
   beforeAll(() => {
@@ -517,12 +509,17 @@ describe("Contract Generator", () => {
             )
             .join("\n");
 
+          dbgLog(`Error processing ${contractName}:\n${cleanedErrorMessage}`, {
+            logType: "error",
+            titleBefore: "Contract Processing Error",
+          });
+        } else {
           dbgLog(
-            `Error processing ${contractName}:\n${cleanedErrorMessage}`,
+            `Error processing ${contractName}: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
             { logType: "error", titleBefore: "Contract Processing Error" }
           );
-        } else {
-          dbgLog(`Error processing ${contractName}: ${error instanceof Error ? error.message : String(error)}`, { logType: "error", titleBefore: "Contract Processing Error" });
         }
         throw error; // Re-throw to fail the test
       }
@@ -622,7 +619,9 @@ describe("Contract Generator", () => {
     );
 
     if (unknownVariables.length > 0) {
-      dbgLog(`Found ${unknownVariables.length} unknown variables:`, { titleBefore: "Unknown Variables" });
+      dbgLog(`Found ${unknownVariables.length} unknown variables:`, {
+        titleBefore: "Unknown Variables",
+      });
       dbgLog(unknownVariables);
     }
   });
