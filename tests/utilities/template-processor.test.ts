@@ -389,13 +389,13 @@ describe("Contract Generator", () => {
 
     // Agent Trait references
     ".aibtc-agent-account-traits.aibtc-account/agent_account_trait_account":
-      ".test-traits.agent-account",
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account",
     ".aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval":
-      ".test-traits.faktory-dex-approval",
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-faktory-dex",
     ".aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals":
-      ".test-traits.agent-proposals",
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-proposals",
     ".aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell":
-      ".test-traits.faktory-buy-sell",
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.faktory-buy-sell",
 
     // SIP Trait references
     "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010":
@@ -448,12 +448,12 @@ describe("Contract Generator", () => {
     dao_action_send_message_contract: ".test-send-message",
 
     // Agent account simplified keys
-    agent_account_trait_account: ".test-traits.agent-account",
+    agent_account_trait_account: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account",
     agent_account_trait_faktory_dex_approval:
-      ".test-traits.faktory-dex-approval",
-    base_trait_sip010: ".test-traits.sip010",
-    dao_trait_proposal: ".test-traits.proposal",
-    dao_trait_faktory_dex: ".test-traits.faktory-dex",
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-faktory-dex",
+    base_trait_sip010: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sip-010-trait-ft-standard.sip-010-trait",
+    dao_trait_proposal: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.proposal",
+    dao_trait_faktory_dex: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.faktory-dex",
     account_owner: "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
     account_agent: "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
   };
