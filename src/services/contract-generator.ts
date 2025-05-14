@@ -89,11 +89,13 @@ export class ContractGeneratorService {
           // Extract just the key name and what it replaces, without including surrounding code
           return `LINE ${v.line} MISSING TEMPLATE VARIABLE\n${
             v.keyName.split("\n")[0]
-          }\n${v.toReplace}`;
+          }\nNeeds replacement for: ${v.toReplace}\nExpected key: ${v.key}`;
         })
         .join("\n\n");
 
-      throw new Error(missingDetails);
+      console.error(`Missing template variables for ${contract.name}:`);
+      console.error(missingDetails);
+      throw new Error(`Missing template variables for ${contract.name}:\n${missingDetails}`);
     }
 
     return processContractTemplate(templateContent, replacementsMap);
