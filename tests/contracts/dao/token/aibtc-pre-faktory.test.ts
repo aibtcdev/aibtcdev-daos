@@ -2,6 +2,7 @@ import { Cl, ClarityType, cvToValue, UIntCV } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 import { getDaoTokens } from "../../../../utilities/dao-helpers";
+import { dbgLog } from "../../../../utilities/debug-logging";
 
 // setup accounts
 const accounts = simnet.getAccounts();

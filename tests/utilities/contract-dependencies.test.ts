@@ -3,6 +3,7 @@ import { ContractRegistry } from "../../utilities/contract-registry";
 import { ContractGeneratorService } from "../../src/services/contract-generator";
 import { defineAllDaoContractDependencies } from "../../utilities/contract-dependencies";
 import { generateTemplateReplacements } from "../../utilities/template-variables";
+import { dbgLog } from "../../utilities/debug-logging";
 import fs from "node:fs";
 import path from "node:path";
 

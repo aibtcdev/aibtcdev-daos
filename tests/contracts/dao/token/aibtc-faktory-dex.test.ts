@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 import { fundVoters, getDaoTokens } from "../../../../utilities/dao-helpers";
 import { SBTC_CONTRACT } from "../../../../utilities/contract-helpers";
+import { dbgLog } from "../../../../utilities/debug-logging";
 
 // setup accounts
 const accounts = simnet.getAccounts();
