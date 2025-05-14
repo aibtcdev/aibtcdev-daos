@@ -13,9 +13,19 @@ export type {
   AddressDependency,
   TraitDependency,
   ContractDependency,
-  RuntimeValue,
-  DeploymentResult
+  RuntimeValue
 } from '../../models/contract-template';
+
+/**
+ * Contract generation result
+ */
+export interface DeploymentResult {
+  sender: string;
+  success: boolean;
+  txId?: string;
+  address: string;
+  error?: string;
+}
 
 // API Response interface
 export interface ApiResponse<T> {
@@ -86,15 +96,3 @@ export interface DaoConfig {
   network: string;
 }
 
-// MCP event types
-export enum McpEventType {
-  CONTRACT_DEPLOYED = 'CONTRACT_DEPLOYED',
-  CONTRACT_GENERATED = 'CONTRACT_GENERATED',
-  DAO_INITIALIZED = 'DAO_INITIALIZED'
-}
-
-export interface McpEvent<T = any> {
-  type: McpEventType;
-  timestamp: number;
-  data: T;
-}
