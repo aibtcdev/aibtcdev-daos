@@ -64,7 +64,7 @@ export class ContractGeneratorService {
         `Found ${toReplace} to replace with ${keyName} at line ${lineNumber}`
       );
       return {
-        key: `${match[1]}/${match[2]}`,
+        key: keyName, // Use just the value key as the lookup key
         line: lineNumber,
         toReplace: match[1],
         keyName: match[2],

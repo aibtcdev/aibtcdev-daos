@@ -39,9 +39,9 @@ export function processContractTemplate(
     if (commentMatch) {
       const replacementKey = commentMatch[1];
       const valueKey = commentMatch[2];
-      const replacementMapKey = `${replacementKey}/${valueKey}`;
-
-      if (replacements.has(replacementMapKey)) {
+      
+      // Use just the value key for lookup, not the combined key
+      if (replacements.has(valueKey)) {
         // Find the target line - the first line after this comment that contains the key
         let targetLineIndex = i + 1;
         let foundTarget = false;
@@ -72,8 +72,8 @@ export function processContractTemplate(
             lineIndex: targetLineIndex,
             commentLineIndex: i,
             key: replacementKey,
-            value: replacements.get(replacementMapKey)!,
-            replacementKey: replacementMapKey,
+            value: replacements.get(valueKey)!,
+            replacementKey: valueKey,
           });
 
           // Mark this comment line to be skipped
@@ -83,7 +83,7 @@ export function processContractTemplate(
           dbgLog(
             {
               action: "template_replacement_warning",
-              key: replacementMapKey,
+              key: valueKey,
               message: `Could not find target line containing key '${replacementKey}' for comment at line ${
                 i + 1
               }`,

@@ -126,12 +126,12 @@ describe("Contract Dependencies", () => {
     // Add API values to the appropriate template variables
     Object.entries(apiProvidedValues).forEach(([key, value]) => {
       if (key === "dao_token_symbol") {
-        customReplacements["aibtc/dao_token_symbol"] = value.toUpperCase();
+        customReplacements["dao_token_symbol"] = value.toUpperCase();
       } else if (key === "dao_manifest") {
-        customReplacements["dao mission goes here/dao_manifest"] = value;
+        customReplacements["dao_manifest"] = value;
       } else {
         // Other runtime values
-        customReplacements[`${key}/${key}`] = value;
+        customReplacements[key] = value;
       }
     });
     
@@ -192,8 +192,8 @@ describe("Contract Dependencies", () => {
     
     // Override with API-provided values
     const customReplacements = {
-      "aibtc/dao_token_symbol": apiRequest.tokenSymbol.toUpperCase(),
-      "dao mission goes here/dao_manifest": apiRequest.manifest
+      "dao_token_symbol": apiRequest.tokenSymbol.toUpperCase(),
+      "dao_manifest": apiRequest.manifest
     };
     
     // Merge replacements

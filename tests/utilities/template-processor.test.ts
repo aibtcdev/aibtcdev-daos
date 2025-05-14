@@ -25,8 +25,8 @@ describe("Template Processor", () => {
 `;
 
     const replacements = createReplacementsMap({
-      "TEST_ADDRESS/account_owner": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
-      "TEST_ADDRESS/account_agent": "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
+      "account_owner": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+      "account_agent": "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
     });
 
     const processed = processContractTemplate(template, replacements);
@@ -262,8 +262,8 @@ describe("Template Processor", () => {
 `;
 
     const replacements = createReplacementsMap({
-      "TOKEN_NAME/token_name": "Test Token",
-      "TOKEN_SYMBOL/token_symbol": "TEST",
+      "token_name": "Test Token",
+      "token_symbol": "TEST",
     });
 
     const processed = processContractTemplate(template, replacements);
@@ -294,7 +294,7 @@ describe("Template Processor", () => {
 `;
 
     const replacements = createReplacementsMap({
-      "TOKEN_URI/token_uri": "https://example.com/token.json?id=123&type=nft",
+      "token_uri": "https://example.com/token.json?id=123&type=nft",
     });
 
     const processed = processContractTemplate(template, replacements);
