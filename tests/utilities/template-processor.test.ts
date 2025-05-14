@@ -93,8 +93,8 @@ describe("Template Processor", () => {
 ;; traits
 ;; /g/.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account
 (impl-trait .aibtc-agent-account-traits.aibtc-account)
-;; /g/.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval
-(impl-trait .aibtc-agent-account-traits.aibtc-faktory-dex)
+;; /g/.aibtc-agent-account-traits.faktory-dex/agent_account_trait_faktory_dex_approval
+(impl-trait .aibtc-agent-account-traits.faktory-dex)
 ;; /g/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
