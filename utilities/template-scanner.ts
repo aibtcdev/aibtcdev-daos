@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { ContractRegistry } from "./contract-registry";
+import { getAllKnownTemplateVariables } from "./template-variables";
 
 /**
  * Utility to scan contract templates and extract variables
@@ -22,17 +23,21 @@ export class TemplateScanner {
         
         if (fs.existsSync(templatePath)) {
           const templateContent = fs.readFileSync(templatePath, "utf8");
-          const variableRegex = /\{\{([^}]+)\}\}/g;
+          
+          // Only check for /g/ format
+          const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
+          
           const matches = [...templateContent.matchAll(variableRegex)];
-          const variables = matches.map(match => match[1]);
+          // Only store the key/value pairs, not the surrounding content
+          const variables = matches.map(match => `${match[1]}/${match[2]}`);
           
           // Store unique variables
           report[`${contract.type}/${contract.name}`] = [...new Set(variables)];
         } else {
-          console.error(`Template not found for ${contract.name}: ${templatePath}`);
+          dbgLog(`Template not found for ${contract.name}: ${templatePath}`, { logType: "error", titleBefore: "Template Scanner Error" });
         }
       } catch (error) {
-        console.error(`Error scanning template for ${contract.name}:`, error);
+        dbgLog(`Error scanning template for ${contract.name}: ${error instanceof Error ? error.message : String(error)}`, { logType: "error", titleBefore: "Template Scanning Error" });
       }
     }
     
@@ -47,6 +52,23 @@ export class TemplateScanner {
     const allVariables = Object.values(report).flat();
     return [...new Set(allVariables)];
   }
+  
+  /**
+   * Get a list of all known template variables
+   */
+  static getKnownTemplateVariables(): string[] {
+    return getAllKnownTemplateVariables();
+  }
+  
+  /**
+   * Find template variables that are used but not in our known list
+   */
+  static async findUnknownTemplateVariables(): Promise<string[]> {
+    const usedVariables = await this.getAllUniqueVariables();
+    const knownVariables = this.getKnownTemplateVariables();
+    
+    return usedVariables.filter(variable => !knownVariables.includes(variable));
+  }
 
   /**
    * Save the template variable report to a file
@@ -54,9 +76,19 @@ export class TemplateScanner {
   static async saveVariableReport(outputPath: string): Promise<void> {
     const report = await this.scanAllTemplates();
     const allVariables = await this.getAllUniqueVariables();
+    const knownVariables = this.getKnownTemplateVariables();
+    const unknownVariables = await this.findUnknownTemplateVariables();
     
     const output = {
+      summary: {
+        totalContracts: Object.keys(report).length,
+        totalUniqueVariables: allVariables.length,
+        knownVariables: knownVariables.length,
+        unknownVariables: unknownVariables.length
+      },
       allUniqueVariables: allVariables,
+      knownVariables: knownVariables,
+      unknownVariables: unknownVariables,
       contractVariables: report
     };
     
@@ -65,6 +97,6 @@ export class TemplateScanner {
       JSON.stringify(output, null, 2)
     );
     
-    console.log(`Template variable report saved to ${outputPath}`);
+    dbgLog(`Template variable report saved to ${outputPath}`, { titleBefore: "Template Report" });
   }
 }

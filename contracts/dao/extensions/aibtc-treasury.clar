@@ -5,12 +5,12 @@
 ;; traits
 ;;
 
-;; /g/.aibtc-dao-traits.extension/dao_extension_trait
+;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.treasury/dao_treasury_trait
+;; /g/.aibtc-dao-traits.treasury/dao_trait_treasury
 (impl-trait .aibtc-dao-traits.treasury)
 
-;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait
+;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait sip010-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; constants
@@ -30,24 +30,31 @@
 
 ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_token_contract
 (define-constant CFG_SBTC_TOKEN 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token)
-;; /g/.aibtc-faktory/dao_token_contract
+;; /g/.aibtc-faktory/dao_contract_token
 (define-constant CFG_DAO_TOKEN .aibtc-faktory)
 
 ;; data maps
 ;;
 
 ;; track allowed assets for deposit/transfer
-(define-map AllowedAssets principal bool)
-(map-set AllowedAssets CFG_SBTC_TOKEN true)
-(map-set AllowedAssets CFG_DAO_TOKEN true)
-
-;; public functions
-;;
-
-(define-public (callback (sender principal) (memo (buff 34))) (ok true))
+(define-map AllowedAssets
+  principal
+  bool
+)
+(map-set AllowedAssets CFG_SBTC_TOKEN true) 
+(map-set AllowedAssets CFG_DAO_TOKEN true) ;; public functions;;
+(define-public (callback
+    (sender principal)
+    (memo (buff 34))
+  )
+  (ok true)
+)
 
 ;; add or update an asset to the allowed list
-(define-public (allow-asset (token principal) (enabled bool))
+(define-public (allow-asset
+    (token principal)
+    (enabled bool)
+  )
   (begin
     (try! (is-dao-or-extension))
     (print {
@@ -57,15 +64,18 @@
         token: token,
         enabled: enabled,
         contractCaller: contract-caller,
-        txSender: tx-sender
-      }
+        txSender: tx-sender,
+      },
     })
     (ok (map-set AllowedAssets token enabled))
   )
 )
 
 ;; deposit FT to the treasury
-(define-public (deposit-ft (ft <sip010-trait>) (amount uint))
+(define-public (deposit-ft
+    (ft <sip010-trait>)
+    (amount uint)
+  )
   (begin
     ;; no auth - anyone can deposit if token allowed
     (asserts! (is-allowed-asset (contract-of ft)) ERR_ASSET_NOT_ALLOWED)
@@ -77,15 +87,19 @@
         recipient: SELF,
         assetContract: (contract-of ft),
         contractCaller: contract-caller,
-        txSender: tx-sender
-      }
+        txSender: tx-sender,
+      },
     })
     (contract-call? ft transfer amount tx-sender SELF none)
   )
 )
 
 ;; withdraw FT from the treasury
-(define-public (withdraw-ft (ft <sip010-trait>) (amount uint) (to principal))
+(define-public (withdraw-ft
+    (ft <sip010-trait>)
+    (amount uint)
+    (to principal)
+  )
   (begin
     ;; only DAO contract can withdraw if token allowed
     (try! (is-dao-or-extension))
@@ -98,8 +112,8 @@
         recipient: to,
         assetContract: (contract-of ft),
         contractCaller: contract-caller,
-        txSender: tx-sender
-      }
+        txSender: tx-sender,
+      },
     })
     (as-contract (contract-call? ft transfer amount SELF to none))
   )
@@ -128,9 +142,13 @@
 ;;
 
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_base_contract
-  (ok (asserts! (or (is-eq tx-sender .aibtc-base-dao)
-    ;; /g/.aibtc-base-dao/dao_base_contract
-    (contract-call? .aibtc-base-dao is-extension contract-caller)) ERR_NOT_DAO_OR_EXTENSION
+  ;; /g/.aibtc-base-dao/dao_contract_base
+  (ok (asserts!
+    (or
+      (is-eq tx-sender .aibtc-base-dao)
+      ;; /g/.aibtc-base-dao/dao_contract_base
+      (contract-call? .aibtc-base-dao is-extension contract-caller)
+    )
+    ERR_NOT_DAO_OR_EXTENSION
   ))
 )

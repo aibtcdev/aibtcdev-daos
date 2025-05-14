@@ -2,6 +2,7 @@ import { Cl, ClarityType, cvToValue, UIntCV } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 import { getDaoTokens } from "../../../../utilities/dao-helpers";
+import { dbgLog } from "../../../../utilities/debug-logging";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -285,8 +286,9 @@ describe(`public functions: ${contractName}`, () => {
         Cl.uint(0n)
       );
     } catch (e) {
-      console.log(
-        "Refund test skipped - distribution may be initialized or refund period expired"
+      dbgLog(
+        "Refund test skipped - distribution may be initialized or refund period expired",
+        { titleBefore: "Test Skip Notice" }
       );
     }
   });
@@ -334,7 +336,7 @@ describe(`public functions: ${contractName}`, () => {
 
     // Skip test if distribution is already initialized
     if (distributionInitialized) {
-      console.log("Skipping claim test - distribution already initialized");
+      dbgLog("Skipping claim test - distribution already initialized", { titleBefore: "Test Skip Notice" });
       return;
     }
 
@@ -373,7 +375,7 @@ describe(`public functions: ${contractName}`, () => {
 
     // Skip test if distribution is not initialized
     if (!distributionInitialized) {
-      console.log("Skipping claim test - could not initialize distribution");
+      dbgLog("Skipping claim test - could not initialize distribution", { titleBefore: "Test Skip Notice" });
       return;
     }
 
@@ -436,8 +438,9 @@ describe(`public functions: ${contractName}`, () => {
 
     // Skip test if distribution is not initialized
     if (!distributionInitialized) {
-      console.log(
-        "Skipping claim-on-behalf test - distribution not initialized"
+      dbgLog(
+        "Skipping claim-on-behalf test - distribution not initialized",
+        { titleBefore: "Test Skip Notice" }
       );
       return;
     }

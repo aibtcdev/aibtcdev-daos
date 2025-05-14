@@ -5,9 +5,9 @@
 ;; traits
 ;;
 
-;; /g/.aibtc-dao-traits.extension/dao_extension_trait
+;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.users/dao_users_trait
+;; /g/.aibtc-dao-traits.users/dao_trait_users
 (impl-trait .aibtc-dao-traits.dao-users)
 
 ;; constants
@@ -31,7 +31,10 @@
 ;;
 
 ;; central tracking for DAO users
-(define-map UserIndexes principal uint)
+(define-map UserIndexes
+  principal
+  uint
+)
 (define-map UserData
   uint ;; user index
   {
@@ -44,17 +47,22 @@
 ;; public functions
 ;;
 
-(define-public (callback (sender principal) (memo (buff 34))) (ok true))
+(define-public (callback
+    (sender principal)
+    (memo (buff 34))
+  )
+  (ok true)
+)
 
 (define-public (get-or-create-user-index (address principal))
   (begin
     (try! (is-dao-or-extension))
     (match (map-get? UserIndexes address)
       ;; user already exists, return the index
-      value (ok value)
+      value
+      (ok value)
       ;; user does not exist, create a new one
-      (let
-        ((userIndex (+ u1 (var-get userCount))))
+      (let ((userIndex (+ u1 (var-get userCount))))
         (print {
           ;; /g/aibtc/dao_token_symbol
           notification: "aibtc-dao-users/get-or-create-user-index",
@@ -63,8 +71,8 @@
             address: address,
             createdAt: DEPLOYED_BURN_BLOCK,
             contractCaller: contract-caller,
-            txSender: tx-sender
-          }
+            txSender: tx-sender,
+          },
         })
         (map-insert UserIndexes address userIndex)
         (map-insert UserData userIndex {
@@ -79,9 +87,11 @@
   )
 )
 
-(define-public (increase-user-reputation (address principal) (amount uint))
-  (let
-    (
+(define-public (increase-user-reputation
+    (address principal)
+    (amount uint)
+  )
+  (let (
       (userIndex (unwrap! (get-user-index address) ERR_USER_NOT_FOUND))
       (userData (unwrap! (get-user-data-by-index userIndex) ERR_USER_NOT_FOUND))
       (increaseAmount (to-int amount))
@@ -95,8 +105,8 @@
         address: address,
         createdAt: DEPLOYED_BURN_BLOCK,
         contractCaller: contract-caller,
-        txSender: tx-sender
-      }
+        txSender: tx-sender,
+      },
     })
     (map-set UserData userIndex {
       address: address,
@@ -107,9 +117,11 @@
   )
 )
 
-(define-public (decrease-user-reputation (address principal) (amount uint))
-  (let
-    (
+(define-public (decrease-user-reputation
+    (address principal)
+    (amount uint)
+  )
+  (let (
       (userIndex (unwrap! (get-user-index address) ERR_USER_NOT_FOUND))
       (userData (unwrap! (get-user-data-by-index userIndex) ERR_USER_NOT_FOUND))
       (decreaseAmount (to-int amount))
@@ -123,8 +135,8 @@
         address: address,
         createdAt: DEPLOYED_BURN_BLOCK,
         contractCaller: contract-caller,
-        txSender: tx-sender
-      }
+        txSender: tx-sender,
+      },
     })
     (map-set UserData userIndex {
       address: address,
@@ -163,9 +175,13 @@
 
 ;; returns ok if the caller is the DAO or an extension or err if not
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_base_contract
-  (ok (asserts! (or (is-eq tx-sender .aibtc-base-dao)
-    ;; /g/.aibtc-base-dao/dao_base_contract
-    (contract-call? .aibtc-base-dao is-extension contract-caller)) ERR_NOT_DAO_OR_EXTENSION
+  ;; /g/.aibtc-base-dao/dao_contract_base
+  (ok (asserts!
+    (or
+      (is-eq tx-sender .aibtc-base-dao)
+      ;; /g/.aibtc-base-dao/dao_contract_base
+      (contract-call? .aibtc-base-dao is-extension contract-caller)
+    )
+    ERR_NOT_DAO_OR_EXTENSION
   ))
 )

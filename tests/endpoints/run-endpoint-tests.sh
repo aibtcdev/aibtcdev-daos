@@ -32,7 +32,7 @@ test_api_by_type
 test_api_contract
 test_api_by_type_subtype
 test_api_dependencies
-test_api_generate_contract
+test_api_process_template
 
 # Print summary
 echo ""
@@ -44,7 +44,7 @@ echo "Failed tests: $FAILED_TESTS"
 
 # Exit with failure if any tests failed
 if [ $FAILED_TESTS -gt 0 ]; then
-  ./tests/chadsay.sh "Action needed: $FAILED_TESTS test(s) failed."
+  echo "❌ Action needed: $FAILED_TESTS test(s) failed."
   exit 1
 else
   ./tests/chadsay.sh "All $TOTAL_TESTS endpoint tests passed. Good job."

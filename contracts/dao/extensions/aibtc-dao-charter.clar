@@ -5,9 +5,9 @@
 ;; traits
 ;;
 
-;; /g/.aibtc-dao-traits.extension/dao_extension_trait
+;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.charter/dao_charter_trait
+;; /g/.aibtc-dao-traits.charter/dao_trait_charter
 (impl-trait .aibtc-dao-traits.dao-charter)
 
 ;; constants
@@ -47,26 +47,31 @@
 ;; public functions
 ;;
 
-(define-public (callback (sender principal) (memo (buff 34))) (ok true))
+(define-public (callback
+    (sender principal)
+    (memo (buff 34))
+  )
+  (ok true)
+)
 
 (define-public (set-dao-charter (charter (string-ascii 4096)))
-  (let
-    (
-      (newVersion (+ (var-get currentVersion) u1))
-    )
+  (let ((newVersion (+ (var-get currentVersion) u1)))
     ;; check if sender is dao or extension
     (try! (is-dao-or-extension))
     ;; check length of charter
     (asserts! (>= (len charter) u1) ERR_CHARTER_TOO_SHORT)
     (asserts! (<= (len charter) u4096) ERR_CHARTER_TOO_LONG)
     ;; insert new charter version
-    (asserts! (map-insert CharterVersions newVersion {
-      burnHeight: burn-block-height,
-      createdAt: stacks-block-height,
-      caller: contract-caller,
-      sender: tx-sender,
-      charter: charter,
-    }) ERR_SAVING_CHARTER)
+    (asserts!
+      (map-insert CharterVersions newVersion {
+        burnHeight: burn-block-height,
+        createdAt: stacks-block-height,
+        caller: contract-caller,
+        sender: tx-sender,
+        charter: charter,
+      })
+      ERR_SAVING_CHARTER
+    )
     ;; print charter info
     (print {
       ;; /g/aibtc/dao_token_symbol
@@ -79,8 +84,8 @@
         dao: SELF,
         charter: charter,
         previousCharter: (var-get daoCharter),
-        version: newVersion
-      }
+        version: newVersion,
+      },
     })
     ;; increment charter version
     (var-set currentVersion newVersion)
@@ -114,9 +119,13 @@
 ;; private functions
 ;;
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_base_contract
-  (ok (asserts! (or (is-eq tx-sender .aibtc-base-dao)
-    ;; /g/.aibtc-base-dao/dao_base_contract
-    (contract-call? .aibtc-base-dao is-extension contract-caller)) ERR_NOT_DAO_OR_EXTENSION
+  ;; /g/.aibtc-base-dao/dao_contract_base
+  (ok (asserts!
+    (or
+      (is-eq tx-sender .aibtc-base-dao)
+      ;; /g/.aibtc-base-dao/dao_contract_base
+      (contract-call? .aibtc-base-dao is-extension contract-caller)
+    )
+    ERR_NOT_DAO_OR_EXTENSION
   ))
 )

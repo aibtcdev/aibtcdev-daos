@@ -5,9 +5,9 @@
 ;; traits
 ;;
 
-;; /g/.aibtc-dao-traits.extension/dao_extension_trait
+;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.epoch/dao_epoch_trait
+;; /g/.aibtc-dao-traits.epoch/dao_trait_epoch
 (impl-trait .aibtc-dao-traits.dao-epoch)
 
 ;; constants
@@ -24,7 +24,12 @@
 ;; public functions
 ;;
 
-(define-public (callback (sender principal) (memo (buff 34))) (ok true))
+(define-public (callback
+    (sender principal)
+    (memo (buff 34))
+  )
+  (ok true)
+)
 
 ;; read only functions
 ;;

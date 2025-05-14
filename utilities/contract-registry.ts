@@ -19,10 +19,12 @@ import {
   processContractTemplate,
   createReplacementsMap,
 } from "./template-processor";
+import { defineAllDaoContractDependencies } from "./contract-dependencies";
 
 export function setupDaoContractRegistry(): ContractRegistry {
   const registry = new ContractRegistry();
   registry.registerDaoContracts();
+  defineAllDaoContractDependencies(registry);
   return registry;
 }
 
@@ -30,6 +32,7 @@ export function setupDaoContractRegistry(): ContractRegistry {
 export function setupFullContractRegistry(): ContractRegistry {
   const registry = new ContractRegistry();
   registry.registerAllDefinedContracts();
+  defineAllDaoContractDependencies(registry);
   return registry;
 }
 

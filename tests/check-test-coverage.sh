@@ -71,9 +71,9 @@ echo "Contracts without test files: $untested_contracts"
 echo ""
 
 if [ $untested_contracts -eq 0 ]; then
-    ./tests/chadsay.sh "All contracts have corresponding test files. Good job."
+    ./tests/chadsay.sh "All $total_contracts contracts have test files. Good job."
     exit 0
 else
-    ./tests/chadsay.sh "Action needed: $untested_contracts contract(s) are missing test files."
+    echo "❌ Action needed: $untested_contracts contract(s) are missing test files."
     exit 1
 fi
