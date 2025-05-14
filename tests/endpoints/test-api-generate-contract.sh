@@ -39,9 +39,9 @@ test_api_process_template() {
         "$url")
     
     # Debug the raw response
-    echo "Raw response (first 500 chars):"
-    echo "$response" | head -c 500
-    echo "..."
+    #echo "Raw response (first 500 chars):"
+    #echo "$response" | head -c 500
+    #echo "..."
     
     status=$(echo "$response" | tail -n1)
     
@@ -187,6 +187,7 @@ test_api_generate_dao_contracts() {
         # Check if the response is valid JSON
         if ! echo "$body" | jq empty >/dev/null 2>&1; then
             echo -e "${RED}✗${NC} Response is not valid JSON"
+            echo "Response: $response"
             FAILED_TESTS=$((FAILED_TESTS + 1))
             return
         fi
@@ -200,8 +201,8 @@ test_api_generate_dao_contracts() {
         fi
         
         # Debug the response structure
-        echo "Response structure:"
-        echo "$body" | jq -r 'keys'
+        #echo "Response structure:"
+        #echo "$body" | jq -r 'keys'
         
         # Check for data field
         if ! echo "$body" | jq -e '.data' >/dev/null 2>&1; then
@@ -212,8 +213,8 @@ test_api_generate_dao_contracts() {
         fi
         
         # Debug the data structure
-        echo "Data structure:"
-        echo "$body" | jq -r '.data | keys'
+        #echo "Data structure:"
+        #echo "$body" | jq -r '.data | keys'
         
         # Check for contracts array
         if ! echo "$body" | jq -e '.data.contracts' >/dev/null 2>&1; then
@@ -225,11 +226,11 @@ test_api_generate_dao_contracts() {
         
         # Check if the contracts array is not empty
         contracts_count=$(echo "$body" | jq -r '.data.contracts | length')
-        echo "Contracts count: $contracts_count"
+        #echo "Contracts count: $contracts_count"
         
         # If contracts_count is empty or 0, we'll still pass the test but with a warning
         if [ -z "$contracts_count" ] || [ "$contracts_count" -eq 0 ]; then
-            echo -e "${YELLOW}⚠${NC} Contracts array is empty, but this might be expected in some environments"
+            echo -e "  ${YELLOW}⚠${NC} Contracts array is empty, but this might be expected in some environments"
             # Don't fail the test, just warn
         fi
         
@@ -238,13 +239,13 @@ test_api_generate_dao_contracts() {
         if echo "$body" | jq -e '.data.contracts' >/dev/null 2>&1; then
             valid_contracts=$(echo "$body" | jq -r '[.data.contracts[] | select(.name != null and .content != null)] | length')
             if [ -z "$valid_contracts" ] || [ "$valid_contracts" -eq 0 ]; then
-                echo -e "${YELLOW}⚠${NC} No valid contracts found in the response"
+                echo -e "  ${YELLOW}⚠${NC} No valid contracts found in the response"
                 # Don't fail the test, just warn
             else
-                echo -e "${GREEN}✓${NC} Found $valid_contracts valid contracts"
+                echo -e "  ${GREEN}✓${NC} Found $valid_contracts valid contracts"
             fi
         else
-            echo -e "${YELLOW}⚠${NC} No contracts array found in response"
+            echo -e "  ${YELLOW}⚠${NC} No contracts array found in response"
             # Don't fail the test, just warn
         fi
         
@@ -252,17 +253,17 @@ test_api_generate_dao_contracts() {
         if echo "$body" | jq -e '.data.contracts' >/dev/null 2>&1; then
             error_contracts=$(echo "$body" | jq -r '[.data.contracts[] | select(.content | contains("ERROR:"))] | length')
             if [ -z "$error_contracts" ]; then
-                echo -e "${GREEN}✓${NC} No contracts with errors found"
+                echo -e "  ${GREEN}✓${NC} No contracts with errors found"
             elif [ "$error_contracts" -gt 0 ]; then
-                echo -e "${YELLOW}⚠${NC} Found $error_contracts contracts with errors"
+                echo -e "  ${YELLOW}⚠${NC} Found $error_contracts contracts with errors"
                 # Don't fail the test, just warn
             else
-                echo -e "${GREEN}✓${NC} No contracts with errors found"
+                echo -e "  ${GREEN}✓${NC} No contracts with errors found"
             fi
         fi
         
         # Successfully parsed the response
-        echo -e "${GREEN}✓${NC} Successfully processed the response"
+        echo -e "  ${GREEN}✓${NC} Successfully processed the response"
     else
         echo -e "${RED}✗${NC} Generate all DAO contracts endpoint with valid data - Expected status 200, got $status"
         FAILED_TESTS=$((FAILED_TESTS + 1))
