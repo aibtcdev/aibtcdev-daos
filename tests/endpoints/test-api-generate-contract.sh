@@ -190,15 +190,16 @@ test_api_generate_dao_contracts() {
         fi
         
         # Check if the contracts array is not empty
-        contracts_count=$(echo "$body" | jq '.data.contracts | length')
+        contracts_count=$(echo "$body" | jq -r '.data.contracts | length')
         if [ -z "$contracts_count" ] || [ "$contracts_count" -eq 0 ]; then
             echo -e "${RED}✗${NC} Contracts array is empty"
+            echo "Response body: $body"
             FAILED_TESTS=$((FAILED_TESTS + 1))
             return
         fi
         
         # Check if the contracts array contains valid contract objects
-        valid_contracts=$(echo "$body" | jq '[.data.contracts[] | select(.name != null and .content != null)] | length')
+        valid_contracts=$(echo "$body" | jq -r '[.data.contracts[] | select(.name != null and .content != null)] | length')
         if [ -z "$valid_contracts" ] || [ "$valid_contracts" -eq 0 ]; then
             echo -e "${RED}✗${NC} Contracts array does not contain valid contract objects"
             FAILED_TESTS=$((FAILED_TESTS + 1))
@@ -206,7 +207,7 @@ test_api_generate_dao_contracts() {
         fi
         
         # Check if the contracts array contains errors
-        error_contracts=$(echo "$body" | jq '[.data.contracts[] | select(.content | contains("ERROR:"))] | length')
+        error_contracts=$(echo "$body" | jq -r '[.data.contracts[] | select(.content | contains("ERROR:"))] | length')
         if [ -z "$error_contracts" ] || [ "$error_contracts" -gt 0 ]; then
             echo -e "${RED}✗${NC} Contracts array contains $error_contracts contracts with errors"
             FAILED_TESTS=$((FAILED_TESTS + 1))
