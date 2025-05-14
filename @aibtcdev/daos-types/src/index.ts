@@ -55,7 +55,6 @@ export interface ContractInfo {
   templatePath: string;
   source?: string;
   hash?: string;
-  deploymentResult?: DeploymentResult;
 }
 
 // API response types for specific endpoints

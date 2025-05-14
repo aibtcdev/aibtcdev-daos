@@ -23,8 +23,8 @@ async function fetchContract(name: string): Promise<ApiResponse<ContractInfo>> {
 function processContract(data: ContractInfo) {
   console.log(`Contract: ${data.name} (${data.type}/${data.subtype})`);
   
-  if (data.deploymentResult?.success) {
-    console.log(`Deployed at: ${data.deploymentResult.address}`);
+  if (data.source) {
+    console.log(`Contract source hash: ${data.hash}`);
   }
 }
 ```
@@ -39,7 +39,7 @@ function processContract(data: ContractInfo) {
 - `ContractType` - Types of contracts (BASE, ACTIONS, etc.)
 - `ContractSubtype` - Subtypes for each contract type
 - `ContractInfo` - Information about a contract
-- `DeploymentResult` - Result of a contract deployment
+- `DeploymentResult` - Result of contract generation
 
 ### Dependencies
 - `AddressDependency` - Address dependency for contract templates
@@ -53,10 +53,6 @@ function processContract(data: ContractInfo) {
 - `ContractDependenciesResponse` - Response for contract dependencies
 - `ContractSourceResponse` - Response for contract source code
 - `GeneratedContractResponse` - Response for a generated contract
-
-### MCP Types
-- `McpEventType` - MCP event types
-- `McpEvent<T>` - MCP event payload
 
 ## License
 
