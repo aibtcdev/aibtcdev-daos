@@ -4,9 +4,20 @@
  * This package provides TypeScript type definitions for the AIBTC DAO API.
  */
 
-/**
- * Base API response interface
- */
+// Re-export contract types from utilities/contract-types.ts
+export { ContractType } from '../../utilities/contract-types';
+export type { ContractSubtype, AllContractSubtypes } from '../../utilities/contract-types';
+
+// Re-export contract model types from models/contract-template.ts
+export type {
+  AddressDependency,
+  TraitDependency,
+  ContractDependency,
+  RuntimeValue,
+  DeploymentResult
+} from '../../models/contract-template';
+
+// API Response interface
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -18,9 +29,7 @@ export interface ApiResponse<T> {
   };
 }
 
-/**
- * Error codes used in API responses
- */
+// Error codes
 export enum ErrorCode {
   // General errors
   INTERNAL_ERROR = 'INTERNAL_ERROR',
@@ -37,22 +46,7 @@ export enum ErrorCode {
   DEPLOYMENT_FAILED = 'DEPLOYMENT_FAILED'
 }
 
-/**
- * Contract types supported by the platform
- */
-export type ContractType = 
-  | "BASE" 
-  | "ACTIONS" 
-  | "EXTENSIONS" 
-  | "PROPOSALS" 
-  | "CORE" 
-  | "TOKEN" 
-  | "AGENT" 
-  | "EXTERNAL";
-
-/**
- * Contract information
- */
+// Contract info derived from ContractBase
 export interface ContractInfo {
   name: string;
   type: ContractType;
@@ -64,107 +58,42 @@ export interface ContractInfo {
   deploymentResult?: DeploymentResult;
 }
 
-/**
- * Result of a contract deployment
- */
-export interface DeploymentResult {
-  sender: string;
-  success: boolean;
-  txId?: string;
-  address: string;
-  error?: string;
-}
-
-/**
- * Address dependency for contract templates
- */
-export interface AddressDependency {
-  ref: string;
-  key: string;
-}
-
-/**
- * Trait dependency for contract templates
- */
-export interface TraitDependency {
-  ref: string;
-  key: string;
-}
-
-/**
- * Contract dependency for contract templates
- */
-export interface ContractDependency {
-  key: string;
-  category: ContractType;
-  subcategory: string;
-}
-
-/**
- * Runtime value for contract templates
- */
-export interface RuntimeValue {
-  key: string;
-  value?: string;
-}
-
-/**
- * Response for listing all contracts
- */
+// API response types for specific endpoints
 export interface ContractsListResponse {
   contracts: ContractInfo[];
 }
 
-/**
- * Response for a single contract's details
- */
 export interface ContractDetailResponse {
   contract: ContractInfo;
 }
 
-/**
- * Response for contract dependencies
- */
 export interface ContractDependenciesResponse {
   dependencies: Array<AddressDependency | TraitDependency | ContractDependency | RuntimeValue>;
 }
 
-/**
- * Response for contract source code
- */
 export interface ContractSourceResponse {
   source: string;
 }
 
-/**
- * Response for a generated contract
- */
 export interface GeneratedContractResponse {
   source: string;
   hash: string;
 }
 
-/**
- * DAO configuration
- */
+// DAO configuration
 export interface DaoConfig {
   name: string;
   tokenSymbol: string;
   network: string;
 }
 
-/**
- * MCP event types
- */
+// MCP event types
 export enum McpEventType {
   CONTRACT_DEPLOYED = 'CONTRACT_DEPLOYED',
   CONTRACT_GENERATED = 'CONTRACT_GENERATED',
   DAO_INITIALIZED = 'DAO_INITIALIZED'
 }
 
-/**
- * MCP event payload
- */
 export interface McpEvent<T = any> {
   type: McpEventType;
   timestamp: number;

@@ -6,8 +6,13 @@
     "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "baseUrl": "../",
+    "paths": {
+      "models/*": ["models/*"],
+      "utilities/*": ["utilities/*"]
+    }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../models/contract-template.ts", "../utilities/contract-types.ts"],
   "exclude": ["node_modules", "**/*.test.ts"]
 }
