@@ -146,6 +146,54 @@ export abstract class ContractBase {
     this.requiredRuntimeValues.push({ key });
     return this;
   }
+  
+  /**
+   * Add a template variable dependency from the /g/ format
+   * @param toReplace The text to be replaced
+   * @param keyName The key name for the replacement
+   */
+  addTemplateVariable(toReplace: string, keyName: string): this {
+    // Format matches the /g/toReplace/keyName format used in templates
+    const formattedKey = `${toReplace}/${keyName}`;
+    
+    // Check if this is an address, trait, contract, or runtime value
+    // and add to the appropriate collection
+    if (toReplace.startsWith('ST') || toReplace.includes('.')) {
+      // This is likely an address or contract reference
+      this.addRuntimeValue(formattedKey);
+    } else {
+      // Other template variables (configuration values, etc.)
+      this.addRuntimeValue(formattedKey);
+    }
+    
+    return this;
+  }
+
+  /**
+   * Scan the template content for /g/ variables and add them as dependencies
+   * @param templateContent The content of the template file
+   */
+  scanTemplateVariables(templateContent: string): this {
+    // Extract all variables from template
+    const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
+    const matches = [...templateContent.matchAll(variableRegex)];
+    
+    // Add each unique variable as a dependency
+    const uniqueVars = new Set<string>();
+    
+    for (const match of matches) {
+      const toReplace = match[1];
+      const keyName = match[2];
+      const key = `${toReplace}/${keyName}`;
+      
+      if (!uniqueVars.has(key)) {
+        uniqueVars.add(key);
+        this.addTemplateVariable(toReplace, keyName);
+      }
+    }
+    
+    return this;
+  }
 
   // Convert to registry entry format for backward compatibility
   toRegistryEntry(): any {

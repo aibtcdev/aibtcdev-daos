@@ -306,5 +306,65 @@ export function createApiRouter(registry: ContractRegistry) {
     );
   });
 
+  // Generate contract for a specific network
+  api.post("/generate-contract-for-network", async (c) => {
+    return handleRequest(
+      c,
+      async () => {
+        const body = await c.req.json();
+        const contractName = body.contractName || body.name;
+        const network = body.network || "devnet";
+        const tokenSymbol = body.tokenSymbol || "aibtc";
+        const customReplacements = body.customReplacements || {};
+
+        if (!contractName) {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: "Missing required parameter: contractName or name",
+          });
+        }
+
+        // Validate network
+        const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
+        if (!validNetworks.includes(network)) {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(", ")}`,
+          });
+        }
+
+        const contract = registry.getContract(contractName);
+        if (!contract) {
+          throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, {
+            name: contractName,
+          });
+        }
+
+        try {
+          const generatedContract = await generatorService.generateContractForNetwork(
+            contract,
+            network as StacksNetworkName,
+            tokenSymbol,
+            customReplacements
+          );
+
+          return {
+            contract: {
+              name: contract.name,
+              type: contract.type,
+              subtype: contract.subtype,
+              network,
+              tokenSymbol,
+              content: generatedContract,
+            },
+          };
+        } catch (error) {
+          throw new ApiError(ErrorCode.TEMPLATE_PROCESSING_ERROR, {
+            reason: error instanceof Error ? error.message : String(error),
+          });
+        }
+      },
+      { path: "/generate-contract-for-network", method: "POST" }
+    );
+  });
+
   return api;
 }
