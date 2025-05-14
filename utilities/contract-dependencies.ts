@@ -5,7 +5,9 @@ import { ContractType, ContractSubtype } from "./contract-types";
  * Define dependencies for all DAO contracts
  * @param registry The contract registry instance
  */
-export function defineAllDaoContractDependencies(registry: ContractRegistry): void {
+export function defineAllDaoContractDependencies(
+  registry: ContractRegistry
+): void {
   defineBaseDaoContractDependencies(registry);
   defineActionContractDependencies(registry);
   defineExtensionContractDependencies(registry);
@@ -17,9 +19,11 @@ export function defineAllDaoContractDependencies(registry: ContractRegistry): vo
  * Define dependencies for Base DAO contracts
  * @param registry The contract registry instance
  */
-export function defineBaseDaoContractDependencies(registry: ContractRegistry): void {
+export function defineBaseDaoContractDependencies(
+  registry: ContractRegistry
+): void {
   const baseDaoContract = registry.getContract("aibtc-base-dao");
-  
+
   if (baseDaoContract) {
     baseDaoContract
       .addTraitDependency("DAO_BASE", "aibtc-base-dao-trait.aibtc-base-dao")
@@ -33,22 +37,28 @@ export function defineBaseDaoContractDependencies(registry: ContractRegistry): v
  * Define dependencies for Action contracts
  * @param registry The contract registry instance
  */
-export function defineActionContractDependencies(registry: ContractRegistry): void {
+export function defineActionContractDependencies(
+  registry: ContractRegistry
+): void {
   // Get all action contracts
   const actionContracts = registry.getContractsByType("ACTIONS");
-  
+
   // Define dependencies for each action contract
-  actionContracts.forEach(contract => {
+  actionContracts.forEach((contract) => {
     switch (contract.name) {
       case "aibtc-action-send-message":
         contract
-          .addTraitDependency("DAO_ACTION", "aibtc-dao-traits.action")
-          .addContractDependency("messaging_extension", "EXTENSIONS", "MESSAGING")
+          .addTraitDependency("DAO_ACTION", "dao_trait_action")
+          .addContractDependency(
+            "messaging_extension",
+            "EXTENSIONS",
+            "ONCHAIN_MESSAGING"
+          )
           .addRuntimeValue("dao_token_symbol");
         break;
-      
+
       // Add other action contracts as needed
-      
+
       default:
         // Default dependencies for all action contracts
         contract.addRuntimeValue("dao_token_symbol");
@@ -61,12 +71,14 @@ export function defineActionContractDependencies(registry: ContractRegistry): vo
  * Define dependencies for Extension contracts
  * @param registry The contract registry instance
  */
-export function defineExtensionContractDependencies(registry: ContractRegistry): void {
+export function defineExtensionContractDependencies(
+  registry: ContractRegistry
+): void {
   // Get all extension contracts
   const extensionContracts = registry.getContractsByType("EXTENSIONS");
-  
+
   // Define dependencies for each extension contract
-  extensionContracts.forEach(contract => {
+  extensionContracts.forEach((contract) => {
     switch (contract.name) {
       case "aibtc-extension-dao-charter":
         contract
@@ -74,16 +86,16 @@ export function defineExtensionContractDependencies(registry: ContractRegistry):
           .addContractDependency("dao", "BASE", "DAO")
           .addRuntimeValue("dao_token_symbol");
         break;
-      
+
       case "aibtc-extension-messaging":
         contract
           .addTraitDependency("DAO_EXTENSION", "aibtc-dao-traits.extension")
           .addContractDependency("dao", "BASE", "DAO")
           .addRuntimeValue("dao_token_symbol");
         break;
-      
+
       // Add other extension contracts as needed
-      
+
       default:
         // Default dependencies for all extension contracts
         contract
@@ -99,12 +111,14 @@ export function defineExtensionContractDependencies(registry: ContractRegistry):
  * Define dependencies for Proposal contracts
  * @param registry The contract registry instance
  */
-export function defineProposalContractDependencies(registry: ContractRegistry): void {
+export function defineProposalContractDependencies(
+  registry: ContractRegistry
+): void {
   // Get all proposal contracts
   const proposalContracts = registry.getContractsByType("PROPOSALS");
-  
+
   // Define dependencies for each proposal contract
-  proposalContracts.forEach(contract => {
+  proposalContracts.forEach((contract) => {
     switch (contract.name) {
       case "aibtc-proposal-voting":
         contract
@@ -113,18 +127,26 @@ export function defineProposalContractDependencies(registry: ContractRegistry): 
           .addContractDependency("token", "TOKEN", "DAO")
           .addRuntimeValue("dao_token_symbol");
         break;
-      
+
       case "aibtc-proposal-initialize-dao":
         contract
           .addTraitDependency("DAO_PROPOSAL", "aibtc-dao-traits.proposal")
           .addContractDependency("dao", "BASE", "DAO")
-          .addContractDependency("extension_dao_charter", "EXTENSIONS", "CHARTER")
-          .addContractDependency("extension_messaging", "EXTENSIONS", "MESSAGING")
+          .addContractDependency(
+            "extension_dao_charter",
+            "EXTENSIONS",
+            "CHARTER"
+          )
+          .addContractDependency(
+            "extension_messaging",
+            "EXTENSIONS",
+            "MESSAGING"
+          )
           .addRuntimeValue("dao_token_symbol");
         break;
-      
+
       // Add other proposal contracts as needed
-      
+
       default:
         // Default dependencies for all proposal contracts
         contract
@@ -140,29 +162,34 @@ export function defineProposalContractDependencies(registry: ContractRegistry): 
  * Define dependencies for Token contracts
  * @param registry The contract registry instance
  */
-export function defineTokenContractDependencies(registry: ContractRegistry): void {
+export function defineTokenContractDependencies(
+  registry: ContractRegistry
+): void {
   // Get all token contracts
   const tokenContracts = registry.getContractsByType("TOKEN");
-  
+
   // Define dependencies for each token contract
-  tokenContracts.forEach(contract => {
+  tokenContracts.forEach((contract) => {
     switch (contract.name) {
       case "aibtc-token-dao":
         contract
-          .addTraitDependency("STANDARD_SIP010", "sip-010-trait-ft-standard.sip-010-trait")
+          .addTraitDependency(
+            "STANDARD_SIP010",
+            "sip-010-trait-ft-standard.sip-010-trait"
+          )
           .addRuntimeValue("dao_token_symbol")
           .addRuntimeValue("dao_token_name")
           .addRuntimeValue("dao_token_decimals");
         break;
-      
+
       case "aibtc-token-dex":
         contract
           .addContractDependency("token", "TOKEN", "DAO")
           .addRuntimeValue("dao_token_symbol");
         break;
-      
+
       // Add other token contracts as needed
-      
+
       default:
         // Default dependencies for all token contracts
         contract.addRuntimeValue("dao_token_symbol");
