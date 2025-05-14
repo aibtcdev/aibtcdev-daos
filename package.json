@@ -1,6 +1,6 @@
 {
   "name": "aibtcdev-daos",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "AI-powered Bitcoin DAOs",
   "type": "module",
   "private": true,
