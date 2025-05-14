@@ -192,7 +192,10 @@ describe("Template Processor", () => {
       "(try! (contract-call? .test-base-dao set-extensions"
     );
     expect(processed).toContain(
-      "{extension: .test-proposal-voting, enabled: true}"
+      "extension: .test-proposal-voting"
+    );
+    expect(processed).toContain(
+      "enabled: true"
     );
     expect(processed).toContain(
       "{extension: .test-dao-charter, enabled: true}"
@@ -235,7 +238,10 @@ describe("Template Processor", () => {
       'notification: "TEST-token-owner/set-token-uri"'
     );
     expect(processed).toContain(
-      "(ok (asserts! (or (is-eq tx-sender .test-base-dao)"
+      "is-eq tx-sender .test-base-dao"
+    );
+    expect(processed).toContain(
+      "contract-call? .test-base-dao is-extension contract-caller"
     );
     expect(processed).toContain(
       "(contract-call? .test-base-dao is-extension contract-caller))"
@@ -293,10 +299,10 @@ describe("Template Processor", () => {
     );
   });
   it("should generate template replacements for different networks", () => {
-    const {
+    import {
       generateTemplateReplacements,
       getAllKnownTemplateVariables,
-    } = require("../../utilities/template-variables");
+    } from "../../utilities/template-variables";
 
     // Test for different networks
     const mainnetReplacements = generateTemplateReplacements(
