@@ -168,16 +168,8 @@ test_api_generate_dao_contracts() {
         # Check if the response contains contracts array
         body=$(echo "$response" | awk 'BEGIN{RS="\r\n\r\n"} NR==2')
         
-        echo "Full response structure:"
-        echo "$body" | jq '.'
-        
-        echo "Checking for .contracts:"
-        echo "$body" | jq '.contracts'
-        
-        echo "Checking for .data.contracts:"
-        echo "$body" | jq '.data.contracts'
-        
-        if echo "$body" | jq -e '.data.contracts | length > 0' >/dev/null 2>&1; then
+        # Remove debug logging and check for contracts in the response
+        if echo "$body" | jq -e '.success' >/dev/null 2>&1 && echo "$body" | jq -e '.data.contracts | length > 0' >/dev/null 2>&1; then
             # Check if any contract has valid content (not containing "ERROR:")
             if echo "$body" | jq -e '.data.contracts[] | select(.content | contains("ERROR:") | not)' >/dev/null 2>&1; then
                 echo -e "${GREEN}✓${NC} Response contains at least one valid generated contract"
