@@ -24,9 +24,16 @@ jobs:
           branch: main
           minorList: feat, feature
           patchList: fix, bugfix, perf, refactor, test, tests
-          ignoreCommits: "^Merge"
+          additionalCommits: "^Merge:skip"
           noNewCommitBehavior: patch
           noVersionBumpBehavior: patch
+
+      - name: Create Tag
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag -a ${{ steps.semver.outputs.next }} -m "Release ${{ steps.semver.outputs.next }}"
+          git push origin ${{ steps.semver.outputs.next }}
 
       - name: Create Release
         uses: ncipollo/release-action@v1.12.0
@@ -36,4 +43,5 @@ jobs:
           makeLatest: true
           name: ${{ steps.semver.outputs.next }}
           body: Changelog Contents
+          tag: ${{ steps.semver.outputs.next }}
           token: ${{ github.token }}
