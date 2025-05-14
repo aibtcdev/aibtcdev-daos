@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { StacksNetworkName } from "@stacks/network";
 import { CloudflareBindings } from "./cf-types";
 import { ContractRegistry } from "../utilities/contract-registry";
 import {
