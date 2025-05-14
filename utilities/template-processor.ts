@@ -197,10 +197,30 @@ export async function getContractTemplateContent(
 
     dbgLog(
       {
-        action: "fetch_template",
-        url: assetUrl.toString(),
-        status: response.status,
-        statusText: response.statusText,
+        debug: {
+          action: "fetch_template",
+          url: assetUrl.toString(),
+          isOk: response.ok,
+          status: response.status,
+          statusText: response.statusText,
+          text: await response.text(),
+        },
+      },
+      { forceLog: true }
+    );
+
+    const response2 = await fetch(assetUrl.toString());
+
+    dbgLog(
+      {
+        debug: {
+          action: "fetch_template",
+          url: assetUrl.toString(),
+          isOk: response2.ok,
+          status: response2.status,
+          statusText: response2.statusText,
+          text: await response2.text(),
+        },
       },
       { forceLog: true }
     );
