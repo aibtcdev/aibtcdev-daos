@@ -15,8 +15,10 @@ export function generateTemplateReplacements(
 
   // Base replacements
   const replacements: Record<string, string> = {
-    // Token symbol
+    // Token info
     [`${tokenSymbol}/dao_token_symbol`]: tokenSymbol.toUpperCase(),
+    [`${tokenSymbol}/dao_token_name`]: `${tokenSymbol.toUpperCase()} DAO Token`,
+    [`${tokenSymbol}/dao_token_decimals`]: "6",
 
     // Account addresses
     [`${addresses.DEPLOYER}/account_owner`]: addresses.DEPLOYER,
@@ -25,26 +27,31 @@ export function generateTemplateReplacements(
 
     // SIP traits
     [`${traits.STANDARD_SIP010}/base_trait_sip010`]: traits.STANDARD_SIP010,
+    [`'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010'`]: `'${traits.STANDARD_SIP010}'`,
 
     // DAO traits
     [`.aibtc-dao-traits.extension/dao_trait_extension`]: traits.DAO_EXTENSION,
     [`.aibtc-dao-traits.action/dao_trait_action`]: traits.DAO_ACTION,
     [`.aibtc-dao-traits.proposal/dao_trait_proposal`]: traits.DAO_PROPOSAL,
-    [`.aibtc-dao-traits.token-owner/dao_trait_token_owner`]:
-      traits.DAO_TOKEN_OWNER,
-    [`.aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex`]:
-      traits.DAO_TOKEN_DEX,
+    [`.aibtc-dao-traits.token-owner/dao_trait_token_owner`]: traits.DAO_TOKEN_OWNER,
+    [`.aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex`]: traits.DAO_TOKEN_DEX,
+    [`.aibtc-dao-traits.faktory-token/dao_trait_faktory_token`]: traits.DAO_FAKTORY_TOKEN,
     [`.aibtc-base-dao-trait.aibtc-base-dao/dao_trait_base`]: traits.DAO_BASE,
+    [`.aibtc-dao-traits.charter/dao_trait_charter`]: traits.DAO_CHARTER,
+    [`.aibtc-dao-traits.users/dao_trait_users`]: traits.DAO_USERS,
+    [`.aibtc-dao-traits.messaging/dao_trait_messaging`]: traits.DAO_MESSAGING,
+    [`.aibtc-dao-traits.treasury/dao_trait_treasury`]: traits.DAO_TREASURY,
+    [`.aibtc-dao-traits.rewards-account/dao_trait_rewards_account`]: traits.DAO_REWARDS,
+    [`.aibtc-dao-traits.epoch/dao_trait_epoch`]: traits.DAO_EPOCH,
+    [`.aibtc-dao-traits.action-proposals-voting/dao_trait_action_proposals_voting`]: traits.DAO_ACTION_PROPOSALS,
+    [`.aibtc-dao-traits.action/dao_trait_action_proposals_voting`]: traits.DAO_ACTION_PROPOSALS,
 
     // Agent traits
-    [`.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account`]:
-      traits.AGENT_ACCOUNT,
-    [`.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval`]:
-      traits.AGENT_FAKTORY_DEX_APPROVAL,
-    [`.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals`]:
-      traits.AGENT_PROPOSALS,
-    [`.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell`]:
-      traits.AGENT_FAKTORY_BUY_SELL,
+    [`.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account`]: traits.AGENT_ACCOUNT,
+    [`.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval`]: traits.AGENT_FAKTORY_DEX_APPROVAL,
+    [`.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals`]: traits.AGENT_PROPOSALS,
+    [`.aibtc-agent-account-traits.aibtc-faktory-buy-sell/agent_account_trait_faktory_buy_sell`]: traits.AGENT_FAKTORY_BUY_SELL,
+    [`.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell`]: traits.AGENT_FAKTORY_BUY_SELL,
 
     // Contract references - these would typically be generated based on deployed contracts
     [`.aibtc-faktory/dao_contract_token`]: `.${tokenSymbol}-faktory`,
@@ -56,20 +63,21 @@ export function generateTemplateReplacements(
     [`.aibtc-dao-charter/dao_contract_charter`]: `.${tokenSymbol}-dao-charter`,
     [`.aibtc-dao-epoch/dao_contract_epoch`]: `.${tokenSymbol}-dao-epoch`,
     [`.aibtc-onchain-messaging/dao_contract_messaging`]: `.${tokenSymbol}-onchain-messaging`,
+    [`.aibtc-token-owner/dao_contract_token_owner`]: `.${tokenSymbol}-token-owner`,
     [`.aibtc-token-owner/dao_token_owner_contract`]: `.${tokenSymbol}-token-owner`,
+    [`.aibtc-action-send-message/dao_action_send_message`]: `.${tokenSymbol}-action-send-message`,
     [`.aibtc-action-send-message/dao_action_send_message_contract`]: `.${tokenSymbol}-action-send-message`,
     [`.dao-run-cost/base_contract_dao_run_cost`]: `.${tokenSymbol}-dao-run-cost`,
     [`.aibtc-rewards-account/dao_contract_rewards_account`]: `.${tokenSymbol}-rewards-account`,
 
     // External contracts
     [`${addresses.SBTC}/sbtc_contract`]: addresses.SBTC,
+    [`STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_contract`]: addresses.SBTC,
+    [`STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_token_contract`]: addresses.SBTC,
+    [`STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc`]: addresses.SBTC,
 
     // Configuration values
     [`dao mission goes here/dao_manifest`]: `The mission of the ${tokenSymbol.toUpperCase()} DAO is to...`,
-
-    // Additional variables from the report
-    // These are specific to certain contracts and may need to be customized per deployment
-    [`'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010'`]: `'${traits.STANDARD_SIP010}'`,
   };
 
   // Merge with custom replacements
