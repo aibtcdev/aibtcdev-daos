@@ -64,7 +64,7 @@ export function generateTemplateReplacements(
 
     // Agent traits with full paths for template matching
     [`.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account`]: `${networkPrefix}${traits.AGENT_ACCOUNT}`,
-    [`.aibtc-agent-account-traits.faktory-dex/agent_account_trait_faktory_dex_approval`]: `${networkPrefix}${traits.AGENT_FAKTORY_DEX_APPROVAL}`,
+    [`.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval`]: `${networkPrefix}${traits.AGENT_FAKTORY_DEX_APPROVAL}`,
     [`.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals`]: `${networkPrefix}${traits.AGENT_PROPOSALS}`,
     [`.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell`]: `${networkPrefix}${traits.AGENT_FAKTORY_BUY_SELL}`,
     
