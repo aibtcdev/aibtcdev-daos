@@ -172,15 +172,19 @@ export async function getContractTemplateContent(
 
     // If not found locally, try to fetch from the worker assets
     // In a Cloudflare Worker environment, assets are available at the root
-    const assetPath = `/contracts/${contract.templatePath}`;
-    dbgLog(`Looking for template in assets: ${assetPath}`, { forceLog: true });
-
     try {
+      // We need to use the current request URL as the base for our asset URLs
+      const currentUrl = new URL(self.location.href);
+      const baseUrl = `${currentUrl.protocol}//${currentUrl.host}`;
+      const fullAssetUrl = `${baseUrl}/contracts/${contract.templatePath}`;
+      
+      dbgLog(`Looking for template in assets: ${fullAssetUrl}`, { forceLog: true });
+      
       // Try to fetch the asset directly
-      const response = await fetch(assetPath);
+      const response = await fetch(fullAssetUrl);
       
       if (response.ok) {
-        dbgLog(`Found template in assets at: ${assetPath}`, { forceLog: true });
+        dbgLog(`Found template in assets at: ${fullAssetUrl}`, { forceLog: true });
         const content = await response.text();
         return content;
       }
