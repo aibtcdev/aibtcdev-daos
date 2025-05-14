@@ -5,13 +5,13 @@ TypeScript type definitions for the AIBTC DAO API. These types are directly impo
 ## Installation
 
 ```bash
-npm install @aibtcdev/daos-types
+npm install @aibtc/types
 ```
 
 ## Usage
 
 ```typescript
-import { ApiResponse, ContractInfo } from '@aibtcdev/daos-types';
+import { ApiResponse, ContractInfo } from "@aibtc/types";
 
 // Example: Fetch a contract
 async function fetchContract(name: string): Promise<ApiResponse<ContractInfo>> {
@@ -22,7 +22,7 @@ async function fetchContract(name: string): Promise<ApiResponse<ContractInfo>> {
 // Example: Type checking for API responses
 function processContract(data: ContractInfo) {
   console.log(`Contract: ${data.name} (${data.type}/${data.subtype})`);
-  
+
   if (data.source) {
     console.log(`Contract source hash: ${data.hash}`);
   }
@@ -32,22 +32,26 @@ function processContract(data: ContractInfo) {
 ## Available Types
 
 ### Base Types
+
 - `ApiResponse<T>` - Base response wrapper for all API endpoints
 - `ErrorCode` - Error codes used in API responses
 
 ### Contract Types
+
 - `ContractType` - Types of contracts (BASE, ACTIONS, etc.)
 - `ContractSubtype` - Subtypes for each contract type
 - `ContractInfo` - Information about a contract
 - `DeploymentResult` - Result of contract generation
 
 ### Dependencies
+
 - `AddressDependency` - Address dependency for contract templates
 - `TraitDependency` - Trait dependency for contract templates
 - `ContractDependency` - Contract dependency for contract templates
 - `RuntimeValue` - Runtime value for contract templates
 
 ### API Response Types
+
 - `ContractsListResponse` - Response for listing all contracts
 - `ContractDetailResponse` - Response for a single contract's details
 - `ContractDependenciesResponse` - Response for contract dependencies

@@ -1,7 +1,7 @@
 {
-  "name": "@aibtcdev/daos-types",
+  "name": "@aibtc/types",
   "version": "0.1.0",
-  "description": "TypeScript types for AIBTC DAO API",
+  "description": "TypeScript types for AIBTC",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -11,7 +11,14 @@
     "build": "tsc",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["aibtc", "dao", "api", "types", "stacks", "bitcoin"],
+  "keywords": [
+    "aibtc",
+    "dao",
+    "api",
+    "types",
+    "stacks",
+    "bitcoin"
+  ],
   "author": "",
   "license": "MIT",
   "publishConfig": {
