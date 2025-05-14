@@ -284,7 +284,8 @@ export function createApiRouter(registry: ContractRegistry) {
         try {
           const generatedContract = await generatorService.generateContract(
             contract,
-            replacements
+            replacements,
+            c.env
           );
 
           return {
@@ -345,7 +346,8 @@ export function createApiRouter(registry: ContractRegistry) {
               contract,
               network as StacksNetworkName,
               tokenSymbol,
-              customReplacements
+              customReplacements,
+              c.env
             );
 
           return {
@@ -404,7 +406,8 @@ export function createApiRouter(registry: ContractRegistry) {
                   contract,
                   network as StacksNetworkName,
                   tokenSymbol,
-                  customReplacements
+                  customReplacements,
+                  c.env
                 );
 
               generatedContracts.push({

@@ -7,6 +7,7 @@ import {
 } from "../../utilities/template-processor";
 import { generateTemplateReplacements } from "../../utilities/template-variables";
 import { StacksNetworkName } from "@stacks/network";
+import { CloudflareBindings } from "../cf-types";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -16,11 +17,12 @@ export class ContractGeneratorService {
    */
   async generateContract(
     contract: ContractBase,
-    replacements: Record<string, string>
+    replacements: Record<string, string>,
+    env?: CloudflareBindings
   ): Promise<string> {
     try {
       // Get the template content
-      const templateContent = await getContractTemplateContent(contract);
+      const templateContent = await getContractTemplateContent(contract, env);
 
       // Check if the template content is empty
       if (!templateContent) {
@@ -134,7 +136,8 @@ export class ContractGeneratorService {
     contract: ContractBase,
     network: StacksNetworkName,
     tokenSymbol: string = "aibtc",
-    customReplacements: Record<string, string> = {}
+    customReplacements: Record<string, string> = {},
+    env?: CloudflareBindings
   ): Promise<string> {
     try {
       // Generate replacements for the specified network
@@ -145,7 +148,7 @@ export class ContractGeneratorService {
       );
 
       // Use the existing method to generate the contract
-      return this.generateContract(contract, networkReplacements);
+      return this.generateContract(contract, networkReplacements, env);
     } catch (error) {
       // Log the error but don't throw it
       dbgLog(`Error generating contract ${contract.name} for network ${network}: ${error instanceof Error ? error.message : String(error)}`, 
