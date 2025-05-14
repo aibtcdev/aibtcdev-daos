@@ -158,7 +158,7 @@ export async function getContractTemplateContent(
 
     // Check if file exists
     if (!fs.existsSync(contractPath)) {
-      console.error(`Template file not found: ${contractPath}`);
+      dbgLog(`Template file not found: ${contractPath}`, { logType: "error", titleBefore: "Template File Error" });
       return null;
     }
 
@@ -166,10 +166,11 @@ export async function getContractTemplateContent(
     const content = await fs.promises.readFile(contractPath, "utf-8");
     return content;
   } catch (error) {
-    console.error(
+    dbgLog(
       `Error reading contract template: ${
         error instanceof Error ? error.message : String(error)
-      }`
+      }`,
+      { logType: "error", titleBefore: "Contract Template Error" }
     );
     return null;
   }

@@ -34,10 +34,10 @@ export class TemplateScanner {
           // Store unique variables
           report[`${contract.type}/${contract.name}`] = [...new Set(variables)];
         } else {
-          console.error(`Template not found for ${contract.name}: ${templatePath}`);
+          dbgLog(`Template not found for ${contract.name}: ${templatePath}`, { logType: "error", titleBefore: "Template Scanner Error" });
         }
       } catch (error) {
-        console.error(`Error scanning template for ${contract.name}:`, error);
+        dbgLog(`Error scanning template for ${contract.name}: ${error instanceof Error ? error.message : String(error)}`, { logType: "error", titleBefore: "Template Scanning Error" });
       }
     }
     
@@ -97,6 +97,6 @@ export class TemplateScanner {
       JSON.stringify(output, null, 2)
     );
     
-    console.log(`Template variable report saved to ${outputPath}`);
+    dbgLog(`Template variable report saved to ${outputPath}`, { titleBefore: "Template Report" });
   }
 }

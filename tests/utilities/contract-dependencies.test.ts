@@ -75,12 +75,12 @@ describe("Contract Dependencies", () => {
           fs.writeFileSync(outputPath, content);
           
           // Log success
-          console.log(`Successfully generated ${contract.name} with all dependencies resolved`);
+          dbgLog(`Successfully generated ${contract.name} with all dependencies resolved`, { titleBefore: "Contract Generation Success" });
         } catch (error) {
           // Format error for better readability
           if (error instanceof Error) {
-            console.error(`Error generating ${contractName}:`);
-            console.error(error.message);
+            dbgLog(`Error generating ${contractName}:`, { logType: "error", titleBefore: "Contract Generation Error" });
+            dbgLog(error.message, { logType: "error" });
             
             // If the error contains missing template variables, extract them
             if (error.message.includes("MISSING TEMPLATE VARIABLE")) {
@@ -89,7 +89,8 @@ describe("Contract Dependencies", () => {
                 .filter(line => line.includes("Expected key:"))
                 .map(line => line.replace("Expected key:", "").trim());
               
-              console.error("Missing template variables:", missingVars);
+              dbgLog("Missing template variables:", { logType: "error" });
+              dbgLog(missingVars, { logType: "error" });
             }
           }
           
@@ -162,9 +163,10 @@ describe("Contract Dependencies", () => {
         const outputPath = path.join(outputDir, `api-${contract.name}.clar`);
         fs.writeFileSync(outputPath, content);
         
-        console.log(`Successfully generated ${contract.name} with API-provided runtime values`);
+        dbgLog(`Successfully generated ${contract.name} with API-provided runtime values`, { titleBefore: "API Contract Generation Success" });
       } catch (error) {
-        console.error("Error generating contract with API values:", error);
+        dbgLog("Error generating contract with API values:", { logType: "error", titleBefore: "API Contract Generation Error" });
+        dbgLog(error instanceof Error ? error.message : String(error), { logType: "error" });
         throw error;
       }
     }
@@ -224,15 +226,15 @@ describe("Contract Dependencies", () => {
           const outputPath = path.join(outputDir, `api-simulation-${contractName}.clar`);
           fs.writeFileSync(outputPath, content);
           
-          console.log(`Successfully generated ${contractName} for API simulation`);
+          dbgLog(`Successfully generated ${contractName} for API simulation`, { titleBefore: "API Simulation Success" });
         } catch (error) {
           results[contractName] = {
             success: false,
             error: error instanceof Error ? error.message : String(error)
           };
           
-          console.error(`Failed to generate ${contractName}:`, 
-            error instanceof Error ? error.message : String(error));
+          dbgLog(`Failed to generate ${contractName}:`, { logType: "error", titleBefore: "API Simulation Error" });
+          dbgLog(error instanceof Error ? error.message : String(error), { logType: "error" });
         }
       }
     }

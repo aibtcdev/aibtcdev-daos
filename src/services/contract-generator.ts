@@ -23,10 +23,11 @@ export class ContractGeneratorService {
 
     // Check if the template content is empty
     if (!templateContent) {
-      console.error(
-        `Template content for ${contract.name} is empty or not found`
+      dbgLog(
+        `Template content for ${contract.name} is empty or not found`,
+        { logType: "error", titleBefore: "Template Error" }
       );
-      console.error(`Template path: ${contract.templatePath}`);
+      dbgLog(`Template path: ${contract.templatePath}`, { logType: "error" });
 
       // Check if the template file exists
       const templatePath = path.join(
@@ -35,7 +36,7 @@ export class ContractGeneratorService {
         contract.templatePath
       );
       if (!fs.existsSync(templatePath)) {
-        console.error(`Template file does not exist: ${templatePath}`);
+        dbgLog(`Template file does not exist: ${templatePath}`, { logType: "error" });
       }
 
       throw new Error(
@@ -93,8 +94,8 @@ export class ContractGeneratorService {
         })
         .join("\n\n");
 
-      console.error(`Missing template variables for ${contract.name}:`);
-      console.error(missingDetails);
+      dbgLog(`Missing template variables for ${contract.name}:`, { logType: "error", titleBefore: "Template Variables Error" });
+      dbgLog(missingDetails, { logType: "error" });
       throw new Error(
         `Missing template variables for ${contract.name}:\n${missingDetails}`
       );

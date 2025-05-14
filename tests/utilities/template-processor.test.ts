@@ -511,11 +511,12 @@ describe("Contract Generator", () => {
             )
             .join("\n");
 
-          console.error(
-            `Error processing ${contractName}:\n${cleanedErrorMessage}`
+          dbgLog(
+            `Error processing ${contractName}:\n${cleanedErrorMessage}`,
+            { logType: "error", titleBefore: "Contract Processing Error" }
           );
         } else {
-          console.error(`Error processing ${contractName}:`, error);
+          dbgLog(`Error processing ${contractName}: ${error instanceof Error ? error.message : String(error)}`, { logType: "error", titleBefore: "Contract Processing Error" });
         }
         throw error; // Re-throw to fail the test
       }
@@ -609,13 +610,14 @@ describe("Contract Generator", () => {
     const outputPath = path.join(outputDir, "template-variables-report.json");
     fs.writeFileSync(outputPath, JSON.stringify(formattedReport, null, 2));
 
-    console.log(
-      `Variable report generated with ${formattedReport.summary.totalUniqueVariables} unique variables across ${formattedReport.summary.totalContracts} contracts`
+    dbgLog(
+      `Variable report generated with ${formattedReport.summary.totalUniqueVariables} unique variables across ${formattedReport.summary.totalContracts} contracts`,
+      { titleBefore: "Variable Report Summary" }
     );
 
     if (unknownVariables.length > 0) {
-      console.log(`Found ${unknownVariables.length} unknown variables:`);
-      console.log(unknownVariables);
+      dbgLog(`Found ${unknownVariables.length} unknown variables:`, { titleBefore: "Unknown Variables" });
+      dbgLog(unknownVariables);
     }
   });
 });

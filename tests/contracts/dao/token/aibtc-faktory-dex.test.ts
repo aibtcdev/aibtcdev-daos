@@ -80,7 +80,7 @@ describe(`public functions: ${contractName}`, () => {
           );
         } catch (e) {
           // If we can't toggle it, skip this test
-          console.log("Skipping test: Cannot control pre-faktory market state");
+          dbgLog("Skipping test: Cannot control pre-faktory market state", { titleBefore: "Test Skip Notice" });
           return;
         }
       }
@@ -97,7 +97,7 @@ describe(`public functions: ${contractName}`, () => {
       expect(receipt.result).toBeErr(Cl.uint(ERR_MARKET_CLOSED));
     } catch (e) {
       // If any error occurs, skip this test
-      console.log("Skipping test: Error accessing pre-faktory contract");
+      dbgLog("Skipping test: Error accessing pre-faktory contract", { titleBefore: "Test Skip Notice" });
     }
   });
 
@@ -152,7 +152,7 @@ describe(`public functions: ${contractName}`, () => {
         expect(isOpenResult.result).toBeOk(Cl.bool(true));
       } else {
         // If we can't check the market state, skip this test
-        console.log("Skipping test: Cannot check pre-faktory market state");
+        dbgLog("Skipping test: Cannot check pre-faktory market state", { titleBefore: "Test Skip Notice" });
       }
     } catch (e) {
       // If any error occurs, skip this test
