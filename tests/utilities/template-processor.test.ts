@@ -195,12 +195,8 @@ describe("Template Processor", () => {
     );
     expect(processed).toContain("extension: .test-proposal-voting");
     expect(processed).toContain("enabled: true");
-    expect(processed).toContain(
-      "extension: .test-dao-charter"
-    );
-    expect(processed).toContain(
-      "enabled: true"
-    );
+    expect(processed).toContain("extension: .test-dao-charter");
+    expect(processed).toContain("enabled: true");
     expect(processed).toContain('notification: "TEST-base-dao/execute"');
   });
 
@@ -242,12 +238,8 @@ describe("Template Processor", () => {
     expect(processed).toContain(
       "contract-call? .test-base-dao is-extension contract-caller"
     );
-    expect(processed).toContain(
-      "is-extension contract-caller)"
-    );
-    expect(processed).toContain(
-      "ERR_NOT_DAO_OR_EXTENSION"
-    );
+    expect(processed).toContain("is-extension contract-caller)");
+    expect(processed).toContain("ERR_NOT_DAO_OR_EXTENSION");
   });
 
   it("should handle multiple replacements in the same line", () => {
@@ -448,12 +440,16 @@ describe("Contract Generator", () => {
     dao_action_send_message_contract: ".test-send-message",
 
     // Agent account simplified keys
-    agent_account_trait_account: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account",
+    agent_account_trait_account:
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account",
     agent_account_trait_faktory_dex_approval:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-faktory-dex",
-    base_trait_sip010: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sip-010-trait-ft-standard.sip-010-trait",
-    dao_trait_proposal: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.proposal",
-    dao_trait_faktory_dex: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.faktory-dex",
+    base_trait_sip010:
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sip-010-trait-ft-standard.sip-010-trait",
+    dao_trait_proposal:
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.proposal",
+    dao_trait_faktory_dex:
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.faktory-dex",
     account_owner: "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
     account_agent: "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
   };
@@ -576,11 +572,15 @@ describe("Contract Generator", () => {
               )
               .join("\n");
 
-            console.error(
-              `Error processing ${contractName}:\n${cleanedErrorMessage}`
+            dbgLog(
+              `Error processing ${contractName}:\n${cleanedErrorMessage}`,
+              { logType: "error", titleBefore: "Contract Processing Error" }
             );
           } else {
-            console.error(`Error processing ${contractName}:`, error);
+            dbgLog(`Error processing ${contractName}: ${error}`, {
+              logType: "error",
+              titleBefore: "Contract Processing Error",
+            });
           }
           throw error; // Re-throw to fail the test
         }
