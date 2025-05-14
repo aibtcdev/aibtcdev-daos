@@ -196,6 +196,18 @@ export abstract class ContractBase {
   }
 
   // Convert to registry entry format for backward compatibility
+  /**
+   * Get all dependencies for this contract
+   */
+  getDependencies(): Array<AddressDependency | TraitDependency | ContractDependency | RuntimeValue> {
+    return [
+      ...this.requiredAddresses,
+      ...this.requiredTraits,
+      ...this.requiredContractAddresses,
+      ...this.requiredRuntimeValues
+    ];
+  }
+
   toRegistryEntry(): any {
     const entry: any = {
       name: this.name,
