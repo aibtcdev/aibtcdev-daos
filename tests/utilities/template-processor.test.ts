@@ -425,6 +425,16 @@ describe("Contract Generator", () => {
     "dao mission goes here/dao_manifest":
       "The mission of this DAO is to test template processing",
     "aibtc/dao_token_symbol": "TEST",
+    
+    // Simplified keys for template variables
+    "dao_trait_extension": ".test-traits.extension",
+    "dao_trait_action": ".test-traits.action",
+    "base_contract_dao_run_cost": ".test-dao-run-cost",
+    "dao_contract_treasury": ".test-treasury",
+    "dao_contract_token": ".test-token-contract",
+    "dao_contract_users": ".test-dao-users",
+    "dao_contract_base": ".test-base-dao",
+    "dao_token_symbol": "TEST",
   };
 
   beforeAll(() => {
