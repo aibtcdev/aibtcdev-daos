@@ -167,20 +167,43 @@ test_api_generate_dao_contracts() {
         
         # Check if the response contains contracts array
         body=$(echo "$response" | awk 'BEGIN{RS="\r\n\r\n"} NR==2')
-        
-        # Remove debug logging and check for contracts in the response
-        if echo "$body" | jq -e '.success' >/dev/null 2>&1 && echo "$body" | jq -e '.data.contracts | length > 0' >/dev/null 2>&1; then
-            # Check if any contract has valid content (not containing "ERROR:")
-            if echo "$body" | jq -e '.data.contracts[] | select(.content | contains("ERROR:") | not)' >/dev/null 2>&1; then
-                echo -e "${GREEN}✓${NC} Response contains at least one valid generated contract"
-            else
-                echo -e "${YELLOW}!${NC} All contracts in response contain errors - check template paths"
-                # Don't fail the test, just warn
-            fi
-        else
-            echo -e "${RED}✗${NC} Response does not contain generated contracts"
+
+        # Check if the response is valid JSON
+        if ! echo "$body" | jq empty >/dev/null 2>&1; then
+            echo -e "${RED}✗${NC} Response is not valid JSON"
             FAILED_TESTS=$((FAILED_TESTS + 1))
+            return
         fi
+        echo "Current response body:"
+        echo "$body" | jq -e '.success'
+        echo "$body" | jq -e '.data'
+        echo "$body" | jq -e '.data.contracts'
+        # Check if the response contains the expected keys
+        if ! echo "$body" | jq -e '.success, .data.contracts' >/dev/null 2>&1; then
+            echo -e "${RED}✗${NC} Response does not contain expected keys"
+            FAILED_TESTS=$((FAILED_TESTS + 1))
+            return
+        fi
+        # Check if the contracts array is not empty
+        if ! echo "$body" | jq -e '.data.contracts | length > 0' >/dev/null 2>&1; then
+            echo -e "${RED}✗${NC} Contracts array is empty"
+            FAILED_TESTS=$((FAILED_TESTS + 1))
+            return
+        fi
+        # Check if the contracts array contains valid contract objects
+        if ! echo "$body" | jq -e '.data.contracts[] | select(.name and .content)' >/dev/null 2>&1; then
+            echo -e "${RED}✗${NC} Contracts array does not contain valid contract objects"
+            FAILED_TESTS=$((FAILED_TESTS + 1))
+            return
+        fi
+        # Check if the contracts array contains errors
+        if echo "$body" | jq -e '.data.contracts[] | select(.content | contains("ERROR:"))' >/dev/null 2>&1; then
+            echo -e "${RED}✗${NC} Contracts array contains errors"
+            FAILED_TESTS=$((FAILED_TESTS + 1))
+            return
+        fi
+        # Successfully parsed the response
+        echo -e "${GREEN}✓${NC} Response contains at least one valid generated contract"
     else
         echo -e "${RED}✗${NC} Generate all DAO contracts endpoint with valid data - Expected status 200, got $status"
         FAILED_TESTS=$((FAILED_TESTS + 1))
