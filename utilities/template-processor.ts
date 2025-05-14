@@ -1,7 +1,7 @@
 import { dbgLog } from "./debug-logging";
 import fs from "node:fs";
 import path from "node:path";
-import { Request } from "@cloudflare/workers-types";
+import type { Request } from "@cloudflare/workers-types";
 
 /**
  * Processes a contract template line by line and performs replacements
