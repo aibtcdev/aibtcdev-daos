@@ -26,6 +26,7 @@ export function generateTemplateReplacements(
   // Base replacements
   const replacements: Record<string, string> = {
     // Token info
+    [`${tokenSymbol}/dao_token_symbol`]: displaySymbol,
     [`dao_token_symbol`]: displaySymbol,
     [`dao_token_name`]: `${displaySymbol} DAO Token`,
     [`dao_token_decimals`]: "6",
@@ -37,7 +38,15 @@ export function generateTemplateReplacements(
     // SIP traits
     [`base_trait_sip010`]: traits.STANDARD_SIP010,
 
-    // DAO traits
+    // DAO traits with full paths for template matching
+    [`.aibtc-dao-traits.extension/dao_trait_extension`]: `${networkPrefix}${traits.DAO_EXTENSION}`,
+    [`.aibtc-dao-traits.action/dao_trait_action`]: `${networkPrefix}${traits.DAO_ACTION}`,
+    [`.aibtc-dao-traits.proposal/dao_trait_proposal`]: `${networkPrefix}${traits.DAO_PROPOSAL}`,
+    [`.aibtc-dao-traits.token-owner/dao_trait_token_owner`]: `${networkPrefix}${traits.DAO_TOKEN_OWNER}`,
+    [`.aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex`]: `${networkPrefix}${traits.DAO_TOKEN_DEX}`,
+    [`.aibtc-base-dao-trait.aibtc-base-dao/dao_trait_base`]: `${networkPrefix}${traits.DAO_BASE}`,
+    
+    // DAO traits with simplified keys
     [`dao_trait_extension`]: `${networkPrefix}${traits.DAO_EXTENSION}`,
     [`dao_trait_action`]: `${networkPrefix}${traits.DAO_ACTION}`,
     [`dao_trait_proposal`]: `${networkPrefix}${traits.DAO_PROPOSAL}`,
@@ -53,13 +62,36 @@ export function generateTemplateReplacements(
     [`dao_trait_epoch`]: `${networkPrefix}${traits.DAO_EPOCH}`,
     [`dao_trait_action_proposals_voting`]: `${networkPrefix}${traits.DAO_ACTION_PROPOSALS}`,
 
-    // Agent traits
+    // Agent traits with full paths for template matching
+    [`.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account`]: `${networkPrefix}${traits.AGENT_ACCOUNT}`,
+    [`.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval`]: `${networkPrefix}${traits.AGENT_FAKTORY_DEX_APPROVAL}`,
+    [`.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals`]: `${networkPrefix}${traits.AGENT_PROPOSALS}`,
+    [`.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell`]: `${networkPrefix}${traits.AGENT_FAKTORY_BUY_SELL}`,
+    
+    // Agent traits with simplified keys
     [`agent_account_trait_account`]: `${networkPrefix}${traits.AGENT_ACCOUNT}`,
     [`agent_account_trait_faktory_dex_approval`]: `${networkPrefix}${traits.AGENT_FAKTORY_DEX_APPROVAL}`,
     [`agent_account_trait_proposals`]: `${networkPrefix}${traits.AGENT_PROPOSALS}`,
     [`agent_account_trait_faktory_buy_sell`]: `${networkPrefix}${traits.AGENT_FAKTORY_BUY_SELL}`,
 
-    // Contract references - these would typically be generated based on deployed contracts
+    // Contract references with full paths for template matching
+    [`.aibtc-faktory/dao_contract_token`]: `.${tokenSymbol}-faktory`,
+    [`.aibtc-faktory-dex/dao_contract_token_dex`]: `.${tokenSymbol}-faktory-dex`,
+    [`.aibtc-base-dao/dao_contract_base`]: `.${tokenSymbol}-base-dao`,
+    [`.aibtc-treasury/dao_contract_treasury`]: `.${tokenSymbol}-treasury`,
+    [`.aibtc-dao-users/dao_contract_users`]: `.${tokenSymbol}-dao-users`,
+    [`.aibtc-action-proposal-voting/dao_contract_action_proposal_voting`]: `.${tokenSymbol}-action-proposal-voting`,
+    [`.aibtc-dao-charter/dao_contract_charter`]: `.${tokenSymbol}-dao-charter`,
+    [`.aibtc-dao-epoch/dao_contract_epoch`]: `.${tokenSymbol}-dao-epoch`,
+    [`.aibtc-onchain-messaging/dao_contract_messaging`]: `.${tokenSymbol}-onchain-messaging`,
+    [`.aibtc-token-owner/dao_contract_token_owner`]: `.${tokenSymbol}-token-owner`,
+    [`.aibtc-token-owner/dao_token_owner_contract`]: `.${tokenSymbol}-token-owner`,
+    [`.aibtc-action-send-message/dao_action_send_message`]: `.${tokenSymbol}-action-send-message`,
+    [`.aibtc-action-send-message/dao_action_send_message_contract`]: `.${tokenSymbol}-action-send-message`,
+    [`.dao-run-cost/base_contract_dao_run_cost`]: `.${tokenSymbol}-dao-run-cost`,
+    [`.aibtc-rewards-account/dao_contract_rewards_account`]: `.${tokenSymbol}-rewards-account`,
+    
+    // Contract references with simplified keys
     [`dao_contract_token`]: `.${tokenSymbol}-faktory`,
     [`dao_contract_token_dex`]: `.${tokenSymbol}-faktory-dex`,
     [`dao_contract_base`]: `.${tokenSymbol}-base-dao`,
