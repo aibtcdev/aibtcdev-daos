@@ -419,10 +419,12 @@ export function createApiRouter(registry: ContractRegistry) {
         }
 
         return {
-          network,
-          tokenSymbol,
-          contracts: generatedContracts,
-          errors: errors.length > 0 ? errors : undefined,
+          data: {
+            network,
+            tokenSymbol,
+            contracts: generatedContracts,
+            errors: errors.length > 0 ? errors : undefined,
+          }
         };
       },
       { path: "/generate-dao-contracts", method: "POST" }
