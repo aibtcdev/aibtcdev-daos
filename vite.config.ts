@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import build from "@hono/vite-build/cloudflare-workers";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 export default defineConfig(({ command, isSsrBuild }) => {
   if (command === "serve") {
@@ -17,6 +18,14 @@ export default defineConfig(({ command, isSsrBuild }) => {
         entryContentAfterHooks: [],
         entryContentDefaultExportHook: () => "",
       }),
+      viteStaticCopy({
+        targets: [
+          {
+            src: 'contracts/**/*',
+            dest: '.'
+          }
+        ]
+      })
     ],
     build: {
       rollupOptions: {
