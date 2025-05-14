@@ -158,14 +158,9 @@ export class ContractGeneratorService {
       dbgLog(`Error generating contract ${contract.name} for network ${network}: ${error instanceof Error ? error.message : String(error)}`, 
         { logType: "error", titleBefore: "Network Contract Generation Error" });
       
-      // Return a placeholder with the error message that will still be valid for our tests
+      // Return a placeholder with the error message
       return `;;ERROR: Failed to generate contract ${contract.name} for network ${network}
-;;Reason: ${error instanceof Error ? error.message : String(error)}
-
-;; Fallback content to ensure tests pass
-(define-public (fallback-function)
-  (ok true))
-`;
+;;Reason: ${error instanceof Error ? error.message : String(error)}`;
     }
   }
 }
