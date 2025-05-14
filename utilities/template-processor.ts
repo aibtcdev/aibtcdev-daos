@@ -40,8 +40,15 @@ export function processContractTemplate(
       const replacementKey = commentMatch[1];
       const valueKey = commentMatch[2];
       
-      // Use just the value key for lookup, not the combined key
-      if (replacements.has(valueKey)) {
+      // Try both the value key and the combined key for lookup
+      const combinedKey = `${replacementKey}/${valueKey}`;
+      const replacementValue = replacements.has(valueKey) 
+        ? replacements.get(valueKey)
+        : replacements.has(combinedKey) 
+          ? replacements.get(combinedKey)
+          : null;
+          
+      if (replacementValue !== null) {
         // Find the target line - the first line after this comment that contains the key
         let targetLineIndex = i + 1;
         let foundTarget = false;
@@ -72,7 +79,7 @@ export function processContractTemplate(
             lineIndex: targetLineIndex,
             commentLineIndex: i,
             key: replacementKey,
-            value: replacements.get(valueKey)!,
+            value: replacementValue!,
             replacementKey: valueKey,
           });
 
