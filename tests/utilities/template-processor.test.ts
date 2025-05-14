@@ -435,6 +435,15 @@ describe("Contract Generator", () => {
     "dao_contract_users": ".test-dao-users",
     "dao_contract_base": ".test-base-dao",
     "dao_token_symbol": "TEST",
+    
+    // Agent account simplified keys
+    "agent_account_trait_account": ".test-traits.agent-account",
+    "agent_account_trait_faktory_dex_approval": ".test-traits.faktory-dex-approval",
+    "base_trait_sip010": ".test-traits.sip010",
+    "dao_trait_proposal": ".test-traits.proposal",
+    "dao_trait_faktory_dex": ".test-traits.faktory-dex",
+    "account_owner": "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
+    "account_agent": "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
   };
 
   beforeAll(() => {
