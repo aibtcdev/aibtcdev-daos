@@ -195,6 +195,16 @@ export async function getContractTemplateContent(
     // Try to fetch the asset directly
     const response = await fetch(assetUrl);
 
+    dbgLog(
+      {
+        action: "fetch_template",
+        url: assetUrl.toString(),
+        status: response.status,
+        statusText: response.statusText,
+      },
+      { forceLog: true }
+    );
+
     if (response.ok) {
       dbgLog(`Found template in assets at: ${assetUrl}`, {
         forceLog: true,
@@ -209,7 +219,9 @@ export async function getContractTemplateContent(
 
     // If the response is not OK, throw the error
     throw new Error(
-      `Failed to fetch template from assets: ${assetUrl} ${response.status} ${response.statusText}`
+      `Failed to fetch template from assets: ${assetUrl.toString()} ${
+        response.status
+      } ${response.statusText}`
     );
   } catch (fetchError) {
     dbgLog(
