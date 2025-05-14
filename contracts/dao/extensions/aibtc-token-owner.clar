@@ -7,7 +7,7 @@
 
 ;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.token-owner/dao_token_owner_trait
+;; /g/.aibtc-dao-traits.token-owner/dao_trait_token_owner
 (impl-trait .aibtc-dao-traits.token-owner)
 
 ;; constants

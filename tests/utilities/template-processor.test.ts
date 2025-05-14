@@ -94,7 +94,7 @@ describe("Template Processor", () => {
 (impl-trait .aibtc-agent-account-traits.aibtc-account)
 ;; /g/.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval
 (impl-trait .aibtc-agent-account-traits.aibtc-faktory-dex)
-;; /g/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait
+;; /g/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; owner and agent addresses
@@ -131,7 +131,7 @@ describe("Template Processor", () => {
         ".test-traits.agent-account",
       ".aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval":
         ".test-traits.faktory-dex-approval",
-      "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait":
+      "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010":
         ".test-traits.sip010",
       ".aibtc-dao-traits.proposal/dao_trait_proposal": ".test-traits.proposal",
       ".aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex":
@@ -225,7 +225,7 @@ describe("Template Processor", () => {
     const replacements = createReplacementsMap({
       ".aibtc-dao-traits.extension/dao_trait_extension":
         ".test-traits.extension",
-      ".aibtc-dao-traits.token-owner/dao_token_owner_trait":
+      ".aibtc-dao-traits.token-owner/dao_trait_token_owner":
         ".test-traits.token-owner",
       ".aibtc-faktory/dao_contract_token": ".test-token-contract",
       ".aibtc-base-dao/dao_contract_base": ".test-base-dao",
@@ -388,7 +388,7 @@ describe("Contract Generator", () => {
       ".test-traits.action-proposals-voting",
     ".aibtc-dao-traits.action/dao_trait_action": ".test-traits.action",
     ".aibtc-dao-traits.proposal/dao_trait_proposal": ".test-traits.proposal",
-    ".aibtc-dao-traits.token-owner/dao_token_owner_trait":
+    ".aibtc-dao-traits.token-owner/dao_trait_token_owner":
       ".test-traits.token-owner",
     ".aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex":
       ".test-traits.faktory-dex",
@@ -406,7 +406,7 @@ describe("Contract Generator", () => {
       ".test-traits.faktory-buy-sell",
 
     // SIP Trait references
-    "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait":
+    "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010":
       ".test-traits.sip010",
     "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait/faktory_trait":
       ".test-traits.faktory-token",
@@ -425,7 +425,7 @@ describe("Contract Generator", () => {
     ".aibtc-token-owner/dao_token_owner_contract": ".test-token-owner",
     ".aibtc-action-send-message/dao_action_send_message_contract":
       ".test-send-message",
-    ".dao-run-cost/base_dao_run_cost_contract": ".test-dao-run-cost",
+    ".dao-run-cost/base_contract_dao_run_cost": ".test-dao-run-cost",
     ".aibtc-rewards-account/dao_contract_rewards_account":
       ".test-rewards-account",
 

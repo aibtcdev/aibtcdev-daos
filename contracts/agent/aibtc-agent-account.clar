@@ -11,7 +11,7 @@
 (impl-trait .aibtc-agent-account-traits.faktory-dex-approval)
 ;; /g/.aibtc-agent-account-traits.aibtc-faktory-buy-sell/agent_account_trait_faktory_buy_sell
 (impl-trait .aibtc-agent-account-traits.faktory-buy-sell)
-;; /g/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait
+;; /g/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 ;; /g/.aibtc-dao-traits.action/dao_trait_action
 (use-trait action-trait .aibtc-dao-traits.action)
@@ -36,7 +36,7 @@
 (define-constant ACCOUNT_AGENT 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG) ;; agent (can only take approved actions)
 
 ;; pre-approved contracts
-;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_sbtc_contract
+;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
 (define-constant SBTC_TOKEN 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token) ;; sBTC token
 ;; /g/.aibtc-faktory/dao_contract_token
 (define-constant DAO_TOKEN .aibtc-faktory) ;; DAO token

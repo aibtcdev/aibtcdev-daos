@@ -37,7 +37,7 @@
 
 (define-constant AIBTC_DAO_RUN_COST_AMOUNT u10000000000) ;; 100 DAO tokens w/ 8 decimals
 
-;; /g/.dao-run-cost/base_dao_run_cost_contract
+;; /g/.dao-run-cost/base_contract_dao_run_cost
 (define-constant AIBTC_DAO_RUN_COST_CONTRACT .dao-run-cost) ;; AIBTC dao run cost contract
 ;; /g/.aibtc-rewards-account/dao_contract_rewards_account
 (define-constant DAO_REWARDS_ACCOUNT .aibtc-rewards-account) ;; rewards account for the DAO
