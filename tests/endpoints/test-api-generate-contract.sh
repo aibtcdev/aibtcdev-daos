@@ -167,6 +167,8 @@ test_api_generate_dao_contracts() {
         
         # Check if the response contains contracts array
         body=$(echo "$response" | awk 'BEGIN{RS="\r\n\r\n"} NR==2')
+        echo "Response structure:"
+        echo "$body" | jq '.' | head -20
         if echo "$body" | jq -e '.contracts | length > 0' >/dev/null 2>&1; then
             # Check if any contract has valid content (not containing "ERROR:")
             if echo "$body" | jq -e '.contracts[] | select(.content | contains("ERROR:") | not)' >/dev/null 2>&1; then
