@@ -100,7 +100,7 @@ export class ContractGeneratorService {
             // Extract just the key name and what it replaces, without including surrounding code
             return `LINE ${v.line} MISSING TEMPLATE VARIABLE\nKey: ${
               v.key
-            }\nNeeds to replace: ${v.toReplace}`;
+            }\nTo replace: ${v.toReplace}`;
           })
           .join("\n\n");
 
