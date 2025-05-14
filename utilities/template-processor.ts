@@ -39,15 +39,15 @@ export function processContractTemplate(
     if (commentMatch) {
       const replacementKey = commentMatch[1];
       const valueKey = commentMatch[2];
-      
+
       // Try both the value key and the combined key for lookup
       const combinedKey = `${replacementKey}/${valueKey}`;
-      const replacementValue = replacements.has(valueKey) 
+      const replacementValue = replacements.has(valueKey)
         ? replacements.get(valueKey)
-        : replacements.has(combinedKey) 
-          ? replacements.get(combinedKey)
-          : null;
-          
+        : replacements.has(combinedKey)
+        ? replacements.get(combinedKey)
+        : null;
+
       if (replacementValue !== null) {
         // Find the target line - the first line after this comment that contains the key
         let targetLineIndex = i + 1;
@@ -174,34 +174,51 @@ export async function getContractTemplateContent(
     // In a Cloudflare Worker environment, assets are available at the root
     try {
       // We need to use the current request URL as the base for our asset URLs
-      const currentUrl = new URL(self.location.href);
-      const baseUrl = `${currentUrl.protocol}//${currentUrl.host}`;
-      const fullAssetUrl = `${baseUrl}/contracts/${contract.templatePath}`;
-      
-      dbgLog(`Looking for template in assets: ${fullAssetUrl}`, { forceLog: true });
-      
+      const assetUrl = `/contracts/${contract.templatePath}`;
+      //const currentUrl = new URL(self.location.href);
+      //const baseUrl = `${currentUrl.protocol}//${currentUrl.host}`;
+      //const fullAssetUrl = `${baseUrl}/contracts/${contract.templatePath}`;
+
+      dbgLog(`Looking for template in assets: ${assetUrl}`, {
+        forceLog: true,
+      });
+
       // Try to fetch the asset directly
-      const response = await fetch(fullAssetUrl);
-      
+      const response = await fetch(assetUrl);
+
       if (response.ok) {
-        dbgLog(`Found template in assets at: ${fullAssetUrl}`, { forceLog: true });
+        dbgLog(`Found template in assets at: ${assetUrl}`, {
+          forceLog: true,
+        });
         const content = await response.text();
         return content;
       }
     } catch (fetchError) {
-      dbgLog(`Error fetching from assets: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`, { forceLog: true });
+      dbgLog(
+        `Error fetching from assets: ${
+          fetchError instanceof Error ? fetchError.message : String(fetchError)
+        }`,
+        { forceLog: true }
+      );
       // Continue to try other methods if fetch fails
     }
 
     // If we get here, the template wasn't found
-    dbgLog(`Template file not found: ${contract.templatePath}`, { logType: "error", titleBefore: "Template File Error", forceLog: true });
+    dbgLog(`Template file not found: ${contract.templatePath}`, {
+      logType: "error",
+      forceLog: true,
+    });
     return null;
   } catch (error) {
     dbgLog(
       `Error reading contract template: ${
         error instanceof Error ? error.message : String(error)
       }`,
-      { logType: "error", titleBefore: "Contract Template Error", forceLog: true }
+      {
+        logType: "error",
+        titleBefore: "Contract Template Error",
+        forceLog: true,
+      }
     );
     return null;
   }
