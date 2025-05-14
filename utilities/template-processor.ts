@@ -118,7 +118,7 @@ export function processContractTemplate(
         originalLine,
         replacedLine: lines[variable.lineIndex],
       },
-      { titleBefore: "Template Replacement" }
+      { titleBefore: "Template Replacement", forceLog: true }
     );
   }
 
@@ -161,42 +161,43 @@ export async function getContractTemplateContent(
       "contracts",
       contract.templatePath
     );
-    dbgLog(`Looking for template locally: ${localPath}`);
+    dbgLog(`Looking for template locally: ${localPath}`, { forceLog: true });
 
     // Check if file exists locally
     if (fs.existsSync(localPath)) {
-      dbgLog(`Found template locally at: ${localPath}`);
+      dbgLog(`Found template locally at: ${localPath}`, { forceLog: true });
       const content = await fs.promises.readFile(localPath, "utf-8");
       return content;
     }
 
     // If not found locally, try to fetch from the worker assets
-    const assetPath = `/${contract.templatePath}`;
-    dbgLog(`Looking for template in assets: ${assetPath}`);
+    // In a Cloudflare Worker environment, assets are available at the root
+    const assetPath = `/contracts/${contract.templatePath}`;
+    dbgLog(`Looking for template in assets: ${assetPath}`, { forceLog: true });
 
     try {
-      // In a Cloudflare Worker environment
-      const response = await fetch(new URL(assetPath, self.location.href));
+      // Try to fetch the asset directly
+      const response = await fetch(assetPath);
       
       if (response.ok) {
-        dbgLog(`Found template in assets at: ${assetPath}`);
+        dbgLog(`Found template in assets at: ${assetPath}`, { forceLog: true });
         const content = await response.text();
         return content;
       }
     } catch (fetchError) {
-      dbgLog(`Error fetching from assets: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`);
+      dbgLog(`Error fetching from assets: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`, { forceLog: true });
       // Continue to try other methods if fetch fails
     }
 
     // If we get here, the template wasn't found
-    dbgLog(`Template file not found: ${contract.templatePath}`, { logType: "error", titleBefore: "Template File Error" });
+    dbgLog(`Template file not found: ${contract.templatePath}`, { logType: "error", titleBefore: "Template File Error", forceLog: true });
     return null;
   } catch (error) {
     dbgLog(
       `Error reading contract template: ${
         error instanceof Error ? error.message : String(error)
       }`,
-      { logType: "error", titleBefore: "Contract Template Error" }
+      { logType: "error", titleBefore: "Contract Template Error", forceLog: true }
     );
     return null;
   }
