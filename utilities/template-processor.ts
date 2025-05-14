@@ -148,11 +148,14 @@ function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
 
+import { CloudflareBindings } from "../src/cf-types";
+
 /**
  * Helper function to get template content from the contracts directory
  */
 export async function getContractTemplateContent(
-  contract: any
+  contract: any,
+  env?: CloudflareBindings
 ): Promise<string | null> {
   // first try to load from the filesystem (for local development)
   try {
@@ -182,42 +185,44 @@ export async function getContractTemplateContent(
   // In our Cloudflare Worker environment, assets are available at the root /contracts folder
 
   try {
-    // We need to use the current request URL as the base for our asset URLs
-    const assetUrl = `contracts/${contract.templatePath}`;
+    if (env && env.AIBTC_ASSETS) {
+      // We need to use the current request URL as the base for our asset URLs
+      const assetUrl = `/contracts/${contract.templatePath}`;
+      const request = new Request(assetUrl);
+      const response = await env.AIBTC_ASSETS.fetch(request);
 
-    // TODO: need to use Env.AIBTC_ASSETS instead of fetch
-    const response = await fetch(assetUrl);
-
-    dbgLog(
-      {
-        debug: {
-          action: "fetch_template",
-          url: assetUrl.toString(),
-          isOk: response.ok,
-          status: response.status,
-          statusText: response.statusText,
-          text: await response.text(),
-        },
-      },
-      { forceLog: true }
-    );
-
-    if (response.ok) {
-      dbgLog(`Found template in assets at: ${assetUrl}`);
-      const content = await response.text();
       dbgLog(
-        `Fetched template content from assets: ${content.substring(0, 100)}...`,
+        {
+          debug: {
+            action: "fetch_template",
+            url: assetUrl,
+            isOk: response.ok,
+            status: response.status,
+            statusText: response.statusText,
+          },
+        },
         { forceLog: true }
       );
-      return content;
-    }
 
-    // If the response is not OK, throw the error
-    throw new Error(
-      `Failed to fetch template from assets: ${assetUrl.toString()} ${
-        response.status
-      } ${response.statusText}`
-    );
+      if (response.ok) {
+        dbgLog(`Found template in assets at: ${assetUrl}`);
+        const content = await response.text();
+        dbgLog(
+          `Fetched template content from assets: ${content.substring(0, 100)}...`,
+          { forceLog: true }
+        );
+        return content;
+      }
+
+      // If the response is not OK, throw the error
+      throw new Error(
+        `Failed to fetch template from assets: ${assetUrl} ${
+          response.status
+        } ${response.statusText}`
+      );
+    } else {
+      dbgLog("AIBTC_ASSETS environment binding is not available", { forceLog: true });
+    }
   } catch (fetchError) {
     dbgLog(
       `Error fetching from assets: ${
