@@ -22,6 +22,11 @@ jobs:
         with:
           token: ${{ github.token }}
           branch: main
+          minorList: feat, feature
+          patchList: fix, bugfix, perf, refactor, test, tests
+          ignoreCommits: "^Merge"
+          noNewCommitBehavior: patch
+          noVersionBumpBehavior: patch
 
       - name: Create Release
         uses: ncipollo/release-action@v1.12.0
