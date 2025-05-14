@@ -6,7 +6,6 @@ import {
   CONTRACT_TYPES,
   CONTRACT_SUBTYPES,
 } from "../utilities/contract-types";
-import { getContractTemplateContent } from "../utilities/template-processor";
 import { ApiError } from "./utils/api-error";
 import { ErrorCode } from "./utils/error-catalog";
 import { handleRequest } from "./utils/request-handler";
@@ -258,7 +257,6 @@ export function createApiRouter(registry: ContractRegistry) {
     );
   });
 
-
   // Generate contract from template
   api.post("/generate-contract", async (c) => {
     return handleRequest(
@@ -327,7 +325,9 @@ export function createApiRouter(registry: ContractRegistry) {
         const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
         if (!validNetworks.includes(network)) {
           throw new ApiError(ErrorCode.INVALID_REQUEST, {
-            reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(", ")}`,
+            reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(
+              ", "
+            )}`,
           });
         }
 
@@ -339,12 +339,13 @@ export function createApiRouter(registry: ContractRegistry) {
         }
 
         try {
-          const generatedContract = await generatorService.generateContractForNetwork(
-            contract,
-            network as StacksNetworkName,
-            tokenSymbol,
-            customReplacements
-          );
+          const generatedContract =
+            await generatorService.generateContractForNetwork(
+              contract,
+              network as StacksNetworkName,
+              tokenSymbol,
+              customReplacements
+            );
 
           return {
             contract: {
@@ -380,28 +381,31 @@ export function createApiRouter(registry: ContractRegistry) {
         const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
         if (!validNetworks.includes(network)) {
           throw new ApiError(ErrorCode.INVALID_REQUEST, {
-            reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(", ")}`,
+            reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(
+              ", "
+            )}`,
           });
         }
 
         // Get all DAO contract names
         const daoContractNames = registry.getAllDaoContractNames();
-        
+
         // Generate each contract
         const generatedContracts = [];
         const errors = [];
-        
+
         for (const contractName of daoContractNames) {
           const contract = registry.getContract(contractName);
           if (contract) {
             try {
-              const generatedContract = await generatorService.generateContractForNetwork(
-                contract,
-                network as StacksNetworkName,
-                tokenSymbol,
-                customReplacements
-              );
-              
+              const generatedContract =
+                await generatorService.generateContractForNetwork(
+                  contract,
+                  network as StacksNetworkName,
+                  tokenSymbol,
+                  customReplacements
+                );
+
               generatedContracts.push({
                 name: contract.name,
                 type: contract.type,
@@ -412,7 +416,7 @@ export function createApiRouter(registry: ContractRegistry) {
               // Track errors but continue with other contracts
               errors.push({
                 name: contract.name,
-                error: error instanceof Error ? error.message : String(error)
+                error: error instanceof Error ? error.message : String(error),
               });
             }
           }
@@ -424,7 +428,7 @@ export function createApiRouter(registry: ContractRegistry) {
             tokenSymbol,
             contracts: generatedContracts,
             errors: errors.length > 0 ? errors : undefined,
-          }
+          },
         };
       },
       { path: "/generate-dao-contracts", method: "POST" }
