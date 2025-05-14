@@ -174,7 +174,7 @@ export async function getContractTemplateContent(
     // In a Cloudflare Worker environment, assets are available at the root
     try {
       // We need to use the current request URL as the base for our asset URLs
-      const assetUrl = `/contracts/${contract.templatePath}`;
+      const assetUrl = `https://aibtcdev-daos-preview.hosting-962.workers.dev/contracts/${contract.templatePath}`;
       //const currentUrl = new URL(self.location.href);
       //const baseUrl = `${currentUrl.protocol}//${currentUrl.host}`;
       //const fullAssetUrl = `${baseUrl}/contracts/${contract.templatePath}`;
