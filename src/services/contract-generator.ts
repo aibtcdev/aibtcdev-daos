@@ -87,15 +87,17 @@ export class ContractGeneratorService {
       const missingDetails = missingVars
         .map((v) => {
           // Extract just the key name and what it replaces, without including surrounding code
-          return `LINE ${v.line} MISSING TEMPLATE VARIABLE\n${
+          return `LINE ${v.line} MISSING TEMPLATE VARIABLE\nExpected key: ${
             v.keyName.split("\n")[0]
-          }\nNeeds replacement for: ${v.toReplace}\nExpected key: ${v.key}`;
+          }\nReplaces text: ${v.toReplace}`;
         })
         .join("\n\n");
 
       console.error(`Missing template variables for ${contract.name}:`);
       console.error(missingDetails);
-      throw new Error(`Missing template variables for ${contract.name}:\n${missingDetails}`);
+      throw new Error(
+        `Missing template variables for ${contract.name}:\n${missingDetails}`
+      );
     }
 
     return processContractTemplate(templateContent, replacementsMap);
@@ -116,7 +118,7 @@ export class ContractGeneratorService {
       tokenSymbol,
       customReplacements
     );
-    
+
     // Use the existing method to generate the contract
     return this.generateContract(contract, networkReplacements);
   }
