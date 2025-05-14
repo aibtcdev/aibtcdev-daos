@@ -390,7 +390,7 @@ describe("Contract Generator", () => {
     // Agent Trait references
     ".aibtc-agent-account-traits.aibtc-account/agent_account_trait_account":
       ".test-traits.agent-account",
-    ".aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval":
+    ".aibtc-agent-account-traits.faktory-dex/agent_account_trait_faktory_dex_approval":
       ".test-traits.faktory-dex-approval",
     ".aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals":
       ".test-traits.agent-proposals",
