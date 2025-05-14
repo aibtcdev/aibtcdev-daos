@@ -160,6 +160,9 @@ test_api_generate_dao_contracts() {
         "$url")
     
     status=$(echo "$response" | tail -n1)
+
+    echo "Response: $response"
+    echo "Status: $status"
     
     if [ "$status" -eq 200 ]; then
         echo -e "${GREEN}✓${NC} Generate all DAO contracts endpoint with valid data - Status: $status"
