@@ -3,8 +3,8 @@ import { StacksNetworkName } from "@stacks/network";
 // define known traits by key and category
 
 type ExternalTraits = {
-  STANDARD_SIP009: string;
-  STANDARD_SIP010: string;
+  BASE_SIP009: string;
+  BASE_SIP010: string;
   FAKTORY_SIP010: string;
   BITFLOW_POOL: string;
   BITFLOW_SIP010: string;
@@ -15,16 +15,9 @@ type DaoTraits = {
   DAO_PROPOSAL: string;
   DAO_EXTENSION: string;
   DAO_ACTION: string;
-  DAO_ACTION_PROPOSALS: string;
+  DAO_ACTION_PROPOSAL_VOTING: string;
   DAO_CHARTER: string;
-  DAO_CORE_PROPOSALS: string;
-  DAO_INVOICES: string;
   DAO_MESSAGING: string;
-  DAO_RESOURCES: string;
-  DAO_SMART_WALLET_BASE: string;
-  DAO_SMART_WALLET_PROPOSALS: string;
-  DAO_SMART_WALLET_FAKTORY: string;
-  DAO_TIMED_VAULT: string;
   DAO_TOKEN: string;
   DAO_TOKEN_DEX: string;
   DAO_TOKEN_OWNER: string;
@@ -45,9 +38,8 @@ export type KnownTraits = ExternalTraits & DaoTraits & AgentTraits;
 // define known traits for each network
 
 const mainnetTraits: KnownTraits = {
-  STANDARD_SIP009:
-    "SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait.nft-trait",
-  STANDARD_SIP010:
+  BASE_SIP009: "SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait.nft-trait",
+  BASE_SIP010:
     "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait",
   FAKTORY_SIP010:
     "SP3XXMS38VTAWTVPE5682XSBFXPTH7XCPEBTX8AN2.faktory-trait-v1.sip-010-trait",
@@ -71,26 +63,12 @@ const mainnetTraits: KnownTraits = {
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-dao-traits-v3.extension",
   DAO_ACTION:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-dao-traits-v3.action",
-  DAO_ACTION_PROPOSALS:
-    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-dao-traits-v3.action-proposals",
-  DAO_TIMED_VAULT:
-    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-dao-traits-v3.timed-vault",
+  DAO_ACTION_PROPOSAL_VOTING:
+    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-dao-traits-v3.action-proposal-voting",
   DAO_CHARTER:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-dao-traits-v3.charter",
-  DAO_CORE_PROPOSALS:
-    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-dao-traits-v3.core-proposals",
-  DAO_INVOICES:
-    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-dao-traits-v3.invoices",
   DAO_MESSAGING:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-dao-traits-v3.messaging",
-  DAO_RESOURCES:
-    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-dao-traits-v3.resources",
-  DAO_SMART_WALLET_BASE:
-    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-user-agent-traits.aibtc-smart-wallet",
-  DAO_SMART_WALLET_PROPOSALS:
-    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-user-agent-traits.aibtc-proposals-v2",
-  DAO_SMART_WALLET_FAKTORY:
-    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-user-agent-traits.faktory-buy-sell",
   DAO_TOKEN:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-dao-traits-v3.token",
   DAO_TOKEN_DEX:
@@ -104,9 +82,8 @@ const mainnetTraits: KnownTraits = {
 };
 
 const testnetTraits: KnownTraits = {
-  STANDARD_SIP009:
-    "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.nft-trait.nft-trait",
-  STANDARD_SIP010:
+  BASE_SIP009: "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.nft-trait.nft-trait",
+  BASE_SIP010:
     "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.sip-010-trait-ft-standard.sip-010-trait",
   FAKTORY_SIP010:
     "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait",
@@ -130,26 +107,12 @@ const testnetTraits: KnownTraits = {
     "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-dao-traits-v3.extension",
   DAO_ACTION:
     "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-dao-traits-v3.action",
-  DAO_ACTION_PROPOSALS:
-    "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-dao-traits-v3.action-proposals",
-  DAO_TIMED_VAULT:
-    "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-dao-traits-v3.timed-vault",
+  DAO_ACTION_PROPOSAL_VOTING:
+    "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-dao-traits-v3.action-proposal-voting",
   DAO_CHARTER:
     "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-dao-traits-v3.charter",
-  DAO_CORE_PROPOSALS:
-    "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-dao-traits-v3.core-proposals",
-  DAO_INVOICES:
-    "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-dao-traits-v3.invoices",
   DAO_MESSAGING:
     "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-dao-traits-v3.messaging",
-  DAO_RESOURCES:
-    "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-dao-traits-v3.resources",
-  DAO_SMART_WALLET_BASE:
-    "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-smart-wallet-traits.aibtc-smart-wallet",
-  DAO_SMART_WALLET_PROPOSALS:
-    "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-smart-wallet-traits.aibtc-proposals-v2",
-  DAO_SMART_WALLET_FAKTORY:
-    "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-smart-wallet-traits.faktory-buy-sell",
   DAO_TOKEN:
     "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-dao-traits-v3.token",
   DAO_TOKEN_DEX:
@@ -163,9 +126,8 @@ const testnetTraits: KnownTraits = {
 };
 
 const devnetTraits: KnownTraits = {
-  STANDARD_SIP009:
-    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.nft-trait.nft-trait",
-  STANDARD_SIP010:
+  BASE_SIP009: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.nft-trait.nft-trait",
+  BASE_SIP010:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sip-010-trait-ft-standard.sip-010-trait",
   FAKTORY_SIP010:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.faktory-trait-v1.sip-010-trait",
@@ -189,26 +151,12 @@ const devnetTraits: KnownTraits = {
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.extension",
   DAO_ACTION:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.action",
-  DAO_ACTION_PROPOSALS:
-    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.action-proposals",
-  DAO_TIMED_VAULT:
-    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.timed-vault",
+  DAO_ACTION_PROPOSAL_VOTING:
+    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.action-proposal-voting",
   DAO_CHARTER:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.charter",
-  DAO_CORE_PROPOSALS:
-    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.core-proposals",
-  DAO_INVOICES:
-    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.invoices",
   DAO_MESSAGING:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.messaging",
-  DAO_RESOURCES:
-    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.resources",
-  DAO_SMART_WALLET_BASE:
-    "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-smart-wallet-traits.aibtc-smart-wallet",
-  DAO_SMART_WALLET_PROPOSALS:
-    "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-smart-wallet-traits.aibtc-proposals-v2",
-  DAO_SMART_WALLET_FAKTORY:
-    "ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG.aibtc-smart-wallet-traits.faktory-buy-sell",
   DAO_TOKEN:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits-v3.token",
   DAO_TOKEN_DEX:

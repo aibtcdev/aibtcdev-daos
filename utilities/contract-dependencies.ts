@@ -57,11 +57,7 @@ export function defineActionContractDependencies(
             "EXTENSIONS",
             "ONCHAIN_MESSAGING"
           )
-          .addContractDependency(
-            "dao_contract_base",
-            "BASE",
-            "DAO"
-          )
+          .addContractDependency("dao_contract_base", "BASE", "DAO")
           .addRuntimeValue("dao_token_symbol");
         break;
 
@@ -107,12 +103,31 @@ export function defineExtensionContractDependencies(
       case "aibtc-action-proposal-voting":
         contract
           .addTraitDependency("DAO_EXTENSION", "dao_trait_extension")
-          .addTraitDependency("DAO_ACTION_PROPOSALS_VOTING", "dao_trait_action_proposals_voting")
+          .addTraitDependency(
+            "DAO_ACTION_PROPOSAL_VOTING",
+            "dao_trait_action_proposals_voting"
+          )
           .addTraitDependency("DAO_ACTION", "dao_trait_action")
-          .addContractDependency("base_contract_dao_run_cost", "CORE", "DAO_RUN_COST")
-          .addContractDependency("dao_contract_rewards_account", "EXTENSIONS", "REWARDS_ACCOUNT")
-          .addContractDependency("dao_contract_treasury", "EXTENSIONS", "TREASURY")
-          .addContractDependency("dao_contract_users", "EXTENSIONS", "DAO_USERS")
+          .addContractDependency(
+            "base_contract_dao_run_cost",
+            "CORE",
+            "DAO_RUN_COST"
+          )
+          .addContractDependency(
+            "dao_contract_rewards_account",
+            "EXTENSIONS",
+            "REWARDS_ACCOUNT"
+          )
+          .addContractDependency(
+            "dao_contract_treasury",
+            "EXTENSIONS",
+            "TREASURY"
+          )
+          .addContractDependency(
+            "dao_contract_users",
+            "EXTENSIONS",
+            "DAO_USERS"
+          )
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
           .addContractDependency("dao_contract_base", "BASE", "DAO")
           .addRuntimeValue("dao_token_symbol");
@@ -129,7 +144,10 @@ export function defineExtensionContractDependencies(
       case "aibtc-rewards-account":
         contract
           .addTraitDependency("DAO_EXTENSION", "dao_trait_extension")
-          .addTraitDependency("DAO_REWARDS_ACCOUNT", "dao_trait_rewards_account")
+          .addTraitDependency(
+            "DAO_REWARDS_ACCOUNT",
+            "dao_trait_rewards_account"
+          )
           .addTraitDependency("STANDARD_SIP010", "base_trait_sip010")
           .addContractDependency("dao_contract_base", "BASE", "DAO")
           .addRuntimeValue("dao_token_symbol");
@@ -140,7 +158,11 @@ export function defineExtensionContractDependencies(
           .addTraitDependency("DAO_EXTENSION", "dao_trait_extension")
           .addTraitDependency("DAO_TREASURY", "dao_trait_treasury")
           .addTraitDependency("STANDARD_SIP010", "base_trait_sip010")
-          .addContractDependency("sbtc_token_contract", "EXTERNAL", "STANDARD_SIP010")
+          .addContractDependency(
+            "sbtc_token_contract",
+            "EXTERNAL",
+            "STANDARD_SIP010"
+          )
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
           .addContractDependency("dao_contract_base", "BASE", "DAO")
           .addRuntimeValue("dao_token_symbol");
@@ -192,14 +214,46 @@ export function defineProposalContractDependencies(
           .addTraitDependency("DAO_PROPOSAL", "dao_trait_proposal")
           .addContractDependency("dao_contract_base", "BASE", "DAO")
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
-          .addContractDependency("dao_contract_action_proposal_voting", "EXTENSIONS", "ACTION_PROPOSAL_VOTING")
-          .addContractDependency("dao_contract_charter", "EXTENSIONS", "DAO_CHARTER")
-          .addContractDependency("dao_contract_epoch", "EXTENSIONS", "DAO_EPOCH")
-          .addContractDependency("dao_contract_users", "EXTENSIONS", "DAO_USERS")
-          .addContractDependency("dao_contract_messaging", "EXTENSIONS", "ONCHAIN_MESSAGING")
-          .addContractDependency("dao_contract_token_owner", "EXTENSIONS", "TOKEN_OWNER")
-          .addContractDependency("dao_contract_treasury", "EXTENSIONS", "TREASURY")
-          .addContractDependency("dao_action_send_message", "ACTIONS", "SEND_MESSAGE")
+          .addContractDependency(
+            "dao_contract_action_proposal_voting",
+            "EXTENSIONS",
+            "ACTION_PROPOSAL_VOTING"
+          )
+          .addContractDependency(
+            "dao_contract_charter",
+            "EXTENSIONS",
+            "DAO_CHARTER"
+          )
+          .addContractDependency(
+            "dao_contract_epoch",
+            "EXTENSIONS",
+            "DAO_EPOCH"
+          )
+          .addContractDependency(
+            "dao_contract_users",
+            "EXTENSIONS",
+            "DAO_USERS"
+          )
+          .addContractDependency(
+            "dao_contract_messaging",
+            "EXTENSIONS",
+            "ONCHAIN_MESSAGING"
+          )
+          .addContractDependency(
+            "dao_contract_token_owner",
+            "EXTENSIONS",
+            "TOKEN_OWNER"
+          )
+          .addContractDependency(
+            "dao_contract_treasury",
+            "EXTENSIONS",
+            "TREASURY"
+          )
+          .addContractDependency(
+            "dao_action_send_message",
+            "ACTIONS",
+            "SEND_MESSAGE"
+          )
           .addRuntimeValue("dao_token_symbol")
           .addRuntimeValue("dao_manifest");
         break;
@@ -232,10 +286,7 @@ export function defineTokenContractDependencies(
     switch (contract.name) {
       case "aibtc-faktory":
         contract
-          .addTraitDependency(
-            "STANDARD_SIP010",
-            "base_trait_sip010"
-          )
+          .addTraitDependency("STANDARD_SIP010", "base_trait_sip010")
           .addRuntimeValue("dao_token_symbol")
           .addRuntimeValue("dao_token_name")
           .addRuntimeValue("dao_token_decimals");
@@ -273,18 +324,34 @@ export function defineAgentContractDependencies(
       case "aibtc-agent-account":
         contract
           .addTraitDependency("AGENT_ACCOUNT", "agent_account_trait_account")
-          .addTraitDependency("AGENT_PROPOSALS", "agent_account_trait_proposals")
-          .addTraitDependency("AGENT_FAKTORY_DEX", "agent_account_trait_faktory_dex_approval")
-          .addTraitDependency("AGENT_FAKTORY_BUY_SELL", "agent_account_trait_faktory_buy_sell")
+          .addTraitDependency(
+            "AGENT_PROPOSALS",
+            "agent_account_trait_proposals"
+          )
+          .addTraitDependency(
+            "AGENT_FAKTORY_DEX",
+            "agent_account_trait_faktory_dex_approval"
+          )
+          .addTraitDependency(
+            "AGENT_FAKTORY_BUY_SELL",
+            "agent_account_trait_faktory_buy_sell"
+          )
           .addTraitDependency("STANDARD_SIP010", "base_trait_sip010")
           .addTraitDependency("DAO_ACTION", "dao_trait_action")
           .addTraitDependency("DAO_PROPOSAL", "dao_trait_proposal")
-          .addTraitDependency("DAO_ACTION_PROPOSALS_VOTING", "dao_trait_action_proposals_voting")
+          .addTraitDependency(
+            "DAO_ACTION_PROPOSALS_VOTING",
+            "dao_trait_action_proposals_voting"
+          )
           .addTraitDependency("DAO_FAKTORY_DEX", "dao_trait_faktory_dex")
           .addTraitDependency("DAO_FAKTORY_TOKEN", "dao_trait_faktory_token")
           .addAddressDependency("DEPLOYER", "account_owner")
           .addAddressDependency("AGENT", "account_agent")
-          .addContractDependency("base_contract_sbtc", "EXTERNAL", "STANDARD_SIP010")
+          .addContractDependency(
+            "base_contract_sbtc",
+            "EXTERNAL",
+            "STANDARD_SIP010"
+          )
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
           .addContractDependency("dao_contract_token_dex", "TOKEN", "DEX")
           .addRuntimeValue("dao_token_symbol");
@@ -312,8 +379,7 @@ export function defineCoreContractDependencies(
   coreContracts.forEach((contract) => {
     switch (contract.name) {
       case "aibtc-dao-run-cost":
-        contract
-          .addTraitDependency("STANDARD_SIP010", "base_trait_sip010");
+        contract.addTraitDependency("STANDARD_SIP010", "base_trait_sip010");
         break;
 
       default:
