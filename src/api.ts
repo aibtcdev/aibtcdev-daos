@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { StacksNetworkName } from "@stacks/network";
 import { CloudflareBindings } from "./cf-types";
 import { ContractRegistry } from "../utilities/contract-registry";
 import {
@@ -6,7 +7,6 @@ import {
   CONTRACT_TYPES,
   CONTRACT_SUBTYPES,
 } from "../utilities/contract-types";
-import { getContractTemplateContent } from "../utilities/template-processor";
 import { ApiError } from "./utils/api-error";
 import { ErrorCode } from "./utils/error-catalog";
 import { handleRequest } from "./utils/request-handler";
@@ -258,7 +258,6 @@ export function createApiRouter(registry: ContractRegistry) {
     );
   });
 
-
   // Generate contract from template
   api.post("/generate-contract", async (c) => {
     return handleRequest(
@@ -285,7 +284,8 @@ export function createApiRouter(registry: ContractRegistry) {
         try {
           const generatedContract = await generatorService.generateContract(
             contract,
-            replacements
+            replacements,
+            c.env
           );
 
           return {
@@ -303,6 +303,146 @@ export function createApiRouter(registry: ContractRegistry) {
         }
       },
       { path: "/generate-contract", method: "POST" }
+    );
+  });
+
+  // Generate contract for a specific network
+  api.post("/generate-contract-for-network", async (c) => {
+    return handleRequest(
+      c,
+      async () => {
+        const body = await c.req.json();
+        const contractName = body.contractName || body.name;
+        const network = body.network || "devnet";
+        const tokenSymbol = body.tokenSymbol || "aibtc";
+        const customReplacements = body.customReplacements || {};
+
+        if (!contractName) {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: "Missing required parameter: contractName or name",
+          });
+        }
+
+        // Validate network
+        const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
+        if (!validNetworks.includes(network)) {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(
+              ", "
+            )}`,
+          });
+        }
+
+        const contract = registry.getContract(contractName);
+        if (!contract) {
+          throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, {
+            name: contractName,
+          });
+        }
+
+        try {
+          const generatedContract =
+            await generatorService.generateContractForNetwork(
+              contract,
+              network as StacksNetworkName,
+              tokenSymbol,
+              customReplacements,
+              c.env
+            );
+
+          return {
+            contract: {
+              name: contract.name,
+              type: contract.type,
+              subtype: contract.subtype,
+              network,
+              tokenSymbol,
+              content: generatedContract,
+            },
+          };
+        } catch (error) {
+          throw new ApiError(ErrorCode.TEMPLATE_PROCESSING_ERROR, {
+            reason: error instanceof Error ? error.message : String(error),
+          });
+        }
+      },
+      { path: "/generate-contract-for-network", method: "POST" }
+    );
+  });
+
+  // Generate all DAO contracts for a network
+  api.post("/generate-dao-contracts", async (c) => {
+    return handleRequest(
+      c,
+      async () => {
+        const body = await c.req.json();
+        const network = body.network || "devnet";
+        const tokenSymbol = body.tokenSymbol || "aibtc";
+        const customReplacements = body.customReplacements || {};
+
+        // Validate network
+        const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
+        if (!validNetworks.includes(network)) {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(
+              ", "
+            )}`,
+          });
+        }
+
+        // Get all DAO contract names
+        const daoContractNames = registry.getAllDaoContractNames();
+
+        // Generate each contract
+        const generatedContracts: Array<{
+          name: string;
+          type: ContractType;
+          subtype: string;
+          content: string;
+        }> = [];
+        const errors: Array<{
+          name: string;
+          error: string;
+        }> = [];
+
+        for (const contractName of daoContractNames) {
+          const contract = registry.getContract(contractName);
+          if (contract) {
+            try {
+              const generatedContract =
+                await generatorService.generateContractForNetwork(
+                  contract,
+                  network as StacksNetworkName,
+                  tokenSymbol,
+                  customReplacements,
+                  c.env
+                );
+
+              generatedContracts.push({
+                name: contract.name,
+                type: contract.type,
+                subtype: contract.subtype,
+                content: generatedContract,
+              });
+            } catch (error) {
+              // Track errors but continue with other contracts
+              errors.push({
+                name: contract.name,
+                error: error instanceof Error ? error.message : String(error),
+              });
+            }
+          }
+        }
+
+        // Make sure we return at least an empty array for contracts
+        return {
+          network,
+          tokenSymbol,
+          contracts: generatedContracts.length > 0 ? generatedContracts : [],
+          errors: errors.length > 0 ? errors : undefined,
+        };
+      },
+      { path: "/generate-dao-contracts", method: "POST" }
     );
   });
 

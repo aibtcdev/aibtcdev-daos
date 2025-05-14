@@ -6,7 +6,7 @@
     "strict": true,
     "skipLibCheck": true,
     "lib": ["ESNext"],
-    "types": ["vite/client"],
+    "types": ["vite/client", "@cloudflare/workers-types"],
     "useDefineForClassFields": true,
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",

@@ -6,7 +6,8 @@
   "compatibility_date": "2025-05-01",
   "compatibility_flags": ["nodejs_compat_v2"],
   "assets": {
-    "directory": "./dist-server"
+    "directory": "./dist-server",
+    "binding": "AIBTC_ASSETS"
   },
   "observability": {
     "enabled": true

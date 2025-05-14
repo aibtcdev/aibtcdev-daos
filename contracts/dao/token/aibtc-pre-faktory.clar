@@ -1,4 +1,4 @@
-;; <%= it.hash %>
+;; 99af7ff63e5e4bd7542e55d88bacc25a7a6f79004f9937ea0bab3ca4c2438061
 ;; aibtc.com DAO faktory.fun PRE @version 1.0
 ;; Pre-launch contract for token distribution
 ;; Dynamic allocation: 1-7 seats per user in Period 1
@@ -14,17 +14,16 @@
 (define-constant MIN-USERS u10)
 (define-constant MAX-SEATS-PER-USER u7)
 (define-constant PRICE-PER-SEAT u20000) ;; 20K sats per seat
-(define-constant TOKENS-PER-SEAT u200000000000000) ;; <%= it.token_max_supply %> times 0.2%
+(define-constant TOKENS-PER-SEAT u200000000000000) ;; max_supply times 0.2%
 (define-constant EXPIRATION-PERIOD u2100) ;; 1 Stacks reward cycle in PoX-4
 (define-constant DEX-AMOUNT u250000)
 (define-constant MULTI-SIG-AMOUNT u10000)
 (define-constant FEE-AMOUNT u140000)
 
-(define-constant FT-INITIALIZED-BALANCE u4000000000000000) ;; <%= it.token_max_supply %> times 4%
+(define-constant FT-INITIALIZED-BALANCE u4000000000000000) ;; max_supply times 4%
 
 ;; Vesting schedule (percentages add up to 100)
-(define-constant VESTING-SCHEDULE (list
-  ;; Initial release - 10% at once
+(define-constant VESTING-SCHEDULE (list ;; Initial release - 10% at once
   {
     height: u100,
     percent: u10,
@@ -42,8 +41,7 @@
     height: u400,
     percent: u3,
     id: u2,
-  }
-  ;; 3%
+  } ;; 3%
   {
     height: u550,
     percent: u3,
@@ -54,8 +52,7 @@
     height: u700,
     percent: u3,
     id: u4,
-  }
-  ;; 3%
+  } ;; 3%
   {
     height: u850,
     percent: u4,
@@ -79,8 +76,7 @@
     height: u1400,
     percent: u4,
     id: u8,
-  }
-  ;; 4%
+  } ;; 4%
   {
     height: u1600,
     percent: u4,
@@ -91,8 +87,7 @@
     height: u1750,
     percent: u4,
     id: u10,
-  }
-  ;; 4%
+  } ;; 4%
   {
     height: u1900,
     percent: u4,
@@ -103,8 +98,7 @@
     height: u2000,
     percent: u5,
     id: u12,
-  }
-  ;; 5%
+  } ;; 5%
   {
     height: u2100,
     percent: u5,
@@ -122,8 +116,7 @@
     height: u2900,
     percent: u5,
     id: u15,
-  }
-  ;; 5%
+  } ;; 5%
   {
     height: u3300,
     percent: u6,
@@ -134,8 +127,7 @@
     height: u3600,
     percent: u6,
     id: u17,
-  }
-  ;; 6%
+  } ;; 6%
   {
     height: u3900,
     percent: u6,
@@ -146,14 +138,12 @@
     height: u4100,
     percent: u6,
     id: u19,
-  }
-  ;; 6%
+  } ;; 6%
   {
     height: u4200,
     percent: u6,
     id: u20,
-  }
-))
+  }))
 
 ;; 6% - hitting 100% total at original final milestone
 

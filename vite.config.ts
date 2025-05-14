@@ -1,13 +1,14 @@
 import { defineConfig } from "vite";
 import build from "@hono/vite-build/cloudflare-workers";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 export default defineConfig(({ command, isSsrBuild }) => {
   if (command === "serve") {
     // Use a simple development server without Miniflare integration
     return {
       server: {
-        port: 3000
-      }
+        port: 3000,
+      },
     };
   }
   return {
@@ -17,11 +18,19 @@ export default defineConfig(({ command, isSsrBuild }) => {
         entryContentAfterHooks: [],
         entryContentDefaultExportHook: () => "",
       }),
+      viteStaticCopy({
+        targets: [
+          {
+            src: "contracts/**/*",
+            dest: "./contracts",
+          },
+        ],
+      }),
     ],
     build: {
       rollupOptions: {
-        external: ["cloudflare:workers"]
-      }
-    }
+        external: ["cloudflare:workers"],
+      },
+    },
   };
 });

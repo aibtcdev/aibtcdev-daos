@@ -10,12 +10,12 @@
 ;; traits
 ;;
 
-;; /g/.aibtc-dao-traits.extension/dao_extension_trait
+;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.rewards-account/dao_rewards_account_trait
+;; /g/.aibtc-dao-traits.rewards-account/dao_trait_rewards_account
 ;; (impl-trait .aibtc-dao-traits.rewards-account)
 
-;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_sip010_trait
+;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; constants
@@ -71,11 +71,11 @@
 ;;
 
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_base_contract
+  ;; /g/.aibtc-base-dao/dao_contract_base
   (ok (asserts!
     (or
       (is-eq tx-sender .aibtc-base-dao)
-      ;; /g/.aibtc-base-dao/dao_base_contract
+      ;; /g/.aibtc-base-dao/dao_contract_base
       (contract-call? .aibtc-base-dao is-extension contract-caller)
     )
     ERR_NOT_DAO_OR_EXTENSION

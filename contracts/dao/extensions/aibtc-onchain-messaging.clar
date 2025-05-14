@@ -5,9 +5,9 @@
 ;; traits
 ;;
 
-;; /g/.aibtc-dao-traits.extension/dao_extension_trait
+;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.messaging/dao_messaging_trait
+;; /g/.aibtc-dao-traits.messaging/dao_trait_messaging
 (impl-trait .aibtc-dao-traits.messaging)
 
 ;; constants
@@ -28,7 +28,7 @@
 (define-public (send (msg (string-ascii 1047888)))
   (let (
       (isFromDao (is-ok (is-dao-or-extension)))
-      ;; /g/.aibtc-base-dao/dao_base_contract
+      ;; /g/.aibtc-base-dao/dao_contract_base
       (senderBalance (unwrap! (contract-call? .aibtc-faktory get-balance tx-sender)
         ERR_FETCHING_TOKEN_DATA
       ))
@@ -58,11 +58,11 @@
 ;;
 
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_base_contract
+  ;; /g/.aibtc-base-dao/dao_contract_base
   (ok (asserts!
     (or
       (is-eq tx-sender .aibtc-base-dao)
-      ;; /g/.aibtc-base-dao/dao_base_contract
+      ;; /g/.aibtc-base-dao/dao_contract_base
       (contract-call? .aibtc-base-dao is-extension contract-caller)
     )
     ERR_NOT_DAO_OR_EXTENSION

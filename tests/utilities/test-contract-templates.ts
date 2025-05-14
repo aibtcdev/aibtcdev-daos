@@ -50,7 +50,7 @@ export const initializeDaoTemplate = `
 ;; version: 1.0.0
 ;; summary: A proposal that sets up the initial DAO configuration and extensions.
 
-;; /g/.aibtc-dao-traits.proposal/dao_proposal_trait
+;; /g/.aibtc-dao-traits.proposal/dao_trait_proposal
 (impl-trait .aibtc-dao-traits.proposal)
 
 ;; /g/dao mission goes here/dao_manifest
@@ -61,7 +61,7 @@ export const initializeDaoTemplate = `
 (define-public (execute (sender principal))
   (begin
     ;; set initial dao extensions list
-    ;; /g/.aibtc-base-dao/dao_base_contract
+    ;; /g/.aibtc-base-dao/dao_contract_base
     (try! (contract-call? .aibtc-base-dao set-extensions
       (list
         ;; initial DAO extensions (features)
@@ -117,9 +117,9 @@ export const tokenOwnerTemplate = `
 ;; traits
 ;;
 
-;; /g/.aibtc-dao-traits.extension/dao_extension_trait
+;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.token-owner/dao_token_owner_trait
+;; /g/.aibtc-dao-traits.token-owner/dao_trait_token_owner
 (impl-trait .aibtc-dao-traits.token-owner)
 
 ;; constants
@@ -179,9 +179,9 @@ export const tokenOwnerTemplate = `
 ;;
 
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_base_contract
+  ;; /g/.aibtc-base-dao/dao_contract_base
   (ok (asserts! (or (is-eq tx-sender .aibtc-base-dao)
-    ;; /g/.aibtc-base-dao/dao_base_contract
+    ;; /g/.aibtc-base-dao/dao_contract_base
     (contract-call? .aibtc-base-dao is-extension contract-caller)) ERR_NOT_DAO_OR_EXTENSION
   ))
 )
