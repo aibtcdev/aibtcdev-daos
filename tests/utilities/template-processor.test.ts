@@ -295,6 +295,7 @@ describe("Template Processor", () => {
   it("should generate template replacements for different networks", () => {
     const {
       generateTemplateReplacements,
+      getAllKnownTemplateVariables,
     } = require("../../utilities/template-variables");
 
     // Test for different networks
@@ -435,6 +436,13 @@ describe("Contract Generator", () => {
     "dao_contract_users": ".test-dao-users",
     "dao_contract_base": ".test-base-dao",
     "dao_token_symbol": "TEST",
+    "dao_trait_base": ".test-traits.base-dao",
+    "dao_contract_action_proposal_voting": ".test-proposal-voting",
+    "dao_contract_epoch": ".test-dao-epoch",
+    "dao_contract_messaging": ".test-messaging",
+    "dao_contract_charter": ".test-dao-charter",
+    "dao_token_owner_contract": ".test-token-owner",
+    "dao_action_send_message_contract": ".test-send-message",
     
     // Agent account simplified keys
     "agent_account_trait_account": ".test-traits.agent-account",
