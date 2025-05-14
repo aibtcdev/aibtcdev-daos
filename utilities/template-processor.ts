@@ -155,23 +155,42 @@ export async function getContractTemplateContent(
   contract: any
 ): Promise<string | null> {
   try {
-    // Construct the path to the contract file
-    const contractPath = path.join(
+    // First try to load from the filesystem (for local development)
+    const localPath = path.join(
       process.cwd(),
       "contracts",
       contract.templatePath
     );
-    dbgLog(`Looking for template: ${contractPath}`);
+    dbgLog(`Looking for template locally: ${localPath}`);
 
-    // Check if file exists
-    if (!fs.existsSync(contractPath)) {
-      dbgLog(`Template file not found: ${contractPath}`, { logType: "error", titleBefore: "Template File Error" });
-      return null;
+    // Check if file exists locally
+    if (fs.existsSync(localPath)) {
+      dbgLog(`Found template locally at: ${localPath}`);
+      const content = await fs.promises.readFile(localPath, "utf-8");
+      return content;
     }
 
-    // Read the file content
-    const content = await fs.promises.readFile(contractPath, "utf-8");
-    return content;
+    // If not found locally, try to fetch from the worker assets
+    const assetPath = `/${contract.templatePath}`;
+    dbgLog(`Looking for template in assets: ${assetPath}`);
+
+    try {
+      // In a Cloudflare Worker environment
+      const response = await fetch(new URL(assetPath, self.location.href));
+      
+      if (response.ok) {
+        dbgLog(`Found template in assets at: ${assetPath}`);
+        const content = await response.text();
+        return content;
+      }
+    } catch (fetchError) {
+      dbgLog(`Error fetching from assets: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`);
+      // Continue to try other methods if fetch fails
+    }
+
+    // If we get here, the template wasn't found
+    dbgLog(`Template file not found: ${contract.templatePath}`, { logType: "error", titleBefore: "Template File Error" });
+    return null;
   } catch (error) {
     dbgLog(
       `Error reading contract template: ${

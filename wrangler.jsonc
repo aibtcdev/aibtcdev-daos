@@ -8,6 +8,9 @@
   "assets": {
     "directory": "./dist-server"
   },
+  "site": {
+    "bucket": "./contracts"
+  },
   "observability": {
     "enabled": true
   },
