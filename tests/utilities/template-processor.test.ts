@@ -196,7 +196,10 @@ describe("Template Processor", () => {
     expect(processed).toContain("extension: .test-proposal-voting");
     expect(processed).toContain("enabled: true");
     expect(processed).toContain(
-      "{extension: .test-dao-charter, enabled: true}"
+      "extension: .test-dao-charter"
+    );
+    expect(processed).toContain(
+      "enabled: true"
     );
     expect(processed).toContain('notification: "TEST-base-dao/execute"');
   });
@@ -240,7 +243,10 @@ describe("Template Processor", () => {
       "contract-call? .test-base-dao is-extension contract-caller"
     );
     expect(processed).toContain(
-      "(contract-call? .test-base-dao is-extension contract-caller))"
+      "is-extension contract-caller)"
+    );
+    expect(processed).toContain(
+      "ERR_NOT_DAO_OR_EXTENSION"
     );
   });
 

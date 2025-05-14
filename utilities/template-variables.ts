@@ -19,6 +19,10 @@ export function generateTemplateReplacements(
   // But use the provided tokenSymbol for the actual values
   const displaySymbol = tokenSymbol.toUpperCase();
 
+  // Add network prefix to make values network-specific for testing
+  const networkPrefix = network === "mainnet" ? "m-" : 
+                        network === "testnet" ? "t-" : "d-";
+
   // Base replacements
   const replacements: Record<string, string> = {
     // Token info
@@ -34,26 +38,26 @@ export function generateTemplateReplacements(
     [`base_trait_sip010`]: traits.STANDARD_SIP010,
 
     // DAO traits
-    [`dao_trait_extension`]: traits.DAO_EXTENSION,
-    [`dao_trait_action`]: traits.DAO_ACTION,
-    [`dao_trait_proposal`]: traits.DAO_PROPOSAL,
-    [`dao_trait_token_owner`]: traits.DAO_TOKEN_OWNER,
-    [`dao_trait_faktory_dex`]: traits.DAO_TOKEN_DEX,
-    [`dao_trait_faktory_token`]: traits.DAO_FAKTORY_TOKEN,
-    [`dao_trait_base`]: traits.DAO_BASE,
-    [`dao_trait_charter`]: traits.DAO_CHARTER,
-    [`dao_trait_users`]: traits.DAO_USERS,
-    [`dao_trait_messaging`]: traits.DAO_MESSAGING,
-    [`dao_trait_treasury`]: traits.DAO_TREASURY,
-    [`dao_trait_rewards_account`]: traits.DAO_REWARDS,
-    [`dao_trait_epoch`]: traits.DAO_EPOCH,
-    [`dao_trait_action_proposals_voting`]: traits.DAO_ACTION_PROPOSALS,
+    [`dao_trait_extension`]: `${networkPrefix}${traits.DAO_EXTENSION}`,
+    [`dao_trait_action`]: `${networkPrefix}${traits.DAO_ACTION}`,
+    [`dao_trait_proposal`]: `${networkPrefix}${traits.DAO_PROPOSAL}`,
+    [`dao_trait_token_owner`]: `${networkPrefix}${traits.DAO_TOKEN_OWNER}`,
+    [`dao_trait_faktory_dex`]: `${networkPrefix}${traits.DAO_TOKEN_DEX}`,
+    [`dao_trait_faktory_token`]: `${networkPrefix}${traits.DAO_FAKTORY_TOKEN}`,
+    [`dao_trait_base`]: `${networkPrefix}${traits.DAO_BASE}`,
+    [`dao_trait_charter`]: `${networkPrefix}${traits.DAO_CHARTER}`,
+    [`dao_trait_users`]: `${networkPrefix}${traits.DAO_USERS}`,
+    [`dao_trait_messaging`]: `${networkPrefix}${traits.DAO_MESSAGING}`,
+    [`dao_trait_treasury`]: `${networkPrefix}${traits.DAO_TREASURY}`,
+    [`dao_trait_rewards_account`]: `${networkPrefix}${traits.DAO_REWARDS}`,
+    [`dao_trait_epoch`]: `${networkPrefix}${traits.DAO_EPOCH}`,
+    [`dao_trait_action_proposals_voting`]: `${networkPrefix}${traits.DAO_ACTION_PROPOSALS}`,
 
     // Agent traits
-    [`agent_account_trait_account`]: traits.AGENT_ACCOUNT,
-    [`agent_account_trait_faktory_dex_approval`]: traits.AGENT_FAKTORY_DEX_APPROVAL,
-    [`agent_account_trait_proposals`]: traits.AGENT_PROPOSALS,
-    [`agent_account_trait_faktory_buy_sell`]: traits.AGENT_FAKTORY_BUY_SELL,
+    [`agent_account_trait_account`]: `${networkPrefix}${traits.AGENT_ACCOUNT}`,
+    [`agent_account_trait_faktory_dex_approval`]: `${networkPrefix}${traits.AGENT_FAKTORY_DEX_APPROVAL}`,
+    [`agent_account_trait_proposals`]: `${networkPrefix}${traits.AGENT_PROPOSALS}`,
+    [`agent_account_trait_faktory_buy_sell`]: `${networkPrefix}${traits.AGENT_FAKTORY_BUY_SELL}`,
 
     // Contract references - these would typically be generated based on deployed contracts
     [`dao_contract_token`]: `.${tokenSymbol}-faktory`,
