@@ -188,7 +188,7 @@ export async function getContractTemplateContent(
       "https://aibtcdev-daos-preview.hosting-962.workers.dev/"
     );
 
-    dbgLog(`Looking for template in assets: ${assetUrl.toString()}`, {
+    dbgLog(`Fetching contract: ${assetUrl.toString()}`, {
       forceLog: true,
     });
 
@@ -209,7 +209,7 @@ export async function getContractTemplateContent(
 
     // If the response is not OK, throw the error
     throw new Error(
-      `Failed to fetch template from assets: ${response.status} ${response.statusText}`
+      `Failed to fetch template from assets: ${assetUrl} ${response.status} ${response.statusText}`
     );
   } catch (fetchError) {
     dbgLog(
