@@ -147,6 +147,10 @@ export class ContractGeneratorService {
         customReplacements
       );
 
+      // Log the contract being generated
+      dbgLog(`Generating contract ${contract.name} for network ${network}`, 
+        { logType: "info", titleBefore: "Contract Generation" });
+
       // Use the existing method to generate the contract
       return this.generateContract(contract, networkReplacements, env);
     } catch (error) {

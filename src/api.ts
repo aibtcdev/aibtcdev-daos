@@ -434,10 +434,11 @@ export function createApiRouter(registry: ContractRegistry) {
           }
         }
 
+        // Make sure we return at least an empty array for contracts
         return {
           network,
           tokenSymbol,
-          contracts: generatedContracts,
+          contracts: generatedContracts.length > 0 ? generatedContracts : [],
           errors: errors.length > 0 ? errors : undefined,
         };
       },
