@@ -154,8 +154,8 @@ function escapeRegExp(string: string): string {
 export async function getContractTemplateContent(
   contract: any
 ): Promise<string | null> {
+  // first try to load from the filesystem (for local development)
   try {
-    // First try to load from the filesystem (for local development)
     const localPath = path.join(
       process.cwd(),
       "contracts",
@@ -169,66 +169,61 @@ export async function getContractTemplateContent(
       const content = await fs.promises.readFile(localPath, "utf-8");
       return content;
     }
+  } catch (fsError) {
+    dbgLog(
+      `Error reading local template: ${
+        fsError instanceof Error ? fsError.message : String(fsError)
+      }`,
+      { forceLog: true }
+    );
+  }
 
-    // If not found locally, try to fetch from the worker assets
-    // In a Cloudflare Worker environment, assets are available at the root
-    try {
-      // We need to use the current request URL as the base for our asset URLs
-      const assetUrl = new URL(
-        `contracts/${contract.templatePath}`,
-        "https://aibtcdev-daos-preview.hosting-962.workers.dev/"
-      );
-      //const currentUrl = new URL(self.location.href);
-      //const baseUrl = `${currentUrl.protocol}//${currentUrl.host}`;
-      //const fullAssetUrl = `${baseUrl}/contracts/${contract.templatePath}`;
+  // If not found locally, try to fetch from the worker assets
+  // In our Cloudflare Worker environment, assets are available at the root /contracts folder
 
-      dbgLog(`Looking for template in assets: ${assetUrl.toString()}`, {
-        forceLog: true,
-      });
+  try {
+    // We need to use the current request URL as the base for our asset URLs
+    const assetUrl = new URL(
+      `contracts/${contract.templatePath}`,
+      "https://aibtcdev-daos-preview.hosting-962.workers.dev/"
+    );
 
-      // Try to fetch the asset directly
-      const response = await fetch(assetUrl);
-
-      if (response.ok) {
-        dbgLog(`Found template in assets at: ${assetUrl}`, {
-          forceLog: true,
-        });
-        const content = await response.text();
-        return content;
-      }
-
-      // If the response is not OK, log the error
-      dbgLog(
-        `Failed to fetch template from assets: ${response.status} ${response.statusText}`,
-        { forceLog: true }
-      );
-    } catch (fetchError) {
-      dbgLog(
-        `Error fetching from assets: ${
-          fetchError instanceof Error ? fetchError.message : String(fetchError)
-        }`,
-        { forceLog: true }
-      );
-      // Continue to try other methods if fetch fails
-    }
-
-    // If we get here, the template wasn't found
-    dbgLog(`Template file not found: ${contract.templatePath}`, {
-      logType: "error",
+    dbgLog(`Looking for template in assets: ${assetUrl.toString()}`, {
       forceLog: true,
     });
-    return null;
-  } catch (error) {
-    dbgLog(
-      `Error reading contract template: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-      {
-        logType: "error",
-        titleBefore: "Contract Template Error",
+
+    // Try to fetch the asset directly
+    const response = await fetch(assetUrl);
+
+    if (response.ok) {
+      dbgLog(`Found template in assets at: ${assetUrl}`, {
         forceLog: true,
-      }
+      });
+      const content = await response.text();
+      dbgLog(
+        `Fetched template content from assets: ${content.substring(0, 100)}...`,
+        { forceLog: true }
+      );
+      return content;
+    }
+
+    // If the response is not OK, throw the error
+    throw new Error(
+      `Failed to fetch template from assets: ${response.status} ${response.statusText}`
     );
-    return null;
+  } catch (fetchError) {
+    dbgLog(
+      `Error fetching from assets: ${
+        fetchError instanceof Error ? fetchError.message : String(fetchError)
+      }`,
+      { forceLog: true }
+    );
   }
+
+  // If we get here, the template wasn't found through any method
+  dbgLog(`Template file not found: ${contract.templatePath}`, {
+    logType: "error",
+    forceLog: true,
+  });
+  return null;
 }
