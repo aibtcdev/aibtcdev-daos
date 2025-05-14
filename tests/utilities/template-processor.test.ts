@@ -335,6 +335,12 @@ describe("Template Processor", () => {
       process.cwd(),
       "generated-contracts/test-output"
     );
+  
+    // Create the directory if it doesn't exist
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+  
     const outputPath = path.join(outputDir, "template-replacements.json");
     fs.writeFileSync(
       outputPath,
