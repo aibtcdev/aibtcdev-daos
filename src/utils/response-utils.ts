@@ -20,7 +20,7 @@ export function corsHeaders(origin?: string): HeadersInit {
 /**
  * Standard response format for all API responses
  */
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: {

@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Get Next Version
         id: semver
@@ -28,10 +30,33 @@ jobs:
           noNewCommitBehavior: patch
           noVersionBumpBehavior: patch
 
-      - name: Create Tag
+      - name: Update package.json version
+        run: |
+          npm version ${{ steps.semver.outputs.next }} --no-git-tag-version
+
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$PREV_TAG" ]; then
+            CHANGELOG=$(git log --pretty=format:"- %s" --no-merges)
+          else
+            CHANGELOG=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s" --no-merges)
+          fi
+          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+          echo "$CHANGELOG" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Commit package.json changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          git add package.json
+          git commit -m "chore: bump version to ${{ steps.semver.outputs.next }}"
+          git push origin main
+
+      - name: Create Tag
+        run: |
           git tag -a ${{ steps.semver.outputs.next }} -m "Release ${{ steps.semver.outputs.next }}"
           git push origin ${{ steps.semver.outputs.next }}
 
@@ -42,6 +67,6 @@ jobs:
           draft: false
           makeLatest: true
           name: ${{ steps.semver.outputs.next }}
-          body: Changelog Contents
+          body: ${{ env.CHANGELOG }}
           tag: ${{ steps.semver.outputs.next }}
           token: ${{ github.token }}

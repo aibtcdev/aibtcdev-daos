@@ -1,0 +1,31 @@
+{
+  "name": "@aibtc/types",
+  "version": "0.1.2",
+  "description": "TypeScript types for AIBTC",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "postbuild": "node scripts/restructure-dist.js",
+    "prepublishOnly": "rm -rf dist && npm run build"
+  },
+  "keywords": [
+    "aibtc",
+    "dao",
+    "api",
+    "types",
+    "stacks",
+    "bitcoin"
+  ],
+  "author": "",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
