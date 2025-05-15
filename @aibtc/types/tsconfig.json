@@ -13,6 +13,10 @@
       "utilities/*": ["utilities/*"]
     }
   },
-  "include": ["src/**/*", "../models/contract-template.ts", "../utilities/contract-types.ts"],
+  "include": [
+    "src/**/*",
+    "../models/contract-template.ts",
+    "../utilities/contract-types.ts"
+  ],
   "exclude": ["node_modules", "**/*.test.ts"]
 }
