@@ -149,10 +149,12 @@ test_api_generate_dao_contracts() {
     local valid_data='{
         "network":"devnet",
         "tokenSymbol":"DAOTST",
-        "customReplacements":{
-            "dao_manifest":"Test DAO with all contracts generated at once"
+        "customReplacements": {
+            "dao_token_metadata": "https://aibtc.dev/metadata.json",
+            "origin_address": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+            "dao_manifest": "LFG"
         }
-    }'
+    }' 
     
     # Ensure proper URL formatting
     local url
