@@ -95,7 +95,7 @@ export function processContractTemplate(
                 i + 1
               }`,
             },
-            { titleBefore: "Template Replacement Warning", forceLog: true }
+            { forceLog: true }
           );
         }
       }
@@ -118,7 +118,7 @@ export function processContractTemplate(
         originalLine,
         replacedLine: lines[variable.lineIndex],
       },
-      { titleBefore: "Template Replacement", forceLog: true }
+      { forceLog: true }
     );
   }
 
