@@ -31,7 +31,7 @@ const SET_CONFIRMATIONS = Cl.uint(4);
 const TEST_NONCE = Cl.uint(1);
 
 // Mock token contract for testing
-const mockTokenAddress = `${deployer}.unknown-token`;
+const mockTokenAddress = `${deployer}.aibtc-faktory`;
 
 describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
@@ -60,7 +60,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(receipt1.result).toBeOk(Cl.bool(false));
-    
+
     // Second confirmation doesn't execute yet
     const receipt2 = simnet.callPublicFn(
       contractAddress,
@@ -69,7 +69,7 @@ describe(`public functions: ${contractName}`, () => {
       address1
     );
     expect(receipt2.result).toBeOk(Cl.bool(false));
-    
+
     // act
     // Third confirmation reaches threshold and executes
     const receipt3 = simnet.callPublicFn(
@@ -78,10 +78,10 @@ describe(`public functions: ${contractName}`, () => {
       [TEST_NONCE, Cl.principal(address5), Cl.bool(true)],
       address2
     );
-    
+
     // assert
     expect(receipt3.result).toBeOk(Cl.bool(true));
-    
+
     // Verify the new owner was added
     const isOwner = simnet.callReadOnlyFn(
       contractAddress,
@@ -117,7 +117,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(receipt1.result).toBeOk(Cl.bool(false));
-    
+
     // Second confirmation doesn't execute yet
     const receipt2 = simnet.callPublicFn(
       contractAddress,
@@ -126,7 +126,7 @@ describe(`public functions: ${contractName}`, () => {
       address1
     );
     expect(receipt2.result).toBeOk(Cl.bool(false));
-    
+
     // act
     // Third confirmation reaches threshold and executes
     const receipt3 = simnet.callPublicFn(
@@ -136,7 +136,7 @@ describe(`public functions: ${contractName}`, () => {
       address2
     );
     expect(receipt3.result).toBeOk(Cl.bool(true));
-    
+
     // assert
     // Verify the asset was added
     const isAllowed = simnet.callReadOnlyFn(
@@ -173,7 +173,7 @@ describe(`public functions: ${contractName}`, () => {
       [assetNonce, Cl.principal(mockTokenAddress), Cl.bool(true)],
       address2
     );
-    
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -186,32 +186,32 @@ describe(`public functions: ${contractName}`, () => {
       ],
       address5
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ERR_NOT_OWNER));
   });
 
   it("transfer-dao-token() fails if asset is not allowed", () => {
     // arrange
-    const nonAllowedToken = `${deployer}.non-allowed-token`;
-    
+    const unknownToken = `${deployer}.unknown-token`;
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "transfer-dao-token",
       [
         TEST_NONCE,
-        Cl.principal(nonAllowedToken),
+        Cl.principal(unknownToken),
         Cl.uint(100),
         Cl.principal(address1),
       ],
       deployer
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ERR_ASSET_NOT_ALLOWED));
   });
-  
+
   ////////////////////////////////////////
   // set-confirmations() tests
   ////////////////////////////////////////
@@ -224,7 +224,7 @@ describe(`public functions: ${contractName}`, () => {
       [TEST_NONCE, Cl.uint(2)],
       address5
     );
-    
+
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ERR_NOT_OWNER));
   });
@@ -232,7 +232,7 @@ describe(`public functions: ${contractName}`, () => {
   it("set-confirmations() succeeds with sufficient confirmations", () => {
     // arrange
     const newConfirmationsNonce = Cl.uint(3);
-    
+
     // First confirmation creates proposal but doesn't execute
     const receipt1 = simnet.callPublicFn(
       contractAddress,
@@ -241,7 +241,7 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(receipt1.result).toBeOk(Cl.bool(false));
-    
+
     // Second confirmation doesn't execute yet
     const receipt2 = simnet.callPublicFn(
       contractAddress,
@@ -250,7 +250,7 @@ describe(`public functions: ${contractName}`, () => {
       address1
     );
     expect(receipt2.result).toBeOk(Cl.bool(false));
-    
+
     // act
     // Third confirmation reaches threshold and executes
     const receipt3 = simnet.callPublicFn(
@@ -259,10 +259,10 @@ describe(`public functions: ${contractName}`, () => {
       [newConfirmationsNonce, Cl.uint(2)],
       address2
     );
-    
+
     // assert
     expect(receipt3.result).toBeOk(Cl.bool(true));
-    
+
     // Verify the confirmations required was updated
     const confirmationsRequired = simnet.callReadOnlyFn(
       contractAddress,
@@ -431,7 +431,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const result = simnet.callReadOnlyFn(
       contractAddress,
       "is-allowed-asset",
-      [Cl.principal(deployer + ".non-allowed-token")],
+      [Cl.principal(deployer + ".unknown-token")],
       deployer
     ).result;
     // assert
@@ -469,7 +469,7 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // assert
     expect(result.type).toBe(ClarityType.Tuple);
-    
+
     if (result.type === ClarityType.Tuple) {
       const tupleData = result.value;
       expect(tupleData.self).toStrictEqual(Cl.principal(contractAddress));
@@ -477,7 +477,7 @@ describe(`read-only functions: ${contractName}`, () => {
       expect(tupleData.deployedStacksBlock).toBeDefined();
     }
   });
-  
+
   ////////////////////////////////////////
   // get-proposal-totals() tests
   ////////////////////////////////////////
@@ -490,14 +490,14 @@ describe(`read-only functions: ${contractName}`, () => {
       [Cl.uint(20), Cl.principal(address3), Cl.bool(true)],
       deployer
     );
-    
+
     simnet.callPublicFn(
       contractAddress,
       "set-asset",
       [Cl.uint(21), Cl.principal(mockTokenAddress), Cl.bool(true)],
       deployer
     );
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -505,10 +505,10 @@ describe(`read-only functions: ${contractName}`, () => {
       [],
       deployer
     ).result;
-    
+
     // assert
     expect(result.type).toBe(ClarityType.Tuple);
-    
+
     if (result.type === ClarityType.Tuple) {
       const totals = result.value;
       expect(totals.setOwner).toBeDefined();
