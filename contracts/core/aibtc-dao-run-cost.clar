@@ -468,13 +468,27 @@
 )
 
 (begin
+  ;; set initial owners
   (map-set Owners 'ST349A3QB5Z4CSTBKAG5ZJFCP5T3ABX1RZXJBQF3W true) ;; p
+  (map-set Owners 'ST2EAF5S80BZ0YBH52K4J7RMWFPWDMH01X4W8AFXS true) ;; p-a
   (map-set Owners 'ST31S76S7P99YHZK9TFYNMN6FG4A57KZ556BPRKEV true) ;; c
+  (map-set Owners 'ST1B9N1SJPRK9D3H98FWGT8AXEGH8T4BH5P38Z4ZC true) ;; c-a
   (map-set Owners 'ST3YT0XW92E6T2FE59B2G5N2WNNFSBZ6MZKQS5D18 true) ;; w
+  (map-set Owners 'ST28Q4F9XY6RAYS5AX4PD54ANQGGCZ9XCCDJB2R6S true) ;; w-a
+  (map-set Owners 'STRZ4P1ABSVSZPC4HZ4GDAW834HHEHJMF65X5S6D true) ;; d
+  (map-set Owners 'ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1 true) ;; h
+  (map-set Owners 'ST1994Y3P6ZDJX476QFSABEFE5T6YMTJT0T7RSQDW true) ;; h-a
   (map-set Owners 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM true) ;; tests
   (map-set Owners 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5 true) ;; tests
   (map-set Owners 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true) ;; tests
   (map-set Owners 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true) ;; tests
   (map-set Owners 'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND true) ;; tests
+  ;; set initial assets
+  ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_sbtc_contract
+  (map-set AllowedAssets 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
+    true
+  )
+  ;; /g/.aibtc-token/dao_token_contract
+  (map-set AllowedAssets .aibtc-faktory true)
   (print (get-contract-info))
 )
