@@ -1,6 +1,7 @@
 import { Cl, ClarityType, ClarityValue, cvToValue } from "@stacks/transactions";
 import { describe, expect, it, beforeEach, beforeAll } from "vitest";
 import { setupFullContractRegistry } from "../../../utilities/contract-registry";
+import { getSpecificAssetBalance } from "../../../utilities/asset-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -464,13 +465,8 @@ describe(`transfer functionality: ${contractName}`, () => {
     const transferNonce = Cl.uint(200);
     const transferAmount = Cl.uint(1000);
     
-    // Get initial balance
-    const initialBalance = simnet.callReadOnlyFn(
-      mockTokenAddress,
-      "get-balance",
-      [Cl.principal(address3)],
-      deployer
-    ).result;
+    // Get initial balance using asset helpers
+    const initialBalance = getSpecificAssetBalance(address3, mockTokenAddress) || 0n;
     
     // First confirmation creates proposal but doesn't execute
     const receipt1 = simnet.callPublicFn(
@@ -514,18 +510,12 @@ describe(`transfer functionality: ${contractName}`, () => {
     );
     expect(receipt3.result).toBeOk(Cl.bool(true));
     
-    // Verify the tokens were transferred
-    const finalBalance = simnet.callReadOnlyFn(
-      mockTokenAddress,
-      "get-balance",
-      [Cl.principal(address3)],
-      deployer
-    ).result;
+    // Verify the tokens were transferred using asset helpers
+    const finalBalance = getSpecificAssetBalance(address3, mockTokenAddress);
+    const initialBalanceValue = initialBalance.type === ClarityType.UInt ? initialBalance.value : 0n;
     
     // Check that the balance increased by the transfer amount
-    if (initialBalance.type === ClarityType.UInt && finalBalance.type === ClarityType.UInt) {
-      expect(finalBalance.value).toEqual(initialBalance.value + transferAmount.value);
-    }
+    expect(finalBalance).toEqual(initialBalanceValue + BigInt(transferAmount.value));
   });
 });
 
