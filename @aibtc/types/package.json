@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "postbuild": "node scripts/restructure-dist.js",
     "prepublishOnly": "rm -rf dist && npm run build"
   },
   "keywords": [
