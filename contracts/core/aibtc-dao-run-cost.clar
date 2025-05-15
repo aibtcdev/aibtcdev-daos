@@ -26,12 +26,14 @@
 (define-constant DEPLOYED_STACKS_BLOCK stacks-block-height)
 (define-constant SELF (as-contract tx-sender))
 
-;; possible actions and parameters
-
+;; possible actions
 (define-constant SET_OWNER u1)
 (define-constant SET_ASSET u2)
 (define-constant TRANSFER u3)
 (define-constant SET_CONFIRMATIONS u4)
+
+;; proposal expiration
+(define-constant PROPOSAL_EXPIRATION u48) ;; 48 blocks / 8 hours
 
 ;; data vars
 ;;
@@ -59,6 +61,7 @@
     who: principal, ;; owner
     status: bool, ;; enabled
     executed: bool, ;; executed
+    created: uint, ;; block height
   }
 )
 
@@ -67,6 +70,7 @@
   {
     token: principal, ;; asset contract
     enabled: bool, ;; enabled
+    created: uint, ;; block height
   }
 )
 
@@ -76,6 +80,7 @@
     ft: principal, ;; asset contract
     amount: uint, ;; amount
     to: principal, ;; recipient
+    created: uint, ;; block height
   }
 )
 
@@ -84,6 +89,7 @@
   {
     required: uint, ;; new confirmation threshold
     executed: bool, ;; executed
+    created: uint, ;; block height
   }
 )
 
@@ -124,6 +130,7 @@
       who: who,
       status: status,
       executed: false,
+      created: burn-block-height,
     })
     (print {
       notification: "dao-run-cost/set-owner",
@@ -150,6 +157,7 @@
     (map-insert SetAssetProposals nonce {
       token: token,
       enabled: enabled,
+      created: burn-block-height,
     })
     (print {
       notification: "dao-run-cost/set-asset",
@@ -179,6 +187,7 @@
       ft: (contract-of ft),
       amount: amount,
       to: to,
+      created: burn-block-height,
     })
     (print {
       notification: "dao-run-cost/transfer-dao-token",
@@ -207,6 +216,7 @@
     (map-insert SetConfirmationsProposals nonce {
       required: required,
       executed: false,
+      created: burn-block-height,
     })
     (print {
       notification: "dao-run-cost/set-confirmations",
@@ -340,6 +350,10 @@
   )
 )
 
+(define-private (can-execute (height uint))
+  (>= height (+ burn-block-height PROPOSAL_EXPIRATION))
+)
+
 (define-private (execute-set-owner (nonce uint))
   (let (
       (proposal (map-get? SetOwnerProposals nonce))
@@ -351,6 +365,7 @@
       who: (get who proposalDetails),
       status: (get status proposalDetails),
       executed: true,
+      created: burn-block-height,
     })
     (map-set Owners (get who proposalDetails) (get status proposalDetails))
   )
@@ -391,14 +406,15 @@
       (proposal (map-get? SetConfirmationsProposals nonce))
       (proposalDetails (unwrap! proposal false))
     )
+    (can-execute (get created proposalDetails))
     (asserts! (is-some proposal) false)
     (asserts! (is-eq (get executed proposalDetails) false) false)
     (map-set SetConfirmationsProposals nonce {
       required: (get required proposalDetails),
       executed: true,
+      created: burn-block-height,
     })
     (var-set confirmationsRequired (get required proposalDetails))
-    true
   )
 )
 
