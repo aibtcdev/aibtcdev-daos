@@ -135,16 +135,22 @@
   )
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
+    (var-set setAssetProposalsTotal (+ (var-get setAssetProposalsTotal) u1))
+    (map-insert SetAssetProposals nonce {
+      token: token,
+      enabled: enabled,
+    })
     (print {
       notification: "dao-run-cost/set-asset",
       payload: {
+        nonce: nonce,
         token: token,
         enabled: enabled,
         contractCaller: contract-caller,
         txSender: tx-sender,
       },
     })
-    (ok (and (is-confirmed SET_ASSET nonce) (map-set AllowedAssets token enabled)))
+    (ok (and (is-confirmed SET_ASSET nonce) (execute-set-asset nonce)))
   )
 )
 
@@ -157,9 +163,16 @@
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
     (asserts! (is-allowed-asset (contract-of ft)) ERR_ASSET_NOT_ALLOWED)
+    (var-set transferProposalsTotal (+ (var-get transferProposalsTotal) u1))
+    (map-insert TransferProposals nonce {
+      ft: (contract-of ft),
+      amount: amount,
+      to: to,
+    })
     (print {
       notification: "dao-run-cost/transfer-dao-token",
       payload: {
+        nonce: nonce,
         amount: amount,
         recipient: to,
         assetContract: (contract-of ft),
@@ -167,7 +180,7 @@
         txSender: tx-sender,
       },
     })
-    (ok (and (is-confirmed TRANSFER nonce) (try! (as-contract (contract-call? ft transfer amount SELF to none)))))
+    (ok (and (is-confirmed TRANSFER nonce) (execute-transfer nonce ft)))
   )
 )
 
@@ -298,6 +311,30 @@
       executed: true,
     })
     (map-set Owners (get who proposalDetails) (get status proposalDetails))
+  )
+)
+
+(define-private (execute-set-asset (nonce uint))
+  (let (
+      (proposal (map-get? SetAssetProposals nonce))
+      (proposalDetails (unwrap! proposal false))
+    )
+    (asserts! (is-some proposal) false)
+    (map-set AllowedAssets (get token proposalDetails) (get enabled proposalDetails))
+  )
+)
+
+(define-private (execute-transfer (nonce uint) (ft <sip010-trait>))
+  (let (
+      (proposal (map-get? TransferProposals nonce))
+      (proposalDetails (unwrap! proposal false))
+    )
+    (asserts! (is-some proposal) false)
+    (as-contract (contract-call? ft transfer 
+      (get amount proposalDetails) 
+      SELF 
+      (get to proposalDetails) 
+      none))
   )
 )
 
