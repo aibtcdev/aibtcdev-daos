@@ -320,21 +320,27 @@
       (proposalDetails (unwrap! proposal false))
     )
     (asserts! (is-some proposal) false)
-    (map-set AllowedAssets (get token proposalDetails) (get enabled proposalDetails))
+    (map-set AllowedAssets (get token proposalDetails)
+      (get enabled proposalDetails)
+    )
   )
 )
 
-(define-private (execute-transfer (nonce uint) (ft <sip010-trait>))
+(define-private (execute-transfer
+    (nonce uint)
+    (ft <sip010-trait>)
+  )
   (let (
       (proposal (map-get? TransferProposals nonce))
       (proposalDetails (unwrap! proposal false))
     )
     (asserts! (is-some proposal) false)
-    (as-contract (contract-call? ft transfer 
-      (get amount proposalDetails) 
-      SELF 
-      (get to proposalDetails) 
-      none))
+    (unwrap!
+      (as-contract (contract-call? ft transfer (get amount proposalDetails) SELF
+        (get to proposalDetails) none
+      ))
+      false
+    )
   )
 )
 
