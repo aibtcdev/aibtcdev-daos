@@ -16,12 +16,14 @@ export function generateTemplateReplacements(
   // Always use "aibtc" for template keys since that's what's in the template files
   const templateKeySymbol = "aibtc";
 
+  const symbol = tokenSymbol.toLowerCase();
+
   // Base replacements
   const replacements: Record<string, string> = {
     // Token info
-    [`${templateKeySymbol}/dao_token_symbol`]: tokenSymbol,
-    [`dao_token_symbol`]: tokenSymbol,
-    [`dao_token_name`]: tokenSymbol,
+    [`${templateKeySymbol}/dao_token_symbol`]: symbol,
+    [`dao_token_symbol`]: symbol,
+    [`dao_token_name`]: symbol,
     [`dao_token_decimals`]: "8",
 
     // Account addresses
@@ -71,37 +73,37 @@ export function generateTemplateReplacements(
     [`.dao-run-cost/base_contract_dao_run_cost`]: `.aibtc-dao-run-cost`,
 
     // Contract references with full paths for template matching
-    [`.aibtc-faktory/dao_contract_token`]: `.${tokenSymbol}-faktory`,
-    [`.aibtc-faktory-dex/dao_contract_token_dex`]: `.${tokenSymbol}-faktory-dex`,
-    [`.aibtc-base-dao/dao_contract_base`]: `.${tokenSymbol}-base-dao`,
-    [`.aibtc-treasury/dao_contract_treasury`]: `.${tokenSymbol}-treasury`,
-    [`.aibtc-dao-users/dao_contract_users`]: `.${tokenSymbol}-dao-users`,
-    [`.aibtc-action-proposal-voting/dao_contract_action_proposal_voting`]: `.${tokenSymbol}-action-proposal-voting`,
-    [`.aibtc-dao-charter/dao_contract_charter`]: `.${tokenSymbol}-dao-charter`,
-    [`.aibtc-dao-epoch/dao_contract_epoch`]: `.${tokenSymbol}-dao-epoch`,
-    [`.aibtc-onchain-messaging/dao_contract_messaging`]: `.${tokenSymbol}-onchain-messaging`,
-    [`.aibtc-token-owner/dao_contract_token_owner`]: `.${tokenSymbol}-token-owner`,
-    [`.aibtc-token-owner/dao_token_owner_contract`]: `.${tokenSymbol}-token-owner`,
-    [`.aibtc-action-send-message/dao_action_send_message`]: `.${tokenSymbol}-action-send-message`,
-    [`.aibtc-action-send-message/dao_action_send_message_contract`]: `.${tokenSymbol}-action-send-message`,
-    [`.aibtc-rewards-account/dao_contract_rewards_account`]: `.${tokenSymbol}-rewards-account`,
+    [`.aibtc-faktory/dao_contract_token`]: `.${symbol}-faktory`,
+    [`.aibtc-faktory-dex/dao_contract_token_dex`]: `.${symbol}-faktory-dex`,
+    [`.aibtc-base-dao/dao_contract_base`]: `.${symbol}-base-dao`,
+    [`.aibtc-treasury/dao_contract_treasury`]: `.${symbol}-treasury`,
+    [`.aibtc-dao-users/dao_contract_users`]: `.${symbol}-dao-users`,
+    [`.aibtc-action-proposal-voting/dao_contract_action_proposal_voting`]: `.${symbol}-action-proposal-voting`,
+    [`.aibtc-dao-charter/dao_contract_charter`]: `.${symbol}-dao-charter`,
+    [`.aibtc-dao-epoch/dao_contract_epoch`]: `.${symbol}-dao-epoch`,
+    [`.aibtc-onchain-messaging/dao_contract_messaging`]: `.${symbol}-onchain-messaging`,
+    [`.aibtc-token-owner/dao_contract_token_owner`]: `.${symbol}-token-owner`,
+    [`.aibtc-token-owner/dao_token_owner_contract`]: `.${symbol}-token-owner`,
+    [`.aibtc-action-send-message/dao_action_send_message`]: `.${symbol}-action-send-message`,
+    [`.aibtc-action-send-message/dao_action_send_message_contract`]: `.${symbol}-action-send-message`,
+    [`.aibtc-rewards-account/dao_contract_rewards_account`]: `.${symbol}-rewards-account`,
 
     // Contract references with simplified keys
-    [`dao_contract_token`]: `.${tokenSymbol}-faktory`,
-    [`dao_contract_token_dex`]: `.${tokenSymbol}-faktory-dex`,
-    [`dao_contract_base`]: `.${tokenSymbol}-base-dao`,
-    [`dao_contract_treasury`]: `.${tokenSymbol}-treasury`,
-    [`dao_contract_users`]: `.${tokenSymbol}-dao-users`,
-    [`dao_contract_action_proposal_voting`]: `.${tokenSymbol}-action-proposal-voting`,
-    [`dao_contract_charter`]: `.${tokenSymbol}-dao-charter`,
-    [`dao_contract_epoch`]: `.${tokenSymbol}-dao-epoch`,
-    [`dao_contract_messaging`]: `.${tokenSymbol}-onchain-messaging`,
-    [`dao_contract_token_owner`]: `.${tokenSymbol}-token-owner`,
-    [`dao_token_owner_contract`]: `.${tokenSymbol}-token-owner`,
-    [`dao_action_send_message`]: `.${tokenSymbol}-action-send-message`,
-    [`dao_action_send_message_contract`]: `.${tokenSymbol}-action-send-message`,
+    [`dao_contract_token`]: `.${symbol}-faktory`,
+    [`dao_contract_token_dex`]: `.${symbol}-faktory-dex`,
+    [`dao_contract_base`]: `.${symbol}-base-dao`,
+    [`dao_contract_treasury`]: `.${symbol}-treasury`,
+    [`dao_contract_users`]: `.${symbol}-dao-users`,
+    [`dao_contract_action_proposal_voting`]: `.${symbol}-action-proposal-voting`,
+    [`dao_contract_charter`]: `.${symbol}-dao-charter`,
+    [`dao_contract_epoch`]: `.${symbol}-dao-epoch`,
+    [`dao_contract_messaging`]: `.${symbol}-onchain-messaging`,
+    [`dao_contract_token_owner`]: `.${symbol}-token-owner`,
+    [`dao_token_owner_contract`]: `.${symbol}-token-owner`,
+    [`dao_action_send_message`]: `.${symbol}-action-send-message`,
+    [`dao_action_send_message_contract`]: `.${symbol}-action-send-message`,
     [`base_contract_dao_run_cost`]: `.aibtc-dao-run-cost`,
-    [`dao_contract_rewards_account`]: `.${tokenSymbol}-rewards-account`,
+    [`dao_contract_rewards_account`]: `.${symbol}-rewards-account`,
 
     // External contracts
     [`sbtc_contract`]: `'${addresses.SBTC}`,
@@ -109,7 +111,7 @@ export function generateTemplateReplacements(
     [`base_contract_sbtc`]: `'${addresses.SBTC}`,
 
     // Configuration values
-    [`dao_manifest`]: `The mission of the ${tokenSymbol} is to...`,
+    [`dao_manifest`]: `The mission of the ${symbol} is to...`,
   };
 
   // Merge with custom replacements
