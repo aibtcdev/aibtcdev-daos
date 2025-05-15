@@ -88,14 +88,10 @@ export function processContractTemplate(
         } else {
           // Log a warning if we couldn't find the target line
           dbgLog(
-            {
-              action: "template_replacement_warning",
-              key: valueKey,
-              message: `Could not find target line containing key '${replacementKey}' for comment at line ${
-                i + 1
-              }`,
-            },
-            { forceLog: true }
+            `Could not find target line containing key '${replacementKey}' for comment at line ${
+              i + 1
+            }`,
+            { logType: "error", forceLog: true }
           );
         }
       }
@@ -111,15 +107,12 @@ export function processContractTemplate(
     );
 
     // Debug log the replacement
-    dbgLog(
-      {
-        action: "template_replacement",
-        key: variable.replacementKey,
-        originalLine,
-        replacedLine: lines[variable.lineIndex],
-      },
-      { forceLog: true }
-    );
+    dbgLog({
+      action: "template_replacement",
+      key: variable.replacementKey,
+      originalLine,
+      replacedLine: lines[variable.lineIndex],
+    });
   }
 
   // Third pass: build the output, skipping marked lines
@@ -164,11 +157,11 @@ export async function getContractTemplateContent(
       "contracts",
       contract.templatePath
     );
-    dbgLog(`Looking for template locally: ${localPath}`, { forceLog: true });
+    dbgLog(`Looking for template locally: ${localPath}`);
 
     // Check if file exists locally
     if (fs.existsSync(localPath)) {
-      dbgLog(`Found template locally at: ${localPath}`, { forceLog: true });
+      dbgLog(`Found template locally at: ${localPath}`);
       const content = await fs.promises.readFile(localPath, "utf-8");
       return content;
     }
@@ -176,8 +169,7 @@ export async function getContractTemplateContent(
     dbgLog(
       `Error reading local template: ${
         fsError instanceof Error ? fsError.message : String(fsError)
-      }`,
-      { forceLog: true }
+      }`
     );
   }
 
@@ -194,19 +186,6 @@ export async function getContractTemplateContent(
       const request = new Request(assetUrl);
       const response = await env.AIBTC_ASSETS.fetch(request);
 
-      dbgLog(
-        {
-          debug: {
-            action: "fetch_template",
-            url: assetUrl,
-            isOk: response.ok,
-            status: response.status,
-            statusText: response.statusText,
-          },
-        },
-        { forceLog: true }
-      );
-
       if (response.ok) {
         dbgLog(`Found template in assets at: ${assetUrl}`);
         const content = await response.text();
@@ -214,8 +193,7 @@ export async function getContractTemplateContent(
           `Fetched template content from assets: ${content.substring(
             0,
             100
-          )}...`,
-          { forceLog: true }
+          )}...`
         );
         return content;
       }
@@ -225,16 +203,13 @@ export async function getContractTemplateContent(
         `Failed to fetch template from assets: ${assetUrl} ${response.status} ${response.statusText}`
       );
     } else {
-      dbgLog("AIBTC_ASSETS environment binding is not available", {
-        forceLog: true,
-      });
+      dbgLog("AIBTC_ASSETS environment binding is not available");
     }
   } catch (fetchError) {
     dbgLog(
       `Error fetching from assets: ${
         fetchError instanceof Error ? fetchError.message : String(fetchError)
-      }`,
-      { forceLog: true }
+      }`
     );
   }
 
