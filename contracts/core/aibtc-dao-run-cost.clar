@@ -359,6 +359,7 @@
       (proposal (map-get? SetOwnerProposals nonce))
       (proposalDetails (unwrap! proposal false))
     )
+    (asserts! (can-execute (get created proposalDetails)) false)
     (asserts! (is-some proposal) false)
     (asserts! (is-eq (get executed proposalDetails) false) false)
     (map-set SetOwnerProposals nonce {
@@ -366,6 +367,18 @@
       status: (get status proposalDetails),
       executed: true,
       created: burn-block-height,
+    })
+    (print {
+      notification: "dao-run-cost/execute-set-owner",
+      payload: {
+        nonce: nonce,
+        who: (get who proposalDetails),
+        status: (get status proposalDetails),
+        executed: true,
+        created: (get created proposalDetails),
+        contractCaller: contract-caller,
+        txSender: tx-sender,
+      },
     })
     (map-set Owners (get who proposalDetails) (get status proposalDetails))
   )
@@ -376,7 +389,19 @@
       (proposal (map-get? SetAssetProposals nonce))
       (proposalDetails (unwrap! proposal false))
     )
+    (asserts! (can-execute (get created proposalDetails)) false)
     (asserts! (is-some proposal) false)
+    (print {
+      notification: "dao-run-cost/execute-set-asset",
+      payload: {
+        nonce: nonce,
+        token: (get token proposalDetails),
+        enabled: (get enabled proposalDetails),
+        created: (get created proposalDetails),
+        contractCaller: contract-caller,
+        txSender: tx-sender,
+      },
+    })
     (map-set AllowedAssets (get token proposalDetails)
       (get enabled proposalDetails)
     )
@@ -391,7 +416,20 @@
       (proposal (map-get? TransferProposals nonce))
       (proposalDetails (unwrap! proposal false))
     )
+    (asserts! (can-execute (get created proposalDetails)) false)
     (asserts! (is-some proposal) false)
+    (print {
+      notification: "dao-run-cost/execute-transfer",
+      payload: {
+        nonce: nonce,
+        amount: (get amount proposalDetails),
+        recipient: (get to proposalDetails),
+        assetContract: (get ft proposalDetails),
+        created: (get created proposalDetails),
+        contractCaller: contract-caller,
+        txSender: tx-sender,
+      },
+    })
     (unwrap!
       (as-contract (contract-call? ft transfer (get amount proposalDetails) SELF
         (get to proposalDetails) none
@@ -406,13 +444,24 @@
       (proposal (map-get? SetConfirmationsProposals nonce))
       (proposalDetails (unwrap! proposal false))
     )
-    (can-execute (get created proposalDetails))
+    (asserts! (can-execute (get created proposalDetails)) false)
     (asserts! (is-some proposal) false)
     (asserts! (is-eq (get executed proposalDetails) false) false)
     (map-set SetConfirmationsProposals nonce {
       required: (get required proposalDetails),
       executed: true,
       created: burn-block-height,
+    })
+    (print {
+      notification: "dao-run-cost/execute-set-confirmations",
+      payload: {
+        nonce: nonce,
+        required: (get required proposalDetails),
+        executed: true,
+        created: (get created proposalDetails),
+        contractCaller: contract-caller,
+        txSender: tx-sender,
+      },
     })
     (var-set confirmationsRequired (get required proposalDetails))
   )
