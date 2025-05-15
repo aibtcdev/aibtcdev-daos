@@ -16,16 +16,12 @@ export function generateTemplateReplacements(
   // Always use "aibtc" for template keys since that's what's in the template files
   const templateKeySymbol = "aibtc";
 
-  // But use the provided tokenSymbol for the actual values
-  const displaySymbol = tokenSymbol.toUpperCase();
-  const daoTokenSymbol = `${displaySymbol}•AIBTC•DAO`;
-
   // Base replacements
   const replacements: Record<string, string> = {
     // Token info
-    [`${templateKeySymbol}/dao_token_symbol`]: displaySymbol,
-    [`dao_token_symbol`]: daoTokenSymbol,
-    [`dao_token_name`]: daoTokenSymbol,
+    [`${templateKeySymbol}/dao_token_symbol`]: tokenSymbol,
+    [`dao_token_symbol`]: tokenSymbol,
+    [`dao_token_name`]: tokenSymbol,
     [`dao_token_decimals`]: "8",
 
     // Account addresses
@@ -113,7 +109,7 @@ export function generateTemplateReplacements(
     [`base_contract_sbtc`]: `'${addresses.SBTC}`,
 
     // Configuration values
-    [`dao_manifest`]: `The mission of the ${daoTokenSymbol} is to...`,
+    [`dao_manifest`]: `The mission of the ${tokenSymbol} is to...`,
   };
 
   // Merge with custom replacements
