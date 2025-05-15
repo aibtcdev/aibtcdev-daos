@@ -5,7 +5,7 @@
 ;; funds are transferred to this contract every time a proposal is created
 ;; will be a mix of several different dao tokens over time
 ;;
-;; only allows withdrawal with 3-of-5 approval from an approved list of addresses
+;; only allows withdrawal with 3-of-N approval from an approved list of addresses
 ;; an approved address can add/remove other addresses with quorum
 
 ;; traits
@@ -26,7 +26,8 @@
 (define-constant DEPLOYED_STACKS_BLOCK stacks-block-height)
 (define-constant SELF (as-contract tx-sender))
 
-;; possible actions
+;; possible actions and parameters
+
 (define-constant SET_OWNER u1)
 (define-constant SET_ASSET u2)
 (define-constant TRANSFER u3)
@@ -34,41 +35,67 @@
 ;; data vars
 ;;
 
-(define-data-var confirmationId uint u0)
-(define-data-var confirmationsRequired uint u3) ;; 3 of 5
+;; 3 of N confirmations required
+(define-data-var confirmationsRequired uint u3)
+
+;; variables to track total proposals, used for nonces
+(define-data-var setOwnerProposalsTotal uint u0)
+(define-data-var setAssetProposalsTotal uint u0)
+(define-data-var transferProposalsTotal uint u0)
 
 ;; data maps
 ;;
 
 (define-map Owners
-  principal
-  bool
+  principal ;; owner
+  bool ;; enabled
 )
+
+(define-map SetOwnerProposals
+  uint ;; nonce
+  {
+    who: principal, ;; owner
+    status: bool, ;; enabled
+  }
+)
+
+(define-map SetAssetProposals
+  uint ;; nonce
+  {
+    token: principal, ;; asset contract
+    enabled: bool, ;; enabled
+  }
+)
+
+(define-map TransferProposals
+  uint ;; nonce
+  {
+    ft: principal, ;; asset contract
+    amount: uint, ;; amount
+    to: principal, ;; recipient
+  }
+)
+
 (define-map OwnerConfirmations
   {
-    id: uint,
-    nonce: uint,
-    owner: principal,
+    id: uint, ;; action id
+    nonce: uint, ;; action nonce
+    owner: principal, ;; owner
   }
-  bool
+  bool ;; confirmed
 )
-(define-map ConfirmationNonces
-  {
-    id: uint,
-    nonce: uint,
-  }
-  bool
-)
+
 (define-map TotalConfirmations
   {
-    id: uint,
-    nonce: uint,
+    id: uint, ;; action id
+    nonce: uint, ;; action nonce
   }
-  uint
+  uint ;; total confirmations
 )
+
 (define-map AllowedAssets
-  principal
-  bool
+  principal ;; asset contract
+  bool ;; enabled
 )
 
 ;; public functions
@@ -140,19 +167,46 @@
 ;; read only functions
 ;;
 
-(define-read-only (is-owner (who principal))
-  (default-to false (map-get? Owners who))
-)
-
-(define-read-only (get-current-id)
-  (var-get confirmationId)
-)
-
 (define-read-only (get-confirmations-required)
   (var-get confirmationsRequired)
 )
 
-(define-read-only (has-confirmed
+(define-read-only (get-proposal-totals)
+  {
+    setOwner: (var-get setOwnerProposalsTotal),
+    setAsset: (var-get setAssetProposalsTotal),
+    transfer: (var-get transferProposalsTotal),
+  }
+)
+
+(define-read-only (is-owner (who principal))
+  (default-to false (map-get? Owners who))
+)
+
+(define-read-only (get-set-owner-proposal (nonce uint))
+  (map-get? SetOwnerProposals nonce)
+)
+
+(define-read-only (get-set-asset-proposal (nonce uint))
+  (map-get? SetAssetProposals nonce)
+)
+
+(define-read-only (get-transfer-proposal (nonce uint))
+  (map-get? TransferProposals nonce)
+)
+
+(define-read-only (get-owner-confirmations
+    (id uint)
+    (nonce uint)
+  )
+  (map-get? OwnerConfirmations {
+    id: id,
+    nonce: nonce,
+    owner: contract-caller,
+  })
+)
+
+(define-read-only (owner-has-confirmed
     (id uint)
     (nonce uint)
     (who principal)
@@ -166,7 +220,7 @@
   )
 )
 
-(define-read-only (get-confirmations
+(define-read-only (get-total-confirmations
     (id uint)
     (nonce uint)
   )
@@ -178,12 +232,12 @@
   )
 )
 
-(define-read-only (is-allowed-asset (assetContract principal))
-  (default-to false (get-allowed-asset assetContract))
-)
-
 (define-read-only (get-allowed-asset (assetContract principal))
   (map-get? AllowedAssets assetContract)
+)
+
+(define-read-only (is-allowed-asset (assetContract principal))
+  (default-to false (get-allowed-asset assetContract))
 )
 
 (define-read-only (get-contract-info)
@@ -197,14 +251,13 @@
 ;; private functions
 ;;
 
-;; TODO: needs nonce tracking (last nonce per ID) to prevent arbitrary values
-;; or a better way to track confirmations for each action
+;; tracks confirmations for a given action
 (define-private (is-confirmed
     (id uint)
     (nonce uint)
   )
-  (let ((confirmations (+ (get-confirmations id nonce)
-      (if (has-confirmed id nonce contract-caller)
+  (let ((confirmations (+ (get-total-confirmations id nonce)
+      (if (owner-has-confirmed id nonce contract-caller)
         u0
         u1
       ))))
@@ -225,8 +278,11 @@
   )
 )
 
-(map-set Owners 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM true) 
-(map-set Owners 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5 true) 
-(map-set Owners 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true) 
-(map-set Owners 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true) 
-(map-set Owners 'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND true)
+(begin
+  (map-set Owners 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM true)
+  (map-set Owners 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5 true)
+  (map-set Owners 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true)
+  (map-set Owners 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true)
+  (map-set Owners 'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND true)
+  (print (get-contract-info))
+)
