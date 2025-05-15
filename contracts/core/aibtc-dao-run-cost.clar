@@ -351,7 +351,7 @@
 )
 
 (define-private (can-execute (height uint))
-  (>= height (+ burn-block-height PROPOSAL_EXPIRATION))
+  (< burn-block-height (+ height PROPOSAL_EXPIRATION))
 )
 
 (define-private (execute-set-owner (nonce uint))
