@@ -1,8 +1,9 @@
-import { Cl, ClarityType, ClarityValue, cvToValue } from "@stacks/transactions";
+import { Cl, ClarityType } from "@stacks/transactions";
 import { describe, expect, it, beforeEach, beforeAll } from "vitest";
 import { setupFullContractRegistry } from "../../../utilities/contract-registry";
 import { getSpecificAssetBalance } from "../../../utilities/asset-helpers";
-import { getDaoTokens } from "../../../utilities/dao-helpers";
+import { DAO_TOKEN_ASSETS_MAP } from "../../../utilities/contract-helpers";
+import { fundVoters, getDaoTokens } from "../../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -283,7 +284,7 @@ describe(`proposal expiration: ${contractName}`, () => {
   it("proposals cannot be executed after expiration period", () => {
     // arrange
     const nonce = Cl.uint(100);
-    
+
     // Create a proposal
     const receipt1 = simnet.callPublicFn(
       contractAddress,
@@ -292,7 +293,7 @@ describe(`proposal expiration: ${contractName}`, () => {
       deployer
     );
     expect(receipt1.result).toBeOk(Cl.bool(false));
-    
+
     // Add more confirmations but don't execute yet
     const receipt2 = simnet.callPublicFn(
       contractAddress,
@@ -301,10 +302,10 @@ describe(`proposal expiration: ${contractName}`, () => {
       address1
     );
     expect(receipt2.result).toBeOk(Cl.bool(false));
-    
+
     // Advance blocks past expiration
     simnet.mineEmptyBlocks(PROPOSAL_EXPIRATION + 1);
-    
+
     // Try to execute with final confirmation
     const receipt3 = simnet.callPublicFn(
       contractAddress,
@@ -312,10 +313,10 @@ describe(`proposal expiration: ${contractName}`, () => {
       [nonce, Cl.principal(address5), Cl.bool(true)],
       address2
     );
-    
+
     // Should still be ok but execution should fail (returns false)
     expect(receipt3.result).toBeOk(Cl.bool(false));
-    
+
     // Verify the owner was not added
     const isOwner = simnet.callReadOnlyFn(
       contractAddress,
@@ -325,11 +326,11 @@ describe(`proposal expiration: ${contractName}`, () => {
     ).result;
     expect(isOwner).toStrictEqual(Cl.bool(false));
   });
-  
+
   it("confirmations can still be added after expiration but execution fails", () => {
     // arrange
     const nonce = Cl.uint(101);
-    
+
     // Create a proposal
     simnet.callPublicFn(
       contractAddress,
@@ -337,10 +338,10 @@ describe(`proposal expiration: ${contractName}`, () => {
       [nonce, Cl.principal(address5), Cl.bool(true)],
       deployer
     );
-    
+
     // Advance blocks past expiration
     simnet.mineEmptyBlocks(PROPOSAL_EXPIRATION + 1);
-    
+
     // Add more confirmations
     const receipt2 = simnet.callPublicFn(
       contractAddress,
@@ -349,7 +350,7 @@ describe(`proposal expiration: ${contractName}`, () => {
       address1
     );
     expect(receipt2.result).toBeOk(Cl.bool(false));
-    
+
     // Verify confirmation was recorded
     const hasConfirmed = simnet.callReadOnlyFn(
       contractAddress,
@@ -358,7 +359,7 @@ describe(`proposal expiration: ${contractName}`, () => {
       deployer
     ).result;
     expect(hasConfirmed).toStrictEqual(Cl.bool(true));
-    
+
     // Verify total confirmations increased
     const totalConfirmations = simnet.callReadOnlyFn(
       contractAddress,
@@ -374,7 +375,7 @@ describe(`edge cases: ${contractName}`, () => {
   it("cannot execute a proposal that doesn't exist", () => {
     // arrange
     const nonExistentNonce = Cl.uint(999);
-    
+
     // Try to execute a non-existent proposal by adding the final confirmation
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -382,15 +383,15 @@ describe(`edge cases: ${contractName}`, () => {
       [nonExistentNonce, Cl.principal(address5), Cl.bool(true)],
       deployer
     );
-    
+
     // Should be ok but execution should fail (returns false)
     expect(receipt.result).toBeOk(Cl.bool(false));
   });
-  
+
   it("cannot execute an already executed proposal", () => {
     // arrange
     const nonce = Cl.uint(102);
-    
+
     // Create and execute a proposal
     simnet.callPublicFn(
       contractAddress,
@@ -410,7 +411,7 @@ describe(`edge cases: ${contractName}`, () => {
       [nonce, Cl.principal(address5), Cl.bool(true)],
       address2
     );
-    
+
     // Try to execute again with a different value
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -418,7 +419,7 @@ describe(`edge cases: ${contractName}`, () => {
       [nonce, Cl.principal(address5), Cl.bool(false)],
       address3
     );
-    
+
     // Should be ok but execution should fail (returns false)
     expect(receipt.result).toBeOk(Cl.bool(false));
   });
@@ -428,16 +429,16 @@ describe(`contract initialization: ${contractName}`, () => {
   it("initial owners are correctly set up", () => {
     // Check that the initial owners from the contract are set up correctly
     const initialOwners = [
-      'ST349A3QB5Z4CSTBKAG5ZJFCP5T3ABX1RZXJBQF3W', // p
-      'ST31S76S7P99YHZK9TFYNMN6FG4A57KZ556BPRKEV', // c
-      'ST3YT0XW92E6T2FE59B2G5N2WNNFSBZ6MZKQS5D18', // w
-      'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM', // tests
-      'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5', // tests
-      'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG', // tests
-      'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC', // tests
-      'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND'   // tests
+      "ST349A3QB5Z4CSTBKAG5ZJFCP5T3ABX1RZXJBQF3W", // p
+      "ST31S76S7P99YHZK9TFYNMN6FG4A57KZ556BPRKEV", // c
+      "ST3YT0XW92E6T2FE59B2G5N2WNNFSBZ6MZKQS5D18", // w
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM", // tests
+      "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5", // tests
+      "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG", // tests
+      "ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC", // tests
+      "ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND", // tests
     ];
-    
+
     for (const owner of initialOwners) {
       const isOwner = simnet.callReadOnlyFn(
         contractAddress,
@@ -451,65 +452,85 @@ describe(`contract initialization: ${contractName}`, () => {
 });
 
 describe(`transfer functionality: ${contractName}`, () => {
-  
   it("transfer-dao-token successfully transfers tokens when confirmed", () => {
     // arrange
-    const transferNonce = Cl.uint(200);
-    const transferAmount = Cl.uint(1000);
-    
-    // Fund the contract with tokens
-    getDaoTokens(contractAddress, 1000000);
-    
-    // Get initial balance using asset helpers
-    const initialBalance = getSpecificAssetBalance(address3, mockTokenAddress) || 0n;
-    
+    const satsAmount = 1000000;
+    const transferNonce = 200;
+    const transferAmount = 1000;
+
+    const initialBalance = getSpecificAssetBalance(
+      address3,
+      DAO_TOKEN_ASSETS_MAP
+    );
+
+    getDaoTokens(deployer, satsAmount);
+
+    // transfer dao tokens to the contract
+    const transferReceipt = simnet.callPublicFn(
+      mockTokenAddress,
+      "transfer",
+      [
+        Cl.uint(transferAmount),
+        Cl.principal(deployer),
+        Cl.principal(contractAddress),
+        Cl.none(),
+      ],
+      deployer
+    );
+    expect(transferReceipt.result).toBeOk(Cl.bool(true));
+
     // First confirmation creates proposal but doesn't execute
     const receipt1 = simnet.callPublicFn(
       contractAddress,
       "transfer-dao-token",
       [
-        transferNonce,
+        Cl.uint(transferNonce),
         Cl.principal(mockTokenAddress),
-        transferAmount,
+        Cl.uint(transferAmount),
         Cl.principal(address3),
       ],
       deployer
     );
     expect(receipt1.result).toBeOk(Cl.bool(false));
-    
+
     // Second confirmation doesn't execute yet
     const receipt2 = simnet.callPublicFn(
       contractAddress,
       "transfer-dao-token",
       [
-        transferNonce,
+        Cl.uint(transferNonce),
         Cl.principal(mockTokenAddress),
-        transferAmount,
+        Cl.uint(transferAmount),
         Cl.principal(address3),
       ],
       address1
     );
     expect(receipt2.result).toBeOk(Cl.bool(false));
-    
+
     // Third confirmation reaches threshold and executes
     const receipt3 = simnet.callPublicFn(
       contractAddress,
       "transfer-dao-token",
       [
-        transferNonce,
+        Cl.uint(transferNonce),
         Cl.principal(mockTokenAddress),
-        transferAmount,
+        Cl.uint(transferAmount),
         Cl.principal(address3),
       ],
       address2
     );
     expect(receipt3.result).toBeOk(Cl.bool(true));
-    
-    // Verify the tokens were transferred using asset helpers
-    const finalBalance = getSpecificAssetBalance(address3, mockTokenAddress) || 0n;
-    
+
+    // Verify the tokens were transferred
+    const finalBalance = getSpecificAssetBalance(
+      address3,
+      DAO_TOKEN_ASSETS_MAP
+    );
+
     // Check that the balance increased by the transfer amount
-    expect(finalBalance).toEqual(initialBalance + BigInt(transferAmount.value));
+    expect(finalBalance).toEqual(
+      (initialBalance ?? 0n) + BigInt(transferAmount)
+    );
   });
 });
 
@@ -692,20 +713,26 @@ describe(`read-only functions: ${contractName}`, () => {
     // assert
     expect(result).toBeSome(Cl.bool(true));
   });
-  
+
   ////////////////////////////////////////
   // get-set-owner-proposal() tests
   ////////////////////////////////////////
   it("get-set-owner-proposal() returns the correct proposal details", () => {
     // arrange
     const nonce = Cl.uint(300);
+    const expectedProposal = Cl.tuple({
+      who: Cl.principal(address3),
+      status: Cl.bool(true),
+      executed: Cl.bool(false),
+      created: Cl.uint(4), // set by contract
+    });
     simnet.callPublicFn(
       contractAddress,
       "set-owner",
       [nonce, Cl.principal(address3), Cl.bool(true)],
       deployer
     );
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -713,31 +740,33 @@ describe(`read-only functions: ${contractName}`, () => {
       [nonce],
       deployer
     ).result;
-    
+
     // assert
     expect(result.type).toBe(ClarityType.OptionalSome);
     if (result.type === ClarityType.OptionalSome) {
-      const proposal = cvToValue(result.value);
-      expect(proposal.who).toBeDefined();
-      expect(proposal.status).toBeDefined();
-      expect(proposal.executed).toBeDefined();
-      expect(proposal.created).toBeDefined();
+      const proposal = result.value;
+      expect(proposal).toStrictEqual(expectedProposal);
     }
   });
-  
+
   ////////////////////////////////////////
   // get-set-asset-proposal() tests
   ////////////////////////////////////////
   it("get-set-asset-proposal() returns the correct proposal details", () => {
     // arrange
     const nonce = Cl.uint(301);
+    const expectedProposal = Cl.tuple({
+      token: Cl.principal(mockTokenAddress),
+      enabled: Cl.bool(true),
+      created: Cl.uint(4), // set by contract
+    });
     simnet.callPublicFn(
       contractAddress,
       "set-asset",
       [nonce, Cl.principal(mockTokenAddress), Cl.bool(true)],
       deployer
     );
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -745,17 +774,15 @@ describe(`read-only functions: ${contractName}`, () => {
       [nonce],
       deployer
     ).result;
-    
+
     // assert
     expect(result.type).toBe(ClarityType.OptionalSome);
     if (result.type === ClarityType.OptionalSome) {
-      const proposal = cvToValue(result.value);
-      expect(proposal.token).toBeDefined();
-      expect(proposal.enabled).toBeDefined();
-      expect(proposal.created).toBeDefined();
+      const proposal = result.value;
+      expect(proposal).toStrictEqual(expectedProposal);
     }
   });
-  
+
   ////////////////////////////////////////
   // get-transfer-proposal() tests
   ////////////////////////////////////////
@@ -763,13 +790,19 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     const nonce = Cl.uint(302);
     const amount = Cl.uint(500);
+    const expectedProposal = Cl.tuple({
+      ft: Cl.principal(mockTokenAddress),
+      amount: Cl.uint(500),
+      to: Cl.principal(address3),
+      created: Cl.uint(4), // set by contract
+    });
     simnet.callPublicFn(
       contractAddress,
       "transfer-dao-token",
       [nonce, Cl.principal(mockTokenAddress), amount, Cl.principal(address3)],
       deployer
     );
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -777,18 +810,15 @@ describe(`read-only functions: ${contractName}`, () => {
       [nonce],
       deployer
     ).result;
-    
+
     // assert
     expect(result.type).toBe(ClarityType.OptionalSome);
     if (result.type === ClarityType.OptionalSome) {
-      const proposal = cvToValue(result.value);
-      expect(proposal.ft).toBeDefined();
-      expect(proposal.amount).toBeDefined();
-      expect(proposal.to).toBeDefined();
-      expect(proposal.created).toBeDefined();
+      const proposal = result.value;
+      expect(proposal).toStrictEqual(expectedProposal);
     }
   });
-  
+
   ////////////////////////////////////////
   // get-set-confirmations-proposal() tests
   ////////////////////////////////////////
@@ -796,13 +826,18 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     const nonce = Cl.uint(303);
     const required = Cl.uint(2);
+    const expectedProposal = Cl.tuple({
+      required: Cl.uint(2),
+      executed: Cl.bool(false),
+      created: Cl.uint(4), // set by contract
+    });
     simnet.callPublicFn(
       contractAddress,
       "set-confirmations",
       [nonce, required],
       deployer
     );
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -810,17 +845,15 @@ describe(`read-only functions: ${contractName}`, () => {
       [nonce],
       deployer
     ).result;
-    
+
     // assert
     expect(result.type).toBe(ClarityType.OptionalSome);
     if (result.type === ClarityType.OptionalSome) {
-      const proposal = cvToValue(result.value);
-      expect(proposal.required).toBeDefined();
-      expect(proposal.executed).toBeDefined();
-      expect(proposal.created).toBeDefined();
+      const proposal = result.value;
+      expect(proposal).toStrictEqual(expectedProposal);
     }
   });
-  
+
   ////////////////////////////////////////
   // get-owner-confirmations() tests
   ////////////////////////////////////////
@@ -833,7 +866,7 @@ describe(`read-only functions: ${contractName}`, () => {
       [nonce, Cl.principal(address3), Cl.bool(true)],
       deployer
     );
-    
+
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -841,7 +874,7 @@ describe(`read-only functions: ${contractName}`, () => {
       [SET_OWNER, nonce],
       deployer
     ).result;
-    
+
     // assert
     expect(result).toBeSome(Cl.bool(true));
   });
