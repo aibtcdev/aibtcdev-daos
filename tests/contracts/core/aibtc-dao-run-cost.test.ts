@@ -511,11 +511,10 @@ describe(`transfer functionality: ${contractName}`, () => {
     expect(receipt3.result).toBeOk(Cl.bool(true));
     
     // Verify the tokens were transferred using asset helpers
-    const finalBalance = getSpecificAssetBalance(address3, mockTokenAddress);
-    const initialBalanceValue = initialBalance.type === ClarityType.UInt ? initialBalance.value : 0n;
+    const finalBalance = getSpecificAssetBalance(address3, mockTokenAddress) || 0n;
     
     // Check that the balance increased by the transfer amount
-    expect(finalBalance).toEqual(initialBalanceValue + BigInt(transferAmount.value));
+    expect(finalBalance).toEqual(initialBalance + BigInt(transferAmount.value));
   });
 });
 
