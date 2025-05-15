@@ -10,6 +10,7 @@
 (define-fungible-token SYMBOL-AIBTC-DAO MAX)
 (define-constant MAX u100000000000000000)
 (define-data-var contract-owner principal .aibtc-token-owner)
+;; /g/link to json for token metadata/dao_token_metadata
 (define-data-var token-uri (optional (string-utf8 256)) (some u"link to json for token metadata"))
 
 ;; SIP-10 Functions

@@ -390,6 +390,34 @@ export function createApiRouter(registry: ContractRegistry) {
           });
         }
 
+        // Validate token symbol
+        if (!tokenSymbol) {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: "Missing required parameter: tokenSymbol",
+          });
+        }
+
+        // Validate custom replacements
+        if (typeof customReplacements !== "object") {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: "Invalid customReplacements format. Must be an object.",
+          });
+        }
+
+        // Check if all expected replacements are present
+        const expectedReplacements = [
+          "dao_token_metadata",
+          "origin_address",
+          "dao_manifest",
+        ];
+        for (const replacement of expectedReplacements) {
+          if (!customReplacements[replacement]) {
+            throw new ApiError(ErrorCode.INVALID_REQUEST, {
+              reason: `Missing required custom replacement: ${replacement}`,
+            });
+          }
+        }
+
         // Get all DAO contract names
         const daoContractNames = registry.getAllDaoContractNames();
 
