@@ -56,6 +56,7 @@
   {
     who: principal, ;; owner
     status: bool, ;; enabled
+    executed: bool, ;; executed
   }
 )
 
@@ -108,16 +109,22 @@
   )
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
+    (map-insert SetOwnerProposals nonce {
+      who: who,
+      status: status,
+      executed: false,
+    })
     (print {
       notification: "dao-run-cost/set-owner",
       payload: {
+        nonce: nonce,
         who: who,
         status: status,
         contractCaller: contract-caller,
         txSender: tx-sender,
       },
     })
-    (ok (and (is-confirmed SET_OWNER nonce) (map-set Owners who status)))
+    (ok (and (is-confirmed SET_OWNER nonce) (execute-set-owner nonce)))
   )
 )
 
@@ -275,6 +282,22 @@
       confirmations
     )
     (is-eq confirmations (var-get confirmationsRequired))
+  )
+)
+
+(define-private (execute-set-owner (nonce uint))
+  (let (
+      (proposal (map-get? SetOwnerProposals nonce))
+      (proposalDetails (unwrap! proposal false))
+    )
+    (asserts! (is-some proposal) false)
+    (asserts! (is-eq (get executed proposalDetails) false) false)
+    (map-set SetOwnerProposals nonce {
+      who: (get who proposalDetails),
+      status: (get status proposalDetails),
+      executed: true,
+    })
+    (map-set Owners (get who proposalDetails) (get status proposalDetails))
   )
 )
 
