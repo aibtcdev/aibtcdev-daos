@@ -31,6 +31,7 @@
 (define-constant SET_OWNER u1)
 (define-constant SET_ASSET u2)
 (define-constant TRANSFER u3)
+(define-constant SET_CONFIRMATIONS u4)
 
 ;; data vars
 ;;
@@ -42,6 +43,7 @@
 (define-data-var setOwnerProposalsTotal uint u0)
 (define-data-var setAssetProposalsTotal uint u0)
 (define-data-var transferProposalsTotal uint u0)
+(define-data-var setConfirmationsProposalsTotal uint u0)
 
 ;; data maps
 ;;
@@ -77,6 +79,14 @@
   }
 )
 
+(define-map SetConfirmationsProposals
+  uint ;; nonce
+  {
+    required: uint, ;; new confirmation threshold
+    executed: bool, ;; executed
+  }
+)
+
 (define-map OwnerConfirmations
   {
     id: uint, ;; action id
@@ -109,6 +119,7 @@
   )
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
+    (var-set setOwnerProposalsTotal (+ (var-get setOwnerProposalsTotal) u1))
     (map-insert SetOwnerProposals nonce {
       who: who,
       status: status,
@@ -184,6 +195,30 @@
   )
 )
 
+(define-public (set-confirmations
+    (nonce uint)
+    (required uint)
+  )
+  (begin
+    (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
+    (var-set setConfirmationsProposalsTotal (+ (var-get setConfirmationsProposalsTotal) u1))
+    (map-insert SetConfirmationsProposals nonce {
+      required: required,
+      executed: false,
+    })
+    (print {
+      notification: "dao-run-cost/set-confirmations",
+      payload: {
+        nonce: nonce,
+        required: required,
+        contractCaller: contract-caller,
+        txSender: tx-sender,
+      },
+    })
+    (ok (and (is-confirmed SET_CONFIRMATIONS nonce) (execute-set-confirmations nonce)))
+  )
+)
+
 ;; read only functions
 ;;
 
@@ -196,6 +231,7 @@
     setOwner: (var-get setOwnerProposalsTotal),
     setAsset: (var-get setAssetProposalsTotal),
     transfer: (var-get transferProposalsTotal),
+    setConfirmations: (var-get setConfirmationsProposalsTotal),
   }
 )
 
@@ -213,6 +249,10 @@
 
 (define-read-only (get-transfer-proposal (nonce uint))
   (map-get? TransferProposals nonce)
+)
+
+(define-read-only (get-set-confirmations-proposal (nonce uint))
+  (map-get? SetConfirmationsProposals nonce)
 )
 
 (define-read-only (get-owner-confirmations
@@ -341,6 +381,22 @@
       ))
       false
     )
+  )
+)
+
+(define-private (execute-set-confirmations (nonce uint))
+  (let (
+      (proposal (map-get? SetConfirmationsProposals nonce))
+      (proposalDetails (unwrap! proposal false))
+    )
+    (asserts! (is-some proposal) false)
+    (asserts! (is-eq (get executed proposalDetails) false) false)
+    (map-set SetConfirmationsProposals nonce {
+      required: (get required proposalDetails),
+      executed: true,
+    })
+    (var-set confirmationsRequired (get required proposalDetails))
+    true
   )
 )
 
