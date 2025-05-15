@@ -201,7 +201,9 @@
   )
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
-    (var-set setConfirmationsProposalsTotal (+ (var-get setConfirmationsProposalsTotal) u1))
+    (var-set setConfirmationsProposalsTotal
+      (+ (var-get setConfirmationsProposalsTotal) u1)
+    )
     (map-insert SetConfirmationsProposals nonce {
       required: required,
       executed: false,
