@@ -25,6 +25,7 @@ export type {
   ContractDependency,
   RuntimeValue,
   ContractBase,
+  ContractResponse,
 };
 
 /**
