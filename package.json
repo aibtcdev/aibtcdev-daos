@@ -8,6 +8,8 @@
     "test": "vitest run",
     "test:report": "vitest run -- --coverage --costs",
     "test:watch": "chokidar \"tests/**/*.ts\" \"contracts/**/*.clar\" -c \"npm run test:report\"",
+    "test:check-coverage": "bash ./tests/check-test-coverage.sh",
+    "test:endpoints": "bash ./tests/check-endpoints.sh http://localhost:8787",
     "dev": "wrangler dev src/index.ts",
     "build": "vite build && vite build --ssr",
     "preview": "$npm_execpath run build && wrangler dev dist-server/index.js",
