@@ -2,6 +2,7 @@
   "name": "@aibtc/types",
   "version": "0.2.0",
   "description": "TypeScript types for AIBTC",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
