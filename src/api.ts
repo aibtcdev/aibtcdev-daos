@@ -1,5 +1,15 @@
 import { Hono } from "hono";
 import { StacksNetworkName } from "@stacks/network";
+import {
+  TypesResponse,
+  ContractsListResponse,
+  ContractNamesResponse,
+  ContractDetailResponse,
+  ContractsByTypeResponse,
+  ContractDependenciesResponse,
+  GeneratedContractResponse,
+  GeneratedDaoContractsResponse
+} from "@aibtc/types";
 import { CloudflareBindings } from "./cf-types";
 import { ContractRegistry } from "../utilities/contract-registry";
 import {
@@ -43,7 +53,7 @@ export function createApiRouter(registry: ContractRegistry) {
             : [];
         });
 
-        return { types: result };
+        return { types: result } as TypesResponse;
       },
       { path: "/types", method: "GET" }
     );
@@ -63,7 +73,7 @@ export function createApiRouter(registry: ContractRegistry) {
           isDeployed: contract.isDeployed,
         }));
 
-        return { contracts: contractData };
+        return { contracts: contractData } as ContractsListResponse;
       },
       { path: "/contracts", method: "GET" }
     );
@@ -75,7 +85,7 @@ export function createApiRouter(registry: ContractRegistry) {
       c,
       async () => {
         const contractNames = registry.getAllContractNames();
-        return { names: contractNames };
+        return { names: contractNames } as ContractNamesResponse;
       },
       { path: "/names", method: "GET" }
     );
@@ -87,7 +97,7 @@ export function createApiRouter(registry: ContractRegistry) {
       c,
       async () => {
         const availableNames = registry.getAllAvailableContractNames();
-        return { names: availableNames };
+        return { names: availableNames } as ContractNamesResponse;
       },
       { path: "/available-names", method: "GET" }
     );
@@ -99,7 +109,7 @@ export function createApiRouter(registry: ContractRegistry) {
       c,
       async () => {
         const daoNames = registry.getAllDaoContractNames();
-        return { names: daoNames };
+        return { names: daoNames } as ContractNamesResponse;
       },
       { path: "/dao-names", method: "GET" }
     );
@@ -126,7 +136,7 @@ export function createApiRouter(registry: ContractRegistry) {
             deploymentOrder: contract.deploymentOrder,
             isDeployed: contract.isDeployed,
           })),
-        };
+        } as ContractsByTypeResponse;
       },
       { path: `/by-type/${c.req.param("type")}`, method: "GET" }
     );
@@ -156,7 +166,7 @@ export function createApiRouter(registry: ContractRegistry) {
             hash: contract.hash,
             deploymentResult: contract.deploymentResult,
           },
-        };
+        } as ContractDetailResponse;
       },
       { path: `/contract/${c.req.param("name")}`, method: "GET" }
     );
@@ -252,7 +262,7 @@ export function createApiRouter(registry: ContractRegistry) {
             contracts: contract.requiredContractAddresses,
             runtimeValues: contract.requiredRuntimeValues,
           },
-        };
+        } as ContractDependenciesResponse;
       },
       { path: `/dependencies/${c.req.param("name")}`, method: "GET" }
     );
@@ -295,7 +305,7 @@ export function createApiRouter(registry: ContractRegistry) {
               subtype: contract.subtype,
               content: generatedContract,
             },
-          };
+          } as GeneratedContractResponse;
         } catch (error) {
           throw new ApiError(ErrorCode.TEMPLATE_PROCESSING_ERROR, {
             reason: error instanceof Error ? error.message : String(error),
@@ -359,7 +369,7 @@ export function createApiRouter(registry: ContractRegistry) {
               tokenSymbol,
               content: generatedContract,
             },
-          };
+          } as GeneratedContractResponse;
         } catch (error) {
           throw new ApiError(ErrorCode.TEMPLATE_PROCESSING_ERROR, {
             reason: error instanceof Error ? error.message : String(error),
@@ -468,7 +478,7 @@ export function createApiRouter(registry: ContractRegistry) {
           tokenSymbol,
           contracts: generatedContracts.length > 0 ? generatedContracts : [],
           errors: errors.length > 0 ? errors : undefined,
-        };
+        } as GeneratedDaoContractsResponse;
       },
       { path: "/generate-dao-contracts", method: "POST" }
     );
