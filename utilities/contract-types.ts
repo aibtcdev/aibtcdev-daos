@@ -4,7 +4,6 @@ export const CONTRACT_TYPES = [
   "ACTIONS", // action proposal extensions
   "EXTENSIONS", // extensions
   "PROPOSALS", // core proposals
-  "EXTERNAL", // sips, bitflow, faktory
   "TOKEN", // token, dex, pool
 ] as const;
 
@@ -31,13 +30,6 @@ export const CONTRACT_SUBTYPES = {
     "TREASURY",
   ],
   PROPOSALS: ["INITIALIZE_DAO"],
-  EXTERNAL: [
-    "STANDARD_SIP009",
-    "STANDARD_SIP010",
-    "FAKTORY_SIP010",
-    "BITFLOW_POOL",
-    "BITFOW_SIP010",
-  ] as const,
   TOKEN: ["DAO", "DEX", "POOL", "PRELAUNCH"] as const,
 } as const;
 
@@ -47,7 +39,7 @@ export type ContractSubtype<C extends ContractType> =
 
 export const CONTRACT_NAMES: {
   [K in ContractType]: {
-    [S in ContractSubtype<K>]?: string;
+    [S in ContractSubtype<K>]: string;
   };
 } = {
   AGENT: {
@@ -71,9 +63,6 @@ export const CONTRACT_NAMES: {
   },
   PROPOSALS: {
     INITIALIZE_DAO: "aibtc-base-initialize-dao",
-  },
-  EXTERNAL: {
-    // Fill in as needed
   },
   TOKEN: {
     DAO: "aibtc-faktory",

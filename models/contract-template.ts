@@ -58,10 +58,6 @@ export abstract class ContractBase {
         return `dao/token/${name}.clar`;
       case "AGENT":
         return `agent/${name}.clar`;
-      case "CORE":
-        return `core/${name}.clar`;
-      case "EXTERNAL":
-        return `external/${name}.clar`;
       default:
         return `${name}.clar`;
     }
@@ -146,7 +142,7 @@ export abstract class ContractBase {
     this.requiredRuntimeValues.push({ key });
     return this;
   }
-  
+
   /**
    * Add a template variable dependency from the /g/ format
    * @param toReplace The text to be replaced
@@ -155,17 +151,17 @@ export abstract class ContractBase {
   addTemplateVariable(toReplace: string, keyName: string): this {
     // Format matches the /g/toReplace/keyName format used in templates
     const formattedKey = `${toReplace}/${keyName}`;
-    
+
     // Check if this is an address, trait, contract, or runtime value
     // and add to the appropriate collection
-    if (toReplace.startsWith('ST') || toReplace.includes('.')) {
+    if (toReplace.startsWith("ST") || toReplace.includes(".")) {
       // This is likely an address or contract reference
       this.addRuntimeValue(formattedKey);
     } else {
       // Other template variables (configuration values, etc.)
       this.addRuntimeValue(formattedKey);
     }
-    
+
     return this;
   }
 
@@ -177,21 +173,21 @@ export abstract class ContractBase {
     // Extract all variables from template
     const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
     const matches = [...templateContent.matchAll(variableRegex)];
-    
+
     // Add each unique variable as a dependency
     const uniqueVars = new Set<string>();
-    
+
     for (const match of matches) {
       const toReplace = match[1];
       const keyName = match[2];
       const key = `${toReplace}/${keyName}`;
-      
+
       if (!uniqueVars.has(key)) {
         uniqueVars.add(key);
         this.addTemplateVariable(toReplace, keyName);
       }
     }
-    
+
     return this;
   }
 
@@ -199,12 +195,14 @@ export abstract class ContractBase {
   /**
    * Get all dependencies for this contract
    */
-  getDependencies(): Array<AddressDependency | TraitDependency | ContractDependency | RuntimeValue> {
+  getDependencies(): Array<
+    AddressDependency | TraitDependency | ContractDependency | RuntimeValue
+  > {
     return [
       ...this.requiredAddresses,
       ...this.requiredTraits,
       ...this.requiredContractAddresses,
-      ...this.requiredRuntimeValues
+      ...this.requiredRuntimeValues,
     ];
   }
 
