@@ -12,7 +12,7 @@
 ;;
 
 ;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
-(use-trait sip010-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+(use-trait sip010-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; constants
 ;;
@@ -478,17 +478,10 @@
   (map-set Owners 'STRZ4P1ABSVSZPC4HZ4GDAW834HHEHJMF65X5S6D true) ;; d
   (map-set Owners 'ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1 true) ;; h
   (map-set Owners 'ST1994Y3P6ZDJX476QFSABEFE5T6YMTJT0T7RSQDW true) ;; h-a
-  (map-set Owners 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM true) ;; tests
-  (map-set Owners 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5 true) ;; tests
-  (map-set Owners 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true) ;; tests
-  (map-set Owners 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true) ;; tests
-  (map-set Owners 'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND true) ;; tests
   ;; set initial assets
   ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_sbtc_contract
   (map-set AllowedAssets 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
     true
   )
-  ;; /g/.aibtc-token/dao_token_contract
-  (map-set AllowedAssets .aibtc-faktory true)
   (print (get-contract-info))
 )
