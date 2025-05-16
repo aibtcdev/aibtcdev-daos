@@ -8,8 +8,7 @@ These models provide type-safe representations of the smart contracts, enabling 
 
 ## Key Components
 
-- `contract-template.ts` - Base interface for contract templates and deployment results
-- `contract-base.ts` - Abstract base class for all contract types
+- `contract-template.ts` - Contains the `ContractBase` abstract class and interfaces for contract dependencies
 
 Type-specific contract models:
 
