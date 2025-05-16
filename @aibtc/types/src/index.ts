@@ -15,6 +15,8 @@ import type {
   ContractDependency,
   RuntimeValue,
   TraitDependency,
+  ContractBase,
+  DeploymentResult,
 } from "../../../models/contract-template";
 
 export type {
@@ -22,6 +24,8 @@ export type {
   TraitDependency,
   ContractDependency,
   RuntimeValue,
+  ContractBase,
+  DeploymentResult,
 };
 
 /**
@@ -49,30 +53,62 @@ export { CONTRACT_NAMES };
 import type { ApiResponse } from "../../../src/utils/response-utils";
 export type { ApiResponse };
 
-// Contract info derived from ContractBase
-export interface ContractInfo {
-  name: string;
-  type: ContractType;
-  subtype: ContractSubtype<ContractType>;
-  deploymentOrder: number;
-  templatePath: string;
-  source?: string;
-  hash?: string;
+// API response types for specific endpoints
+export interface TypesResponse {
+  types: Record<string, string[]>;
 }
 
-// API response types for specific endpoints
 export interface ContractsListResponse {
-  contracts: ContractInfo[];
+  contracts: Array<Pick<ContractBase, 'name' | 'type' | 'subtype' | 'deploymentOrder' | 'isDeployed'>>;
+}
+
+export interface ContractNamesResponse {
+  names: string[];
 }
 
 export interface ContractDetailResponse {
-  contract: ContractInfo;
+  contract: Pick<ContractBase, 'name' | 'type' | 'subtype' | 'templatePath' | 'deploymentOrder' | 'isDeployed' | 'source' | 'hash' | 'deploymentResult'>;
+}
+
+export interface ContractsByTypeResponse {
+  type: string;
+  contracts: Array<Pick<ContractBase, 'name' | 'subtype' | 'deploymentOrder' | 'isDeployed'>>;
 }
 
 export interface ContractDependenciesResponse {
-  dependencies: Array<
-    AddressDependency | TraitDependency | ContractDependency | RuntimeValue
-  >;
+  name: string;
+  dependencies: {
+    addresses: ContractBase['requiredAddresses'];
+    traits: ContractBase['requiredTraits'];
+    contracts: ContractBase['requiredContractAddresses'];
+    runtimeValues: ContractBase['requiredRuntimeValues'];
+  };
+}
+
+export interface GeneratedContractResponse {
+  contract: {
+    name: ContractBase['name'];
+    type: ContractBase['type'];
+    subtype: ContractBase['subtype'];
+    content: string;
+    network?: string;
+    tokenSymbol?: string;
+  };
+}
+
+export interface GeneratedDaoContractsResponse {
+  network: string;
+  tokenSymbol: string;
+  contracts: Array<{
+    name: string;
+    type: ContractType;
+    subtype: string;
+    content: string;
+  }>;
+  errors?: Array<{
+    name: string;
+    error: string;
+  }>;
 }
 
 // DAO configuration
