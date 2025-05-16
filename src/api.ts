@@ -9,6 +9,7 @@ import {
   ContractTypesResponse,
   GeneratedContractResponse,
   GeneratedDaoContractsResponse,
+  ContractResponse,
 } from "@aibtc/types";
 import { CloudflareBindings } from "./cf-types";
 import { ContractRegistry } from "../utilities/contract-registry";
@@ -64,12 +65,15 @@ export function createApiRouter(registry: ContractRegistry) {
       c,
       async () => {
         const contracts = registry.getAllContracts();
-        // TODO: use SimpleContractResponse if possible
         const contractData = contracts.map((contract) => ({
           name: contract.name,
+          displayName: contract.displayName,
           type: contract.type,
           subtype: contract.subtype,
+          source: contract.source,
+          hash: contract.hash,
           deploymentOrder: contract.deploymentOrder,
+          clarityVersion: contract.clarityVersion,
         }));
 
         return { contracts: contractData } as ContractsListResponse;
@@ -129,11 +133,15 @@ export function createApiRouter(registry: ContractRegistry) {
 
         return {
           type,
-          // TODO: use SimpleContractResponse if possible
           contracts: contracts.map((contract) => ({
             name: contract.name,
+            displayName: contract.displayName,
+            type: contract.type,
             subtype: contract.subtype,
+            source: contract.source,
+            hash: contract.hash,
             deploymentOrder: contract.deploymentOrder,
+            clarityVersion: contract.clarityVersion,
           })),
         } as ContractsByTypeResponse;
       },
@@ -154,15 +162,15 @@ export function createApiRouter(registry: ContractRegistry) {
         }
 
         return {
-          // TODO: use SimpleContractResponse if possible
           contract: {
             name: contract.name,
+            displayName: contract.displayName,
             type: contract.type,
             subtype: contract.subtype,
-            templatePath: contract.templatePath,
-            deploymentOrder: contract.deploymentOrder,
             source: contract.source,
             hash: contract.hash,
+            deploymentOrder: contract.deploymentOrder,
+            clarityVersion: contract.clarityVersion,
           },
         } as ContractDetailResponse;
       },
@@ -211,13 +219,15 @@ export function createApiRouter(registry: ContractRegistry) {
           }
 
           return {
-            // TODO: use SimpleContractResponse if possible
             contract: {
               name: contract.name,
+              displayName: contract.displayName,
               type: contract.type,
               subtype: contract.subtype,
-              templatePath: contract.templatePath,
+              source: contract.source,
+              hash: contract.hash,
               deploymentOrder: contract.deploymentOrder,
+              clarityVersion: contract.clarityVersion,
             },
           };
         } catch (error) {
@@ -315,9 +325,13 @@ export function createApiRouter(registry: ContractRegistry) {
             tokenSymbol,
             contract: {
               name: contract.name,
+              displayName: contract.displayName,
               type: contract.type,
               subtype: contract.subtype,
               source: generatedContract,
+              hash: contract.hash,
+              deploymentOrder: contract.deploymentOrder,
+              clarityVersion: contract.clarityVersion,
             },
           } as GeneratedContractResponse;
         } catch (error) {
@@ -405,6 +419,9 @@ export function createApiRouter(registry: ContractRegistry) {
                 type: contract.type,
                 subtype: contract.subtype,
                 source: generatedContract,
+                hash: contract.hash,
+                deploymentOrder: contract.deploymentOrder,
+                clarityVersion: contract.clarityVersion,
               });
             } catch (error) {
               // Track errors but continue with other contracts
