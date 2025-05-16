@@ -8,7 +8,7 @@ The API provides a programmatic interface for interacting with the AIBTC DAO con
 
 ## Key Components
 
-- `index.ts` - Main entry point for the API
+- `index.ts` - Main entry point for the API and Cloudflare Worker
 - `api.ts` - API router and endpoint definitions
 - `cf-types.ts` - Cloudflare-specific type definitions
 - `services/` - Service implementations including contract generation
@@ -16,11 +16,10 @@ The API provides a programmatic interface for interacting with the AIBTC DAO con
 
 ## Utilities
 
-- `request-helpers.ts` - Functions for parsing and validating API requests
-- `response-formatters.ts` - Standardized response formatting utilities
-- `error-handlers.ts` - Error handling and reporting utilities
-- `cache-helpers.ts` - Utilities for response caching and optimization
-- `auth-utils.ts` - Authentication and authorization utilities
+- `request-handler.ts` - Functions for processing API requests
+- `response-utils.ts` - Standardized response formatting utilities
+- `api-error.ts` - Error handling and reporting utilities
+- `error-catalog.ts` - Standardized error codes and messages
 
 ## Usage
 
@@ -40,5 +39,14 @@ The API is deployed as a Cloudflare Worker and provides endpoints for:
 
 ### POST Endpoints
 - `/generate-contract` - Generate a contract from template with custom parameters
+- `/generate-contract-for-network` - Generate a contract for a specific network
+- `/generate-dao-contracts` - Generate all DAO contracts for a network
+
+## Durable Objects Integration
+
+The API integrates with Cloudflare Durable Objects for persistent state management:
+
+- `/sse` - Server-Sent Events endpoint for real-time updates
+- `/mcp` - Multi-Contract Protocol endpoint for blockchain interaction
 
 [Back to main README](/)

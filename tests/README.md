@@ -9,43 +9,41 @@ These tests ensure the correct functionality of the AIBTC platform components, i
 ## Structure
 
 - `/contracts` - Clarinet SDK Tests for smart contracts, mirrors contract directory structure
-- `/endpoints` - Tests for API endpoints
-- `/utilities` - Tests for utility functions
+  - `/agent` - Tests for agent automation contracts
+  - `/dao` - Tests for DAO contracts
+    - `/actions` - Tests for action contracts
+    - `/extensions` - Tests for extension contracts
+    - `/proposals` - Tests for proposal contracts
+    - `/token` - Tests for token and DEX contracts
 
 ## Key Test Files
 
 - Contract tests validate core functionality like voting, treasury operations, and token management
-- Endpoint tests verify API behavior and response formats
 - Utility tests check helper functions and shared code
 
-## Utilities
+## Test Utilities
 
-- `test-helpers.ts` - Common helper functions for test setup and assertions
-- `mock-data.ts` - Mock data generators for testing
-- `test-fixtures.ts` - Reusable test fixtures and scenarios
-- `contract-test-utils.ts` - Utilities specific to contract testing
-- `api-test-utils.ts` - Utilities for API endpoint testing
+The tests use several utility functions from the main `/utilities` directory:
+- `dao-helpers.ts` - Helper functions for DAO operations in tests
+- `debug-logging.ts` - Logging utilities for test output
+- `contract-registry.ts` - Contract registry for test setup
 
 ## Running Tests
 
-All tests can be run using `npm`, or specific test file(s) can be provided:
+All tests can be run using the npm scripts defined in package.json:
 
 ```bash
 npm run test
-npm run test tests/contracts/dao/aibtc-base-dao.test.ts
+npm run test:report  # Generates coverage report
+npm run test:watch   # Watches for changes and runs tests
 ```
 
-All Clarity contract files should have a corresponding test file, checked by this script:
+To run a specific test file:
 
 ```bash
-bash ./tests/check-test-coverage.sh
+npm run test tests/contracts/dao/token/aibtc-faktory-dex.test.ts
 ```
 
-API endpoint tests can be run using the test scripts, with an optional URL and flag to disable the 10s delay:
-
-```bash
-bash ./tests/check-endpoints.sh
-bash ./tests/check-endpoints.sh https://aibtcdev-daos-preview.hosting-962.workers.dev/ true
-```
+The test environment uses Clarinet's simnet for blockchain simulation.
 
 [Back to main README](/)
