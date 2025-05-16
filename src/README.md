@@ -16,31 +16,31 @@ The API provides a programmatic interface for interacting with the AIBTC DAO con
 
 ## Utilities
 
-- `request-handler.ts` - Functions for processing API requests
-- `response-utils.ts` - Standardized response formatting utilities
-- `api-error.ts` - Error handling and reporting utilities
-- `error-catalog.ts` - Standardized error codes and messages
+- `request-handler.ts` - Functions for processing API requests with standardized error handling
+- `response-utils.ts` - Standardized response formatting utilities and CORS support
+- `api-error.ts` - Error handling and reporting with unique error IDs
+- `error-catalog.ts` - Standardized error codes, messages, and HTTP status codes
 
-## Usage
+## API Endpoints
 
-The API is deployed as a Cloudflare Worker and provides endpoints for:
+The API is deployed as a Cloudflare Worker and provides the following endpoints:
 
 ### GET Endpoints
-- `/` - API status check
-- `/types` - Get all contract types and their subtypes
-- `/contracts` - Get all contracts in the registry
-- `/names` - Get all contract names
-- `/available-names` - Get all available contract names
-- `/dao-names` - Get all DAO contract names
-- `/by-type/:type` - Get contracts by type
-- `/contract/:name` - Get contract by name
-- `/by-type-subtype/:type/:subtype` - Get contract by type and subtype
-- `/dependencies/:name` - Get contract dependencies
+- `/api` - API status check
+- `/api/types` - Get all contract types and their subtypes
+- `/api/contracts` - Get all contracts in the registry
+- `/api/names` - Get all contract names
+- `/api/available-names` - Get all available contract names
+- `/api/dao-names` - Get all DAO contract names
+- `/api/by-type/:type` - Get contracts by type
+- `/api/contract/:name` - Get contract by name
+- `/api/by-type-subtype/:type/:subtype` - Get contract by type and subtype
+- `/api/dependencies/:name` - Get contract dependencies
 
 ### POST Endpoints
-- `/generate-contract` - Generate a contract from template with custom parameters
-- `/generate-contract-for-network` - Generate a contract for a specific network
-- `/generate-dao-contracts` - Generate all DAO contracts for a network
+- `/api/generate-contract` - Generate a contract from template with custom parameters
+- `/api/generate-contract-for-network` - Generate a contract for a specific network
+- `/api/generate-dao-contracts` - Generate all DAO contracts for a network
 
 ## Durable Objects Integration
 
@@ -49,4 +49,25 @@ The API integrates with Cloudflare Durable Objects for persistent state manageme
 - `/sse` - Server-Sent Events endpoint for real-time updates
 - `/mcp` - Multi-Contract Protocol endpoint for blockchain interaction
 
-[Back to main README](/)
+## Response Format
+
+All API responses follow a standardized format:
+
+```typescript
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: {
+    id: string;
+    code: string;
+    message: string;
+    details?: Record<string, any>;
+  };
+}
+```
+
+## Error Handling
+
+The API uses a standardized error handling system with unique error IDs for tracking and debugging. Error codes are defined in `error-catalog.ts` and provide consistent HTTP status codes and error messages.
+
+[Back to main README](/README.md)
