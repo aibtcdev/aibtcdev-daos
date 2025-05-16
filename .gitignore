@@ -1,5 +1,5 @@
 # prod
-#dist/
+dist/
 dist-server/
 
 # dev
