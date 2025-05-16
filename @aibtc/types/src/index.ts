@@ -58,8 +58,9 @@ export interface TypesResponse {
   types: Record<string, string[]>;
 }
 
-export type SimpleContractResponse = Array<
-  Pick<ContractBase, "name" | "type" | "subtype" | "source">
+export type SimpleContractResponse = Pick<
+  ContractBase,
+  "name" | "type" | "subtype" | "source"
 >;
 
 export interface ContractsListResponse {
