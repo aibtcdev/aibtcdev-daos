@@ -60,7 +60,7 @@ export interface TypesResponse {
 
 export type SimpleContractResponse = Pick<
   ContractBase,
-  "name" | "type" | "subtype" | "source"
+  "name" | "displayName" | "type" | "subtype" | "source"
 >;
 
 export interface ContractsListResponse {

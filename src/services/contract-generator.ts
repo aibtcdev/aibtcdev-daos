@@ -181,5 +181,6 @@ export class ContractGeneratorService {
           error instanceof Error ? error.message : String(error)
         }`
       );
+    }
   }
 }

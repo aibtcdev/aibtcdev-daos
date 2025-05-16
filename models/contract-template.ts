@@ -39,6 +39,7 @@ export abstract class ContractBase {
   readonly templatePath: string;
 
   protected clarityVersion: ClarityVersion | undefined;
+  protected _displayName?: string;
   protected _source?: string;
   protected _hash?: string;
   protected _deploymentResult?: DeploymentResult;
@@ -86,6 +87,10 @@ export abstract class ContractBase {
   }
 
   // Getters
+  get displayName(): string | undefined {
+    return this._displayName;
+  }
+
   get source(): string | undefined {
     return this._source;
   }
@@ -103,6 +108,11 @@ export abstract class ContractBase {
   }
 
   // Setters for generated content
+  setDisplayName(displayName: string): this {
+    this._displayName = displayName;
+    return this;
+  }
+
   setSource(source: string): this {
     this._source = source;
     return this;
