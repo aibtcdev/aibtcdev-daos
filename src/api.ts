@@ -22,8 +22,6 @@ import { ErrorCode } from "./utils/error-catalog";
 import { handleRequest } from "./utils/request-handler";
 import { ContractGeneratorService } from "./services/contract-generator";
 
-// TODO: should SimpleContractResponse just be the full ContractBase object?
-
 export function createApiRouter(registry: ContractRegistry) {
   const api = new Hono<{ Bindings: CloudflareBindings }>();
   const generatorService = new ContractGeneratorService();
