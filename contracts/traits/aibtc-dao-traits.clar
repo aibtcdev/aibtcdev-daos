@@ -137,6 +137,15 @@
   )
 ))
 
+;; an extension that holds funds from the DAO treasury and allows
+;; the DAO to transfer rewards to users for successful proposals.
+(define-trait rewards-account (
+  (transfer-reward
+    (principal uint)
+    (response bool uint)
+  )
+))
+
 ;; an extension that manages the token on behalf of the dao
 ;; allows for same functionality normally used by deployer through proposals
 (define-trait token-owner (
