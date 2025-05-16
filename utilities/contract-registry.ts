@@ -12,8 +12,6 @@ import { ExtensionContract } from "../models/dao-extension-contract";
 import { ActionContract } from "../models/dao-action-contract";
 import { ProposalContract } from "../models/dao-proposal-contract";
 import { AgentContract } from "../models/agent-contract";
-import { CoreContract } from "../models/core-contract";
-import { ExternalContract } from "../models/external-contract";
 import { DEVNET_DEPLOYER } from "./contract-helpers";
 import {
   processContractTemplate,
@@ -334,12 +332,6 @@ export class ContractRegistry {
         contract = new AgentContract(
           name as any, // Type assertion to handle the string literal constraint
           subtype as ContractSubtype<"AGENT">
-        );
-        break;
-      case "EXTERNAL":
-        contract = new ExternalContract(
-          name as any, // Type assertion to handle the string literal constraint
-          subtype as ContractSubtype<"EXTERNAL">
         );
         break;
       default:

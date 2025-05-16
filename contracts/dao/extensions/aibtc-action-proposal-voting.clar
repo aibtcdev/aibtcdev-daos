@@ -271,10 +271,14 @@
     ;; /g/.aibtc-faktory/dao_contract_token
     (try! (contract-call? .aibtc-faktory transfer VOTING_BOND contract-caller SELF none))
     ;; transfer the run cost fee to the run AIBTC dao cost contract
+    ;; /g/.aibtc-treasury/dao_contract_treasury
+    ;; /g/.aibtc-faktory/dao_contract_token
     (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-faktory
       AIBTC_DAO_RUN_COST_AMOUNT AIBTC_DAO_RUN_COST_CONTRACT
     )))
     ;; transfer reward to the dao rewards account
+    ;; /g/.aibtc-treasury/dao_contract_treasury
+    ;; /g/.aibtc-faktory/dao_contract_token
     (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-faktory VOTING_REWARD
       DAO_REWARDS_ACCOUNT
     ))
@@ -290,9 +294,9 @@
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
-      ;; /g/.aibtc-faktory/dao_contract_token
       (senderBalance (unwrap!
         (at-block proposalBlockHash
+          ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance contract-caller)
         )
         ERR_FETCHING_TOKEN_DATA
@@ -376,9 +380,9 @@
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
-      ;; /g/.aibtc-faktory/dao_contract_token
       (senderBalance (unwrap!
         (at-block proposalBlockHash
+          ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance contract-caller)
         )
         ERR_FETCHING_TOKEN_DATA
@@ -568,6 +572,7 @@
         (match (contract-call? action run (get parameters proposalDetails))
           ;; running the action succeeded
           ok_
+          ;; /g/.aibtc-rewards-account/dao_contract_rewards_account
           (try! (as-contract (contract-call? .aibtc-rewards-account transfer-reward creator
             VOTING_REWARD
           )))
@@ -579,6 +584,7 @@
               notification: "aibtc-action-proposal-voting/conclude-action-proposal",
               payload: { executionError: err_ },
             })
+            ;; /g/.aibtc-rewards-account/dao_contract_rewards_account
             (try! (as-contract (contract-call? .aibtc-rewards-account transfer-reward
               VOTING_TREASURY VOTING_REWARD
             )))
@@ -678,14 +684,14 @@
 (define-read-only (get-liquid-supply (blockHeight uint))
   (let (
       (blockHash (unwrap! (get-block-hash blockHeight) ERR_RETRIEVING_START_BLOCK_HASH))
-      ;; /g/.aibtc-faktory/dao_contract_token
       (totalSupply (unwrap!
+        ;; /g/.aibtc-faktory/dao_contract_token
         (at-block blockHash (contract-call? .aibtc-faktory get-total-supply))
         ERR_FETCHING_TOKEN_DATA
       ))
-      ;; /g/.aibtc-faktory/dao_contract_token
       (treasuryBalance (unwrap!
         (at-block blockHash
+          ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance VOTING_TREASURY)
         )
         ERR_FETCHING_TOKEN_DATA
@@ -698,9 +704,9 @@
 ;; private functions
 ;;
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_contract_base
   (ok (asserts!
     (or
+      ;; /g/.aibtc-base-dao/dao_contract_base
       (is-eq tx-sender .aibtc-base-dao)
       ;; /g/.aibtc-base-dao/dao_contract_base
       (contract-call? .aibtc-base-dao is-extension contract-caller)

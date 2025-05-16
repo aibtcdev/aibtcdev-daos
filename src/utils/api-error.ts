@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorMessages, ErrorStatusCodes } from './error-catalog';
+import { ErrorCode, ErrorMessages, ErrorStatusCodes } from "./error-catalog";
 
 /**
  * Standard API error class used throughout the application
@@ -28,7 +28,7 @@ export class ApiError extends Error {
     }
 
     super(message);
-    this.name = 'ApiError';
+    this.name = "ApiError";
     this.code = code;
     this.status = ErrorStatusCodes[code];
     this.details = details;
@@ -42,8 +42,8 @@ export class ApiError extends Error {
    */
   private generateId(): string {
     // Use crypto.randomUUID() if available
-    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-      return crypto.randomUUID().split('-')[0]; // Use first segment for brevity
+    if (typeof crypto !== "undefined" && crypto.randomUUID) {
+      return crypto.randomUUID().split("-")[0]; // Use first segment for brevity
     }
 
     // Fallback to timestamp + random string

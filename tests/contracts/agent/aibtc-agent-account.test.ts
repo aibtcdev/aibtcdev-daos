@@ -42,10 +42,6 @@ const tokenDexContractAddress = registry.getContractAddressByTypeAndSubtype(
   "TOKEN",
   "DEX"
 );
-const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
-  "BASE",
-  "DAO"
-);
 const actionProposalsContractAddress =
   registry.getContractAddressByTypeAndSubtype(
     "EXTENSIONS",

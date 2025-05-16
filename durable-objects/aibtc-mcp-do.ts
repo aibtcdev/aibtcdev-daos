@@ -19,36 +19,43 @@ export class AIBTC_MCP_DO extends McpAgent {
     // Add contract generation tool
     this.server.tool(
       "generate-contract",
-      { 
+      {
         contractName: z.string(),
-        replacements: z.record(z.string()).optional().default({})
+        replacements: z.record(z.string()).optional().default({}),
       },
       async ({ contractName, replacements }) => {
         const contract = this.registry.getContract(contractName);
         if (!contract) {
           return {
-            content: [{ 
-              type: "text", 
-              text: `Error: Contract ${contractName} not found` 
-            }],
+            content: [
+              {
+                type: "text",
+                text: `Error: Contract ${contractName} not found`,
+              },
+            ],
           };
         }
-        
+
         try {
-          const generatedContract = await this.generatorService.generateContract(
-            contract,
-            replacements
-          );
-          
+          const generatedContract =
+            await this.generatorService.generateContract(
+              contract,
+              replacements
+            );
+
           return {
             content: [{ type: "text", text: generatedContract }],
           };
         } catch (error) {
           return {
-            content: [{ 
-              type: "text", 
-              text: `Error generating contract: ${error instanceof Error ? error.message : String(error)}` 
-            }],
+            content: [
+              {
+                type: "text",
+                text: `Error generating contract: ${
+                  error instanceof Error ? error.message : String(error)
+                }`,
+              },
+            ],
           };
         }
       }

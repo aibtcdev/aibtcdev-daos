@@ -33,7 +33,8 @@ const testnetAddresses: KnownAddresses = {
   POX: "ST000000000000000000002AMW42H.pox-4",
   BURN: "ST000000000000000000002AMW42H",
   SBTC: "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token",
-  AIBTC_RUN_COST: "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.aibtc-dao-run-cost",
+  AIBTC_RUN_COST:
+    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-run-cost",
   BITFLOW_CORE: "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2",
   BITFLOW_STX_TOKEN: "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.token-stx-v-1-2",
   BITFLOW_FEE: "ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1",
@@ -62,12 +63,13 @@ const ADDRESSES: Record<StacksNetworkName, KnownAddresses> = {
 } as const;
 
 // helper to get known addresses for a network
-// TODO: replaces ADDRESSES in constants.ts
+// TODO: export this in package!
 export function getKnownAddresses(network: StacksNetworkName): KnownAddresses {
   return ADDRESSES[network];
 }
 
 // helper to get a specific address
+// TODO: export this in package!
 export function getKnownAddress(
   network: StacksNetworkName,
   address: keyof KnownAddresses

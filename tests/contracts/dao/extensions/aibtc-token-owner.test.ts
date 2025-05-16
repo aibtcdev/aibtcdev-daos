@@ -7,8 +7,6 @@ import { setupDaoContractRegistry } from "../../../../utilities/contract-registr
 const accounts = simnet.getAccounts();
 const deployer = accounts.get("deployer")!;
 const address1 = accounts.get("wallet_1")!;
-const address2 = accounts.get("wallet_2")!;
-const address3 = accounts.get("wallet_3")!;
 
 // setup contract info for tests
 const registry = setupDaoContractRegistry();
@@ -17,10 +15,6 @@ const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "TOKEN_OWNER"
 );
 const contractName = contractAddress.split(".")[1];
-const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
-  "BASE",
-  "DAO"
-);
 
 // import error codes
 const ErrCode = ErrCodeTokenOwner;
