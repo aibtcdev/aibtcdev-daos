@@ -26,10 +26,9 @@ export class ContractGeneratorService {
 
       // Check if the template content is empty
       if (!templateContent) {
-        dbgLog(
-          `Template content for ${contract.name} is empty or not found`,
-          { logType: "error", titleBefore: "Template Error" }
-        );
+        dbgLog(`Template content for ${contract.name} is empty or not found`, {
+          logType: "error",
+        });
         dbgLog(`Template path: ${contract.templatePath}`, { logType: "error" });
 
         // Check if the template file exists
@@ -39,7 +38,9 @@ export class ContractGeneratorService {
           contract.templatePath
         );
         if (!fs.existsSync(templatePath)) {
-          dbgLog(`Template file does not exist: ${templatePath}`, { logType: "error" });
+          dbgLog(`Template file does not exist: ${templatePath}`, {
+            logType: "error",
+          });
         }
 
         throw new Error(
@@ -77,7 +78,7 @@ export class ContractGeneratorService {
 
       // Add combined keys to the replacements map
       // This helps with the format /g/KEY/value where we might have both KEY/value and value in the replacements
-      variablesWithLineNumbers.forEach(v => {
+      variablesWithLineNumbers.forEach((v) => {
         const combinedKey = `${v.toReplace}/${v.key}`;
         if (replacements[v.key] && !replacementsMap.has(combinedKey)) {
           replacementsMap.set(combinedKey, replacements[v.key]);
@@ -100,32 +101,44 @@ export class ContractGeneratorService {
         const missingDetails = missingVars
           .map((v) => {
             // Extract just the key name and what it replaces, without including surrounding code
-            return `LINE ${v.line} MISSING TEMPLATE VARIABLE\nKey: ${
-              v.key
-            }\nTo replace: ${v.toReplace}`;
+            return `LINE ${v.line} MISSING TEMPLATE VARIABLE\nKey: ${v.key}\nTo replace: ${v.toReplace}`;
           })
           .join("\n\n");
 
-        dbgLog(`Missing template variables for ${contract.name}:`, { logType: "error", titleBefore: "Template Variables Error" });
+        dbgLog(`Missing template variables for ${contract.name}:`, {
+          logType: "error",
+        });
         dbgLog(missingDetails, { logType: "error" });
-        
+
         // Instead of throwing, we'll add warning comments to the template
-        const warningComments = missingVars.map(v => 
-          `\n;; WARNING: Missing template variable at line ${v.line}: ${v.key} to replace ${v.toReplace}`
-        ).join('');
-        
+        const warningComments = missingVars
+          .map(
+            (v) =>
+              `\n;; WARNING: Missing template variable at line ${v.line}: ${v.key} to replace ${v.toReplace}`
+          )
+          .join("");
+
         // Process with what we have
-        return processContractTemplate(templateContent, replacementsMap) + warningComments;
+        return (
+          processContractTemplate(templateContent, replacementsMap) +
+          warningComments
+        );
       }
 
       return processContractTemplate(templateContent, replacementsMap);
     } catch (error) {
       // Log the error but don't throw it
-      dbgLog(`Error generating contract ${contract.name}: ${error instanceof Error ? error.message : String(error)}`, 
-        { logType: "error", titleBefore: "Contract Generation Error" });
-      
+      dbgLog(
+        `Error generating contract ${contract.name}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+        { logType: "error" }
+      );
+
       // Return a placeholder with the error message
-      return `;;ERROR: Failed to generate contract ${contract.name}\n;;Reason: ${error instanceof Error ? error.message : String(error)}`;
+      return `;;ERROR: Failed to generate contract ${
+        contract.name
+      }\n;;Reason: ${error instanceof Error ? error.message : String(error)}`;
     }
   }
 
@@ -148,18 +161,25 @@ export class ContractGeneratorService {
       );
 
       // Log the contract being generated
-      dbgLog(`Generating contract ${contract.name} for network ${network}`, 
-        { logType: "info", titleBefore: "Contract Generation" });
+      dbgLog(`Generating contract ${contract.name} for network ${network}`, {
+        logType: "info",
+      });
 
       // Use the existing method to generate the contract
       return this.generateContract(contract, networkReplacements, env);
     } catch (error) {
       // Log the error but don't throw it
-      dbgLog(`Error generating contract ${contract.name} for network ${network}: ${error instanceof Error ? error.message : String(error)}`, 
-        { logType: "error", titleBefore: "Network Contract Generation Error" });
-      
+      dbgLog(
+        `Error generating contract ${contract.name} for network ${network}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+        { logType: "error" }
+      );
+
       // Return a placeholder with the error message
-      return `;;ERROR: Failed to generate contract ${contract.name} for network ${network}
+      return `;;ERROR: Failed to generate contract ${
+        contract.name
+      } for network ${network}
 ;;Reason: ${error instanceof Error ? error.message : String(error)}`;
     }
   }

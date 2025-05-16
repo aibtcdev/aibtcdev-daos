@@ -1,6 +1,5 @@
 export const CONTRACT_TYPES = [
   "AGENT", // agent account
-  "CORE", // core contracts
   "BASE", // base-dao
   "ACTIONS", // action proposal extensions
   "EXTENSIONS", // extensions
@@ -20,7 +19,6 @@ export type AllContractSubtypes = {
 export const CONTRACT_SUBTYPES = {
   AGENT: ["AGENT_ACCOUNT"] as const,
   BASE: ["DAO"] as const,
-  CORE: ["DAO_RUN_COST"] as const,
   ACTIONS: ["SEND_MESSAGE"],
   EXTENSIONS: [
     "ACTION_PROPOSAL_VOTING",
@@ -57,9 +55,6 @@ export const CONTRACT_NAMES: {
   },
   BASE: {
     DAO: "aibtc-base-dao",
-  },
-  CORE: {
-    DAO_RUN_COST: "aibtc-dao-run-cost",
   },
   ACTIONS: {
     SEND_MESSAGE: "aibtc-action-send-message",
