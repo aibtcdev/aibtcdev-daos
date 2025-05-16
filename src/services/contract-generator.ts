@@ -136,9 +136,11 @@ export class ContractGeneratorService {
       );
 
       // Return a placeholder with the error message
-      return `;;ERROR: Failed to generate contract ${
-        contract.name
-      }\n;;Reason: ${error instanceof Error ? error.message : String(error)}`;
+      throw new Error(
+        `Failed to generate contract for ${contract.name}: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
   }
 
