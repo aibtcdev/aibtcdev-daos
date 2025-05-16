@@ -58,6 +58,10 @@ export interface TypesResponse {
   types: Record<string, string[]>;
 }
 
+export type SimpleContractResponse = Array<
+  Pick<ContractBase, "name" | "type" | "subtype" | "source">
+>;
+
 export interface ContractsListResponse {
   contracts: Array<
     Pick<
@@ -104,33 +108,18 @@ export interface ContractDependenciesResponse {
 }
 
 export interface GeneratedContractResponse {
-  contract: {
-    name: ContractBase["name"];
-    type: ContractBase["type"];
-    subtype: ContractBase["subtype"];
-    source: string;
-    network?: string;
-    tokenSymbol?: string;
-  };
+  network: string;
+  tokenSymbol: string;
+  contract: SimpleContractResponse;
+  error?: string;
 }
 
 export interface GeneratedDaoContractsResponse {
   network: string;
   tokenSymbol: string;
-  contracts: Array<{
-    name: string;
-    type: ContractType;
-    subtype: string;
-    source: string;
-  }>;
+  contracts: SimpleContractResponse[];
   errors?: Array<{
     name: string;
     error: string;
   }>;
-}
-
-// DAO configuration
-export interface DaoConfig {
-  tokenSymbol: string;
-  network: string;
 }

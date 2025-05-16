@@ -268,56 +268,8 @@ export function createApiRouter(registry: ContractRegistry) {
     );
   });
 
-  // Generate contract from template
-  api.post("/generate-contract", async (c) => {
-    return handleRequest(
-      c,
-      async () => {
-        const body = await c.req.json();
-        // Support both name and contractName parameters for backward compatibility
-        const contractName = body.contractName || body.name;
-        const replacements = body.replacements || {};
-
-        if (!contractName) {
-          throw new ApiError(ErrorCode.INVALID_REQUEST, {
-            reason: "Missing required parameter: contractName or name",
-          });
-        }
-
-        const contract = registry.getContract(contractName);
-        if (!contract) {
-          throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, {
-            name: contractName,
-          });
-        }
-
-        try {
-          const generatedContract = await generatorService.generateContract(
-            contract,
-            replacements,
-            c.env
-          );
-
-          return {
-            contract: {
-              name: contract.name,
-              type: contract.type,
-              subtype: contract.subtype,
-              source: generatedContract,
-            },
-          } as GeneratedContractResponse;
-        } catch (error) {
-          throw new ApiError(ErrorCode.TEMPLATE_PROCESSING_ERROR, {
-            reason: error instanceof Error ? error.message : String(error),
-          });
-        }
-      },
-      { path: "/generate-contract", method: "POST" }
-    );
-  });
-
   // Generate contract for a specific network
-  api.post("/generate-contract-for-network", async (c) => {
+  api.post("/generate-contract", async (c) => {
     return handleRequest(
       c,
       async () => {
