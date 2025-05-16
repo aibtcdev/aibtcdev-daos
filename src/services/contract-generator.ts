@@ -176,11 +176,10 @@ export class ContractGeneratorService {
         { logType: "error" }
       );
 
-      // Return a placeholder with the error message
-      return `;;ERROR: Failed to generate contract ${
-        contract.name
-      } for network ${network}
-;;Reason: ${error instanceof Error ? error.message : String(error)}`;
-    }
+      throw new Error(
+        `Failed to generate contract on ${network} for ${contract.name}: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
   }
 }
