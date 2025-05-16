@@ -6,9 +6,6 @@ import { constructDao } from "../../../../utilities/dao-helpers";
 // setup accounts
 const accounts = simnet.getAccounts();
 const deployer = accounts.get("deployer")!;
-const address1 = accounts.get("wallet_1")!;
-const address2 = accounts.get("wallet_2")!;
-const address3 = accounts.get("wallet_3")!;
 
 // setup contract info for tests
 const registry = setupDaoContractRegistry();
@@ -17,10 +14,6 @@ const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "DAO_EPOCH"
 );
 const contractName = contractAddress.split(".")[1];
-const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
-  "BASE",
-  "DAO"
-);
 
 describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////

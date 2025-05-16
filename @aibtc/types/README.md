@@ -39,6 +39,7 @@ function processContract(data: ContractInfo) {
 ### Error Codes
 
 The platform uses standardized error codes organized by contract type:
+
 - `ErrCodeProtocolFeesAccount` - Error codes for protocol fees (1000-1099)
 - `ErrCodeAgentAccount` - Error codes for agent accounts (1100-1199)
 - `ErrCodeBaseDao` - Error codes for base DAO operations (1200-1299)
@@ -70,8 +71,6 @@ The platform uses standardized error codes organized by contract type:
 - `ContractsListResponse` - Response for listing all contracts
 - `ContractDetailResponse` - Response for a single contract's details
 - `ContractDependenciesResponse` - Response for contract dependencies
-- `ContractSourceResponse` - Response for contract source code
-- `GeneratedContractResponse` - Response for a generated contract
 
 ## License
 

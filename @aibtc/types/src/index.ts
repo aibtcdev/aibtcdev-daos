@@ -4,43 +4,56 @@
  * This package provides TypeScript type definitions for the AIBTC DAO API.
  */
 
-import {
+/**
+ * Contract template dependencies
+ * These are used to define the dependencies of a contract template.
+ * They can be addresses, traits, or other contracts.
+ * The dependencies are used to generate the contract and its deployment.
+ */
+import type {
   AddressDependency,
   ContractDependency,
   RuntimeValue,
   TraitDependency,
 } from "../../../models/contract-template";
-import { ContractType } from "../../../utilities/contract-types";
 
-// Re-export contract types from utilities/contract-types.ts
 export type {
+  AddressDependency,
+  TraitDependency,
+  ContractDependency,
+  RuntimeValue,
+};
+
+/**
+ * Contract types and subtypes
+ * These are used to define the types of contracts that can be generated.
+ * The types are used to generate the contract and its deployment.
+ * The subtypes are used to define the specific type of contract.
+ */
+import type {
   ContractType,
   ContractSubtype,
   AllContractSubtypes,
 } from "../../../utilities/contract-types";
+import { CONTRACT_NAMES } from "../../../utilities/contract-types";
 
-// Re-export contract model types from models/contract-template.ts
-export type {
-  AddressDependency,
-  TraitDependency,
-  ContractDependency,
-  RuntimeValue,
-} from "../../../models/contract-template";
+export type { ContractType, ContractSubtype, AllContractSubtypes };
+export { CONTRACT_NAMES };
 
 /**
- * Contract generation result
+ * API response types
+ * These are used to define the types of responses that can be returned by the API.
  */
 
-export type { DeploymentResult } from "../../../models/contract-template";
-
 // API Response interface
-export type { ApiResponse } from "../../../src/utils/response-utils";
+import type { ApiResponse } from "../../../src/utils/response-utils";
+export type { ApiResponse };
 
 // Contract info derived from ContractBase
 export interface ContractInfo {
   name: string;
   type: ContractType;
-  subtype: string;
+  subtype: ContractSubtype<ContractType>;
   deploymentOrder: number;
   templatePath: string;
   source?: string;
@@ -60,15 +73,6 @@ export interface ContractDependenciesResponse {
   dependencies: Array<
     AddressDependency | TraitDependency | ContractDependency | RuntimeValue
   >;
-}
-
-export interface ContractSourceResponse {
-  source: string;
-}
-
-export interface GeneratedContractResponse {
-  source: string;
-  hash: string;
 }
 
 // DAO configuration

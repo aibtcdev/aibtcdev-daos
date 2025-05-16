@@ -40,6 +40,7 @@ These Clarity smart contracts implement the core functionality of the DAO, inclu
 ## Contract Types
 
 The contracts are organized according to the types defined in `utilities/contract-types.ts`:
+
 - `AGENT` - Agent automation contracts for user custody and autonomous operations
 - `BASE` - Core DAO contracts that handle fundamental operations
 - `ACTIONS` - Action proposal contracts that implement specific operations

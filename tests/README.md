@@ -5,6 +5,7 @@ This directory contains the comprehensive test suite for both the smart contract
 ## Purpose
 
 These tests ensure the correct functionality of the AIBTC platform components, including:
+
 - Smart contract logic and interactions
 - API endpoints and responses
 - Utility functions and shared code
@@ -40,6 +41,7 @@ These tests ensure the correct functionality of the AIBTC platform components, i
 ## Error Code Testing
 
 The platform uses a standardized error code system defined in `utilities/contract-error-codes.ts`. Tests ensure:
+
 - Error codes are properly defined and documented
 - Contracts use the correct error code ranges for their type
 - Error messages are consistent across the platform
@@ -48,6 +50,7 @@ The platform uses a standardized error code system defined in `utilities/contrac
 ## Test Utilities
 
 The tests use several utility functions from the main `/utilities` directory:
+
 - `dao-helpers.ts` - Helper functions for DAO operations in tests
 - `debug-logging.ts` - Logging utilities for test output
 - `contract-registry.ts` - Contract registry for test setup

@@ -23,7 +23,8 @@
 (define-constant FT-INITIALIZED-BALANCE u4000000000000000) ;; max_supply times 4%
 
 ;; Vesting schedule (percentages add up to 100)
-(define-constant VESTING-SCHEDULE (list ;; Initial release - 10% at once
+(define-constant VESTING-SCHEDULE (list
+  ;; Initial release - 10% at once
   {
     height: u100,
     percent: u10,
@@ -41,7 +42,8 @@
     height: u400,
     percent: u3,
     id: u2,
-  } ;; 3%
+  }
+  ;; 3%
   {
     height: u550,
     percent: u3,
@@ -52,7 +54,8 @@
     height: u700,
     percent: u3,
     id: u4,
-  } ;; 3%
+  }
+  ;; 3%
   {
     height: u850,
     percent: u4,
@@ -76,7 +79,8 @@
     height: u1400,
     percent: u4,
     id: u8,
-  } ;; 4%
+  }
+  ;; 4%
   {
     height: u1600,
     percent: u4,
@@ -87,7 +91,8 @@
     height: u1750,
     percent: u4,
     id: u10,
-  } ;; 4%
+  }
+  ;; 4%
   {
     height: u1900,
     percent: u4,
@@ -98,7 +103,8 @@
     height: u2000,
     percent: u5,
     id: u12,
-  } ;; 5%
+  }
+  ;; 5%
   {
     height: u2100,
     percent: u5,
@@ -116,7 +122,8 @@
     height: u2900,
     percent: u5,
     id: u15,
-  } ;; 5%
+  }
+  ;; 5%
   {
     height: u3300,
     percent: u6,
@@ -127,7 +134,8 @@
     height: u3600,
     percent: u6,
     id: u17,
-  } ;; 6%
+  }
+  ;; 6%
   {
     height: u3900,
     percent: u6,
@@ -138,12 +146,14 @@
     height: u4100,
     percent: u6,
     id: u19,
-  } ;; 6%
+  }
+  ;; 6%
   {
     height: u4200,
     percent: u6,
     id: u20,
-  }))
+  }
+))
 
 ;; 6% - hitting 100% total at original final milestone
 

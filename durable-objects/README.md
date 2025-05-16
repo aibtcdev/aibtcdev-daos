@@ -24,19 +24,13 @@ The Durable Objects are deployed as part of the Cloudflare Workers infrastructur
 
 ```typescript
 // Mount durable object endpoints
-app.mount(
-  "/sse",
-  (req, env) => {
-    return env.AIBTC_MCP_DO.serveSSE("/sse").fetch(req);
-  }
-);
+app.mount("/sse", (req, env) => {
+  return env.AIBTC_MCP_DO.serveSSE("/sse").fetch(req);
+});
 
-app.mount(
-  "/mcp",
-  (req, env) => {
-    return env.AIBTC_MCP_DO.serve("/mcp").fetch(req);
-  }
-);
+app.mount("/mcp", (req, env) => {
+  return env.AIBTC_MCP_DO.serve("/mcp").fetch(req);
+});
 ```
 
 [Back to main README](/)

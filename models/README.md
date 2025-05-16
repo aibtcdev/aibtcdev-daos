@@ -22,6 +22,7 @@ Type-specific contract models:
 ## Contract Model Structure
 
 Each contract model extends the `ContractBase` class and provides:
+
 - Type information (contract type and subtype)
 - Deployment order information
 - Template path generation
@@ -31,6 +32,7 @@ Each contract model extends the `ContractBase` class and provides:
 ## Usage
 
 These models are used by:
+
 1. The contract registry to organize and look up contracts
 2. The contract generator service to generate contracts with the correct dependencies
 3. The API to provide contract information to clients

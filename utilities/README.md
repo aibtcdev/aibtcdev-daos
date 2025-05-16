@@ -27,6 +27,7 @@ These utilities provide common functionality needed across different parts of th
 ## Contract Types
 
 The platform organizes contracts into the following types:
+
 - `AGENT` - Agent automation contracts
 - `BASE` - Core DAO contracts
 - `ACTIONS` - Action proposal contracts
@@ -39,6 +40,7 @@ Each type has specific subtypes as defined in `contract-types.ts`.
 ## Usage
 
 These utilities are imported by other parts of the codebase to perform common operations like:
+
 - Contract generation and template processing
 - Dependency management between contracts
 - Asset and balance tracking

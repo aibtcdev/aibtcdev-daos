@@ -26,6 +26,7 @@ The API provides a programmatic interface for interacting with the AIBTC DAO con
 The API is deployed as a Cloudflare Worker and provides the following endpoints:
 
 ### GET Endpoints
+
 - `/api` - API status check
 - `/api/types` - Get all contract types and their subtypes
 - `/api/contracts` - Get all contracts in the registry
@@ -38,6 +39,7 @@ The API is deployed as a Cloudflare Worker and provides the following endpoints:
 - `/api/dependencies/:name` - Get contract dependencies
 
 ### POST Endpoints
+
 - `/api/generate-contract` - Generate a contract from template with custom parameters
 - `/api/generate-contract-for-network` - Generate a contract for a specific network
 - `/api/generate-dao-contracts` - Generate all DAO contracts for a network
