@@ -8,7 +8,7 @@ import {
   ContractsByTypeResponse,
   ContractDependenciesResponse,
   GeneratedContractResponse,
-  GeneratedDaoContractsResponse
+  GeneratedDaoContractsResponse,
 } from "@aibtc/types";
 import { CloudflareBindings } from "./cf-types";
 import { ContractRegistry } from "../utilities/contract-registry";

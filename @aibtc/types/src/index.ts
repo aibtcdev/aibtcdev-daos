@@ -59,7 +59,12 @@ export interface TypesResponse {
 }
 
 export interface ContractsListResponse {
-  contracts: Array<Pick<ContractBase, 'name' | 'type' | 'subtype' | 'deploymentOrder' | 'isDeployed'>>;
+  contracts: Array<
+    Pick<
+      ContractBase,
+      "name" | "type" | "subtype" | "deploymentOrder" | "isDeployed"
+    >
+  >;
 }
 
 export interface ContractNamesResponse {
@@ -67,29 +72,42 @@ export interface ContractNamesResponse {
 }
 
 export interface ContractDetailResponse {
-  contract: Pick<ContractBase, 'name' | 'type' | 'subtype' | 'templatePath' | 'deploymentOrder' | 'isDeployed' | 'source' | 'hash' | 'deploymentResult'>;
+  contract: Pick<
+    ContractBase,
+    | "name"
+    | "type"
+    | "subtype"
+    | "templatePath"
+    | "deploymentOrder"
+    | "isDeployed"
+    | "source"
+    | "hash"
+    | "deploymentResult"
+  >;
 }
 
 export interface ContractsByTypeResponse {
   type: string;
-  contracts: Array<Pick<ContractBase, 'name' | 'subtype' | 'deploymentOrder' | 'isDeployed'>>;
+  contracts: Array<
+    Pick<ContractBase, "name" | "subtype" | "deploymentOrder" | "isDeployed">
+  >;
 }
 
 export interface ContractDependenciesResponse {
   name: string;
   dependencies: {
-    addresses: ContractBase['requiredAddresses'];
-    traits: ContractBase['requiredTraits'];
-    contracts: ContractBase['requiredContractAddresses'];
-    runtimeValues: ContractBase['requiredRuntimeValues'];
+    addresses: ContractBase["requiredAddresses"];
+    traits: ContractBase["requiredTraits"];
+    contracts: ContractBase["requiredContractAddresses"];
+    runtimeValues: ContractBase["requiredRuntimeValues"];
   };
 }
 
 export interface GeneratedContractResponse {
   contract: {
-    name: ContractBase['name'];
-    type: ContractBase['type'];
-    subtype: ContractBase['subtype'];
+    name: ContractBase["name"];
+    type: ContractBase["type"];
+    subtype: ContractBase["subtype"];
     content: string;
     network?: string;
     tokenSymbol?: string;
@@ -113,7 +131,6 @@ export interface GeneratedDaoContractsResponse {
 
 // DAO configuration
 export interface DaoConfig {
-  name: string;
   tokenSymbol: string;
   network: string;
 }
