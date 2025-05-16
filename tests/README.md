@@ -35,6 +35,15 @@ These tests ensure the correct functionality of the AIBTC platform components, i
 - Contract tests validate core functionality like voting, treasury operations, and token management
 - Endpoint tests verify API responses and error handling
 - Utility tests check helper functions and shared code
+- Error code tests verify that all contracts use the standardized error code system
+
+## Error Code Testing
+
+The platform uses a standardized error code system defined in `utilities/contract-error-codes.ts`. Tests ensure:
+- Error codes are properly defined and documented
+- Contracts use the correct error code ranges for their type
+- Error messages are consistent across the platform
+- No duplicate error codes exist within a contract type
 
 ## Test Utilities
 

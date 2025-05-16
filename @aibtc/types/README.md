@@ -36,6 +36,21 @@ function processContract(data: ContractInfo) {
 - `ApiResponse<T>` - Base response wrapper for all API endpoints
 - `ErrorCode` - Error codes used in API responses
 
+### Error Codes
+
+The platform uses standardized error codes organized by contract type:
+- `ErrCodeProtocolFeesAccount` - Error codes for protocol fees (1000-1099)
+- `ErrCodeAgentAccount` - Error codes for agent accounts (1100-1199)
+- `ErrCodeBaseDao` - Error codes for base DAO operations (1200-1299)
+- `ErrCodeActionProposalVoting` - Error codes for proposal voting (1300-1399)
+- `ErrCodeDaoCharter` - Error codes for DAO charter operations (1400-1499)
+- `ErrCodeDaoUsers` - Error codes for DAO user management (1500-1599)
+- `ErrCodeOnchainMessaging` - Error codes for messaging (1600-1699)
+- `ErrCodeRewardsAccount` - Error codes for rewards (1700-1799)
+- `ErrCodeTokenOwner` - Error codes for token ownership (1800-1899)
+- `ErrCodeTreasury` - Error codes for treasury operations (1900-1999)
+- `ErrCodeActionSendMessage` - Error codes for message actions (2000-2099)
+
 ### Contract Types
 
 - `ContractType` - Types of contracts (BASE, ACTIONS, etc.)

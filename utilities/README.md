@@ -11,7 +11,7 @@ These utilities provide common functionality needed across different parts of th
 - `asset-helpers.ts` - Utilities for working with blockchain assets and balances
 - `contract-dependencies.ts` - Defines dependencies between contracts
 - `contract-deployment-order.ts` - Defines the order for contract deployment
-- `contract-error-codes.ts` - Standardized error codes for contracts
+- `contract-error-codes.ts` - Standardized error codes for contracts (organized by contract type with unique ranges)
 - `contract-helpers.ts` - Helper functions for contract operations
 - `contract-registry.ts` - Registry for managing contract definitions and lookups
 - `contract-types.ts` - Type definitions for contract categories and subtypes
