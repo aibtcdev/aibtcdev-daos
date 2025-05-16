@@ -70,7 +70,7 @@ export function generateTemplateReplacements(
     [`agent_account_trait_faktory_buy_sell`]: `'${traits.AGENT_FAKTORY_BUY_SELL}`,
 
     // DAO run cost: TODO add to known addresses (and deploy)
-    [`.dao-run-cost/base_contract_dao_run_cost`]: `.aibtc-dao-run-cost`,
+    [`.dao-run-cost/base_contract_dao_run_cost`]: `'${addresses.AIBTC_RUN_COST}`,
 
     // Contract references with full paths for template matching
     [`.aibtc-faktory/dao_contract_token`]: `.${symbol}-faktory`,
@@ -102,7 +102,7 @@ export function generateTemplateReplacements(
     [`dao_token_owner_contract`]: `.${symbol}-token-owner`,
     [`dao_action_send_message`]: `.${symbol}-action-send-message`,
     [`dao_action_send_message_contract`]: `.${symbol}-action-send-message`,
-    [`base_contract_dao_run_cost`]: `.aibtc-dao-run-cost`,
+    [`base_contract_dao_run_cost`]: `'${addresses.AIBTC_RUN_COST}`,
     [`dao_contract_rewards_account`]: `.${symbol}-rewards-account`,
 
     // External contracts

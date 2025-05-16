@@ -13,7 +13,6 @@ export function defineAllDaoContractDependencies(
   defineProposalContractDependencies(registry);
   defineTokenContractDependencies(registry);
   defineAgentContractDependencies(registry);
-  defineCoreContractDependencies(registry);
 }
 
 /**
@@ -107,11 +106,7 @@ export function defineExtensionContractDependencies(
             "dao_trait_action_proposals_voting"
           )
           .addTraitDependency("DAO_ACTION", "dao_trait_action")
-          .addContractDependency(
-            "base_contract_dao_run_cost",
-            "CORE",
-            "DAO_RUN_COST"
-          )
+          .addAddressDependency("AIBTC_RUN_COST", "base_contract_dao_run_cost")
           .addContractDependency(
             "dao_contract_rewards_account",
             "EXTENSIONS",
@@ -354,30 +349,6 @@ export function defineAgentContractDependencies(
       default:
         // Default dependencies for all agent contracts
         contract.addRuntimeValue("dao_token_symbol");
-        break;
-    }
-  });
-}
-
-/**
- * Define dependencies for Core contracts
- * @param registry The contract registry instance
- */
-export function defineCoreContractDependencies(
-  registry: ContractRegistry
-): void {
-  // Get all core contracts
-  const coreContracts = registry.getContractsByType("CORE");
-
-  // Define dependencies for each core contract
-  coreContracts.forEach((contract) => {
-    switch (contract.name) {
-      case "aibtc-dao-run-cost":
-        contract.addTraitDependency("BASE_SIP010", "base_trait_sip010");
-        break;
-
-      default:
-        // Default dependencies for all core contracts
         break;
     }
   });

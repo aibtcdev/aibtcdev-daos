@@ -1,4 +1,4 @@
-import { initSimnet, Simnet } from "@hirosystems/clarinet-sdk";
+import { initSimnet } from "@hirosystems/clarinet-sdk";
 
 const simnetInitializer = async () =>
   await initSimnet("Clarinet.toml", false, {

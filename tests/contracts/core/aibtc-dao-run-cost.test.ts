@@ -1,9 +1,9 @@
 import { Cl, ClarityType } from "@stacks/transactions";
-import { describe, expect, it, beforeEach, beforeAll } from "vitest";
-import { setupFullContractRegistry } from "../../../utilities/contract-registry";
+import { describe, expect, it, beforeEach } from "vitest";
 import { getSpecificAssetBalance } from "../../../utilities/asset-helpers";
 import { DAO_TOKEN_ASSETS_MAP } from "../../../utilities/contract-helpers";
-import { fundVoters, getDaoTokens } from "../../../utilities/dao-helpers";
+import { getDaoTokens } from "../../../utilities/dao-helpers";
+import { getKnownAddress } from "../../../utilities/known-addresses";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -11,15 +11,10 @@ const deployer = accounts.get("deployer")!;
 const address1 = accounts.get("wallet_1")!;
 const address2 = accounts.get("wallet_2")!;
 const address3 = accounts.get("wallet_3")!;
-const address4 = accounts.get("wallet_4")!;
 const address5 = accounts.get("wallet_5")!;
 
 // setup contract info for tests
-const registry = setupFullContractRegistry();
-const contractAddress = registry.getContractAddressByTypeAndSubtype(
-  "CORE",
-  "DAO_RUN_COST"
-);
+const contractAddress = getKnownAddress("devnet", "AIBTC_RUN_COST");
 const contractName = contractAddress.split(".")[1];
 
 // Error constants from the contract

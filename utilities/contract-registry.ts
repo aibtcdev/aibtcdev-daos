@@ -336,12 +336,6 @@ export class ContractRegistry {
           subtype as ContractSubtype<"AGENT">
         );
         break;
-      case "CORE":
-        contract = new CoreContract(
-          name as any, // Type assertion to handle the string literal constraint
-          subtype as ContractSubtype<"CORE">
-        );
-        break;
       case "EXTERNAL":
         contract = new ExternalContract(
           name as any, // Type assertion to handle the string literal constraint

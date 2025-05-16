@@ -21,9 +21,6 @@ export const DEPLOYMENT_ORDER: Record<string, number> = {
   // can be deployed anytime
   [getContractName("AGENT", "AGENT_ACCOUNT")]: 1,
 
-  // core contracts
-  [getContractName("CORE", "DAO_RUN_COST")]: 5,
-
   // token contracts
   [getContractName("TOKEN", "PRELAUNCH")]: 10,
   [getContractName("TOKEN", "DAO")]: 11,
