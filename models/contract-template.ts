@@ -40,8 +40,8 @@ export abstract class ContractBase {
   readonly subtype: ContractSubtype<ContractType>;
   readonly deploymentOrder: number;
   readonly templatePath: string;
-
-  protected clarityVersion: ClarityVersion | undefined;
+  readonly clarityVersion: ClarityVersion | undefined;
+  
   protected _displayName?: string;
   protected _source?: string;
   protected _hash?: string;

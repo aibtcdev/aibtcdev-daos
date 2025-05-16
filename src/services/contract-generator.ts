@@ -158,7 +158,7 @@ export class ContractGeneratorService {
       // Generate replacements for the specified network
       const networkReplacements = generateTemplateReplacements(
         network,
-        tokenSymbol,
+        tokenSymbol.toLowerCase(),
         customReplacements
       );
 
