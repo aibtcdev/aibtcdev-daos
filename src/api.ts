@@ -22,6 +22,8 @@ import { ErrorCode } from "./utils/error-catalog";
 import { handleRequest } from "./utils/request-handler";
 import { ContractGeneratorService } from "./services/contract-generator";
 
+// TODO: should SimpleContractResponse just be the full ContractBase object?
+
 export function createApiRouter(registry: ContractRegistry) {
   const api = new Hono<{ Bindings: CloudflareBindings }>();
   const generatorService = new ContractGeneratorService();
@@ -52,7 +54,7 @@ export function createApiRouter(registry: ContractRegistry) {
             ? Object.values(CONTRACT_SUBTYPES[type])
             : [];
         });
-
+        // TODO: ContractTypesResponse
         return { types: result } as TypesResponse;
       },
       { path: "/types", method: "GET" }
@@ -65,6 +67,7 @@ export function createApiRouter(registry: ContractRegistry) {
       c,
       async () => {
         const contracts = registry.getAllContracts();
+        // TODO: use SimpleContractResponse if possible
         const contractData = contracts.map((contract) => ({
           name: contract.name,
           type: contract.type,
@@ -130,6 +133,7 @@ export function createApiRouter(registry: ContractRegistry) {
 
         return {
           type,
+          // TODO: use SimpleContractResponse if possible
           contracts: contracts.map((contract) => ({
             name: contract.name,
             subtype: contract.subtype,
@@ -155,6 +159,7 @@ export function createApiRouter(registry: ContractRegistry) {
         }
 
         return {
+          // TODO: use SimpleContractResponse if possible
           contract: {
             name: contract.name,
             type: contract.type,
@@ -213,6 +218,7 @@ export function createApiRouter(registry: ContractRegistry) {
           }
 
           return {
+            // TODO: use SimpleContractResponse if possible
             contract: {
               name: contract.name,
               type: contract.type,
@@ -313,12 +319,12 @@ export function createApiRouter(registry: ContractRegistry) {
             );
 
           return {
+            network,
+            tokenSymbol,
             contract: {
               name: contract.name,
               type: contract.type,
               subtype: contract.subtype,
-              network,
-              tokenSymbol,
               source: generatedContract,
             },
           } as GeneratedContractResponse;
@@ -403,6 +409,7 @@ export function createApiRouter(registry: ContractRegistry) {
 
               generatedContracts.push({
                 name: contract.name,
+                displayName: contract.displayName,
                 type: contract.type,
                 subtype: contract.subtype,
                 source: generatedContract,
