@@ -57,7 +57,6 @@ The platform uses standardized error codes organized by contract type:
 - `ContractType` - Types of contracts (BASE, ACTIONS, etc.)
 - `ContractSubtype` - Subtypes for each contract type
 - `ContractInfo` - Information about a contract
-- `DeploymentResult` - Result of contract generation
 
 ### Dependencies
 

@@ -16,7 +16,7 @@ import type {
   RuntimeValue,
   TraitDependency,
   ContractBase,
-  DeploymentResult,
+  ContractResponse,
 } from "../../../models/contract-template";
 
 export type {
@@ -25,7 +25,6 @@ export type {
   ContractDependency,
   RuntimeValue,
   ContractBase,
-  DeploymentResult,
 };
 
 /**
@@ -54,22 +53,12 @@ import type { ApiResponse } from "../../../src/utils/response-utils";
 export type { ApiResponse };
 
 // API response types for specific endpoints
-export interface TypesResponse {
+export interface ContractTypesResponse {
   types: Record<string, string[]>;
 }
 
-export type SimpleContractResponse = Pick<
-  ContractBase,
-  "name" | "displayName" | "type" | "subtype" | "source"
->;
-
 export interface ContractsListResponse {
-  contracts: Array<
-    Pick<
-      ContractBase,
-      "name" | "type" | "subtype" | "deploymentOrder" | "isDeployed"
-    >
-  >;
+  contracts: Array<ContractResponse>;
 }
 
 export interface ContractNamesResponse {
@@ -77,25 +66,12 @@ export interface ContractNamesResponse {
 }
 
 export interface ContractDetailResponse {
-  contract: Pick<
-    ContractBase,
-    | "name"
-    | "type"
-    | "subtype"
-    | "templatePath"
-    | "deploymentOrder"
-    | "isDeployed"
-    | "source"
-    | "hash"
-    | "deploymentResult"
-  >;
+  contract: ContractResponse;
 }
 
 export interface ContractsByTypeResponse {
   type: string;
-  contracts: Array<
-    Pick<ContractBase, "name" | "subtype" | "deploymentOrder" | "isDeployed">
-  >;
+  contracts: Array<ContractResponse>;
 }
 
 export interface ContractDependenciesResponse {
@@ -111,14 +87,14 @@ export interface ContractDependenciesResponse {
 export interface GeneratedContractResponse {
   network: string;
   tokenSymbol: string;
-  contract: SimpleContractResponse;
+  contract: ContractResponse;
   error?: string;
 }
 
 export interface GeneratedDaoContractsResponse {
   network: string;
   tokenSymbol: string;
-  contracts: SimpleContractResponse[];
+  contracts: Array<ContractResponse>;
   errors?: Array<{
     name: string;
     error: string;

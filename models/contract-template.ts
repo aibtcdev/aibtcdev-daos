@@ -23,12 +23,15 @@ export interface RuntimeValue {
   key: string;
 }
 
-export interface DeploymentResult {
-  sender: string; // address from config that deployed
-  success: boolean; // deployment success status
-  txId?: string; // transaction ID if successful
-  address: string; // contract address after deployment
-  error?: string; // error message if failed
+export interface ContractResponse {
+  name: string;
+  displayName?: string;
+  type: ContractType;
+  subtype: ContractSubtype<ContractType>;
+  source?: string;
+  hash?: string;
+  deploymentOrder: number;
+  clarityVersion?: ClarityVersion;
 }
 
 export abstract class ContractBase {
@@ -42,7 +45,6 @@ export abstract class ContractBase {
   protected _displayName?: string;
   protected _source?: string;
   protected _hash?: string;
-  protected _deploymentResult?: DeploymentResult;
 
   // Generate template path based on contract type
   static generateTemplatePath(type: ContractType, name: string): string {
@@ -99,14 +101,6 @@ export abstract class ContractBase {
     return this._hash;
   }
 
-  get isDeployed(): boolean {
-    return !!this._deploymentResult?.success;
-  }
-
-  get deploymentResult(): DeploymentResult | undefined {
-    return this._deploymentResult;
-  }
-
   // Setters for generated content
   setDisplayName(displayName: string): this {
     this._displayName = displayName;
@@ -120,11 +114,6 @@ export abstract class ContractBase {
 
   setHash(hash: string): this {
     this._hash = hash;
-    return this;
-  }
-
-  setDeploymentResult(result: DeploymentResult): this {
-    this._deploymentResult = result;
     return this;
   }
 
@@ -245,16 +234,16 @@ export abstract class ContractBase {
       entry.requiredRuntimeValues = [...this.requiredRuntimeValues];
     }
 
+    if (this._displayName) {
+      entry.displayName = this._displayName;
+    }
+
     if (this._source) {
       entry.source = this._source;
     }
 
     if (this._hash) {
       entry.hash = this._hash;
-    }
-
-    if (this._deploymentResult) {
-      Object.assign(entry, this._deploymentResult);
     }
 
     return entry;

@@ -1,12 +1,12 @@
 import { Hono } from "hono";
 import { StacksNetworkName } from "@stacks/network";
 import {
-  TypesResponse,
   ContractsListResponse,
   ContractNamesResponse,
   ContractDetailResponse,
   ContractsByTypeResponse,
   ContractDependenciesResponse,
+  ContractTypesResponse,
   GeneratedContractResponse,
   GeneratedDaoContractsResponse,
 } from "@aibtc/types";
@@ -54,8 +54,7 @@ export function createApiRouter(registry: ContractRegistry) {
             ? Object.values(CONTRACT_SUBTYPES[type])
             : [];
         });
-        // TODO: ContractTypesResponse
-        return { types: result } as TypesResponse;
+        return { types: result } as ContractTypesResponse;
       },
       { path: "/types", method: "GET" }
     );
@@ -73,7 +72,6 @@ export function createApiRouter(registry: ContractRegistry) {
           type: contract.type,
           subtype: contract.subtype,
           deploymentOrder: contract.deploymentOrder,
-          isDeployed: contract.isDeployed,
         }));
 
         return { contracts: contractData } as ContractsListResponse;
@@ -138,7 +136,6 @@ export function createApiRouter(registry: ContractRegistry) {
             name: contract.name,
             subtype: contract.subtype,
             deploymentOrder: contract.deploymentOrder,
-            isDeployed: contract.isDeployed,
           })),
         } as ContractsByTypeResponse;
       },
@@ -166,10 +163,8 @@ export function createApiRouter(registry: ContractRegistry) {
             subtype: contract.subtype,
             templatePath: contract.templatePath,
             deploymentOrder: contract.deploymentOrder,
-            isDeployed: contract.isDeployed,
             source: contract.source,
             hash: contract.hash,
-            deploymentResult: contract.deploymentResult,
           },
         } as ContractDetailResponse;
       },
@@ -225,7 +220,6 @@ export function createApiRouter(registry: ContractRegistry) {
               subtype: contract.subtype,
               templatePath: contract.templatePath,
               deploymentOrder: contract.deploymentOrder,
-              isDeployed: contract.isDeployed,
             },
           };
         } catch (error) {
