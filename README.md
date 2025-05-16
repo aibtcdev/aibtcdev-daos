@@ -23,7 +23,7 @@ This platform provides the infrastructure for decentralized governance of the AI
 - [/models](/models) - Contract model definitions and abstractions
 - [/src](/src) - Hosted API implementation and endpoints
 - [/tests](/tests) - Test suite for contracts and API functionality
-- [/utilities](/utilities) - Reusable helper code and shared utilities
+- [/utilities](/utilities) - Reusable helper code and shared utilities for contract generation and management
 - [/@aibtc/types](/types) - TypeScript type definitions exported as an npm package
 
 ## API Types
