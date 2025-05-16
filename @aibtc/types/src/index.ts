@@ -15,7 +15,7 @@ import type {
   ContractDependency,
   RuntimeValue,
   TraitDependency,
-} from "../../../models/contract-template";
+} from "../models/contract-template";
 
 export type {
   AddressDependency,
@@ -34,8 +34,8 @@ import type {
   ContractType,
   ContractSubtype,
   AllContractSubtypes,
-} from "../../../utilities/contract-types";
-import { CONTRACT_NAMES } from "../../../utilities/contract-types";
+} from "../utilities/contract-types";
+import { CONTRACT_NAMES } from "../utilities/contract-types";
 
 export type { ContractType, ContractSubtype, AllContractSubtypes };
 export { CONTRACT_NAMES };
@@ -46,7 +46,7 @@ export { CONTRACT_NAMES };
  */
 
 // API Response interface
-import type { ApiResponse } from "../../../src/utils/response-utils";
+import type { ApiResponse } from "../src/utils/response-utils";
 export type { ApiResponse };
 
 // Contract info derived from ContractBase

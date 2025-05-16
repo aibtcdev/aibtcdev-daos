@@ -34,7 +34,7 @@ function copyFiles(dir, targetBase) {
   }
 }
 
-// Fix import paths in JavaScript files
+// Fix import paths in JavaScript and TypeScript declaration files
 function fixImportPaths(dir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
 
@@ -43,11 +43,15 @@ function fixImportPaths(dir) {
     
     if (entry.isDirectory()) {
       fixImportPaths(filePath);
-    } else if (entry.name.endsWith('.js')) {
+    } else if (entry.name.endsWith('.js') || entry.name.endsWith('.d.ts')) {
       let content = fs.readFileSync(filePath, 'utf8');
       
       // Fix imports that use "../../../"
-      content = content.replace(/from\s+["']\.\.\/\.\.\/\.\.\/(.+?)["']/g, (match, importPath) => {
+      const importRegex = entry.name.endsWith('.js') 
+        ? /from\s+["']\.\.\/\.\.\/\.\.\/(.+?)["']/g 
+        : /from\s+["']\.\.\/\.\.\/\.\.\/(.+?)["']/g;
+      
+      content = content.replace(importRegex, (match, importPath) => {
         // For imports from utilities directory
         if (importPath.startsWith('utilities/')) {
           return `from "./utilities/${importPath.substring(10)}"`;
@@ -65,6 +69,28 @@ function fixImportPaths(dir) {
           return `from "./${importPath}"`;
         }
       });
+      
+      // Also fix type imports in .d.ts files
+      if (entry.name.endsWith('.d.ts')) {
+        content = content.replace(/import\s+type\s+\{(.+?)\}\s+from\s+["']\.\.\/\.\.\/\.\.\/(.+?)["']/g, (match, types, importPath) => {
+          // For imports from utilities directory
+          if (importPath.startsWith('utilities/')) {
+            return `import type {${types}} from "./utilities/${importPath.substring(10)}"`;
+          }
+          // For imports from models directory
+          else if (importPath.startsWith('models/')) {
+            return `import type {${types}} from "./models/${importPath.substring(7)}"`;
+          }
+          // For imports from src directory
+          else if (importPath.startsWith('src/')) {
+            return `import type {${types}} from "./src/${importPath.substring(4)}"`;
+          }
+          // For other imports
+          else {
+            return `import type {${types}} from "./${importPath}"`;
+          }
+        });
+      }
       
       fs.writeFileSync(filePath, content);
     }
