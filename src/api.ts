@@ -303,7 +303,7 @@ export function createApiRouter(registry: ContractRegistry) {
               name: contract.name,
               type: contract.type,
               subtype: contract.subtype,
-              content: generatedContract,
+              source: generatedContract,
             },
           } as GeneratedContractResponse;
         } catch (error) {
@@ -367,7 +367,7 @@ export function createApiRouter(registry: ContractRegistry) {
               subtype: contract.subtype,
               network,
               tokenSymbol,
-              content: generatedContract,
+              source: generatedContract,
             },
           } as GeneratedContractResponse;
         } catch (error) {
@@ -432,16 +432,9 @@ export function createApiRouter(registry: ContractRegistry) {
         const daoContractNames = registry.getAllDaoContractNames();
 
         // Generate each contract
-        const generatedContracts: Array<{
-          name: string;
-          type: ContractType;
-          subtype: string;
-          content: string;
-        }> = [];
-        const errors: Array<{
-          name: string;
-          error: string;
-        }> = [];
+        const generatedContracts: GeneratedDaoContractsResponse["contracts"] =
+          [];
+        const generatedErrors: GeneratedDaoContractsResponse["errors"] = [];
 
         for (const contractName of daoContractNames) {
           const contract = registry.getContract(contractName);
@@ -460,11 +453,11 @@ export function createApiRouter(registry: ContractRegistry) {
                 name: contract.name,
                 type: contract.type,
                 subtype: contract.subtype,
-                content: generatedContract,
+                source: generatedContract,
               });
             } catch (error) {
               // Track errors but continue with other contracts
-              errors.push({
+              generatedErrors.push({
                 name: contract.name,
                 error: error instanceof Error ? error.message : String(error),
               });
@@ -477,7 +470,7 @@ export function createApiRouter(registry: ContractRegistry) {
           network,
           tokenSymbol,
           contracts: generatedContracts.length > 0 ? generatedContracts : [],
-          errors: errors.length > 0 ? errors : undefined,
+          errors: generatedErrors.length > 0 ? generatedErrors : undefined,
         } as GeneratedDaoContractsResponse;
       },
       { path: "/generate-dao-contracts", method: "POST" }

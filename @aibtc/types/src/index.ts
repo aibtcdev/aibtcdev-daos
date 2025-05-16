@@ -108,7 +108,7 @@ export interface GeneratedContractResponse {
     name: ContractBase["name"];
     type: ContractBase["type"];
     subtype: ContractBase["subtype"];
-    content: string;
+    source: string;
     network?: string;
     tokenSymbol?: string;
   };
@@ -121,7 +121,7 @@ export interface GeneratedDaoContractsResponse {
     name: string;
     type: ContractType;
     subtype: string;
-    content: string;
+    source: string;
   }>;
   errors?: Array<{
     name: string;
