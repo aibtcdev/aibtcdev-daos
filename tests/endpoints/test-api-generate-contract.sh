@@ -39,14 +39,14 @@ test_api_process_template() {
         "$url")
     
     # Debug the raw response
-    echo "===================="
-    echo "Raw response (valid_data):"
-    echo "$response"
-    echo "===================="
+    #echo "===================="
+    #echo "Raw response (valid_data):"
+    #echo "$response"
+    #echo "===================="
     
     status=$(echo "$response" | tail -n1)
 
-    echo "Status: $status"
+    #echo "Status: $status"
     
     if [ "$status" -eq 200 ]; then
         echo -e "${GREEN}✓${NC} Generate contract endpoint with valid data - Status: $status"
@@ -66,14 +66,14 @@ test_api_process_template() {
         "$url")
 
     # Debug the raw response
-    echo "===================="
-    echo "Raw response (invalid_data):"
-    echo "$response"
-    echo "===================="
+    #echo "===================="
+    #echo "Raw response (invalid_data):"
+    #echo "$response"
+    #echo "===================="
     
     status=$(echo "$response" | tail -n1)
 
-    echo "Status: $status"
+    #echo "Status: $status"
     
     if [ "$status" -eq 400 ]; then
         echo -e "${GREEN}✓${NC} Generate contract endpoint with invalid data - Status: $status"
