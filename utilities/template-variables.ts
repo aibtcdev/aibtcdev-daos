@@ -16,7 +16,7 @@ export function generateTemplateReplacements(
   // Always use "aibtc" for template keys since that's what's in the template files
   const templateKeySymbol = "aibtc";
 
-  const symbol = tokenSymbol.toLowerCase();
+  const symbol = tokenSymbol;
 
   // Base replacements
   const replacements: Record<string, string> = {
@@ -104,7 +104,7 @@ export function generateTemplateReplacements(
     [`dao_action_send_message_contract`]: `.${symbol}-action-send-message`,
     [`base_contract_dao_run_cost`]: `'${addresses.AIBTC_RUN_COST}`,
     [`dao_contract_rewards_account`]: `.${symbol}-rewards-account`,
-    
+
     // Pre-launch and pool contracts
     [`dao_contract_token_prelaunch`]: `.${symbol}-pre-faktory`,
     [`dao_contract_token_pool`]: `.${symbol}-bitflow-pool`,

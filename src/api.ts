@@ -283,7 +283,7 @@ export function createApiRouter(registry: ContractRegistry) {
         const body = await c.req.json();
         const contractName = body.contractName || body.name;
         const network = body.network || "devnet";
-        const tokenSymbol = body.tokenSymbol || "aibtc";
+        const tokenSymbol = body.tokenSymbol.toLowerCase() || "aibtc";
         const customReplacements = body.customReplacements || {};
 
         if (!contractName) {
@@ -350,7 +350,7 @@ export function createApiRouter(registry: ContractRegistry) {
       async () => {
         const body = await c.req.json();
         const network = body.network || "devnet";
-        const tokenSymbol = body.tokenSymbol || "aibtc";
+        const tokenSymbol = body.tokenSymbol.toLowerCase() || "aibtc";
         const customReplacements = body.customReplacements || {};
 
         // Validate network

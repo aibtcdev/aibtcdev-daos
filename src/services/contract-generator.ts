@@ -156,13 +156,13 @@ export class ContractGeneratorService {
   ): Promise<string> {
     try {
       // Set the display name by replacing 'aibtc' with the lowercase token symbol
-      const displayName = contract.name.replace('aibtc', tokenSymbol.toLowerCase());
+      const displayName = contract.name.replace("aibtc", tokenSymbol);
       contract.setDisplayName(displayName);
 
       // Generate replacements for the specified network
       const networkReplacements = generateTemplateReplacements(
         network,
-        tokenSymbol.toLowerCase(),
+        tokenSymbol,
         customReplacements
       );
 

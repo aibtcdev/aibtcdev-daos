@@ -121,7 +121,7 @@ export class ContractRegistry {
     tokenSymbol: string,
     replaceText = "aibtc"
   ): string {
-    return originalName.replace(replaceText, tokenSymbol.toLowerCase());
+    return originalName.replace(replaceText, tokenSymbol);
   }
 
   // Helper function to safely access contract names by type and subtype
