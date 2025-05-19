@@ -24,8 +24,8 @@ export const DEPLOYMENT_ORDER: Record<string, number> = {
   // token contracts
   [useContract("TOKEN", "DAO")]: 10,
   [useContract("TOKEN", "PRELAUNCH")]: 11,
-  [useContract("TOKEN", "DEX")]: 12,
-  [useContract("TOKEN", "POOL")]: 13,
+  [useContract("TOKEN", "POOL")]: 12,
+  [useContract("TOKEN", "DEX")]: 13,
 
   // base dao contract
   [useContract("BASE", "DAO")]: 20,
