@@ -448,5 +448,82 @@ export function createApiRouter(registry: ContractRegistry) {
     );
   });
 
+  // Generate agent contract for a specific network
+  api.post("/generate-agent-contract", async (c) => {
+    return handleRequest(
+      c,
+      async () => {
+        const body = await c.req.json();
+        const contractName: string = body.contractName || body.name;
+        const network: string = body.network ?? "devnet";
+        const tokenSymbol: string = body.tokenSymbol ?? "aibtc";
+        const tokenSymbolLower = tokenSymbol.toLowerCase();
+        const customReplacements: Record<string, string> =
+          body.customReplacements || {};
+
+        if (!contractName) {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: "Missing required parameter: contractName or name",
+          });
+        }
+
+        // Validate network
+        if (!validNetworks.includes(network)) {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(
+              ", "
+            )}`,
+          });
+        }
+
+        const contract = registry.getContract(contractName);
+        if (!contract) {
+          throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, {
+            name: contractName,
+          });
+        }
+
+        // Verify this is an agent contract
+        if (contract.type !== "AGENT") {
+          throw new ApiError(ErrorCode.INVALID_CONTRACT_TYPE, {
+            type: contract.type,
+            expected: "AGENT",
+          });
+        }
+
+        try {
+          const generatedContract =
+            await generatorService.generateContractForNetwork(
+              contract,
+              network as StacksNetworkName,
+              tokenSymbolLower,
+              customReplacements,
+              c.env
+            );
+
+          return {
+            network,
+            tokenSymbol: tokenSymbolLower,
+            contract: {
+              name: contract.name,
+              displayName: contract.displayName,
+              type: contract.type,
+              subtype: contract.subtype,
+              source: generatedContract,
+              hash: contract.hash,
+              deploymentOrder: contract.deploymentOrder,
+              clarityVersion: contract.clarityVersion,
+            },
+          } as GeneratedContractResponse;
+        } catch (error) {
+          throw new ApiError(ErrorCode.TEMPLATE_PROCESSING_ERROR, {
+            reason: error instanceof Error ? error.message : String(error),
+          });
+        }
+      },
+      { path: "/generate-agent-contract", method: "POST" }
+    );
+  });
+
   return api;
 }
