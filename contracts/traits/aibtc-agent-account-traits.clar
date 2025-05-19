@@ -48,6 +48,10 @@
     (<dao-action-proposals-trait> uint bool)
     (response bool uint)
   )
+  (veto-action-proposal
+    (<dao-action-proposals-trait> uint)
+    (response bool uint)
+  )
   (conclude-action-proposal
     (<dao-action-proposals-trait> uint <dao-action-trait>)
     (response bool uint)

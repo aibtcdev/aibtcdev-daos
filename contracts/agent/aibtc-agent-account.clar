@@ -223,6 +223,26 @@
   )
 )
 
+(define-public (veto-action-proposal
+    (voting-contract <action-proposals-voting-trait>)
+    (proposalId uint)
+  )
+  (begin
+    (asserts! (is-authorized) ERR_UNAUTHORIZED)
+    (print {
+      ;; /g/aibtc/dao_token_symbol
+      notification: "aibtc-agent-account/veto-action-proposal",
+      payload: {
+        proposalContract: (contract-of voting-contract),
+        proposalId: proposalId,
+        sender: tx-sender,
+        caller: contract-caller,
+      },
+    })
+    (as-contract (contract-call? voting-contract veto-action-proposal proposalId))
+  )
+)
+
 (define-public (conclude-action-proposal
     (voting-contract <action-proposals-voting-trait>)
     (proposalId uint)

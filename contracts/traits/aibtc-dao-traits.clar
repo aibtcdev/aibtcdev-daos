@@ -83,6 +83,10 @@
     (uint bool)
     (response bool uint)
   )
+  (veto-action-proposal
+    (uint)
+    (response bool uint)
+  )
   (conclude-action-proposal
     (uint <action>)
     (response bool uint)
