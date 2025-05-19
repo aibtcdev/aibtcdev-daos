@@ -22,6 +22,8 @@ import { ErrorCode } from "./utils/error-catalog";
 import { handleRequest } from "./utils/request-handler";
 import { ContractGeneratorService } from "./services/contract-generator";
 
+const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
+
 export function createApiRouter(registry: ContractRegistry) {
   const api = new Hono<{ Bindings: CloudflareBindings }>();
   const generatorService = new ContractGeneratorService();
@@ -281,9 +283,10 @@ export function createApiRouter(registry: ContractRegistry) {
       c,
       async () => {
         const body = await c.req.json();
-        const contractName = String(body.contractName) || String(body.name);
-        const network = String(body.network) || "devnet";
-        const tokenSymbol = String(body.tokenSymbol).toLowerCase() || "aibtc";
+        const contractName: string = body.contractName || body.name;
+        const network: string = body.network ?? "devnet";
+        const tokenSymbol: string = body.tokenSymbol ?? "aibtc";
+        const tokenSymbolLower = tokenSymbol.toLowerCase();
         const customReplacements: Record<string, string> =
           body.customReplacements || {};
 
@@ -294,7 +297,6 @@ export function createApiRouter(registry: ContractRegistry) {
         }
 
         // Validate network
-        const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
         if (!validNetworks.includes(network)) {
           throw new ApiError(ErrorCode.INVALID_REQUEST, {
             reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(
@@ -315,14 +317,14 @@ export function createApiRouter(registry: ContractRegistry) {
             await generatorService.generateContractForNetwork(
               contract,
               network as StacksNetworkName,
-              tokenSymbol,
+              tokenSymbolLower,
               customReplacements,
               c.env
             );
 
           return {
             network,
-            tokenSymbol,
+            tokenSymbol: tokenSymbolLower,
             contract: {
               name: contract.name,
               displayName: contract.displayName,
@@ -350,12 +352,13 @@ export function createApiRouter(registry: ContractRegistry) {
       c,
       async () => {
         const body = await c.req.json();
-        const network = body.network || "devnet";
-        const tokenSymbol = body.tokenSymbol.toLowerCase() || "aibtc";
-        const customReplacements = body.customReplacements || {};
+        const network: string = body.network ?? "devnet";
+        const tokenSymbol: string = body.tokenSymbol ?? "aibtc";
+        const tokenSymbolLower = tokenSymbol.toLowerCase();
+        const customReplacements: Record<string, string> =
+          body.customReplacements || {};
 
         // Validate network
-        const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
         if (!validNetworks.includes(network)) {
           throw new ApiError(ErrorCode.INVALID_REQUEST, {
             reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(
@@ -408,7 +411,7 @@ export function createApiRouter(registry: ContractRegistry) {
                 await generatorService.generateContractForNetwork(
                   contract,
                   network as StacksNetworkName,
-                  tokenSymbol,
+                  tokenSymbolLower,
                   customReplacements,
                   c.env
                 );
@@ -436,7 +439,7 @@ export function createApiRouter(registry: ContractRegistry) {
         // Make sure we return at least an empty array for contracts
         return {
           network,
-          tokenSymbol,
+          tokenSymbol: tokenSymbolLower,
           contracts: generatedContracts.length > 0 ? generatedContracts : [],
           errors: generatedErrors.length > 0 ? generatedErrors : undefined,
         } as GeneratedDaoContractsResponse;
