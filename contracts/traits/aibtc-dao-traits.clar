@@ -74,7 +74,7 @@
 
 ;; a voting contract for whitelisted pre-defined actions
 ;; has lower voting threshold and quorum than core proposals
-(define-trait action-proposals-voting (
+(define-trait action-proposal-voting (
   (create-action-proposal
     (<action> (buff 2048) (optional (string-ascii 1024)))
     (response bool uint)

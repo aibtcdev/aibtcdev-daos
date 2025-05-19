@@ -60,13 +60,13 @@ export function generateTemplateReplacements(
     // Agent traits with full paths for template matching
     [`.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account`]: `'${traits.AGENT_ACCOUNT}`,
     [`.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval`]: `'${traits.AGENT_FAKTORY_DEX_APPROVAL}`,
-    [`.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals`]: `'${traits.AGENT_PROPOSALS}`,
+    [`.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals`]: `'${traits.AGENT_ACCOUNT_PROPOSALS}`,
     [`.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell`]: `'${traits.AGENT_FAKTORY_BUY_SELL}`,
 
     // Agent traits with simplified keys
     [`agent_account_trait_account`]: `'${traits.AGENT_ACCOUNT}`,
     [`agent_account_trait_faktory_dex_approval`]: `'${traits.AGENT_FAKTORY_DEX_APPROVAL}`,
-    [`agent_account_trait_proposals`]: `'${traits.AGENT_PROPOSALS}`,
+    [`agent_account_trait_proposals`]: `'${traits.AGENT_ACCOUNT_PROPOSALS}`,
     [`agent_account_trait_faktory_buy_sell`]: `'${traits.AGENT_FAKTORY_BUY_SELL}`,
 
     // DAO run cost: TODO add to known addresses (and deploy)

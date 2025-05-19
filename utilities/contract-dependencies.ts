@@ -315,7 +315,7 @@ export function defineAgentContractDependencies(
         contract
           .addTraitDependency("AGENT_ACCOUNT", "agent_account_trait_account")
           .addTraitDependency(
-            "AGENT_PROPOSALS",
+            "AGENT_ACCOUNT_PROPOSALS",
             "agent_account_trait_proposals"
           )
           .addTraitDependency(
