@@ -476,18 +476,13 @@ export function createApiRouter(registry: ContractRegistry) {
           });
         }
 
-        const contract = registry.getContract("aibtc-agent-account");
+        const contract = registry.getContractByTypeAndSubtype(
+          "AGENT",
+          "AGENT_ACCOUNT"
+        );
         if (!contract) {
           throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, {
             name: contractName,
-          });
-        }
-
-        // Verify this is an agent contract
-        if (contract.type !== "AGENT") {
-          throw new ApiError(ErrorCode.INVALID_CONTRACT_TYPE, {
-            type: contract.type,
-            expected: "AGENT",
           });
         }
 
