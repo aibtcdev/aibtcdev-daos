@@ -136,7 +136,7 @@
 ;; messages can verifiably indicate the sender is the dao by using a proposal
 (define-trait messaging (
   (send
-    ((string-ascii 1047888))
+    ((string-ascii 10000))
     (response bool uint)
   )
 ))
