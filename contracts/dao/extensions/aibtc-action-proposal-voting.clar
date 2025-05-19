@@ -7,7 +7,7 @@
 
 ;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.action/dao_trait_action_proposal_voting
+;; /g/.aibtc-dao-traits.action-proposal-voting/dao_trait_action_proposal_voting
 (impl-trait .aibtc-dao-traits.action-proposal-voting)
 ;; /g/.aibtc-dao-traits.action/dao_trait_action
 (use-trait action-trait .aibtc-dao-traits.action)
@@ -301,8 +301,7 @@
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
       (senderBalance (unwrap!
-        (at-block proposalBlockHash
-          ;; /g/.aibtc-faktory/dao_contract_token
+        (at-block proposalBlockHash ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance contract-caller)
         )
         ERR_FETCHING_TOKEN_DATA
@@ -387,8 +386,7 @@
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
       (senderBalance (unwrap!
-        (at-block proposalBlockHash
-          ;; /g/.aibtc-faktory/dao_contract_token
+        (at-block proposalBlockHash ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance contract-caller)
         )
         ERR_FETCHING_TOKEN_DATA
@@ -691,14 +689,12 @@
 (define-read-only (get-liquid-supply (blockHeight uint))
   (let (
       (blockHash (unwrap! (get-block-hash blockHeight) ERR_RETRIEVING_START_BLOCK_HASH))
-      (totalSupply (unwrap!
-        ;; /g/.aibtc-faktory/dao_contract_token
+      (totalSupply (unwrap! ;; /g/.aibtc-faktory/dao_contract_token
         (at-block blockHash (contract-call? .aibtc-faktory get-total-supply))
         ERR_FETCHING_TOKEN_DATA
       ))
       (treasuryBalance (unwrap!
-        (at-block blockHash
-          ;; /g/.aibtc-faktory/dao_contract_token
+        (at-block blockHash ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance VOTING_TREASURY)
         )
         ERR_FETCHING_TOKEN_DATA
