@@ -449,7 +449,7 @@ export function createApiRouter(registry: ContractRegistry) {
   });
 
   // Generate agent contract for a specific network
-  api.post("/generate-agent-contract", async (c) => {
+  api.post("/generate-agent-account", async (c) => {
     return handleRequest(
       c,
       async () => {
@@ -521,7 +521,7 @@ export function createApiRouter(registry: ContractRegistry) {
           });
         }
       },
-      { path: "/generate-agent-contract", method: "POST" }
+      { path: "/generate-agent-account", method: "POST" }
     );
   });
 
