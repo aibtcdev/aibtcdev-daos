@@ -476,7 +476,7 @@ export function createApiRouter(registry: ContractRegistry) {
           });
         }
 
-        const contract = registry.getContract(contractName);
+        const contract = registry.getContract("aibtc-agent-account");
         if (!contract) {
           throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, {
             name: contractName,
