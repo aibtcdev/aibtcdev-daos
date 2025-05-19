@@ -27,8 +27,8 @@ export function generateTemplateReplacements(
     [`dao_token_decimals`]: "8",
 
     // Account addresses
-    [`account_owner`]: `'${addresses.DEPLOYER}`,
-    [`account_agent`]: "'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
+    [`account_owner`]: `${addresses.DEPLOYER}`,
+    [`account_agent`]: "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
 
     // SIP traits
     [`base_trait_sip010`]: `'${traits.BASE_SIP010}`,
@@ -69,7 +69,7 @@ export function generateTemplateReplacements(
     [`agent_account_trait_proposals`]: `'${traits.AGENT_ACCOUNT_PROPOSALS}`,
     [`agent_account_trait_faktory_buy_sell`]: `'${traits.AGENT_FAKTORY_BUY_SELL}`,
 
-    // DAO run cost: TODO add to known addresses (and deploy)
+    // DAO run cost
     [`.dao-run-cost/base_contract_dao_run_cost`]: `'${addresses.AIBTC_RUN_COST}`,
 
     // Contract references with full paths for template matching
@@ -113,7 +113,7 @@ export function generateTemplateReplacements(
     [`sbtc_contract`]: addresses.SBTC,
     [`sbtc_token_contract`]: addresses.SBTC,
     [`base_contract_sbtc`]: addresses.SBTC,
-    [`external_bitflow_core`]: `'${addresses.BITFLOW_CORE}`,
+    [`external_bitflow_core`]: addresses.BITFLOW_CORE,
     // Configuration values
     [`dao_manifest`]: `The mission of the ${symbol} is to...`,
   };
