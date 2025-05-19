@@ -281,10 +281,11 @@ export function createApiRouter(registry: ContractRegistry) {
       c,
       async () => {
         const body = await c.req.json();
-        const contractName = body.contractName || body.name;
-        const network = body.network || "devnet";
-        const tokenSymbol = body.tokenSymbol.toLowerCase() || "aibtc";
-        const customReplacements = body.customReplacements || {};
+        const contractName = String(body.contractName) || String(body.name);
+        const network = String(body.network) || "devnet";
+        const tokenSymbol = String(body.tokenSymbol).toLowerCase() || "aibtc";
+        const customReplacements: Record<string, string> =
+          body.customReplacements || {};
 
         if (!contractName) {
           throw new ApiError(ErrorCode.INVALID_REQUEST, {
