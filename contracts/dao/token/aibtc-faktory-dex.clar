@@ -1,8 +1,13 @@
+
 ;; 99af7ff63e5e4bd7542e55d88bacc25a7a6f79004f9937ea0bab3ca4c2438061
 ;; aibtc.dev DAO faktory.fun DEX @version 1.0
 
+;; /g/.aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex
 (impl-trait .aibtc-dao-traits.faktory-dex)
+
+;; TODO: no match on this line? should be fine for testnet
 (impl-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1.dex-trait)
+;; /g/STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait/dao_trait_faktory_sip010
 (use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait)
 
 (define-constant ERR-MARKET-CLOSED (err u1001))
@@ -17,7 +22,9 @@
 (define-constant G-RECEIVER 'ST3CZY55VJE5P5DJAP5E58X123BZKMYDCNEZMRTV2) ;; 'SM3NY5HXXRNCHS1B65R78CYAC1TQ6DEMN3C0DN74S)
 
 (define-constant FAKTORY 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A)
+;; /g/STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A/origin_address
 (define-constant ORIGINATOR 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A)
+;; /g/.aibtc-faktory/dao_contract_token
 (define-constant DEX-TOKEN .aibtc-faktory) ;; SPV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RCJDC22
 
 ;; token constants
@@ -56,13 +63,18 @@
         (new-stx (get new-stx in-info))
         (ft-receiver tx-sender)
       )
+      ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
       (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
         transfer (- fee pre-fee) tx-sender FEE-RECEIVER none
       ))
+      ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
       (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
+      ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
         transfer pre-fee tx-sender .aibtc-pre-faktory none
       ))
+      ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
       (try! (as-contract (contract-call? .aibtc-pre-faktory create-fees-receipt pre-fee)))
+      ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
       (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
         transfer stx-in tx-sender (as-contract tx-sender) none
       ))
@@ -83,19 +95,24 @@
           (try! (as-contract (contract-call? ft transfer originator-amount tx-sender ORIGINATOR none)))
           ;; Call XYK Core v-1-2 pool by Bitflow
           (try! (as-contract (contract-call?
+            ;; /g/STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2/external_bitflow_core
             'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2
+            ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_token_pool
             create-pool .xyk-pool-sbtc-aibtc-v-1-1
+            ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
             'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token ft amm-ustx
             amm-amount xyk-burn-amount u10 u40 u10 u40
             'ST27Q7Z7P5MTJN2B3M9Q406XPCDB1VFZJ3KWX3CES xyk-pool-uri true
           )))
           ;; here 'ST27Q7Z7P5MTJN2B3M9Q406XPCDB1VFZJ3KWX3CES replaced of ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1
+          ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
           (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
             transfer GRAD-FEE tx-sender G-RECEIVER none
           )))
           (var-set open false)
           (var-set stx-balance u0)
           (var-set ft-balance u0)
+          ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
           (try! (as-contract (contract-call? .aibtc-pre-faktory toggle-bonded)))
           (print {
             type: "buy",
@@ -190,15 +207,20 @@
       )
       (asserts! (>= total-stx stx-out) ERR-STX-BALANCE-TOO-LOW)
       (try! (contract-call? ft transfer amount tx-sender (as-contract tx-sender) none))
+      ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
       (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
         transfer stx-to-receiver tx-sender stx-receiver none
       )))
+      ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
       (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
         transfer (- fee pre-fee) tx-sender FEE-RECEIVER none
       )))
+      ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
       (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
+        ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
         transfer pre-fee tx-sender .aibtc-pre-faktory none
       ))
+      ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
       (try! (as-contract (contract-call? .aibtc-pre-faktory create-fees-receipt pre-fee)))
       (var-set stx-balance new-stx)
       (var-set ft-balance new-ft)
@@ -251,6 +273,7 @@
 )
 
 (define-public (open-market)
+  ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
   (let ((is-prelaunch-allowing (unwrap-panic (contract-call? .aibtc-pre-faktory is-market-open))))
     (asserts! is-prelaunch-allowing ERR-MARKET-CLOSED)
     (var-set stx-balance DEX-AMOUNT)
@@ -261,17 +284,16 @@
 
 ;; boot dex
 (begin
-  (var-set open (if is-in-mainnet
-    false
-    true
-  ))
+  (var-set open true)
   (var-set fak-ustx FAK_STX)
   (var-set ft-balance u16000000000000000)
   (print {
     type: "faktory-dex-trait-v1-1",
     dexContract: (as-contract tx-sender),
+    ;; /g/STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2/external_bitflow_core
     ammReceiver: 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2, ;; 'SM1793C4R5PZ4NS4VQ4WMP7SKKYVH8JZEWSZ9HCCR.xyk-core-v-1-2
-    poolName: .aibtc-bitflow-pool, ;; 'SPV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RCJDC22.xyk-pool-stx-NAME-v1-1
+    ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_token_pool
+    poolName: .xyk-pool-sbtc-aibtc-v-1-1, ;; 'SPV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RCJDC22.xyk-pool-stx-NAME-v1-1
   })
   (ok true)
 )

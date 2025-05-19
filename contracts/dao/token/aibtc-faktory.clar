@@ -7,9 +7,12 @@
 (define-constant ERR-NOT-AUTHORIZED u401)
 (define-constant ERR-NOT-OWNER u402)
 
+;; /g/SYMBOL/dao_token_symbol
 (define-fungible-token SYMBOL-AIBTC-DAO MAX)
 (define-constant MAX u100000000000000000)
+;; /g/.aibtc-token-owner/dao_contract_token_owner
 (define-data-var contract-owner principal .aibtc-token-owner)
+;; /g/link to json for token metadata/dao_token_metadata
 (define-data-var token-uri (optional (string-utf8 256)) (some u"link to json for token metadata"))
 
 ;; SIP-10 Functions
@@ -22,6 +25,7 @@
   (begin
     (asserts! (is-eq tx-sender sender) (err ERR-NOT-AUTHORIZED))
     (and (is-some memo) (is-some (print memo)))
+    ;; /g/SYMBOL/dao_token_symbol
     (ft-transfer? SYMBOL-AIBTC-DAO amount sender recipient)
   )
 )
@@ -41,14 +45,17 @@
 )
 
 (define-read-only (get-balance (account principal))
+  ;; /g/SYMBOL/dao_token_symbol
   (ok (ft-get-balance SYMBOL-AIBTC-DAO account))
 )
 
 (define-read-only (get-name)
+  ;; /g/SYMBOL/dao_token_symbol
   (ok "SYMBOL-AIBTC-DAO")
 )
 
 (define-read-only (get-symbol)
+  ;; /g/SYMBOL/dao_token_symbol
   (ok "SYMBOL-AIBTC-DAO")
 )
 
@@ -57,6 +64,7 @@
 )
 
 (define-read-only (get-total-supply)
+  ;; /g/SYMBOL/dao_token_symbol
   (ok (ft-get-supply SYMBOL-AIBTC-DAO))
 )
 
@@ -117,12 +125,16 @@
 
 (begin
   ;; ft distribution
+  ;; /g/SYMBOL/dao_token_symbol
   (try! (ft-mint? SYMBOL-AIBTC-DAO (/ (* MAX u80) u100) .aibtc-treasury)) ;; 80% treasury SPVMS254T8Q0RXQP95Y01T7KBHZV91X88CDK48QH
+  ;; /g/SYMBOL/dao_token_symbol
   (try! (ft-mint? SYMBOL-AIBTC-DAO (/ (* MAX u16) u100) .aibtc-faktory-dex)) ;; 16% dex SPVMS254T8Q0RXQP95Y01T7KBHZV91X88CDK48QH
+  ;; /g/SYMBOL/dao_token_symbol
   (try! (ft-mint? SYMBOL-AIBTC-DAO (/ (* MAX u4) u100) .aibtc-pre-faktory)) ;; 4% pre-launch SPVMS254T8Q0RXQP95Y01T7KBHZV91X88CDK48QH
   (print {
     type: "faktory-trait-v1",
     name: "NAME",
+    ;; /g/SYMBOL/dao_token_symbol
     symbol: "SYMBOL-AIBTC-DAO",
     token-uri: u"link to json for token metadata",
     tokenContract: (as-contract tx-sender),

@@ -6,6 +6,7 @@ export interface KnownAddresses {
   POX: string;
   BURN: string;
   SBTC: string;
+  AIBTC_RUN_COST: string;
   BITFLOW_CORE: string;
   BITFLOW_STX_TOKEN: string;
   BITFLOW_FEE: string;
@@ -18,6 +19,9 @@ const mainnetAddresses: KnownAddresses = {
   POX: "SP000000000000000000002Q6VF78.pox-4",
   BURN: "SP000000000000000000002Q6VF78",
   SBTC: "SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token",
+  // TODO: CONFIRM VALUE BELOW
+  AIBTC_RUN_COST:
+    "SP2XCME6ED8RERGR9R7YDZW7CA6G3F113Y8JMVA46.aibtc-dao-run-cost",
   BITFLOW_CORE: "SM1793C4R5PZ4NS4VQ4WMP7SKKYVH8JZEWSZ9HCCR.xyk-core-v-1-2",
   BITFLOW_STX_TOKEN:
     "SM1793C4R5PZ4NS4VQ4WMP7SKKYVH8JZEWSZ9HCCR.token-stx-v-1-2",
@@ -29,6 +33,8 @@ const testnetAddresses: KnownAddresses = {
   POX: "ST000000000000000000002AMW42H.pox-4",
   BURN: "ST000000000000000000002AMW42H",
   SBTC: "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token",
+  AIBTC_RUN_COST:
+    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-run-cost",
   BITFLOW_CORE: "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2",
   BITFLOW_STX_TOKEN: "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.token-stx-v-1-2",
   BITFLOW_FEE: "ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1",
@@ -39,6 +45,8 @@ const devnetAddresses: KnownAddresses = {
   POX: "ST000000000000000000002AMW42H.pox-4",
   BURN: "ST000000000000000000002AMW42H",
   SBTC: "STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token",
+  AIBTC_RUN_COST:
+    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-run-cost",
   BITFLOW_CORE: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.xyk-core-v-1-2",
   BITFLOW_STX_TOKEN:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token-stx-v-1-2",
@@ -55,12 +63,13 @@ const ADDRESSES: Record<StacksNetworkName, KnownAddresses> = {
 } as const;
 
 // helper to get known addresses for a network
-// TODO: replaces ADDRESSES in constants.ts
+// TODO: export this in package!
 export function getKnownAddresses(network: StacksNetworkName): KnownAddresses {
   return ADDRESSES[network];
 }
 
 // helper to get a specific address
+// TODO: export this in package!
 export function getKnownAddress(
   network: StacksNetworkName,
   address: keyof KnownAddresses

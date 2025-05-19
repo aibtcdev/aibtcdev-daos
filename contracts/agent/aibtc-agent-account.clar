@@ -17,8 +17,8 @@
 (use-trait action-trait .aibtc-dao-traits.action)
 ;; /g/.aibtc-dao-traits.proposal/dao_trait_proposal
 (use-trait proposal-trait .aibtc-dao-traits.proposal)
-;; /g/.aibtc-dao-traits.action-proposals-voting/dao_trait_action_proposals_voting
-(use-trait action-proposals-voting-trait .aibtc-dao-traits.action-proposals-voting)
+;; /g/.aibtc-dao-traits.action-proposals-voting/dao_trait_action_proposal_voting
+(use-trait action-proposal-voting-trait .aibtc-dao-traits.action-proposal-voting)
 ;; /g/.aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex
 (use-trait dao-faktory-dex .aibtc-dao-traits.faktory-dex)
 ;; /g/.aibtc-dao-traits.faktory-token/dao_trait_faktory_token
@@ -179,7 +179,7 @@
 ;; DAO Interaction Functions
 
 (define-public (create-action-proposal
-    (voting-contract <action-proposals-voting-trait>)
+    (voting-contract <action-proposal-voting-trait>)
     (action <action-trait>)
     (parameters (buff 2048))
     (memo (optional (string-ascii 1024)))
@@ -202,7 +202,7 @@
 )
 
 (define-public (vote-on-action-proposal
-    (voting-contract <action-proposals-voting-trait>)
+    (voting-contract <action-proposal-voting-trait>)
     (proposalId uint)
     (vote bool)
   )
@@ -223,8 +223,28 @@
   )
 )
 
+(define-public (veto-action-proposal
+    (voting-contract <action-proposal-voting-trait>)
+    (proposalId uint)
+  )
+  (begin
+    (asserts! (is-authorized) ERR_UNAUTHORIZED)
+    (print {
+      ;; /g/aibtc/dao_token_symbol
+      notification: "aibtc-agent-account/veto-action-proposal",
+      payload: {
+        proposalContract: (contract-of voting-contract),
+        proposalId: proposalId,
+        sender: tx-sender,
+        caller: contract-caller,
+      },
+    })
+    (as-contract (contract-call? voting-contract veto-action-proposal proposalId))
+  )
+)
+
 (define-public (conclude-action-proposal
-    (voting-contract <action-proposals-voting-trait>)
+    (voting-contract <action-proposal-voting-trait>)
     (proposalId uint)
     (action <action-trait>)
   )

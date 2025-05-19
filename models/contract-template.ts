@@ -23,12 +23,15 @@ export interface RuntimeValue {
   key: string;
 }
 
-export interface DeploymentResult {
-  sender: string; // address from config that deployed
-  success: boolean; // deployment success status
-  txId?: string; // transaction ID if successful
-  address: string; // contract address after deployment
-  error?: string; // error message if failed
+export interface ContractResponse {
+  name: string;
+  displayName?: string;
+  type: ContractType;
+  subtype: ContractSubtype<ContractType>;
+  source?: string;
+  hash?: string;
+  deploymentOrder: number;
+  clarityVersion?: ClarityVersion;
 }
 
 export abstract class ContractBase {
@@ -37,11 +40,11 @@ export abstract class ContractBase {
   readonly subtype: ContractSubtype<ContractType>;
   readonly deploymentOrder: number;
   readonly templatePath: string;
-
-  protected clarityVersion: ClarityVersion | undefined;
+  readonly clarityVersion: ClarityVersion | undefined;
+  
+  protected _displayName?: string;
   protected _source?: string;
   protected _hash?: string;
-  protected _deploymentResult?: DeploymentResult;
 
   // Generate template path based on contract type
   static generateTemplatePath(type: ContractType, name: string): string {
@@ -58,10 +61,6 @@ export abstract class ContractBase {
         return `dao/token/${name}.clar`;
       case "AGENT":
         return `agent/${name}.clar`;
-      case "CORE":
-        return `core/${name}.clar`;
-      case "EXTERNAL":
-        return `external/${name}.clar`;
       default:
         return `${name}.clar`;
     }
@@ -90,6 +89,10 @@ export abstract class ContractBase {
   }
 
   // Getters
+  get displayName(): string | undefined {
+    return this._displayName;
+  }
+
   get source(): string | undefined {
     return this._source;
   }
@@ -98,15 +101,12 @@ export abstract class ContractBase {
     return this._hash;
   }
 
-  get isDeployed(): boolean {
-    return !!this._deploymentResult?.success;
-  }
-
-  get deploymentResult(): DeploymentResult | undefined {
-    return this._deploymentResult;
-  }
-
   // Setters for generated content
+  setDisplayName(displayName: string): this {
+    this._displayName = displayName;
+    return this;
+  }
+
   setSource(source: string): this {
     this._source = source;
     return this;
@@ -114,11 +114,6 @@ export abstract class ContractBase {
 
   setHash(hash: string): this {
     this._hash = hash;
-    return this;
-  }
-
-  setDeploymentResult(result: DeploymentResult): this {
-    this._deploymentResult = result;
     return this;
   }
 
@@ -146,7 +141,7 @@ export abstract class ContractBase {
     this.requiredRuntimeValues.push({ key });
     return this;
   }
-  
+
   /**
    * Add a template variable dependency from the /g/ format
    * @param toReplace The text to be replaced
@@ -155,17 +150,17 @@ export abstract class ContractBase {
   addTemplateVariable(toReplace: string, keyName: string): this {
     // Format matches the /g/toReplace/keyName format used in templates
     const formattedKey = `${toReplace}/${keyName}`;
-    
+
     // Check if this is an address, trait, contract, or runtime value
     // and add to the appropriate collection
-    if (toReplace.startsWith('ST') || toReplace.includes('.')) {
+    if (toReplace.startsWith("ST") || toReplace.includes(".")) {
       // This is likely an address or contract reference
       this.addRuntimeValue(formattedKey);
     } else {
       // Other template variables (configuration values, etc.)
       this.addRuntimeValue(formattedKey);
     }
-    
+
     return this;
   }
 
@@ -177,21 +172,21 @@ export abstract class ContractBase {
     // Extract all variables from template
     const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
     const matches = [...templateContent.matchAll(variableRegex)];
-    
+
     // Add each unique variable as a dependency
     const uniqueVars = new Set<string>();
-    
+
     for (const match of matches) {
       const toReplace = match[1];
       const keyName = match[2];
       const key = `${toReplace}/${keyName}`;
-      
+
       if (!uniqueVars.has(key)) {
         uniqueVars.add(key);
         this.addTemplateVariable(toReplace, keyName);
       }
     }
-    
+
     return this;
   }
 
@@ -199,12 +194,14 @@ export abstract class ContractBase {
   /**
    * Get all dependencies for this contract
    */
-  getDependencies(): Array<AddressDependency | TraitDependency | ContractDependency | RuntimeValue> {
+  getDependencies(): Array<
+    AddressDependency | TraitDependency | ContractDependency | RuntimeValue
+  > {
     return [
       ...this.requiredAddresses,
       ...this.requiredTraits,
       ...this.requiredContractAddresses,
-      ...this.requiredRuntimeValues
+      ...this.requiredRuntimeValues,
     ];
   }
 
@@ -237,16 +234,16 @@ export abstract class ContractBase {
       entry.requiredRuntimeValues = [...this.requiredRuntimeValues];
     }
 
+    if (this._displayName) {
+      entry.displayName = this._displayName;
+    }
+
     if (this._source) {
       entry.source = this._source;
     }
 
     if (this._hash) {
       entry.hash = this._hash;
-    }
-
-    if (this._deploymentResult) {
-      Object.assign(entry, this._deploymentResult);
     }
 
     return entry;

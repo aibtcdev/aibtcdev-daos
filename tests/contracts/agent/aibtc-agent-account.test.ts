@@ -42,10 +42,6 @@ const tokenDexContractAddress = registry.getContractAddressByTypeAndSubtype(
   "TOKEN",
   "DEX"
 );
-const baseDaoContractAddress = registry.getContractAddressByTypeAndSubtype(
-  "BASE",
-  "DAO"
-);
 const actionProposalsContractAddress =
   registry.getContractAddressByTypeAndSubtype(
     "EXTENSIONS",
@@ -826,6 +822,103 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
 
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+    const event = receipt.events[0];
+    expect(event).toBeDefined();
+    const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    expect(printEvent).toStrictEqual(expectedEvent);
+  });
+
+  ////////////////////////////////////////
+  // veto-action-proposal() tests
+  ////////////////////////////////////////
+
+  it("veto-action-proposal() fails if caller is not authorized (user or agent)", () => {
+    // arrange
+    const proposalId = 1;
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "veto-action-proposal",
+      [Cl.principal(actionProposalsContractAddress), Cl.uint(proposalId)],
+      address3
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_UNAUTHORIZED));
+  });
+  it("veto-action-proposal() succeeds when called by owner", () => {
+    // arrange
+    const proposalId = 1;
+    setupAgentAccount(deployer);
+    fundVoters([deployer]);
+    constructDao(deployer);
+    // Create a proposal first
+    const message = Cl.stringAscii("hello world");
+    const createProposalReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.principal(sendMessageActionContractAddress),
+        formatSerializedBuffer(message),
+        Cl.some(Cl.stringAscii("Test memo")),
+      ],
+      deployer
+    );
+    expect(createProposalReceipt.result).toBeOk(Cl.bool(true));
+    // progress chain past voting delay and period
+    simnet.mineEmptyBlocks(VOTING_DELAY + VOTING_PERIOD);
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "veto-action-proposal",
+      [Cl.principal(actionProposalsContractAddress), Cl.uint(proposalId)],
+      deployer
+    );
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+  });
+  it("veto-action-proposal() emits the correct notification event", () => {
+    // arrange
+    const proposalId = "1";
+    const expectedEvent = {
+      notification: "aibtc-agent-account/veto-action-proposal",
+      payload: {
+        proposalContract: actionProposalsContractAddress,
+        proposalId: proposalId,
+        sender: deployer,
+        caller: deployer,
+      },
+    };
+    setupAgentAccount(deployer);
+    fundVoters([deployer]);
+    constructDao(deployer);
+    // Create a proposal first
+    const message = Cl.stringAscii("hello world");
+    const createProposalReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.principal(sendMessageActionContractAddress),
+        formatSerializedBuffer(message),
+        Cl.some(Cl.stringAscii("Test memo")),
+      ],
+      deployer
+    );
+    expect(createProposalReceipt.result).toBeOk(Cl.bool(true));
+    // progress chain past voting delay and period
+    simnet.mineEmptyBlocks(VOTING_DELAY + VOTING_PERIOD);
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "veto-action-proposal",
+      [Cl.principal(actionProposalsContractAddress), Cl.uint(proposalId)],
+      deployer
+    );
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
     const event = receipt.events[0];

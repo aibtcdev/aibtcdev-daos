@@ -8,6 +8,8 @@
     "test": "vitest run",
     "test:report": "vitest run -- --coverage --costs",
     "test:watch": "chokidar \"tests/**/*.ts\" \"contracts/**/*.clar\" -c \"npm run test:report\"",
+    "test:check-coverage": "bash ./tests/check-test-coverage.sh",
+    "test:endpoints": "bash ./tests/check-endpoints.sh http://localhost:8787",
     "dev": "wrangler dev src/index.ts",
     "build": "vite build && vite build --ssr",
     "preview": "$npm_execpath run build && wrangler dev dist-server/index.js",
@@ -19,26 +21,27 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.11.2",
-    "agents": "^0.0.84",
-    "hono": "^4.7.8"
+    "@modelcontextprotocol/sdk": "^1.11.4",
+    "agents": "^0.0.88",
+    "hono": "^4.7.10"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.1.1",
-    "@cloudflare/workers-types": "^4.20250508.0",
-    "@hirosystems/clarinet-sdk": "^3.0.1",
+    "@aibtc/types": "^0.2.10",
+    "@cloudflare/vite-plugin": "^1.2.2",
+    "@cloudflare/workers-types": "^4.20250519.0",
+    "@hirosystems/clarinet-sdk": "^3.0.2",
     "@hono/vite-build": "^1.6.1",
     "@stacks/transactions": "^7.0.6",
-    "@types/node": "^22.15.17",
+    "@types/node": "^22.15.19",
     "chokidar-cli": "^3.0.0",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
     "vite-plugin-ssr-hot-reload": "^0.5.0",
     "vite-plugin-static-copy": "^3.0.0",
-    "vitest": "^3.1.3",
+    "vitest": "^3.1.4",
     "vitest-environment-clarinet": "^2.3.0",
     "workers-mcp": "^0.0.13",
-    "wrangler": "^4.14.4",
-    "zod": "^3.24.4"
+    "wrangler": "^4.15.2",
+    "zod": "^3.25.3"
   }
 }

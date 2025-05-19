@@ -74,13 +74,17 @@
 
 ;; a voting contract for whitelisted pre-defined actions
 ;; has lower voting threshold and quorum than core proposals
-(define-trait action-proposals-voting (
+(define-trait action-proposal-voting (
   (create-action-proposal
     (<action> (buff 2048) (optional (string-ascii 1024)))
     (response bool uint)
   )
   (vote-on-action-proposal
     (uint bool)
+    (response bool uint)
+  )
+  (veto-action-proposal
+    (uint)
     (response bool uint)
   )
   (conclude-action-proposal
@@ -132,7 +136,16 @@
 ;; messages can verifiably indicate the sender is the dao by using a proposal
 (define-trait messaging (
   (send
-    ((string-ascii 1047888))
+    ((string-ascii 10000))
+    (response bool uint)
+  )
+))
+
+;; an extension that holds funds from the DAO treasury and allows
+;; the DAO to transfer rewards to users for successful proposals.
+(define-trait rewards-account (
+  (transfer-reward
+    (principal uint)
     (response bool uint)
   )
 ))

@@ -7,8 +7,8 @@
 
 ;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.action/dao_trait_action_proposals_voting
-(impl-trait .aibtc-dao-traits.action-proposals-voting)
+;; /g/.aibtc-dao-traits.action-proposal-voting/dao_trait_action_proposal_voting
+(impl-trait .aibtc-dao-traits.action-proposal-voting)
 ;; /g/.aibtc-dao-traits.action/dao_trait_action
 (use-trait action-trait .aibtc-dao-traits.action)
 
@@ -116,6 +116,9 @@
     metThreshold: bool, ;; did the proposal meet threshold
     passed: bool, ;; did the proposal pass
     executed: bool, ;; did the proposal execute
+    expired: bool, ;; was the proposal expired
+    vetoMetQuorum: bool, ;; did the veto meet quorum
+    vetoExceedsYes: bool, ;; did the veto exceed yes votes
     vetoed: bool, ;; was the proposal vetoed
   }
 )
@@ -258,6 +261,9 @@
         metThreshold: false,
         passed: false,
         executed: false,
+        expired: false,
+        vetoMetQuorum: false,
+        vetoExceedsYes: false,
         vetoed: false,
       })
       ERR_SAVING_PROPOSAL
@@ -271,10 +277,14 @@
     ;; /g/.aibtc-faktory/dao_contract_token
     (try! (contract-call? .aibtc-faktory transfer VOTING_BOND contract-caller SELF none))
     ;; transfer the run cost fee to the run AIBTC dao cost contract
+    ;; /g/.aibtc-treasury/dao_contract_treasury
+    ;; /g/.aibtc-faktory/dao_contract_token
     (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-faktory
       AIBTC_DAO_RUN_COST_AMOUNT AIBTC_DAO_RUN_COST_CONTRACT
     )))
     ;; transfer reward to the dao rewards account
+    ;; /g/.aibtc-treasury/dao_contract_treasury
+    ;; /g/.aibtc-faktory/dao_contract_token
     (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-faktory VOTING_REWARD
       DAO_REWARDS_ACCOUNT
     ))
@@ -290,9 +300,9 @@
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
-      ;; /g/.aibtc-faktory/dao_contract_token
       (senderBalance (unwrap!
         (at-block proposalBlockHash
+        ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance contract-caller)
         )
         ERR_FETCHING_TOKEN_DATA
@@ -376,9 +386,9 @@
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
-      ;; /g/.aibtc-faktory/dao_contract_token
       (senderBalance (unwrap!
         (at-block proposalBlockHash
+          ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance contract-caller)
         )
         ERR_FETCHING_TOKEN_DATA
@@ -459,12 +469,14 @@
         (> vetoVotes u0)
         (>= (/ (* vetoVotes u100) liquidTokens) VOTING_QUORUM)
       ))
+      (vetoExceedsYes (> vetoVotes votesFor))
+      (vetoActivated (and vetoMetQuorum vetoExceedsYes))
       ;; evaluate criteria to determine if proposal passed
       (votePassed (and
         hasVotes ;; check if there are any votes
         metQuorum ;; quorum: total votes vs liquid supply
         metThreshold ;; threshold: enough yes votes vs total votes
-        (not vetoMetQuorum) ;; veto quorum: total veto votes vs liquid supply
+        (not vetoActivated) ;; veto: reached quorum and more than yes votes
       ))
       ;; check info for running action
       (validAction (is-action-valid action))
@@ -513,6 +525,8 @@
         metQuorum: metQuorum,
         metThreshold: metThreshold,
         vetoMetQuorum: vetoMetQuorum,
+        vetoExceedsYes: vetoExceedsYes,
+        vetoed: vetoActivated,
         passed: votePassed,
         expired: (not notExpired),
         executed: tryToExecute,
@@ -525,8 +539,11 @@
         metQuorum: metQuorum,
         metThreshold: metThreshold,
         passed: votePassed,
+        expired: (not notExpired),
         executed: tryToExecute,
-        vetoed: vetoMetQuorum,
+        vetoMetQuorum: vetoMetQuorum,
+        vetoExceedsYes: vetoExceedsYes,
+        vetoed: vetoActivated,
       })
     )
     ;; transfer the bond based on the outcome
@@ -554,12 +571,6 @@
     ;; increment the concluded proposal count
     (var-set concludedProposalCount (+ (var-get concludedProposalCount) u1))
     ;; try to execute the action if the proposal passed
-    ;;   returns (ok true) if the action successfully executes
-    ;;   returns (ok false) if the action was not executed or executed with an error
-    ;; if the proposal can be executed
-    ;;   set executedProposalCount += 1
-    ;;   update the drip (private func?)
-    ;;   try to run the action
     (ok (if tryToExecute
       (and
         ;; increment the executed proposal count
@@ -568,17 +579,19 @@
         (match (contract-call? action run (get parameters proposalDetails))
           ;; running the action succeeded
           ok_
+          ;; /g/.aibtc-rewards-account/dao_contract_rewards_account
           (try! (as-contract (contract-call? .aibtc-rewards-account transfer-reward creator
             VOTING_REWARD
           )))
           ;; return false and print error on failure
-          ;; /g/aibtc/dao_token_symbol
           err_
           (begin
             (print {
+              ;; /g/aibtc/dao_token_symbol
               notification: "aibtc-action-proposal-voting/conclude-action-proposal",
               payload: { executionError: err_ },
             })
+            ;; /g/.aibtc-rewards-account/dao_contract_rewards_account
             (try! (as-contract (contract-call? .aibtc-rewards-account transfer-reward
               VOTING_TREASURY VOTING_REWARD
             )))
@@ -678,14 +691,14 @@
 (define-read-only (get-liquid-supply (blockHeight uint))
   (let (
       (blockHash (unwrap! (get-block-hash blockHeight) ERR_RETRIEVING_START_BLOCK_HASH))
-      ;; /g/.aibtc-faktory/dao_contract_token
       (totalSupply (unwrap!
+      ;; /g/.aibtc-faktory/dao_contract_token
         (at-block blockHash (contract-call? .aibtc-faktory get-total-supply))
         ERR_FETCHING_TOKEN_DATA
       ))
-      ;; /g/.aibtc-faktory/dao_contract_token
       (treasuryBalance (unwrap!
         (at-block blockHash
+        ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance VOTING_TREASURY)
         )
         ERR_FETCHING_TOKEN_DATA
@@ -698,9 +711,9 @@
 ;; private functions
 ;;
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_contract_base
   (ok (asserts!
     (or
+      ;; /g/.aibtc-base-dao/dao_contract_base
       (is-eq tx-sender .aibtc-base-dao)
       ;; /g/.aibtc-base-dao/dao_contract_base
       (contract-call? .aibtc-base-dao is-extension contract-caller)

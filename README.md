@@ -13,29 +13,31 @@ This platform provides the infrastructure for decentralized governance of the AI
 - Treasury management for multiple assets
 - Reward distribution mechanisms
 - Agent-based automation capabilities
-- MCP and API for contract interaction
+- Multi-Contract Protocol (MCP) integration
+- Cloudflare Workers-based API
 
 ## Repository Structure
 
 - [/contracts](/contracts) - Smart contracts organized by type (DAO core, extensions, actions, etc.)
-- [/durable-objects](/durable-objects) - Cloudflare Durable Objects for Remote MCP
+- [/durable-objects](/durable-objects) - Cloudflare Durable Objects for persistent state management
 - [/models](/models) - Contract model definitions and abstractions
 - [/src](/src) - Hosted API implementation and endpoints
 - [/tests](/tests) - Test suite for contracts and API functionality
-- [/utilities](/utilities) - Reusable helper code and shared utilities
+- [/utilities](/utilities) - Reusable helper code and shared utilities for contract generation and management
+- [/@aibtc/types](/types) - TypeScript type definitions exported as an npm package
 
 ## API Types
 
 TypeScript type definitions for the API are available as a separate npm package:
 
 ```bash
-npm install @aibtcdev/daos-types
+npm install @aibtc/types
 ```
 
 Usage example:
 
 ```typescript
-import { ApiResponse, ContractInfo } from '@aibtcdev/daos-types';
+import { ApiResponse, ContractInfo } from '@aibtc/types';
 
 async function fetchContract(name: string): Promise<ApiResponse<ContractInfo>> {
   const response = await fetch(`https://api.aibtc.dev/api/contracts/${name}`);

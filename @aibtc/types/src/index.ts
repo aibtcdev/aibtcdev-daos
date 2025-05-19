@@ -4,76 +4,100 @@
  * This package provides TypeScript type definitions for the AIBTC DAO API.
  */
 
-import {
+/**
+ * Contract template dependencies
+ * These are used to define the dependencies of a contract template.
+ * They can be addresses, traits, or other contracts.
+ * The dependencies are used to generate the contract and its deployment.
+ */
+import type {
   AddressDependency,
   ContractDependency,
   RuntimeValue,
   TraitDependency,
+  ContractBase,
+  ContractResponse,
 } from "../../../models/contract-template";
-import { ContractType } from "../../../utilities/contract-types";
 
-// Re-export contract types from utilities/contract-types.ts
 export type {
+  AddressDependency,
+  TraitDependency,
+  ContractDependency,
+  RuntimeValue,
+  ContractBase,
+  ContractResponse,
+};
+
+/**
+ * Contract types and subtypes
+ * These are used to define the types of contracts that can be generated.
+ * The types are used to generate the contract and its deployment.
+ * The subtypes are used to define the specific type of contract.
+ */
+import type {
   ContractType,
   ContractSubtype,
   AllContractSubtypes,
 } from "../../../utilities/contract-types";
+import { CONTRACT_NAMES } from "../../../utilities/contract-types";
 
-// Re-export contract model types from models/contract-template.ts
-export type {
-  AddressDependency,
-  TraitDependency,
-  ContractDependency,
-  RuntimeValue,
-} from "../../../models/contract-template";
+export type { ContractType, ContractSubtype, AllContractSubtypes };
+export { CONTRACT_NAMES };
 
 /**
- * Contract generation result
+ * API response types
+ * These are used to define the types of responses that can be returned by the API.
  */
 
-export type { DeploymentResult } from "../../../models/contract-template";
-
 // API Response interface
-export type { ApiResponse } from "../../../src/utils/response-utils";
-
-// Contract info derived from ContractBase
-export interface ContractInfo {
-  name: string;
-  type: ContractType;
-  subtype: string;
-  deploymentOrder: number;
-  templatePath: string;
-  source?: string;
-  hash?: string;
-}
+import type { ApiResponse } from "../../../src/utils/response-utils";
+export type { ApiResponse };
 
 // API response types for specific endpoints
+export interface ContractTypesResponse {
+  types: Record<string, string[]>;
+}
+
 export interface ContractsListResponse {
-  contracts: ContractInfo[];
+  contracts: Array<ContractResponse>;
+}
+
+export interface ContractNamesResponse {
+  names: string[];
 }
 
 export interface ContractDetailResponse {
-  contract: ContractInfo;
+  contract: ContractResponse;
+}
+
+export interface ContractsByTypeResponse {
+  type: string;
+  contracts: Array<ContractResponse>;
 }
 
 export interface ContractDependenciesResponse {
-  dependencies: Array<
-    AddressDependency | TraitDependency | ContractDependency | RuntimeValue
-  >;
-}
-
-export interface ContractSourceResponse {
-  source: string;
+  name: string;
+  dependencies: {
+    addresses: ContractBase["requiredAddresses"];
+    traits: ContractBase["requiredTraits"];
+    contracts: ContractBase["requiredContractAddresses"];
+    runtimeValues: ContractBase["requiredRuntimeValues"];
+  };
 }
 
 export interface GeneratedContractResponse {
-  source: string;
-  hash: string;
+  network: string;
+  tokenSymbol: string;
+  contract: ContractResponse;
+  error?: string;
 }
 
-// DAO configuration
-export interface DaoConfig {
-  name: string;
-  tokenSymbol: string;
+export interface GeneratedDaoContractsResponse {
   network: string;
+  tokenSymbol: string;
+  contracts: Array<ContractResponse>;
+  errors?: Array<{
+    name: string;
+    error: string;
+  }>;
 }

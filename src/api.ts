@@ -1,5 +1,15 @@
 import { Hono } from "hono";
 import { StacksNetworkName } from "@stacks/network";
+import {
+  ContractsListResponse,
+  ContractNamesResponse,
+  ContractDetailResponse,
+  ContractsByTypeResponse,
+  ContractDependenciesResponse,
+  ContractTypesResponse,
+  GeneratedContractResponse,
+  GeneratedDaoContractsResponse,
+} from "@aibtc/types";
 import { CloudflareBindings } from "./cf-types";
 import { ContractRegistry } from "../utilities/contract-registry";
 import {
@@ -11,6 +21,8 @@ import { ApiError } from "./utils/api-error";
 import { ErrorCode } from "./utils/error-catalog";
 import { handleRequest } from "./utils/request-handler";
 import { ContractGeneratorService } from "./services/contract-generator";
+
+const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
 
 export function createApiRouter(registry: ContractRegistry) {
   const api = new Hono<{ Bindings: CloudflareBindings }>();
@@ -42,8 +54,7 @@ export function createApiRouter(registry: ContractRegistry) {
             ? Object.values(CONTRACT_SUBTYPES[type])
             : [];
         });
-
-        return { types: result };
+        return { types: result } as ContractTypesResponse;
       },
       { path: "/types", method: "GET" }
     );
@@ -57,13 +68,16 @@ export function createApiRouter(registry: ContractRegistry) {
         const contracts = registry.getAllContracts();
         const contractData = contracts.map((contract) => ({
           name: contract.name,
+          displayName: contract.displayName,
           type: contract.type,
           subtype: contract.subtype,
+          source: contract.source,
+          hash: contract.hash,
           deploymentOrder: contract.deploymentOrder,
-          isDeployed: contract.isDeployed,
+          clarityVersion: contract.clarityVersion,
         }));
 
-        return { contracts: contractData };
+        return { contracts: contractData } as ContractsListResponse;
       },
       { path: "/contracts", method: "GET" }
     );
@@ -75,7 +89,7 @@ export function createApiRouter(registry: ContractRegistry) {
       c,
       async () => {
         const contractNames = registry.getAllContractNames();
-        return { names: contractNames };
+        return { names: contractNames } as ContractNamesResponse;
       },
       { path: "/names", method: "GET" }
     );
@@ -87,7 +101,7 @@ export function createApiRouter(registry: ContractRegistry) {
       c,
       async () => {
         const availableNames = registry.getAllAvailableContractNames();
-        return { names: availableNames };
+        return { names: availableNames } as ContractNamesResponse;
       },
       { path: "/available-names", method: "GET" }
     );
@@ -99,7 +113,7 @@ export function createApiRouter(registry: ContractRegistry) {
       c,
       async () => {
         const daoNames = registry.getAllDaoContractNames();
-        return { names: daoNames };
+        return { names: daoNames } as ContractNamesResponse;
       },
       { path: "/dao-names", method: "GET" }
     );
@@ -122,11 +136,15 @@ export function createApiRouter(registry: ContractRegistry) {
           type,
           contracts: contracts.map((contract) => ({
             name: contract.name,
+            displayName: contract.displayName,
+            type: contract.type,
             subtype: contract.subtype,
+            source: contract.source,
+            hash: contract.hash,
             deploymentOrder: contract.deploymentOrder,
-            isDeployed: contract.isDeployed,
+            clarityVersion: contract.clarityVersion,
           })),
-        };
+        } as ContractsByTypeResponse;
       },
       { path: `/by-type/${c.req.param("type")}`, method: "GET" }
     );
@@ -147,16 +165,15 @@ export function createApiRouter(registry: ContractRegistry) {
         return {
           contract: {
             name: contract.name,
+            displayName: contract.displayName,
             type: contract.type,
             subtype: contract.subtype,
-            templatePath: contract.templatePath,
-            deploymentOrder: contract.deploymentOrder,
-            isDeployed: contract.isDeployed,
             source: contract.source,
             hash: contract.hash,
-            deploymentResult: contract.deploymentResult,
+            deploymentOrder: contract.deploymentOrder,
+            clarityVersion: contract.clarityVersion,
           },
-        };
+        } as ContractDetailResponse;
       },
       { path: `/contract/${c.req.param("name")}`, method: "GET" }
     );
@@ -205,11 +222,13 @@ export function createApiRouter(registry: ContractRegistry) {
           return {
             contract: {
               name: contract.name,
+              displayName: contract.displayName,
               type: contract.type,
               subtype: contract.subtype,
-              templatePath: contract.templatePath,
+              source: contract.source,
+              hash: contract.hash,
               deploymentOrder: contract.deploymentOrder,
-              isDeployed: contract.isDeployed,
+              clarityVersion: contract.clarityVersion,
             },
           };
         } catch (error) {
@@ -252,70 +271,24 @@ export function createApiRouter(registry: ContractRegistry) {
             contracts: contract.requiredContractAddresses,
             runtimeValues: contract.requiredRuntimeValues,
           },
-        };
+        } as ContractDependenciesResponse;
       },
       { path: `/dependencies/${c.req.param("name")}`, method: "GET" }
     );
   });
 
-  // Generate contract from template
+  // Generate contract for a specific network
   api.post("/generate-contract", async (c) => {
     return handleRequest(
       c,
       async () => {
         const body = await c.req.json();
-        // Support both name and contractName parameters for backward compatibility
-        const contractName = body.contractName || body.name;
-        const replacements = body.replacements || {};
-
-        if (!contractName) {
-          throw new ApiError(ErrorCode.INVALID_REQUEST, {
-            reason: "Missing required parameter: contractName or name",
-          });
-        }
-
-        const contract = registry.getContract(contractName);
-        if (!contract) {
-          throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, {
-            name: contractName,
-          });
-        }
-
-        try {
-          const generatedContract = await generatorService.generateContract(
-            contract,
-            replacements,
-            c.env
-          );
-
-          return {
-            contract: {
-              name: contract.name,
-              type: contract.type,
-              subtype: contract.subtype,
-              content: generatedContract,
-            },
-          };
-        } catch (error) {
-          throw new ApiError(ErrorCode.TEMPLATE_PROCESSING_ERROR, {
-            reason: error instanceof Error ? error.message : String(error),
-          });
-        }
-      },
-      { path: "/generate-contract", method: "POST" }
-    );
-  });
-
-  // Generate contract for a specific network
-  api.post("/generate-contract-for-network", async (c) => {
-    return handleRequest(
-      c,
-      async () => {
-        const body = await c.req.json();
-        const contractName = body.contractName || body.name;
-        const network = body.network || "devnet";
-        const tokenSymbol = body.tokenSymbol || "aibtc";
-        const customReplacements = body.customReplacements || {};
+        const contractName: string = body.contractName || body.name;
+        const network: string = body.network ?? "devnet";
+        const tokenSymbol: string = body.tokenSymbol ?? "aibtc";
+        const tokenSymbolLower = tokenSymbol.toLowerCase();
+        const customReplacements: Record<string, string> =
+          body.customReplacements || {};
 
         if (!contractName) {
           throw new ApiError(ErrorCode.INVALID_REQUEST, {
@@ -324,7 +297,6 @@ export function createApiRouter(registry: ContractRegistry) {
         }
 
         // Validate network
-        const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
         if (!validNetworks.includes(network)) {
           throw new ApiError(ErrorCode.INVALID_REQUEST, {
             reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(
@@ -345,21 +317,25 @@ export function createApiRouter(registry: ContractRegistry) {
             await generatorService.generateContractForNetwork(
               contract,
               network as StacksNetworkName,
-              tokenSymbol,
+              tokenSymbolLower,
               customReplacements,
               c.env
             );
 
           return {
+            network,
+            tokenSymbol: tokenSymbolLower,
             contract: {
               name: contract.name,
+              displayName: contract.displayName,
               type: contract.type,
               subtype: contract.subtype,
-              network,
-              tokenSymbol,
-              content: generatedContract,
+              source: generatedContract,
+              hash: contract.hash,
+              deploymentOrder: contract.deploymentOrder,
+              clarityVersion: contract.clarityVersion,
             },
-          };
+          } as GeneratedContractResponse;
         } catch (error) {
           throw new ApiError(ErrorCode.TEMPLATE_PROCESSING_ERROR, {
             reason: error instanceof Error ? error.message : String(error),
@@ -376,12 +352,13 @@ export function createApiRouter(registry: ContractRegistry) {
       c,
       async () => {
         const body = await c.req.json();
-        const network = body.network || "devnet";
-        const tokenSymbol = body.tokenSymbol || "aibtc";
-        const customReplacements = body.customReplacements || {};
+        const network: string = body.network ?? "devnet";
+        const tokenSymbol: string = body.tokenSymbol ?? "aibtc";
+        const tokenSymbolLower = tokenSymbol.toLowerCase();
+        const customReplacements: Record<string, string> =
+          body.customReplacements || {};
 
         // Validate network
-        const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
         if (!validNetworks.includes(network)) {
           throw new ApiError(ErrorCode.INVALID_REQUEST, {
             reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(
@@ -390,20 +367,41 @@ export function createApiRouter(registry: ContractRegistry) {
           });
         }
 
+        // Validate token symbol
+        if (!tokenSymbol) {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: "Missing required parameter: tokenSymbol",
+          });
+        }
+
+        // Validate custom replacements
+        if (typeof customReplacements !== "object") {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: "Invalid customReplacements format. Must be an object.",
+          });
+        }
+
+        // Check if all expected replacements are present
+        const expectedReplacements = [
+          "dao_token_metadata",
+          "origin_address",
+          "dao_manifest",
+        ];
+        for (const replacement of expectedReplacements) {
+          if (!customReplacements[replacement]) {
+            throw new ApiError(ErrorCode.INVALID_REQUEST, {
+              reason: `Missing required custom replacement: ${replacement}`,
+            });
+          }
+        }
+
         // Get all DAO contract names
         const daoContractNames = registry.getAllDaoContractNames();
 
         // Generate each contract
-        const generatedContracts: Array<{
-          name: string;
-          type: ContractType;
-          subtype: string;
-          content: string;
-        }> = [];
-        const errors: Array<{
-          name: string;
-          error: string;
-        }> = [];
+        const generatedContracts: GeneratedDaoContractsResponse["contracts"] =
+          [];
+        const generatedErrors: GeneratedDaoContractsResponse["errors"] = [];
 
         for (const contractName of daoContractNames) {
           const contract = registry.getContract(contractName);
@@ -413,20 +411,24 @@ export function createApiRouter(registry: ContractRegistry) {
                 await generatorService.generateContractForNetwork(
                   contract,
                   network as StacksNetworkName,
-                  tokenSymbol,
+                  tokenSymbolLower,
                   customReplacements,
                   c.env
                 );
 
               generatedContracts.push({
                 name: contract.name,
+                displayName: contract.displayName,
                 type: contract.type,
                 subtype: contract.subtype,
-                content: generatedContract,
+                source: generatedContract,
+                hash: contract.hash,
+                deploymentOrder: contract.deploymentOrder,
+                clarityVersion: contract.clarityVersion,
               });
             } catch (error) {
               // Track errors but continue with other contracts
-              errors.push({
+              generatedErrors.push({
                 name: contract.name,
                 error: error instanceof Error ? error.message : String(error),
               });
@@ -437,10 +439,10 @@ export function createApiRouter(registry: ContractRegistry) {
         // Make sure we return at least an empty array for contracts
         return {
           network,
-          tokenSymbol,
+          tokenSymbol: tokenSymbolLower,
           contracts: generatedContracts.length > 0 ? generatedContracts : [],
-          errors: errors.length > 0 ? errors : undefined,
-        };
+          errors: generatedErrors.length > 0 ? generatedErrors : undefined,
+        } as GeneratedDaoContractsResponse;
       },
       { path: "/generate-dao-contracts", method: "POST" }
     );

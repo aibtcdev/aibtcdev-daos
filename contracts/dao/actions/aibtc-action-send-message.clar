@@ -50,7 +50,6 @@
 ;;
 
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_contract_base
   (ok (asserts!
     (or
       ;; /g/.aibtc-base-dao/dao_contract_base

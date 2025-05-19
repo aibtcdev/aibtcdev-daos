@@ -336,7 +336,9 @@ describe(`public functions: ${contractName}`, () => {
 
     // Skip test if distribution is already initialized
     if (distributionInitialized) {
-      dbgLog("Skipping claim test - distribution already initialized", { titleBefore: "Test Skip Notice" });
+      dbgLog("Skipping claim test - distribution already initialized", {
+        titleBefore: "Test Skip Notice",
+      });
       return;
     }
 
@@ -375,7 +377,9 @@ describe(`public functions: ${contractName}`, () => {
 
     // Skip test if distribution is not initialized
     if (!distributionInitialized) {
-      dbgLog("Skipping claim test - could not initialize distribution", { titleBefore: "Test Skip Notice" });
+      dbgLog("Skipping claim test - could not initialize distribution", {
+        titleBefore: "Test Skip Notice",
+      });
       return;
     }
 
@@ -438,10 +442,9 @@ describe(`public functions: ${contractName}`, () => {
 
     // Skip test if distribution is not initialized
     if (!distributionInitialized) {
-      dbgLog(
-        "Skipping claim-on-behalf test - distribution not initialized",
-        { titleBefore: "Test Skip Notice" }
-      );
+      dbgLog("Skipping claim-on-behalf test - distribution not initialized", {
+        titleBefore: "Test Skip Notice",
+      });
       return;
     }
 

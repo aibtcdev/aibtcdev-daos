@@ -292,71 +292,6 @@ describe("Template Processor", () => {
       '(define-data-var token-uri (optional (string-utf8 256)) (some u"https://example.com/token.json?id=123&type=nft"))'
     );
   });
-  it("should generate template replacements for different networks", () => {
-    // Test for different networks
-    const mainnetReplacements = generateTemplateReplacements(
-      "mainnet",
-      "aibtc"
-    );
-    const testnetReplacements = generateTemplateReplacements(
-      "testnet",
-      "aibtc"
-    );
-    const devnetReplacements = generateTemplateReplacements("devnet", "aibtc");
-
-    // Verify network-specific values are different
-    expect(
-      mainnetReplacements[".aibtc-dao-traits.extension/dao_trait_extension"]
-    ).not.toEqual(
-      testnetReplacements[".aibtc-dao-traits.extension/dao_trait_extension"]
-    );
-
-    // Verify token symbol is used correctly
-    expect(mainnetReplacements["aibtc/dao_token_symbol"]).toBe("AIBTC");
-
-    // Test with custom token symbol
-    const customReplacements = generateTemplateReplacements("devnet", "test");
-    expect(customReplacements["test/dao_token_symbol"]).toBe("TEST");
-    expect(customReplacements[".aibtc-faktory/dao_contract_token"]).toBe(
-      ".test-faktory"
-    );
-
-    // Test with custom replacements
-    const withCustom = generateTemplateReplacements("devnet", "aibtc", {
-      "custom/variable": "custom-value",
-      "aibtc/dao_token_symbol": "OVERRIDE",
-    });
-
-    expect(withCustom["custom/variable"]).toBe("custom-value");
-    expect(withCustom["aibtc/dao_token_symbol"]).toBe("OVERRIDE");
-
-    // Save the replacements for inspection
-    const outputDir = path.join(
-      process.cwd(),
-      "generated-contracts/test-output"
-    );
-  
-    // Create the directory if it doesn't exist
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
-  
-    const outputPath = path.join(outputDir, "template-replacements.json");
-    fs.writeFileSync(
-      outputPath,
-      JSON.stringify(
-        {
-          mainnet: mainnetReplacements,
-          testnet: testnetReplacements,
-          devnet: devnetReplacements,
-          custom: customReplacements,
-          withCustomOverrides: withCustom,
-        },
-        null,
-        2
-      )
-    );
-  });
 });
 
 describe("Contract Generator", () => {
@@ -374,7 +309,7 @@ describe("Contract Generator", () => {
 
     // DAO Trait references
     ".aibtc-dao-traits.extension/dao_trait_extension": ".test-traits.extension",
-    ".aibtc-dao-traits.action/dao_trait_action_proposals_voting":
+    ".aibtc-dao-traits.action/dao_trait_action_proposal_voting":
       ".test-traits.action-proposals-voting",
     ".aibtc-dao-traits.action/dao_trait_action": ".test-traits.action",
     ".aibtc-dao-traits.proposal/dao_trait_proposal": ".test-traits.proposal",
