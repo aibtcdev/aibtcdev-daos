@@ -107,7 +107,7 @@ export function generateTemplateReplacements(
 
     // Pre-launch and pool contracts
     [`dao_contract_token_prelaunch`]: `.${symbol}-pre-faktory`,
-    [`dao_contract_token_pool`]: `.${symbol}-bitflow-pool`,
+    [`dao_contract_token_pool`]: `.xyk-pool-sbtc-${symbol}-v-1-1`,
 
     // External contracts
     [`sbtc_contract`]: addresses.SBTC,

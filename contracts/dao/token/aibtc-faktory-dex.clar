@@ -295,7 +295,7 @@
     dexContract: (as-contract tx-sender),
     ;; /g/STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2/external_bitflow_core
     ammReceiver: 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2, ;; 'SM1793C4R5PZ4NS4VQ4WMP7SKKYVH8JZEWSZ9HCCR.xyk-core-v-1-2
-    ;; /g/.aibtc-bitflow-pool/dao_contract_token_pool
+    ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_token_pool
     poolName: .xyk-pool-sbtc-aibtc-v-1-1, ;; 'SPV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RCJDC22.xyk-pool-stx-NAME-v1-1
   })
   (ok true)
