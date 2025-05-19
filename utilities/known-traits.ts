@@ -30,8 +30,8 @@ type DaoTraits = {
 
 type AgentTraits = {
   AGENT_ACCOUNT: string;
+  AGENT_ACCOUNT_PROPOSALS: string;
   AGENT_FAKTORY_DEX_APPROVAL: string;
-  AGENT_PROPOSALS: string;
   AGENT_FAKTORY_BUY_SELL: string;
 };
 
@@ -84,7 +84,7 @@ const mainnetTraits: KnownTraits = {
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-account",
   AGENT_FAKTORY_DEX_APPROVAL:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-faktory-dex",
-  AGENT_PROPOSALS:
+  AGENT_ACCOUNT_PROPOSALS:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-proposals",
   AGENT_FAKTORY_BUY_SELL:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.faktory-buy-sell",
@@ -103,41 +103,43 @@ const testnetTraits: KnownTraits = {
     "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.sip-010-trait-ft-standard.sip-010-trait",
   // DAO traits
   DAO_BASE:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-base-dao-trait.aibtc-base-dao",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-base-dao-trait.aibtc-base-dao",
   DAO_PROPOSAL:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.proposal",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.proposal",
   DAO_EXTENSION:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.extension",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.extension",
   DAO_ACTION:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.action",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.action",
   DAO_ACTION_PROPOSAL_VOTING:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.action-proposal-voting",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.action-proposal-voting",
   DAO_CHARTER:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.charter",
-  DAO_EPOCH: "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.epoch",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.dao-charter",
+  DAO_EPOCH:
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.dao-epoch",
   DAO_MESSAGING:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.messaging",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.messaging",
   DAO_REWARDS_ACCOUNT:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.rewards-account",
-  DAO_TOKEN: "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.token",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.rewards-account",
+  DAO_TOKEN: "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.token",
   DAO_TOKEN_DEX:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.faktory-dex",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.faktory-dex",
   DAO_TOKEN_OWNER:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.token-owner",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.token-owner",
   DAO_TOKEN_POOL:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.bitflow-pool",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.bitflow-pool",
   DAO_TREASURY:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.treasury",
-  DAO_USERS: "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-dao-traits.users",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.treasury",
+  DAO_USERS:
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-dao-traits.dao-users",
   // Agent traits
   AGENT_ACCOUNT:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-agent-account-traits.aibtc-account",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-agent-account-traits.aibtc-account",
   AGENT_FAKTORY_DEX_APPROVAL:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-agent-account-traits.aibtc-faktory-dex",
-  AGENT_PROPOSALS:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-agent-account-traits.aibtc-proposals",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-agent-account-traits.aibtc-faktory-dex",
+  AGENT_ACCOUNT_PROPOSALS:
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-agent-account-traits.aibtc-proposals",
   AGENT_FAKTORY_BUY_SELL:
-    "ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA.aibtc-agent-account-traits.faktory-buy-sell",
+    "ST3DD7MASYJADCFXN3745R11RVM4PCXCPVRS3V27K.aibtc-agent-account-traits.faktory-buy-sell",
 };
 
 const devnetTraits: KnownTraits = {
@@ -184,7 +186,7 @@ const devnetTraits: KnownTraits = {
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account",
   AGENT_FAKTORY_DEX_APPROVAL:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-faktory-dex",
-  AGENT_PROPOSALS:
+  AGENT_ACCOUNT_PROPOSALS:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-proposals",
   AGENT_FAKTORY_BUY_SELL:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.faktory-buy-sell",

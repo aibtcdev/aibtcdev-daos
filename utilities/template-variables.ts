@@ -16,7 +16,7 @@ export function generateTemplateReplacements(
   // Always use "aibtc" for template keys since that's what's in the template files
   const templateKeySymbol = "aibtc";
 
-  const symbol = tokenSymbol.toLowerCase();
+  const symbol = tokenSymbol;
 
   // Base replacements
   const replacements: Record<string, string> = {
@@ -27,8 +27,8 @@ export function generateTemplateReplacements(
     [`dao_token_decimals`]: "8",
 
     // Account addresses
-    [`account_owner`]: `'${addresses.DEPLOYER}`,
-    [`account_agent`]: "'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
+    [`account_owner`]: `${addresses.DEPLOYER}`,
+    [`account_agent`]: "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
 
     // SIP traits
     [`base_trait_sip010`]: `'${traits.BASE_SIP010}`,
@@ -55,21 +55,21 @@ export function generateTemplateReplacements(
     [`dao_trait_treasury`]: `'${traits.DAO_TREASURY}`,
     [`dao_trait_rewards_account`]: `'${traits.DAO_REWARDS_ACCOUNT}`,
     [`dao_trait_epoch`]: `'${traits.DAO_EPOCH}`,
-    [`dao_trait_action_proposals_voting`]: `'${traits.DAO_ACTION_PROPOSAL_VOTING}`,
+    [`dao_trait_action_proposal_voting`]: `'${traits.DAO_ACTION_PROPOSAL_VOTING}`,
 
     // Agent traits with full paths for template matching
     [`.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account`]: `'${traits.AGENT_ACCOUNT}`,
     [`.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval`]: `'${traits.AGENT_FAKTORY_DEX_APPROVAL}`,
-    [`.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals`]: `'${traits.AGENT_PROPOSALS}`,
+    [`.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals`]: `'${traits.AGENT_ACCOUNT_PROPOSALS}`,
     [`.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell`]: `'${traits.AGENT_FAKTORY_BUY_SELL}`,
 
     // Agent traits with simplified keys
     [`agent_account_trait_account`]: `'${traits.AGENT_ACCOUNT}`,
     [`agent_account_trait_faktory_dex_approval`]: `'${traits.AGENT_FAKTORY_DEX_APPROVAL}`,
-    [`agent_account_trait_proposals`]: `'${traits.AGENT_PROPOSALS}`,
+    [`agent_account_trait_proposals`]: `'${traits.AGENT_ACCOUNT_PROPOSALS}`,
     [`agent_account_trait_faktory_buy_sell`]: `'${traits.AGENT_FAKTORY_BUY_SELL}`,
 
-    // DAO run cost: TODO add to known addresses (and deploy)
+    // DAO run cost
     [`.dao-run-cost/base_contract_dao_run_cost`]: `'${addresses.AIBTC_RUN_COST}`,
 
     // Contract references with full paths for template matching
@@ -105,11 +105,15 @@ export function generateTemplateReplacements(
     [`base_contract_dao_run_cost`]: `'${addresses.AIBTC_RUN_COST}`,
     [`dao_contract_rewards_account`]: `.${symbol}-rewards-account`,
 
-    // External contracts
-    [`sbtc_contract`]: `'${addresses.SBTC}`,
-    [`sbtc_token_contract`]: `'${addresses.SBTC}`,
-    [`base_contract_sbtc`]: `'${addresses.SBTC}`,
+    // Pre-launch and pool contracts
+    [`dao_contract_token_prelaunch`]: `.${symbol}-pre-faktory`,
+    [`dao_contract_token_pool`]: `.xyk-pool-sbtc-${symbol}-v-1-1`,
 
+    // External contracts
+    [`sbtc_contract`]: addresses.SBTC,
+    [`sbtc_token_contract`]: addresses.SBTC,
+    [`base_contract_sbtc`]: addresses.SBTC,
+    [`external_bitflow_core`]: addresses.BITFLOW_CORE,
     // Configuration values
     [`dao_manifest`]: `The mission of the ${symbol} is to...`,
   };

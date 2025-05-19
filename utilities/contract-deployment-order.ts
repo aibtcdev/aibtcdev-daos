@@ -5,7 +5,7 @@ import {
 } from "./contract-types";
 
 // Helper function to safely access contract names with proper typing
-function getContractName<T extends ContractType>(
+function useContract<T extends ContractType>(
   category: T,
   subcategory: ContractSubtype<T>
 ): string {
@@ -19,33 +19,30 @@ function getContractName<T extends ContractType>(
 export const DEPLOYMENT_ORDER: Record<string, number> = {
   // separate from dao deployment
   // can be deployed anytime
-  [getContractName("AGENT", "AGENT_ACCOUNT")]: 1,
+  [useContract("AGENT", "AGENT_ACCOUNT")]: 1,
 
   // token contracts
-  [getContractName("TOKEN", "PRELAUNCH")]: 10,
-  [getContractName("TOKEN", "DAO")]: 11,
-  [getContractName("TOKEN", "POOL")]: 12,
-  [getContractName("TOKEN", "DEX")]: 13,
+  [useContract("TOKEN", "DAO")]: 10,
+  [useContract("TOKEN", "PRELAUNCH")]: 11,
+  [useContract("TOKEN", "POOL")]: 12,
+  [useContract("TOKEN", "DEX")]: 13,
 
   // base dao contract
-  [getContractName("BASE", "DAO")]: 20,
+  [useContract("BASE", "DAO")]: 20,
 
   // extensions
-  [getContractName("EXTENSIONS", "ACTION_PROPOSAL_VOTING")]: 30,
-  [getContractName("EXTENSIONS", "DAO_CHARTER")]: 31,
-  [getContractName("EXTENSIONS", "DAO_EPOCH")]: 32,
-  [getContractName("EXTENSIONS", "DAO_USERS")]: 33,
-  [getContractName("EXTENSIONS", "ONCHAIN_MESSAGING")]: 34,
-  [getContractName("EXTENSIONS", "REWARDS_ACCOUNT")]: 35,
-  [getContractName("EXTENSIONS", "TOKEN_OWNER")]: 36,
-  [getContractName("EXTENSIONS", "TREASURY")]: 37,
+  [useContract("EXTENSIONS", "DAO_USERS")]: 30,
+  [useContract("EXTENSIONS", "TREASURY")]: 31,
+  [useContract("EXTENSIONS", "REWARDS_ACCOUNT")]: 32,
+  [useContract("EXTENSIONS", "ACTION_PROPOSAL_VOTING")]: 33,
+  [useContract("EXTENSIONS", "DAO_CHARTER")]: 34,
+  [useContract("EXTENSIONS", "DAO_EPOCH")]: 35,
+  [useContract("EXTENSIONS", "ONCHAIN_MESSAGING")]: 36,
+  [useContract("EXTENSIONS", "TOKEN_OWNER")]: 37,
 
   // actions
-  [getContractName("ACTIONS", "SEND_MESSAGE")]: 40,
+  [useContract("ACTIONS", "SEND_MESSAGE")]: 40,
 
   // initialize dao (always last)
-  [getContractName("PROPOSALS", "INITIALIZE_DAO")]: 50,
-
-  // External contracts can be added as needed
-  // These would typically have higher numbers as they're deployed separately
+  [useContract("PROPOSALS", "INITIALIZE_DAO")]: 50,
 };

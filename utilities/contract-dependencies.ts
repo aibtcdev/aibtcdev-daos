@@ -103,7 +103,7 @@ export function defineExtensionContractDependencies(
           .addTraitDependency("DAO_EXTENSION", "dao_trait_extension")
           .addTraitDependency(
             "DAO_ACTION_PROPOSAL_VOTING",
-            "dao_trait_action_proposals_voting"
+            "dao_trait_action_proposal_voting"
           )
           .addTraitDependency("DAO_ACTION", "dao_trait_action")
           .addAddressDependency("AIBTC_RUN_COST", "base_contract_dao_run_cost")
@@ -315,7 +315,7 @@ export function defineAgentContractDependencies(
         contract
           .addTraitDependency("AGENT_ACCOUNT", "agent_account_trait_account")
           .addTraitDependency(
-            "AGENT_PROPOSALS",
+            "AGENT_ACCOUNT_PROPOSALS",
             "agent_account_trait_proposals"
           )
           .addTraitDependency(
@@ -331,7 +331,7 @@ export function defineAgentContractDependencies(
           .addTraitDependency("DAO_PROPOSAL", "dao_trait_proposal")
           .addTraitDependency(
             "DAO_ACTION_PROPOSAL_VOTING",
-            "dao_trait_action_proposals_voting"
+            "dao_trait_action_proposal_voting"
           )
           .addTraitDependency(
             "AGENT_FAKTORY_DEX_APPROVAL",

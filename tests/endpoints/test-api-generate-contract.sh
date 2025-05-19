@@ -39,11 +39,14 @@ test_api_process_template() {
         "$url")
     
     # Debug the raw response
-    #echo "Raw response (first 500 chars):"
-    #echo "$response" | head -c 500
-    #echo "..."
+    #echo "===================="
+    #echo "Raw response (valid_data):"
+    #echo "$response"
+    #echo "===================="
     
     status=$(echo "$response" | tail -n1)
+
+    #echo "Status: $status"
     
     if [ "$status" -eq 200 ]; then
         echo -e "${GREEN}✓${NC} Generate contract endpoint with valid data - Status: $status"
@@ -61,8 +64,16 @@ test_api_process_template() {
         -H "Content-Type: application/json" \
         -d "$invalid_data" \
         "$url")
+
+    # Debug the raw response
+    #echo "===================="
+    #echo "Raw response (invalid_data):"
+    #echo "$response"
+    #echo "===================="
     
     status=$(echo "$response" | tail -n1)
+
+    #echo "Status: $status"
     
     if [ "$status" -eq 400 ]; then
         echo -e "${GREEN}✓${NC} Generate contract endpoint with invalid data - Status: $status"
@@ -105,9 +116,16 @@ test_api_generate_dao_contracts() {
         -H "Content-Type: application/json" \
         -d "$valid_data" \
         "$url")
+
+    # Debug the raw response
+    #echo "===================="
+    #echo "Raw response (generate_dao_contracts):"
+    #echo "$response"
+    #echo "===================="
     
     status=$(echo "$response" | tail -n1)
 
+    #echo "Status: $status"
     
     if [ "$status" -eq 200 ]; then
         echo -e "${GREEN}✓${NC} Generate all DAO contracts endpoint with valid data - Status: $status"
@@ -174,7 +192,7 @@ test_api_generate_dao_contracts() {
         # Check if the contracts array contains valid contract objects
         # First check if we have a data.contracts array
         if echo "$body" | jq -e '.data.contracts' >/dev/null 2>&1; then
-            valid_contracts=$(echo "$body" | jq -r '[.data.contracts[] | select(.name != null and .content != null)] | length')
+            valid_contracts=$(echo "$body" | jq -r '[.data.contracts[] | select(.name != null and .source != null)] | length')
             if [ -z "$valid_contracts" ] || [ "$valid_contracts" -eq 0 ]; then
                 echo -e "  ${YELLOW}⚠${NC} No valid contracts found in the response"
                 # Don't fail the test, just warn
@@ -188,7 +206,7 @@ test_api_generate_dao_contracts() {
         
         # Check if the contracts array contains errors
         if echo "$body" | jq -e '.data.contracts' >/dev/null 2>&1; then
-            error_contracts=$(echo "$body" | jq -r '[.data.contracts[] | select(.content | contains("ERROR:"))] | length')
+            error_contracts=$(echo "$body" | jq -r '[.data.contracts[] | select(.source | contains("ERROR:"))] | length')
             if [ -z "$error_contracts" ]; then
                 echo -e "  ${GREEN}✓${NC} No contracts with errors found"
             elif [ "$error_contracts" -gt 0 ]; then

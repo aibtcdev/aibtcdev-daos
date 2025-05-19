@@ -309,7 +309,7 @@ describe("Contract Generator", () => {
 
     // DAO Trait references
     ".aibtc-dao-traits.extension/dao_trait_extension": ".test-traits.extension",
-    ".aibtc-dao-traits.action/dao_trait_action_proposals_voting":
+    ".aibtc-dao-traits.action/dao_trait_action_proposal_voting":
       ".test-traits.action-proposals-voting",
     ".aibtc-dao-traits.action/dao_trait_action": ".test-traits.action",
     ".aibtc-dao-traits.proposal/dao_trait_proposal": ".test-traits.proposal",

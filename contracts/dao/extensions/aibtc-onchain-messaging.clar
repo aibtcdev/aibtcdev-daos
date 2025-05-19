@@ -25,7 +25,7 @@
   (ok true)
 )
 
-(define-public (send (msg (string-ascii 1047888)))
+(define-public (send (msg (string-ascii 10000)))
   (let (
       (isFromDao (is-ok (is-dao-or-extension)))
       ;; /g/.aibtc-base-dao/dao_contract_base
