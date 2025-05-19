@@ -116,6 +116,9 @@
     metThreshold: bool, ;; did the proposal meet threshold
     passed: bool, ;; did the proposal pass
     executed: bool, ;; did the proposal execute
+    expired: bool, ;; was the proposal expired
+    vetoMetQuorum: bool, ;; did the veto meet quorum
+    vetoExceedsYes: bool, ;; did the veto exceed yes votes
     vetoed: bool, ;; was the proposal vetoed
   }
 )
@@ -258,6 +261,9 @@
         metThreshold: false,
         passed: false,
         executed: false,
+        expired: false,
+        vetoMetQuorum: false,
+        vetoExceedsYes: false,
         vetoed: false,
       })
       ERR_SAVING_PROPOSAL
@@ -463,12 +469,14 @@
         (> vetoVotes u0)
         (>= (/ (* vetoVotes u100) liquidTokens) VOTING_QUORUM)
       ))
+      (vetoExceedsYes (> vetoVotes votesFor))
+      (vetoActivated (and vetoMetQuorum vetoExceedsYes))
       ;; evaluate criteria to determine if proposal passed
       (votePassed (and
         hasVotes ;; check if there are any votes
         metQuorum ;; quorum: total votes vs liquid supply
         metThreshold ;; threshold: enough yes votes vs total votes
-        (not vetoMetQuorum) ;; veto quorum: total veto votes vs liquid supply
+        (not vetoActivated) ;; veto: reached quorum and more than yes votes
       ))
       ;; check info for running action
       (validAction (is-action-valid action))
@@ -517,6 +525,8 @@
         metQuorum: metQuorum,
         metThreshold: metThreshold,
         vetoMetQuorum: vetoMetQuorum,
+        vetoExceedsYes: vetoExceedsYes,
+        vetoed: vetoActivated,
         passed: votePassed,
         expired: (not notExpired),
         executed: tryToExecute,
@@ -529,8 +539,11 @@
         metQuorum: metQuorum,
         metThreshold: metThreshold,
         passed: votePassed,
+        expired: (not notExpired),
         executed: tryToExecute,
-        vetoed: vetoMetQuorum,
+        vetoMetQuorum: vetoMetQuorum,
+        vetoExceedsYes: vetoExceedsYes,
+        vetoed: vetoActivated,
       })
     )
     ;; transfer the bond based on the outcome
@@ -558,12 +571,6 @@
     ;; increment the concluded proposal count
     (var-set concludedProposalCount (+ (var-get concludedProposalCount) u1))
     ;; try to execute the action if the proposal passed
-    ;;   returns (ok true) if the action successfully executes
-    ;;   returns (ok false) if the action was not executed or executed with an error
-    ;; if the proposal can be executed
-    ;;   set executedProposalCount += 1
-    ;;   update the drip (private func?)
-    ;;   try to run the action
     (ok (if tryToExecute
       (and
         ;; increment the executed proposal count
