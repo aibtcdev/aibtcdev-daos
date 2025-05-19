@@ -7,8 +7,8 @@
 
 ;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.action/dao_trait_action_proposals_voting
-(impl-trait .aibtc-dao-traits.action-proposals-voting)
+;; /g/.aibtc-dao-traits.action/dao_trait_action_proposal_voting
+(impl-trait .aibtc-dao-traits.action-proposal-voting)
 ;; /g/.aibtc-dao-traits.action/dao_trait_action
 (use-trait action-trait .aibtc-dao-traits.action)
 

@@ -55,7 +55,7 @@ export function generateTemplateReplacements(
     [`dao_trait_treasury`]: `'${traits.DAO_TREASURY}`,
     [`dao_trait_rewards_account`]: `'${traits.DAO_REWARDS_ACCOUNT}`,
     [`dao_trait_epoch`]: `'${traits.DAO_EPOCH}`,
-    [`dao_trait_action_proposals_voting`]: `'${traits.DAO_ACTION_PROPOSAL_VOTING}`,
+    [`dao_trait_action_proposal_voting`]: `'${traits.DAO_ACTION_PROPOSAL_VOTING}`,
 
     // Agent traits with full paths for template matching
     [`.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account`]: `'${traits.AGENT_ACCOUNT}`,
