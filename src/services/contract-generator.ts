@@ -155,6 +155,10 @@ export class ContractGeneratorService {
     env?: CloudflareBindings
   ): Promise<string> {
     try {
+      // Set the display name by replacing 'aibtc' with the lowercase token symbol
+      const displayName = contract.name.replace('aibtc', tokenSymbol.toLowerCase());
+      contract.setDisplayName(displayName);
+
       // Generate replacements for the specified network
       const networkReplacements = generateTemplateReplacements(
         network,
