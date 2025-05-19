@@ -106,10 +106,9 @@ export function generateTemplateReplacements(
     [`dao_contract_rewards_account`]: `.${symbol}-rewards-account`,
 
     // External contracts
-    [`sbtc_contract`]: `'${addresses.SBTC}`,
-    [`sbtc_token_contract`]: `'${addresses.SBTC}`,
-    [`base_contract_sbtc`]: `'${addresses.SBTC}`,
-
+    [`sbtc_contract`]: addresses.SBTC,
+    [`sbtc_token_contract`]: addresses.SBTC,
+    [`base_contract_sbtc`]: addresses.SBTC,
     // Configuration values
     [`dao_manifest`]: `The mission of the ${symbol} is to...`,
   };
