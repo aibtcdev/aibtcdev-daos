@@ -25,13 +25,17 @@ export function generateTemplateReplacements(
     [`dao_token_symbol`]: symbol,
     [`dao_token_name`]: symbol,
     [`dao_token_decimals`]: "8",
+    [`aibtc/dao_token_symbol`]: symbol,
 
     // Account addresses
     [`account_owner`]: `${addresses.DEPLOYER}`,
     [`account_agent`]: "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
+    [`ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/account_owner`]: `${addresses.DEPLOYER}`,
+    [`ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG/account_agent`]: "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
 
     // SIP traits
     [`base_trait_sip010`]: `'${traits.BASE_SIP010}`,
+    [`SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010`]: `'${traits.BASE_SIP010}`,
 
     // DAO traits with full paths for template matching
     [`.aibtc-dao-traits.extension/dao_trait_extension`]: `'${traits.DAO_EXTENSION}`,
@@ -45,8 +49,10 @@ export function generateTemplateReplacements(
     [`dao_trait_extension`]: `'${traits.DAO_EXTENSION}`,
     [`dao_trait_action`]: `'${traits.DAO_ACTION}`,
     [`dao_trait_proposal`]: `'${traits.DAO_PROPOSAL}`,
+    [`.aibtc-dao-traits.proposal/dao_trait_proposal`]: `'${traits.DAO_PROPOSAL}`,
     [`dao_trait_token_owner`]: `'${traits.DAO_TOKEN_OWNER}`,
     [`dao_trait_faktory_dex`]: `'${traits.DAO_TOKEN_DEX}`,
+    [`.aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex`]: `'${traits.DAO_TOKEN_DEX}`,
     [`dao_trait_faktory_token`]: `'${traits.FAKTORY_SIP010}`,
     [`dao_trait_base`]: `'${traits.DAO_BASE}`,
     [`dao_trait_charter`]: `'${traits.DAO_CHARTER}`,
@@ -62,7 +68,11 @@ export function generateTemplateReplacements(
     [`.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval`]: `'${traits.AGENT_FAKTORY_DEX_APPROVAL}`,
     [`.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals`]: `'${traits.AGENT_ACCOUNT_PROPOSALS}`,
     [`.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell`]: `'${traits.AGENT_FAKTORY_BUY_SELL}`,
-
+  
+    // Additional agent trait paths for exact template matching
+    [`.aibtc-agent-account-traits.aibtc-account`]: `.${symbol}-agent-account-traits.${symbol}-account`,
+    [`.aibtc-agent-account-traits.faktory-dex-approval`]: `.${symbol}-agent-account-traits.faktory-dex-approval`,
+  
     // Agent traits with simplified keys
     [`agent_account_trait_account`]: `'${traits.AGENT_ACCOUNT}`,
     [`agent_account_trait_faktory_dex_approval`]: `'${traits.AGENT_FAKTORY_DEX_APPROVAL}`,
