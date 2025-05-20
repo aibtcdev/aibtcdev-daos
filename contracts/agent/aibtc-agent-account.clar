@@ -7,7 +7,7 @@
 (impl-trait .aibtc-agent-account-traits.aibtc-account)
 ;; /g/.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals
 (impl-trait .aibtc-agent-account-traits.aibtc-proposals)
-;; /g/.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval
+;; /g/.aibtc-agent-account-traits.faktory-dex-approval/agent_account_trait_faktory_dex_approval
 (impl-trait .aibtc-agent-account-traits.faktory-dex-approval)
 ;; /g/.aibtc-agent-account-traits.aibtc-faktory-buy-sell/agent_account_trait_faktory_buy_sell
 (impl-trait .aibtc-agent-account-traits.faktory-buy-sell)
@@ -17,11 +17,11 @@
 (use-trait action-trait .aibtc-dao-traits.action)
 ;; /g/.aibtc-dao-traits.proposal/dao_trait_proposal
 (use-trait proposal-trait .aibtc-dao-traits.proposal)
-;; /g/.aibtc-dao-traits.action-proposals-voting/dao_trait_action_proposal_voting
+;; /g/.aibtc-dao-traits.action-proposal-voting/dao_trait_action_proposal_voting
 (use-trait action-proposal-voting-trait .aibtc-dao-traits.action-proposal-voting)
 ;; /g/.aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex
 (use-trait dao-faktory-dex .aibtc-dao-traits.faktory-dex)
-;; /g/.aibtc-dao-traits.faktory-token/dao_trait_faktory_token
+;; /g/.aibtc-dao-traits.faktory-token/dao_trait_faktory_sip010
 (use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait)
 
 ;; constants
