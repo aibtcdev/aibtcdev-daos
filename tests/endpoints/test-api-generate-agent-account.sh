@@ -9,7 +9,7 @@ test_api_generate_agent_account() {
     
     # Test POST endpoint with valid data
     local valid_data='{
-        "name":"aibtc-agent-account",
+        "name":"aibtc-acct-ST1PQ-PGZGM-ST2CY-RK9AG",
         "network":"devnet",
         "tokenSymbol":"AIBTC",
         "account_owner": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
@@ -77,7 +77,7 @@ test_api_generate_agent_account() {
             echo -e "${RED}✗${NC} Contract does not contain source field"
             FAILED_TESTS=$((FAILED_TESTS + 1))
             return
-        }
+        fi
         
         echo -e "  ${GREEN}✓${NC} Successfully processed the response"
     else

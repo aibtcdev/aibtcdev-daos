@@ -43,6 +43,7 @@ echo "Test Summary"
 echo "===================="
 echo "Total tests: $TOTAL_TESTS"
 echo "Failed tests: $FAILED_TESTS"
+echo ""
 
 # Exit with failure if any tests failed
 if [ $FAILED_TESTS -gt 0 ]; then
