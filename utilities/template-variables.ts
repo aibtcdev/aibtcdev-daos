@@ -4,6 +4,8 @@ import { getKnownAddresses } from "./known-addresses";
 
 /**
  * Generate a complete set of template variable replacements for a given network
+ * 
+ * Note: Template variables in contracts are formatted as: ;; /g/variable/replacement_key
  */
 export function generateTemplateReplacements(
   network: StacksNetworkName,
@@ -54,6 +56,7 @@ export function generateTemplateReplacements(
     [`dao_trait_rewards_account`]: `'${traits.DAO_REWARDS_ACCOUNT}`,
     [`dao_trait_epoch`]: `'${traits.DAO_EPOCH}`,
     [`dao_trait_action_proposal_voting`]: `'${traits.DAO_ACTION_PROPOSAL_VOTING}`,
+    [`.aibtc-dao-traits.action-proposal-voting/dao_trait_action_proposal_voting`]: `'${traits.DAO_ACTION_PROPOSAL_VOTING}`,
     // DAO Token Info
     [`${templateKeySymbol}/dao_token_symbol`]: symbol,
     [`dao_token_symbol`]: symbol,
@@ -99,7 +102,7 @@ export function generateTemplateReplacements(
   const agentAccountReplacements: Record<string, string> = {
     // Agent account traits with full paths for template matching
     [`.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account`]: `'${traits.AGENT_ACCOUNT}`,
-    [`.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval`]: `'${traits.AGENT_FAKTORY_DEX_APPROVAL}`,
+    [`.aibtc-agent-account-traits.faktory-dex-approval/agent_account_trait_faktory_dex_approval`]: `'${traits.AGENT_FAKTORY_DEX_APPROVAL}`,
     [`.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals`]: `'${traits.AGENT_ACCOUNT_PROPOSALS}`,
     [`.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell`]: `'${traits.AGENT_FAKTORY_BUY_SELL}`,
     // Agent traits with simplified keys
