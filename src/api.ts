@@ -289,23 +289,6 @@ export function createApiRouter(registry: ContractRegistry) {
         const tokenSymbolLower = tokenSymbol.toLowerCase();
         const customReplacements: Record<string, string> =
           body.customReplacements || {};
-          
-        // Extract account owner and agent addresses from request body
-        if (body.account_owner) {
-          customReplacements["account_owner"] = body.account_owner;
-        } else {
-          throw new ApiError(ErrorCode.INVALID_REQUEST, {
-            reason: "Missing required parameter: account_owner",
-          });
-        }
-        
-        if (body.account_agent) {
-          customReplacements["account_agent"] = body.account_agent;
-        } else {
-          throw new ApiError(ErrorCode.INVALID_REQUEST, {
-            reason: "Missing required parameter: account_agent",
-          });
-        }
 
         if (!contractName) {
           throw new ApiError(ErrorCode.INVALID_REQUEST, {
@@ -477,6 +460,23 @@ export function createApiRouter(registry: ContractRegistry) {
         const tokenSymbolLower = tokenSymbol.toLowerCase();
         const customReplacements: Record<string, string> =
           body.customReplacements || {};
+
+        // Extract account owner and agent addresses from request body
+        if (body.account_owner) {
+          customReplacements["account_owner"] = body.account_owner;
+        } else {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: "Missing required parameter: account_owner",
+          });
+        }
+
+        if (body.account_agent) {
+          customReplacements["account_agent"] = body.account_agent;
+        } else {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: "Missing required parameter: account_agent",
+          });
+        }
 
         if (!contractName) {
           throw new ApiError(ErrorCode.INVALID_REQUEST, {
