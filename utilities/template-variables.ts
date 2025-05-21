@@ -116,11 +116,6 @@ export function generateTemplateReplacements(
     [`ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG/account_agent`]:
       "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
     [`account_agent`]: "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
-    // dao token and dex contracts
-    [`dao_contract_token`]: `.${symbol}-faktory`,
-    [`.aibtc-faktory/dao_contract_token`]: `.${symbol}-faktory`,
-    [`dao_contract_token_dex`]: `.${symbol}-faktory-dex`,
-    [`.aibtc-faktory-dex/dao_contract_token_dex`]: `.${symbol}-faktory-dex`,
   };
 
   // Merge with custom replacements
