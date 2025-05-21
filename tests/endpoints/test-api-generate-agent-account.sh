@@ -12,8 +12,12 @@ test_api_generate_agent_account() {
         "name":"aibtc-acct-ST1PQ-PGZGM-ST2CY-RK9AG",
         "network":"devnet",
         "tokenSymbol":"AIBTC",
-        "account_owner": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
-        "account_agent": "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG"
+        "customReplacements": {
+            "account_owner": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+            "account_agent": "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
+            "dao_contract_token": "ST000000000000000000002AMW42H.aibtc-token",
+            "dao_contract_token_dex": "ST000000000000000000002AMW42H.aibtc-faktory-dex"
+        }
     }'
     
     # Ensure proper URL formatting
@@ -92,7 +96,11 @@ test_api_generate_agent_account() {
         "name":"aibtc-agent-account",
         "network":"devnet",
         "tokenSymbol":"AIBTC",
-        "account_agent": "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG"
+        "customReplacements": {
+            "account_agent": "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
+            "dao_contract_token": "ST000000000000000000002AMW42H.aibtc-token",
+            "dao_contract_token_dex": "ST000000000000000000002AMW42H.aibtc-faktory-dex"
+        }
     }'
     
     response=$(curl -s -i -w "\n%{http_code}" -X POST \
@@ -116,7 +124,11 @@ test_api_generate_agent_account() {
         "name":"aibtc-agent-account",
         "network":"devnet",
         "tokenSymbol":"AIBTC",
-        "account_owner": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
+        "customReplacements": {
+            "account_owner": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+            "dao_contract_token": "ST000000000000000000002AMW42H.aibtc-token",
+            "dao_contract_token_dex": "ST000000000000000000002AMW42H.aibtc-faktory-dex"
+        }
     }'
     
     response=$(curl -s -i -w "\n%{http_code}" -X POST \
