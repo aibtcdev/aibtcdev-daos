@@ -20,6 +20,7 @@ source "$(dirname "$0")/test-api-contract.sh"
 source "$(dirname "$0")/test-api-by-type-subtype.sh"
 source "$(dirname "$0")/test-api-dependencies.sh"
 source "$(dirname "$0")/test-api-generate-contract.sh"
+source "$(dirname "$0")/test-api-generate-agent-account.sh"
 
 # Run all test functions
 test_index
@@ -33,6 +34,7 @@ test_api_contract
 test_api_by_type_subtype
 test_api_dependencies
 test_api_process_template
+test_api_generate_agent_account
 
 # Print summary
 echo ""
@@ -41,6 +43,7 @@ echo "Test Summary"
 echo "===================="
 echo "Total tests: $TOTAL_TESTS"
 echo "Failed tests: $FAILED_TESTS"
+echo ""
 
 # Exit with failure if any tests failed
 if [ $FAILED_TESTS -gt 0 ]; then
