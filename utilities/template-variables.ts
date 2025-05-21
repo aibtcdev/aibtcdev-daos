@@ -22,8 +22,8 @@ export function generateTemplateReplacements(
 
   const baseAndExternalReplacements: Record<string, string> = {
     // Base Traits
-    [`SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010`]: `'${traits.BASE_SIP010}`,
-    [`base_trait_sip010`]: `'${traits.BASE_SIP010}`,
+    [`SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010`]: `${traits.BASE_SIP010}`,
+    [`base_trait_sip010`]: `${traits.BASE_SIP010}`,
     // DAO run cost
     [`.dao-run-cost/base_contract_dao_run_cost`]: `'${addresses.AIBTC_RUN_COST}`,
     // External contracts
@@ -48,7 +48,7 @@ export function generateTemplateReplacements(
     [`.aibtc-base-dao-trait.aibtc-base-dao/dao_trait_base`]: `'${traits.DAO_BASE}`,
     [`dao_trait_base`]: `'${traits.DAO_BASE}`,
     // DAO traits with simplified keys
-    [`dao_trait_faktory_token`]: `'${traits.FAKTORY_SIP010}`,
+    [`dao_trait_faktory_token`]: `${traits.FAKTORY_SIP010}`,
     [`dao_trait_charter`]: `'${traits.DAO_CHARTER}`,
     [`dao_trait_users`]: `'${traits.DAO_USERS}`,
     [`dao_trait_messaging`]: `'${traits.DAO_MESSAGING}`,
