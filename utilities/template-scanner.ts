@@ -110,4 +110,65 @@ export class TemplateScanner {
 
     dbgLog(`Template variable report saved to ${outputPath}`);
   }
+
+  /**
+   * Check if all template variables for a specific contract will be filled
+   * @param contractName The name of the contract to check
+   * @param replacements The replacements map to check against
+   * @returns Object containing validation results
+   */
+  static validateContractReplacements(
+    contractName: string,
+    replacements: Record<string, string>
+  ): { valid: boolean; missingVariables: string[] } {
+    try {
+      const registry = new ContractRegistry();
+      registry.registerAllDefinedContracts();
+      
+      const contract = registry.getContract(contractName);
+      if (!contract) {
+        return { 
+          valid: false, 
+          missingVariables: [`Contract not found: ${contractName}`] 
+        };
+      }
+      
+      const templatePath = path.join(
+        process.cwd(),
+        "contracts",
+        contract.templatePath
+      );
+
+      if (!fs.existsSync(templatePath)) {
+        return { 
+          valid: false, 
+          missingVariables: [`Template not found: ${templatePath}`] 
+        };
+      }
+
+      const templateContent = fs.readFileSync(templatePath, "utf8");
+      const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
+      const matches = [...templateContent.matchAll(variableRegex)];
+      
+      // Extract variables in the format used in templates
+      const variables = matches.map((match) => `${match[1]}/${match[2]}`);
+      
+      // Check if each variable has a replacement
+      const missingVariables = variables.filter(variable => {
+        // Check both formats: full path and simplified key
+        const [_, key] = variable.split('/');
+        return !replacements[variable] && !replacements[key];
+      });
+
+      return {
+        valid: missingVariables.length === 0,
+        missingVariables
+      };
+    } catch (error) {
+      return { 
+        valid: false, 
+        missingVariables: [`Error: ${error instanceof Error ? error.message : String(error)}`] 
+      };
+    }
+  }
 }

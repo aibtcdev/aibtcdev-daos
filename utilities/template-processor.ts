@@ -112,6 +112,7 @@ export function processContractTemplate(
       key: variable.replacementKey,
       originalLine,
       replacedLine: lines[variable.lineIndex],
+      lineNumber: variable.lineIndex + 1,
     });
   }
 

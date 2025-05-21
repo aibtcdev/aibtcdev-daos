@@ -24,6 +24,31 @@ import { ContractGeneratorService } from "./services/contract-generator";
 
 const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
 
+/**
+ * Validates the customReplacements object.
+ * Throws an ApiError if validation fails.
+ * @param customReplacements - The custom replacements object to validate.
+ * @param expectedKeys - An array of keys expected to be in customReplacements.
+ */
+function validateCustomReplacements(
+  customReplacements: Record<string, string> | undefined | null,
+  expectedKeys: string[]
+): void {
+  if (!customReplacements || typeof customReplacements !== "object") {
+    throw new ApiError(ErrorCode.INVALID_REQUEST, {
+      reason: "Missing or invalid customReplacements. Must be an object.",
+    });
+  }
+
+  for (const key of expectedKeys) {
+    if (!customReplacements[key]) {
+      throw new ApiError(ErrorCode.INVALID_REQUEST, {
+        reason: `Missing required custom replacement: ${key}`,
+      });
+    }
+  }
+}
+
 export function createApiRouter(registry: ContractRegistry) {
   const api = new Hono<{ Bindings: CloudflareBindings }>();
   const generatorService = new ContractGeneratorService();
@@ -375,25 +400,11 @@ export function createApiRouter(registry: ContractRegistry) {
         }
 
         // Validate custom replacements
-        if (typeof customReplacements !== "object") {
-          throw new ApiError(ErrorCode.INVALID_REQUEST, {
-            reason: "Invalid customReplacements format. Must be an object.",
-          });
-        }
-
-        // Check if all expected replacements are present
-        const expectedReplacements = [
+        validateCustomReplacements(customReplacements, [
           "dao_token_metadata",
           "origin_address",
           "dao_manifest",
-        ];
-        for (const replacement of expectedReplacements) {
-          if (!customReplacements[replacement]) {
-            throw new ApiError(ErrorCode.INVALID_REQUEST, {
-              reason: `Missing required custom replacement: ${replacement}`,
-            });
-          }
-        }
+        ]);
 
         // Get all DAO contract names
         const daoContractNames = registry.getAllDaoContractNames();
@@ -445,6 +456,86 @@ export function createApiRouter(registry: ContractRegistry) {
         } as GeneratedDaoContractsResponse;
       },
       { path: "/generate-dao-contracts", method: "POST" }
+    );
+  });
+
+  // Generate agent contract for a specific network
+  api.post("/generate-agent-account", async (c) => {
+    return handleRequest(
+      c,
+      async () => {
+        const body = await c.req.json();
+        const contractName: string = body.contractName || body.name;
+        const network: string = body.network ?? "devnet";
+        const tokenSymbol: string = body.tokenSymbol ?? "aibtc";
+        const tokenSymbolLower = tokenSymbol.toLowerCase();
+        const customReplacements: Record<string, string> =
+          body.customReplacements;
+
+        // Validate customReplacements
+        validateCustomReplacements(customReplacements, [
+          "account_owner",
+          "account_agent",
+          "dao_contract_token",
+          "dao_contract_token_dex",
+        ]);
+
+        if (!contractName) {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: "Missing required parameter: contractName or name",
+          });
+        }
+
+        // Validate network
+        if (!validNetworks.includes(network)) {
+          throw new ApiError(ErrorCode.INVALID_REQUEST, {
+            reason: `Invalid network: ${network}. Must be one of: ${validNetworks.join(
+              ", "
+            )}`,
+          });
+        }
+
+        const contract = registry.getContractByTypeAndSubtype(
+          "AGENT",
+          "AGENT_ACCOUNT"
+        );
+        if (!contract) {
+          throw new ApiError(ErrorCode.CONTRACT_NOT_FOUND, {
+            name: contractName,
+          });
+        }
+
+        try {
+          const generatedContract =
+            await generatorService.generateContractForNetwork(
+              contract,
+              network as StacksNetworkName,
+              tokenSymbolLower,
+              customReplacements,
+              c.env
+            );
+
+          return {
+            network,
+            tokenSymbol: tokenSymbolLower,
+            contract: {
+              name: contract.name,
+              displayName: contract.displayName,
+              type: contract.type,
+              subtype: contract.subtype,
+              source: generatedContract,
+              hash: contract.hash,
+              deploymentOrder: contract.deploymentOrder,
+              clarityVersion: contract.clarityVersion,
+            },
+          } as GeneratedContractResponse;
+        } catch (error) {
+          throw new ApiError(ErrorCode.TEMPLATE_PROCESSING_ERROR, {
+            reason: error instanceof Error ? error.message : String(error),
+          });
+        }
+      },
+      { path: "/generate-agent-account", method: "POST" }
     );
   });
 

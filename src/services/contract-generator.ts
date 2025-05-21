@@ -118,6 +118,18 @@ export class ContractGeneratorService {
           )
           .join("");
 
+        // For agent accounts, we should be more strict about missing variables
+        if (templateContent.includes("aibtc-agent-account")) {
+          const criticalVars = missingVars.filter(v => 
+            v.key === "account_owner" || 
+            v.key === "account_agent"
+          );
+          
+          if (criticalVars.length > 0) {
+            throw new Error(`Critical template variables missing for agent account: ${criticalVars.map(v => v.key).join(", ")}`);
+          }
+        }
+
         // Process with what we have
         return (
           processContractTemplate(templateContent, replacementsMap) +
@@ -154,6 +166,20 @@ export class ContractGeneratorService {
     customReplacements: Record<string, string> = {},
     env?: CloudflareBindings
   ): Promise<string> {
+    // For agent accounts, validate that we have the required custom replacements
+    if (contract.type === "AGENT" && contract.subtype === "AGENT_ACCOUNT") {
+      if (!customReplacements["account_owner"]) {
+        throw new Error("Missing required replacement: account_owner");
+      }
+      if (!customReplacements["account_agent"]) {
+        throw new Error("Missing required replacement: account_agent");
+      }
+      
+      // Log the agent account parameters
+      dbgLog(`Generating agent account with owner: ${customReplacements["account_owner"]} and agent: ${customReplacements["account_agent"]}`, {
+        logType: "info",
+      });
+    }
     try {
       // Set the display name by replacing 'aibtc' with the lowercase token symbol
       const displayName = contract.name.replace("aibtc", tokenSymbol);

@@ -7,9 +7,9 @@
 (impl-trait .aibtc-agent-account-traits.aibtc-account)
 ;; /g/.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals
 (impl-trait .aibtc-agent-account-traits.aibtc-proposals)
-;; /g/.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval
+;; /g/.aibtc-agent-account-traits.faktory-dex-approval/agent_account_trait_faktory_dex_approval
 (impl-trait .aibtc-agent-account-traits.faktory-dex-approval)
-;; /g/.aibtc-agent-account-traits.aibtc-faktory-buy-sell/agent_account_trait_faktory_buy_sell
+;; /g/.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell
 (impl-trait .aibtc-agent-account-traits.faktory-buy-sell)
 ;; /g/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
@@ -17,11 +17,11 @@
 (use-trait action-trait .aibtc-dao-traits.action)
 ;; /g/.aibtc-dao-traits.proposal/dao_trait_proposal
 (use-trait proposal-trait .aibtc-dao-traits.proposal)
-;; /g/.aibtc-dao-traits.action-proposals-voting/dao_trait_action_proposal_voting
+;; /g/.aibtc-dao-traits.action-proposal-voting/dao_trait_action_proposal_voting
 (use-trait action-proposal-voting-trait .aibtc-dao-traits.action-proposal-voting)
 ;; /g/.aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex
 (use-trait dao-faktory-dex .aibtc-dao-traits.faktory-dex)
-;; /g/.aibtc-dao-traits.faktory-token/dao_trait_faktory_token
+;; /g/STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait/dao_trait_faktory_token
 (use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait)
 
 ;; constants
@@ -69,7 +69,6 @@
 (define-public (deposit-stx (amount uint))
   (begin
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/deposit-stx",
       payload: {
         contractCaller: contract-caller,
@@ -89,7 +88,6 @@
   (begin
     (asserts! (is-approved-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/deposit-ft",
       payload: {
         amount: amount,
@@ -107,7 +105,6 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/withdraw-stx",
       payload: {
         amount: amount,
@@ -128,7 +125,6 @@
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (asserts! (is-approved-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/withdraw-ft",
       payload: {
         amount: amount,
@@ -146,7 +142,6 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/approve-asset",
       payload: {
         asset: asset,
@@ -163,7 +158,6 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/revoke-asset",
       payload: {
         asset: asset,
@@ -187,7 +181,6 @@
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/create-action-proposal",
       payload: {
         proposalContract: (contract-of voting-contract),
@@ -209,7 +202,6 @@
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/vote-on-action-proposal",
       payload: {
         proposalContract: (contract-of voting-contract),
@@ -230,7 +222,6 @@
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/veto-action-proposal",
       payload: {
         proposalContract: (contract-of voting-contract),
@@ -251,7 +242,6 @@
   (begin
     (asserts! (is-authorized) ERR_UNAUTHORIZED)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/conclude-action-proposal",
       payload: {
         proposalContract: (contract-of voting-contract),
@@ -276,7 +266,6 @@
     (asserts! (buy-sell-allowed) ERR_BUY_SELL_NOT_ALLOWED)
     (asserts! (is-approved-dex (contract-of faktory-dex)) ERR_UNKNOWN_ASSET)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/acct-buy-asset",
       payload: {
         dexContract: (contract-of faktory-dex),
@@ -299,7 +288,6 @@
     (asserts! (buy-sell-allowed) ERR_BUY_SELL_NOT_ALLOWED)
     (asserts! (is-approved-dex (contract-of faktory-dex)) ERR_UNKNOWN_ASSET)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/acct-sell-asset",
       payload: {
         dexContract: (contract-of faktory-dex),
@@ -317,7 +305,6 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/acct-approve-dex",
       payload: {
         dexContract: (contract-of faktory-dex),
@@ -334,7 +321,6 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/acct-revoke-dex",
       payload: {
         dexContract: (contract-of faktory-dex),
@@ -351,7 +337,6 @@
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (print {
-      ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-agent-account/set-agent-can-buy-sell",
       payload: {
         canBuySell: canBuySell,
@@ -409,7 +394,6 @@
   (map-set ApprovedDexes DAO_TOKEN_DEX true)
   ;; print creation event
   (print {
-    ;; /g/aibtc/dao_token_symbol
     notification: "aibtc-agent-account/user-agent-account-created",
     payload: (get-configuration),
   })
