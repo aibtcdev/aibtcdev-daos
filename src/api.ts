@@ -458,24 +458,33 @@ export function createApiRouter(registry: ContractRegistry) {
         const network: string = body.network ?? "devnet";
         const tokenSymbol: string = body.tokenSymbol ?? "aibtc";
         const tokenSymbolLower = tokenSymbol.toLowerCase();
-        const customReplacements: Record<string, string> =
-          body.customReplacements || {};
 
-        // Extract account owner and agent addresses from request body
-        if (body.account_owner) {
-          customReplacements["account_owner"] = body.account_owner;
-        } else {
+        // Validate and use customReplacements from the request body
+        if (
+          !body.customReplacements ||
+          typeof body.customReplacements !== "object"
+        ) {
           throw new ApiError(ErrorCode.INVALID_REQUEST, {
-            reason: "Missing required parameter: account_owner",
+            reason:
+              "Missing or invalid customReplacements. Must be an object.",
           });
         }
+        const customReplacements: Record<string, string> =
+          body.customReplacements;
 
-        if (body.account_agent) {
-          customReplacements["account_agent"] = body.account_agent;
-        } else {
-          throw new ApiError(ErrorCode.INVALID_REQUEST, {
-            reason: "Missing required parameter: account_agent",
-          });
+        // Check if all expected replacements are present
+        const expectedReplacements = [
+          "account_owner",
+          "account_agent",
+          "dao_contract_token",
+          "dao_contract_token_dex",
+        ];
+        for (const replacement of expectedReplacements) {
+          if (!customReplacements[replacement]) {
+            throw new ApiError(ErrorCode.INVALID_REQUEST, {
+              reason: `Missing required custom replacement: ${replacement}`,
+            });
+          }
         }
 
         if (!contractName) {
