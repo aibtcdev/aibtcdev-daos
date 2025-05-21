@@ -24,6 +24,31 @@ import { ContractGeneratorService } from "./services/contract-generator";
 
 const validNetworks = ["mainnet", "testnet", "devnet", "mocknet"];
 
+/**
+ * Validates the customReplacements object.
+ * Throws an ApiError if validation fails.
+ * @param customReplacements - The custom replacements object to validate.
+ * @param expectedKeys - An array of keys expected to be in customReplacements.
+ */
+function validateCustomReplacements(
+  customReplacements: Record<string, string> | undefined | null,
+  expectedKeys: string[]
+): void {
+  if (!customReplacements || typeof customReplacements !== "object") {
+    throw new ApiError(ErrorCode.INVALID_REQUEST, {
+      reason: "Missing or invalid customReplacements. Must be an object.",
+    });
+  }
+
+  for (const key of expectedKeys) {
+    if (!customReplacements[key]) {
+      throw new ApiError(ErrorCode.INVALID_REQUEST, {
+        reason: `Missing required custom replacement: ${key}`,
+      });
+    }
+  }
+}
+
 export function createApiRouter(registry: ContractRegistry) {
   const api = new Hono<{ Bindings: CloudflareBindings }>();
   const generatorService = new ContractGeneratorService();
@@ -375,25 +400,11 @@ export function createApiRouter(registry: ContractRegistry) {
         }
 
         // Validate custom replacements
-        if (typeof customReplacements !== "object") {
-          throw new ApiError(ErrorCode.INVALID_REQUEST, {
-            reason: "Invalid customReplacements format. Must be an object.",
-          });
-        }
-
-        // Check if all expected replacements are present
-        const expectedReplacements = [
+        validateCustomReplacements(customReplacements, [
           "dao_token_metadata",
           "origin_address",
           "dao_manifest",
-        ];
-        for (const replacement of expectedReplacements) {
-          if (!customReplacements[replacement]) {
-            throw new ApiError(ErrorCode.INVALID_REQUEST, {
-              reason: `Missing required custom replacement: ${replacement}`,
-            });
-          }
-        }
+        ]);
 
         // Get all DAO contract names
         const daoContractNames = registry.getAllDaoContractNames();
@@ -458,34 +469,16 @@ export function createApiRouter(registry: ContractRegistry) {
         const network: string = body.network ?? "devnet";
         const tokenSymbol: string = body.tokenSymbol ?? "aibtc";
         const tokenSymbolLower = tokenSymbol.toLowerCase();
-
-        // Validate and use customReplacements from the request body
-        if (
-          !body.customReplacements ||
-          typeof body.customReplacements !== "object"
-        ) {
-          throw new ApiError(ErrorCode.INVALID_REQUEST, {
-            reason:
-              "Missing or invalid customReplacements. Must be an object.",
-          });
-        }
         const customReplacements: Record<string, string> =
           body.customReplacements;
 
-        // Check if all expected replacements are present
-        const expectedReplacements = [
+        // Validate customReplacements
+        validateCustomReplacements(customReplacements, [
           "account_owner",
           "account_agent",
           "dao_contract_token",
           "dao_contract_token_dex",
-        ];
-        for (const replacement of expectedReplacements) {
-          if (!customReplacements[replacement]) {
-            throw new ApiError(ErrorCode.INVALID_REQUEST, {
-              reason: `Missing required custom replacement: ${replacement}`,
-            });
-          }
-        }
+        ]);
 
         if (!contractName) {
           throw new ApiError(ErrorCode.INVALID_REQUEST, {
