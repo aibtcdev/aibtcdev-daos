@@ -98,9 +98,9 @@ export class ContractGeneratorService {
       // Check for missing variables but don't throw an error
       const missingVars = uniqueVars.filter((v) => !replacements[v.key]);
       if (missingVars.length > 0) {
+        // Build a detailed error message with all missing variables
         const missingDetails = missingVars
           .map((v) => {
-            // Extract just the key name and what it replaces, without including surrounding code
             return `LINE ${v.line} MISSING TEMPLATE VARIABLE\nKey: ${v.key}\nTo replace: ${v.toReplace}`;
           })
           .join("\n\n");
@@ -109,13 +109,6 @@ export class ContractGeneratorService {
           logType: "error",
         });
         dbgLog(missingDetails, { logType: "error" });
-
-        // Build a detailed error message with all missing variables
-        const missingDetails = missingVars
-          .map((v) => {
-            return `LINE ${v.line} MISSING TEMPLATE VARIABLE\nKey: ${v.key}\nTo replace: ${v.toReplace}`;
-          })
-          .join("\n\n");
 
         // Throw an error with detailed information about missing variables
         throw new Error(
@@ -160,11 +153,14 @@ export class ContractGeneratorService {
       if (!customReplacements["account_agent"]) {
         throw new Error("Missing required replacement: account_agent");
       }
-      
+
       // Log the agent account parameters
-      dbgLog(`Generating agent account with owner: ${customReplacements["account_owner"]} and agent: ${customReplacements["account_agent"]}`, {
-        logType: "info",
-      });
+      dbgLog(
+        `Generating agent account with owner: ${customReplacements["account_owner"]} and agent: ${customReplacements["account_agent"]}`,
+        {
+          logType: "info",
+        }
+      );
     }
     try {
       // Set the display name by replacing 'aibtc' with the lowercase token symbol
