@@ -276,6 +276,17 @@ export function defineTokenContractDependencies(
     switch (contract.name) {
       case "aibtc-faktory":
         contract
+          .addContractDependency(
+            "dao_contract_treasury",
+            "EXTENSIONS",
+            "TREASURY"
+          )
+          .addContractDependency("dao_contract_faktory_dex", "TOKEN", "DEX")
+          .addContractDependency(
+            "dao_contract_pre_faktory",
+            "TOKEN",
+            "PRELAUNCH"
+          )
           .addTraitDependency("BASE_SIP010", "base_trait_sip010")
           .addRuntimeValue("dao_token_symbol")
           .addRuntimeValue("dao_token_name")

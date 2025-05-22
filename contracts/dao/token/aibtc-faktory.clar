@@ -136,7 +136,8 @@
   (try! (ft-mint? SYMBOL-AIBTC-DAO (/ (* MAX u4) u100) .aibtc-pre-faktory)) ;; 4% pre-launch SPVMS254T8Q0RXQP95Y01T7KBHZV91X88CDK48QH
   (print {
     type: "faktory-trait-v1",
-    name: "NAME",
+    ;; /g/SYMBOL/dao_token_symbol
+    name: "SYMBOL-AIBTC-DAO",
     ;; /g/SYMBOL/dao_token_symbol
     symbol: "SYMBOL-AIBTC-DAO",
     token-uri: u"link to json for token metadata",
