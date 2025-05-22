@@ -2,7 +2,7 @@ import { StacksNetworkName } from "@stacks/network";
 
 // define known traits by key and category
 
-type ExternalTraits = {
+export type ExternalTraits = {
   BASE_SIP009: string;
   BASE_SIP010: string;
   FAKTORY_SIP010: string;
