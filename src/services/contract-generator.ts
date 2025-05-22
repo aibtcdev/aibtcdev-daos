@@ -76,15 +76,6 @@ export class ContractGeneratorService {
         };
       });
 
-      // Add combined keys to the replacements map
-      // This helps with the format /g/KEY/value where we might have both KEY/value and value in the replacements
-      variablesWithLineNumbers.forEach((v) => {
-        const combinedKey = `${v.toReplace}/${v.key}`;
-        if (replacements[v.key] && !replacementsMap.has(combinedKey)) {
-          replacementsMap.set(combinedKey, replacements[v.key]);
-        }
-      });
-
       // Get unique variables (keeping the first occurrence for line number)
       const uniqueVarsMap = new Map();
       variablesWithLineNumbers.forEach((v) => {
