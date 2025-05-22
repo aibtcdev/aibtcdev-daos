@@ -123,7 +123,7 @@ export function defineExtensionContractDependencies(
             "DAO_USERS"
           )
           .addContractDependency(
-            "dao_rewards_account",
+            "dao_contract_rewards_account",
             "EXTENSIONS",
             "REWARDS_ACCOUNT"
           )
