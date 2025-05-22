@@ -122,6 +122,11 @@ export function defineExtensionContractDependencies(
             "EXTENSIONS",
             "DAO_USERS"
           )
+          .addContractDependency(
+            "dao_rewards_account",
+            "EXTENSIONS",
+            "REWARDS_ACCOUNT"
+          )
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
           .addContractDependency("dao_contract_base", "BASE", "DAO")
           .addRuntimeValue("dao_token_symbol");
