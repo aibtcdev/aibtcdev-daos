@@ -110,30 +110,16 @@ export class ContractGeneratorService {
         });
         dbgLog(missingDetails, { logType: "error" });
 
-        // Instead of throwing, we'll add warning comments to the template
-        const warningComments = missingVars
-          .map(
-            (v) =>
-              `\n;; WARNING: Missing template variable at line ${v.line}: ${v.key} to replace ${v.toReplace}`
-          )
-          .join("");
+        // Build a detailed error message with all missing variables
+        const missingDetails = missingVars
+          .map((v) => {
+            return `LINE ${v.line} MISSING TEMPLATE VARIABLE\nKey: ${v.key}\nTo replace: ${v.toReplace}`;
+          })
+          .join("\n\n");
 
-        // For agent accounts, we should be more strict about missing variables
-        if (templateContent.includes("aibtc-agent-account")) {
-          const criticalVars = missingVars.filter(v => 
-            v.key === "account_owner" || 
-            v.key === "account_agent"
-          );
-          
-          if (criticalVars.length > 0) {
-            throw new Error(`Critical template variables missing for agent account: ${criticalVars.map(v => v.key).join(", ")}`);
-          }
-        }
-
-        // Process with what we have
-        return (
-          processContractTemplate(templateContent, replacementsMap) +
-          warningComments
+        // Throw an error with detailed information about missing variables
+        throw new Error(
+          `Missing template variables for ${contract.name}:\n${missingDetails}`
         );
       }
 
