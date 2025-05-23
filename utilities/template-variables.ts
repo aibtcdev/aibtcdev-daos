@@ -213,8 +213,16 @@ traits["FAKTORY_SIP010"] }, // Uses the actual trait string as the toReplace key
     const traitValue = traits[key];
     if (traitValue) {
       const lowerKey = (key as string).toLowerCase();
-      const formattedKey = lowerKey.replace(/^agent_/, '');
-      const templateKeyName = `agent_account_trait_${formattedKey}`;
+      let templateKeyName: string;
+
+      // Ensure correct keyName generation for agent traits
+      if (key === "AGENT_ACCOUNT_PROPOSALS") {
+        templateKeyName = "agent_account_trait_proposals";
+      } else {
+        // General case for other agent traits like AGENT_ACCOUNT, AGENT_FAKTORY_DEX_APPROVAL, etc.
+        const formattedKey = lowerKey.replace(/^agent_/, ''); // e.g. "account", "faktory_dex_approval"
+        templateKeyName = `agent_account_trait_${formattedKey}`;
+      }
 
       replacements[templateKeyName] = `'${traitValue}'`;
 
