@@ -126,14 +126,18 @@
 (begin
   ;; ft distribution
   ;; /g/SYMBOL/dao_token_symbol
+  ;; /g/.aibtc-treasury/dao_contract_treasury
   (try! (ft-mint? SYMBOL-AIBTC-DAO (/ (* MAX u80) u100) .aibtc-treasury)) ;; 80% treasury SPVMS254T8Q0RXQP95Y01T7KBHZV91X88CDK48QH
   ;; /g/SYMBOL/dao_token_symbol
+  ;; /g/.aibtc-faktory-dex/dao_contract_faktory_dex
   (try! (ft-mint? SYMBOL-AIBTC-DAO (/ (* MAX u16) u100) .aibtc-faktory-dex)) ;; 16% dex SPVMS254T8Q0RXQP95Y01T7KBHZV91X88CDK48QH
   ;; /g/SYMBOL/dao_token_symbol
+  ;; /g/.aibtc-pre-faktory/dao_contract_pre_faktory
   (try! (ft-mint? SYMBOL-AIBTC-DAO (/ (* MAX u4) u100) .aibtc-pre-faktory)) ;; 4% pre-launch SPVMS254T8Q0RXQP95Y01T7KBHZV91X88CDK48QH
   (print {
     type: "faktory-trait-v1",
-    name: "NAME",
+    ;; /g/SYMBOL/dao_token_symbol
+    name: "SYMBOL-AIBTC-DAO",
     ;; /g/SYMBOL/dao_token_symbol
     symbol: "SYMBOL-AIBTC-DAO",
     token-uri: u"link to json for token metadata",

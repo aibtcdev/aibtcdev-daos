@@ -40,15 +40,10 @@ export function processContractTemplate(
       const replacementKey = commentMatch[1];
       const valueKey = commentMatch[2];
 
-      // Try both the value key and the combined key for lookup
-      const combinedKey = `${replacementKey}/${valueKey}`;
-      const replacementValue = replacements.has(valueKey)
-        ? replacements.get(valueKey)
-        : replacements.has(combinedKey)
-        ? replacements.get(combinedKey)
-        : null;
+      // Look up the replacement value directly using the valueKey
+      const replacementValue = replacements.get(valueKey);
 
-      if (replacementValue !== null) {
+      if (replacementValue !== undefined) {
         // Find the target line - the first line after this comment that contains the key
         let targetLineIndex = i + 1;
         let foundTarget = false;

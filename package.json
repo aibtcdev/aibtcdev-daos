@@ -10,8 +10,9 @@
     "test:watch": "chokidar \"tests/**/*.ts\" \"contracts/**/*.clar\" -c \"npm run test:report\"",
     "test:check-coverage": "bash ./tests/check-test-coverage.sh",
     "test:endpoints": "bash ./tests/check-endpoints.sh http://localhost:8787",
+    "lint:templates": "vite-node ./scripts/run-template-scanner.ts",
     "dev": "wrangler dev src/index.ts",
-    "build": "vite build && vite build --ssr",
+    "build": "rm -rf ./dist-server && vite build && vite build --ssr",
     "preview": "$npm_execpath run build && wrangler dev dist-server/index.js",
     "deploy:preview": "$npm_execpath run build && wrangler deploy --env preview",
     "deploy:staging": "$npm_execpath run build && wrangler deploy --env staging",
@@ -21,18 +22,18 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.11.4",
-    "agents": "^0.0.88",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "agents": "^0.0.92",
     "hono": "^4.7.10"
   },
   "devDependencies": {
-    "@aibtc/types": "^0.2.10",
-    "@cloudflare/vite-plugin": "^1.2.2",
-    "@cloudflare/workers-types": "^4.20250519.0",
+    "@aibtc/types": "^0.2.12",
+    "@cloudflare/vite-plugin": "^1.2.4",
+    "@cloudflare/workers-types": "^4.20250523.0",
     "@hirosystems/clarinet-sdk": "^3.0.2",
-    "@hono/vite-build": "^1.6.1",
+    "@hono/vite-build": "^1.6.2",
     "@stacks/transactions": "^7.0.6",
-    "@types/node": "^22.15.19",
+    "@types/node": "^22.15.21",
     "chokidar-cli": "^3.0.0",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
@@ -41,7 +42,7 @@
     "vitest": "^3.1.4",
     "vitest-environment-clarinet": "^2.3.0",
     "workers-mcp": "^0.0.13",
-    "wrangler": "^4.15.2",
-    "zod": "^3.25.3"
+    "wrangler": "^4.16.1",
+    "zod": "^3.25.23"
   }
 }

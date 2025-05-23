@@ -76,15 +76,6 @@ export class ContractGeneratorService {
         };
       });
 
-      // Add combined keys to the replacements map
-      // This helps with the format /g/KEY/value where we might have both KEY/value and value in the replacements
-      variablesWithLineNumbers.forEach((v) => {
-        const combinedKey = `${v.toReplace}/${v.key}`;
-        if (replacements[v.key] && !replacementsMap.has(combinedKey)) {
-          replacementsMap.set(combinedKey, replacements[v.key]);
-        }
-      });
-
       // Get unique variables (keeping the first occurrence for line number)
       const uniqueVarsMap = new Map();
       variablesWithLineNumbers.forEach((v) => {
@@ -98,9 +89,9 @@ export class ContractGeneratorService {
       // Check for missing variables but don't throw an error
       const missingVars = uniqueVars.filter((v) => !replacements[v.key]);
       if (missingVars.length > 0) {
+        // Build a detailed error message with all missing variables
         const missingDetails = missingVars
           .map((v) => {
-            // Extract just the key name and what it replaces, without including surrounding code
             return `LINE ${v.line} MISSING TEMPLATE VARIABLE\nKey: ${v.key}\nTo replace: ${v.toReplace}`;
           })
           .join("\n\n");
@@ -110,30 +101,9 @@ export class ContractGeneratorService {
         });
         dbgLog(missingDetails, { logType: "error" });
 
-        // Instead of throwing, we'll add warning comments to the template
-        const warningComments = missingVars
-          .map(
-            (v) =>
-              `\n;; WARNING: Missing template variable at line ${v.line}: ${v.key} to replace ${v.toReplace}`
-          )
-          .join("");
-
-        // For agent accounts, we should be more strict about missing variables
-        if (templateContent.includes("aibtc-agent-account")) {
-          const criticalVars = missingVars.filter(v => 
-            v.key === "account_owner" || 
-            v.key === "account_agent"
-          );
-          
-          if (criticalVars.length > 0) {
-            throw new Error(`Critical template variables missing for agent account: ${criticalVars.map(v => v.key).join(", ")}`);
-          }
-        }
-
-        // Process with what we have
-        return (
-          processContractTemplate(templateContent, replacementsMap) +
-          warningComments
+        // Throw an error with detailed information about missing variables
+        throw new Error(
+          `Missing template variables for ${contract.name}:\n${missingDetails}`
         );
       }
 
@@ -174,11 +144,14 @@ export class ContractGeneratorService {
       if (!customReplacements["account_agent"]) {
         throw new Error("Missing required replacement: account_agent");
       }
-      
+
       // Log the agent account parameters
-      dbgLog(`Generating agent account with owner: ${customReplacements["account_owner"]} and agent: ${customReplacements["account_agent"]}`, {
-        logType: "info",
-      });
+      dbgLog(
+        `Generating agent account with owner: ${customReplacements["account_owner"]} and agent: ${customReplacements["account_agent"]}`,
+        {
+          logType: "info",
+        }
+      );
     }
     try {
       // Set the display name by replacing 'aibtc' with the lowercase token symbol

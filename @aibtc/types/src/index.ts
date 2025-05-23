@@ -39,10 +39,14 @@ import type {
   ContractSubtype,
   AllContractSubtypes,
 } from "../../../utilities/contract-types";
-import { CONTRACT_NAMES } from "../../../utilities/contract-types";
+import { 
+  CONTRACT_NAMES, 
+  CONTRACT_TYPES, 
+  CONTRACT_SUBTYPES 
+} from "../../../utilities/contract-types";
 
 export type { ContractType, ContractSubtype, AllContractSubtypes };
-export { CONTRACT_NAMES };
+export { CONTRACT_NAMES, CONTRACT_TYPES, CONTRACT_SUBTYPES };
 
 /**
  * API response types

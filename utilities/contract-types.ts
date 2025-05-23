@@ -18,7 +18,7 @@ export type AllContractSubtypes = {
 export const CONTRACT_SUBTYPES = {
   AGENT: ["AGENT_ACCOUNT"] as const,
   BASE: ["DAO"] as const,
-  ACTIONS: ["SEND_MESSAGE"],
+  ACTIONS: ["SEND_MESSAGE"] as const,
   EXTENSIONS: [
     "ACTION_PROPOSAL_VOTING",
     "DAO_CHARTER",
@@ -28,8 +28,8 @@ export const CONTRACT_SUBTYPES = {
     "REWARDS_ACCOUNT",
     "TOKEN_OWNER",
     "TREASURY",
-  ],
-  PROPOSALS: ["INITIALIZE_DAO"],
+  ] as const,
+  PROPOSALS: ["INITIALIZE_DAO"] as const,
   TOKEN: ["DAO", "DEX", "POOL", "PRELAUNCH"] as const,
 } as const;
 

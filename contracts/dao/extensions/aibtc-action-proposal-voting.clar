@@ -37,8 +37,8 @@
 
 (define-constant AIBTC_DAO_RUN_COST_AMOUNT u10000000000) ;; 100 DAO tokens w/ 8 decimals
 
-;; /g/.dao-run-cost/base_contract_dao_run_cost
-(define-constant AIBTC_DAO_RUN_COST_CONTRACT .dao-run-cost) ;; AIBTC dao run cost contract
+;; /g/.aibtc-dao-run-cost/base_contract_dao_run_cost
+(define-constant AIBTC_DAO_RUN_COST_CONTRACT .aibtc-dao-run-cost) ;; AIBTC dao run cost contract
 ;; /g/.aibtc-rewards-account/dao_contract_rewards_account
 (define-constant DAO_REWARDS_ACCOUNT .aibtc-rewards-account) ;; rewards account for the DAO
 
@@ -301,8 +301,7 @@
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
       (senderBalance (unwrap!
-        (at-block proposalBlockHash
-        ;; /g/.aibtc-faktory/dao_contract_token
+        (at-block proposalBlockHash ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance contract-caller)
         )
         ERR_FETCHING_TOKEN_DATA
@@ -387,8 +386,7 @@
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
       (senderBalance (unwrap!
-        (at-block proposalBlockHash
-          ;; /g/.aibtc-faktory/dao_contract_token
+        (at-block proposalBlockHash ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance contract-caller)
         )
         ERR_FETCHING_TOKEN_DATA
@@ -691,14 +689,12 @@
 (define-read-only (get-liquid-supply (blockHeight uint))
   (let (
       (blockHash (unwrap! (get-block-hash blockHeight) ERR_RETRIEVING_START_BLOCK_HASH))
-      (totalSupply (unwrap!
-      ;; /g/.aibtc-faktory/dao_contract_token
+      (totalSupply (unwrap! ;; /g/.aibtc-faktory/dao_contract_token
         (at-block blockHash (contract-call? .aibtc-faktory get-total-supply))
         ERR_FETCHING_TOKEN_DATA
       ))
       (treasuryBalance (unwrap!
-        (at-block blockHash
-        ;; /g/.aibtc-faktory/dao_contract_token
+        (at-block blockHash ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance VOTING_TREASURY)
         )
         ERR_FETCHING_TOKEN_DATA

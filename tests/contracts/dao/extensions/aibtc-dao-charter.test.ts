@@ -29,7 +29,7 @@ const intializeDaoAddress = registry.getContractAddressByTypeAndSubtype(
 const ErrCode = ErrCodeDaoCharter;
 
 const expectedDaoCharterVersion = Cl.uint(1);
-const expectedDaoCharterString = Cl.stringAscii("dao mission goes here");
+const expectedDaoCharterString = Cl.stringAscii("aibtc mission goes here");
 const expectedDaoCharter = Cl.tuple({
   burnHeight: Cl.uint(4), // deployed btc block height
   caller: Cl.principal(intializeDaoAddress),
