@@ -183,7 +183,9 @@ export abstract class ContractBase {
 
       if (!uniqueVars.has(key)) {
         uniqueVars.add(key);
-        this.addTemplateVariable(toReplace, keyName);
+        // Removed call to this.addTemplateVariable(toReplace, keyName);
+        // The method now only scans and identifies variables from the template content.
+        // It does not modify the contract instance's dependencies.
       }
     }
 
