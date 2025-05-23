@@ -66,14 +66,7 @@ export function defineActionContractDependencies(
         contract.addRuntimeValue("dao_token_symbol");
         break;
 
-      case "aibtc-pre-faktory":
-        contract
-          .addContractDependency("dao_contract_token", "TOKEN", "DAO")
-          .addContractDependency("dao_contract_token_dex", "TOKEN", "DEX")
-          .addAddressDependency("SBTC", "base_contract_sbtc")
-          // Add other specific dependencies for pre-faktory if any are discovered later
-          .addRuntimeValue("dao_token_symbol"); // Assuming it also uses dao_token_symbol
-        break;
+      // Add other action contracts as needed
     }
   });
 }
@@ -339,6 +332,14 @@ export function defineTokenContractDependencies(
           .addContractDependency("dao_contract_token_dex", "TOKEN", "DEX")
           // Add other specific dependencies for xyk-pool if any are discovered later
           .addRuntimeValue("dao_token_symbol"); // Assuming it also uses dao_token_symbol
+        break;
+
+      case "aibtc-pre-faktory":
+        contract
+          .addContractDependency("dao_contract_token", "TOKEN", "DAO")
+          .addContractDependency("dao_contract_token_dex", "TOKEN", "DEX")
+          .addAddressDependency("SBTC", "base_contract_sbtc")
+          .addRuntimeValue("dao_token_symbol");
         break;
 
       // Add other token contracts as needed
