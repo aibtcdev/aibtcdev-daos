@@ -12,7 +12,7 @@
     "test:endpoints": "bash ./tests/check-endpoints.sh http://localhost:8787",
     "lint:templates": "vite-node ./scripts/run-template-scanner.ts",
     "dev": "wrangler dev src/index.ts",
-    "build": "vite build && vite build --ssr",
+    "build": "rm -rf ./dist-server && vite build && vite build --ssr",
     "preview": "$npm_execpath run build && wrangler dev dist-server/index.js",
     "deploy:preview": "$npm_execpath run build && wrangler deploy --env preview",
     "deploy:staging": "$npm_execpath run build && wrangler deploy --env staging",

@@ -1,0 +1,38 @@
+name: Lint Contract Templates
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+  pull_request:
+    branches:
+      - main
+      - staging
+  workflow_dispatch:
+
+jobs:
+  lint-templates:
+    name: "Lint Contract Templates"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22 # Or your project's Node.js version
+
+      - name: "Install dependencies"
+        run: npm ci
+
+      - name: "Run Template Scanner"
+        run: npm run lint:templates
+
+      - name: "Upload template scan report on failure"
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: template-scan-report
+          path: template-scan-report.json

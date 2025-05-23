@@ -65,6 +65,8 @@ export function defineActionContractDependencies(
         // Default dependencies for all action contracts
         contract.addRuntimeValue("dao_token_symbol");
         break;
+
+      // Add other action contracts as needed
     }
   });
 }
@@ -145,6 +147,7 @@ export function defineExtensionContractDependencies(
           )
           .addTraitDependency("BASE_SIP010", "base_trait_sip010")
           .addContractDependency("dao_contract_base", "BASE", "DAO")
+          .addContractDependency("dao_contract_token", "TOKEN", "DAO")
           .addRuntimeValue("dao_token_symbol");
         break;
 
@@ -154,6 +157,7 @@ export function defineExtensionContractDependencies(
           .addTraitDependency("DAO_TREASURY", "dao_trait_treasury")
           .addTraitDependency("BASE_SIP010", "base_trait_sip010")
           .addAddressDependency("SBTC", "base_contract_sbtc")
+          .addAddressDependency("SBTC", "sbtc_token_contract")
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
           .addContractDependency("dao_contract_base", "BASE", "DAO")
           .addRuntimeValue("dao_token_symbol");
@@ -289,14 +293,48 @@ export function defineTokenContractDependencies(
             "PRELAUNCH"
           )
           .addTraitDependency("BASE_SIP010", "base_trait_sip010")
+          .addContractDependency(
+            "dao_contract_token_owner",
+            "EXTENSIONS",
+            "TOKEN_OWNER"
+          )
           .addRuntimeValue("dao_token_symbol")
           .addRuntimeValue("dao_token_name")
-          .addRuntimeValue("dao_token_decimals");
+          .addRuntimeValue("dao_token_decimals")
+          .addRuntimeValue("dao_token_metadata");
         break;
 
       case "aibtc-faktory-dex":
         contract
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
+          .addContractDependency(
+            "dao_contract_token_prelaunch",
+            "TOKEN",
+            "PRELAUNCH"
+          )
+          .addContractDependency("dao_contract_token_pool", "TOKEN", "POOL")
+          .addTraitDependency("DAO_TOKEN_DEX", "dao_trait_faktory_dex")
+          .addTraitDependency("FAKTORY_SIP010", "dao_trait_faktory_sip010")
+          .addAddressDependency("SBTC", "base_contract_sbtc")
+          .addAddressDependency("BITFLOW_CORE", "external_bitflow_core")
+          .addAddressDependency("DEPLOYER", "origin_address")
+          .addRuntimeValue("faktory_dex_trait")
+          .addRuntimeValue("dao_token_symbol");
+        break;
+
+      case "xyk-pool-sbtc-aibtc-v-1-1":
+        contract
+          .addAddressDependency("BITFLOW_CORE", "bitflow_core_contract")
+          .addContractDependency("dao_contract_token_dex", "TOKEN", "DEX")
+          // Add other specific dependencies for xyk-pool if any are discovered later
+          .addRuntimeValue("dao_token_symbol"); // Assuming it also uses dao_token_symbol
+        break;
+
+      case "aibtc-pre-faktory":
+        contract
+          .addContractDependency("dao_contract_token", "TOKEN", "DAO")
+          .addContractDependency("dao_contract_token_dex", "TOKEN", "DEX")
+          .addAddressDependency("SBTC", "base_contract_sbtc")
           .addRuntimeValue("dao_token_symbol");
         break;
 

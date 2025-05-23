@@ -87,6 +87,58 @@ export function generateTemplateReplacements(
       knownTraitKey: "DAO_ACTION",
       templateToReplacePattern: `.${templateKeySymbol}-dao-traits.action`,
     },
+    {
+      templateKeyName: "dao_trait_charter",
+      knownTraitKey: "DAO_CHARTER",
+      templateToReplacePattern: `.${templateKeySymbol}-dao-traits.dao-charter`,
+    },
+    {
+      templateKeyName: "dao_trait_epoch",
+      knownTraitKey: "DAO_EPOCH",
+      templateToReplacePattern: `.${templateKeySymbol}-dao-traits.dao-epoch`,
+    },
+    {
+      templateKeyName: "dao_trait_users",
+      knownTraitKey: "DAO_USERS",
+      templateToReplacePattern: `.${templateKeySymbol}-dao-traits.dao-users`,
+    },
+    {
+      templateKeyName: "dao_trait_messaging",
+      knownTraitKey: "DAO_MESSAGING",
+      templateToReplacePattern: `.${templateKeySymbol}-dao-traits.messaging`,
+    },
+    {
+      templateKeyName: "dao_trait_rewards_account",
+      knownTraitKey: "DAO_REWARDS_ACCOUNT",
+      templateToReplacePattern: `.${templateKeySymbol}-dao-traits.rewards-account`,
+    },
+    {
+      templateKeyName: "dao_trait_token_owner",
+      knownTraitKey: "DAO_TOKEN_OWNER",
+      templateToReplacePattern: `.${templateKeySymbol}-dao-traits.token-owner`,
+    },
+    {
+      templateKeyName: "dao_trait_treasury",
+      knownTraitKey: "DAO_TREASURY",
+      templateToReplacePattern: `.${templateKeySymbol}-dao-traits.treasury`,
+    },
+    {
+      templateKeyName: "dao_trait_faktory_dex",
+      knownTraitKey: "DAO_TOKEN_DEX",
+      templateToReplacePattern: `.${templateKeySymbol}-dao-traits.faktory-dex`,
+    },
+    // For dao_trait_faktory_token, the toReplace pattern is the full trait string from the error
+    {
+      templateKeyName: "dao_trait_faktory_token",
+      knownTraitKey: "FAKTORY_SIP010",
+      templateToReplacePattern: traits["FAKTORY_SIP010"],
+    }, // Uses the actual trait string as the toReplace key part
+    // For dao_trait_faktory_sip010, the toReplace pattern is also the full trait string
+    {
+      templateKeyName: "dao_trait_faktory_sip010",
+      knownTraitKey: "FAKTORY_SIP010",
+      templateToReplacePattern: traits["FAKTORY_SIP010"],
+    }, // Uses the actual trait string as the toReplace key part
   ];
 
   traitMappings.forEach((mapping) => {
@@ -179,6 +231,12 @@ export function generateTemplateReplacements(
   replacements["dao_token_symbol"] = symbol;
   replacements["dao_token_name"] = symbol;
   replacements["dao_token_decimals"] = "8";
+  replacements[
+    "dao_token_metadata"
+  ] = `"https://example.com/metadata/${symbol}.json"`; // Placeholder metadata URL
+  replacements[
+    `link to json for token metadata/dao_token_metadata`
+  ] = `"https://example.com/metadata/${symbol}.json"`;
 
   // 5. Add external contracts and special cases
   replacements["sbtc_contract"] = addresses.SBTC;
@@ -189,6 +247,42 @@ export function generateTemplateReplacements(
     `.${templateKeySymbol}-run-cost/base_contract_dao_run_cost`
   ] = `'${addresses.AIBTC_RUN_COST}`; // Adjusted to use templateKeySymbol
   replacements["base_contract_dao_run_cost"] = `'${addresses.AIBTC_RUN_COST}`;
+
+  // Add origin_address (typically deployer)
+  replacements["origin_address"] = addresses.DEPLOYER;
+  replacements[`${addresses.DEPLOYER.split(".")[0]}/origin_address`] =
+    addresses.DEPLOYER; // Matches the toReplace from error
+
+  // Add specific contract name aliases if they differ from standard generation
+  // These are based on the UnknownKeyName errors for specific templates
+  const faktoryDexContractName = CONTRACT_NAMES["TOKEN"]["DEX"].replace(
+    templateKeySymbol,
+    symbol
+  );
+  replacements["dao_contract_faktory_dex"] = `.${faktoryDexContractName}`;
+  replacements[
+    `.${CONTRACT_NAMES["TOKEN"]["DEX"]}/dao_contract_faktory_dex`
+  ] = `.${faktoryDexContractName}`;
+
+  const preFaktoryContractName = CONTRACT_NAMES["TOKEN"]["PRELAUNCH"].replace(
+    templateKeySymbol,
+    symbol
+  );
+  replacements["dao_contract_pre_faktory"] = `.${preFaktoryContractName}`;
+  replacements[
+    `.${CONTRACT_NAMES["TOKEN"]["PRELAUNCH"]}/dao_contract_pre_faktory`
+  ] = `.${preFaktoryContractName}`;
+
+  // Add faktory_dex_trait (Note: This trait is not in KnownTraits.ts, using literal value from error for devnet/testnet)
+  // Ideally, this should be added to KnownTraits for proper multi-network support.
+  const faktoryDexTraitValue =
+    network === "mainnet"
+      ? "MAINNET_FAKTORY_DEX_TRAIT_PLACEHOLDER"
+      : "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1.dex-trait";
+  replacements["faktory_dex_trait"] = `'${faktoryDexTraitValue}'`;
+  replacements[
+    `${faktoryDexTraitValue}/faktory_dex_trait`
+  ] = `'${faktoryDexTraitValue}'`;
 
   // 6. Add DAO manifest
   replacements[
@@ -208,17 +302,30 @@ export function generateTemplateReplacements(
     const traitValue = traits[key];
     if (traitValue) {
       const lowerKey = (key as string).toLowerCase();
-      const formattedKey = lowerKey.replace(/^agent_/, "");
-      const templateKeyName = `agent_account_trait_${formattedKey}`;
+      let templateKeyName: string;
+
+      // Ensure correct keyName generation for agent traits
+      if (key === "AGENT_ACCOUNT_PROPOSALS") {
+        templateKeyName = "agent_account_trait_proposals";
+      } else {
+        // General case for other agent traits like AGENT_ACCOUNT, AGENT_FAKTORY_DEX_APPROVAL, etc.
+        const formattedKey = lowerKey.replace(/^agent_/, ""); // e.g. "account", "faktory_dex_approval"
+        templateKeyName = `agent_account_trait_${formattedKey}`;
+      }
 
       replacements[templateKeyName] = `'${traitValue}`;
 
-      const traitParts = traitValue.split(".");
-      if (traitParts.length >= 2) {
-        const contractPath = traitParts.slice(0, -1).join(".");
-        const traitName = traitParts[traitParts.length - 1];
+      // Construct the toReplace pattern based on templateKeySymbol and the specific parts of the agent trait name
+      // e.g., for AGENT_ACCOUNT_PROPOSALS -> .aibtc-agent-account-traits.aibtc-proposals
+      const traitNameParts = traitValue.split(".");
+      if (traitNameParts.length > 0) {
+        const lastPart = traitNameParts[traitNameParts.length - 1]; // e.g., aibtc-proposals
+        // Assuming agent traits follow a pattern like '.<templateKeySymbol>-agent-account-traits.<specific-part>'
+        // The specific part (e.g. "aibtc-proposals") is derived from the known trait string.
+        // The "agent-account-traits" part is assumed based on the error messages.
+        const toReplacePattern = `.${templateKeySymbol}-agent-account-traits.${lastPart}`;
         replacements[
-          `${contractPath}.${traitName}/${templateKeyName}`
+          `${toReplacePattern}/${templateKeyName}`
         ] = `'${traitValue}`;
       }
     }
