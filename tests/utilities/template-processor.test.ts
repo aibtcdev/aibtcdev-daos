@@ -538,8 +538,11 @@ describe("TemplateScanner.validateContractReplacements", () => {
       contractName,
       testReplacements
     );
-    expect(result.valid).toBe(true);
-    expect(result.missingVariables).toHaveLength(0);
+    // If this assertion fails, Vitest will print the content of result.missingVariables
+    expect(result.missingVariables, `Expected no missing variables for ${contractName}, but found some. Missing: ${JSON.stringify(result.missingVariables, null, 2)}`).toEqual([]);
+    // result.valid is derived from missingVariables.length, so the above check also covers it.
+    // We can keep this for clarity or remove it if the above is deemed sufficient.
+    expect(result.valid, `Expected result.valid to be true for ${contractName} when no missing variables are expected. Missing: ${JSON.stringify(result.missingVariables, null, 2)}`).toBe(true);
   });
 
   it("should return valid: false and list missing variables for agent account", () => {
@@ -604,7 +607,10 @@ describe("TemplateScanner.validateContractReplacements", () => {
       {}
     );
     expect(result.valid).toBe(false);
-    expect(result.missingVariables.some(v => v.includes("Template not found"))).toBe(true);
+    expect(
+      result.missingVariables.some(v => v.includes("Template not found")),
+      `Expected to find "Template not found" in missingVariables. Actual missingVariables: ${JSON.stringify(result.missingVariables, null, 2)}`
+    ).toBe(true);
 
     registry.getContract = originalGetContract; // Restore original method
   });
