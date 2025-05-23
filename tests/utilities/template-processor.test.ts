@@ -608,7 +608,7 @@ describe("TemplateScanner.validateContractReplacements", () => {
     );
     expect(result.valid).toBe(false);
     expect(
-      result.missingVariables.some(v => v.includes("Template not found")),
+      result.missingVariables.some(v => v.includes("Contract not found")),
       `Expected to find "Template not found" in missingVariables. Actual missingVariables: ${JSON.stringify(result.missingVariables, null, 2)}`
     ).toBe(true);
 
