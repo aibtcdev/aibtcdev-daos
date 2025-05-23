@@ -143,28 +143,6 @@ export abstract class ContractBase {
   }
 
   /**
-   * Add a template variable dependency from the /g/ format
-   * @param toReplace The text to be replaced
-   * @param keyName The key name for the replacement
-   */
-  addTemplateVariable(toReplace: string, keyName: string): this {
-    // Format matches the /g/toReplace/keyName format used in templates
-    const formattedKey = `${toReplace}/${keyName}`;
-
-    // Check if this is an address, trait, contract, or runtime value
-    // and add to the appropriate collection
-    if (toReplace.startsWith("ST") || toReplace.includes(".")) {
-      // This is likely an address or contract reference
-      this.addRuntimeValue(formattedKey);
-    } else {
-      // Other template variables (configuration values, etc.)
-      this.addRuntimeValue(formattedKey);
-    }
-
-    return this;
-  }
-
-  /**
    * Scan the template content for /g/ variables and add them as dependencies
    * @param templateContent The content of the template file
    */
@@ -183,9 +161,6 @@ export abstract class ContractBase {
 
       if (!uniqueVars.has(key)) {
         uniqueVars.add(key);
-        // Removed call to this.addTemplateVariable(toReplace, keyName);
-        // The method now only scans and identifies variables from the template content.
-        // It does not modify the contract instance's dependencies.
       }
     }
 
