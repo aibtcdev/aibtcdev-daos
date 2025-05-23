@@ -379,6 +379,7 @@ describe("Contract Generator", () => {
     dao_contract_charter: ".test-dao-charter",
     dao_token_owner_contract: ".test-token-owner",
     dao_action_send_message_contract: ".test-send-message",
+    dao_contract_rewards_account: ".test-rewards-account",
 
     // Agent account simplified keys
     agent_account_trait_account:
