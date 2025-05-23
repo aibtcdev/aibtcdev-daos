@@ -33,8 +33,8 @@ export function generateTemplateReplacements(
 
   // 2. Add all known traits in both formats
   Object.entries(traits).forEach(([key, value]) => {
-    replacements[key.toLowerCase()] = `'${value}`;
-    replacements[`trait_${key.toLowerCase()}`] = `'${value}`;
+    replacements[key.toLowerCase()] = value;
+    replacements[`trait_${key.toLowerCase()}`] = value;
 
     const traitParts = value.split(".");
     if (traitParts.length >= 2) {
@@ -42,18 +42,18 @@ export function generateTemplateReplacements(
       const traitName = traitParts[traitParts.length - 1];
       replacements[
         `${contractPath}.${traitName}/trait_${key.toLowerCase()}`
-      ] = `'${value}`;
+      ] = value;
     }
   });
 
   // Add BASE_SIP010 trait specifically
   const baseSip010Trait = traits["BASE_SIP010"];
   if (baseSip010Trait) {
-    replacements["base_trait_sip010"] = `'${baseSip010Trait}'`;
+    replacements["base_trait_sip010"] = baseSip010Trait;
     // Add the common toReplace pattern observed in the scanner output
     replacements[
       `SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010`
-    ] = `'${baseSip010Trait}'`;
+    ] = baseSip010Trait;
   }
 
   // Add specific template variable formats for traits as found in .clar files
@@ -145,8 +145,8 @@ export function generateTemplateReplacements(
     const traitValue = traits[mapping.knownTraitKey];
     if (traitValue) {
       const fullKey = `${mapping.templateToReplacePattern}/${mapping.templateKeyName}`;
-      replacements[fullKey] = `'${traitValue}'`;
-      replacements[mapping.templateKeyName] = `'${traitValue}'`;
+      replacements[fullKey] = traitValue;
+      replacements[mapping.templateKeyName] = traitValue;
     }
   });
 
@@ -249,8 +249,8 @@ export function generateTemplateReplacements(
 
   replacements[
     `.${templateKeySymbol}-run-cost/base_contract_dao_run_cost`
-  ] = `'${addresses.AIBTC_RUN_COST}'`; // Adjusted to use templateKeySymbol
-  replacements["base_contract_dao_run_cost"] = `'${addresses.AIBTC_RUN_COST}'`;
+  ] = addresses.AIBTC_RUN_COST; // Adjusted to use templateKeySymbol
+  replacements["base_contract_dao_run_cost"] = addresses.AIBTC_RUN_COST;
 
   // Add origin_address (typically deployer)
   replacements["origin_address"] = addresses.DEPLOYER;
@@ -283,10 +283,10 @@ export function generateTemplateReplacements(
     network === "mainnet"
       ? "MAINNET_FAKTORY_DEX_TRAIT_PLACEHOLDER"
       : "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1.dex-trait";
-  replacements["faktory_dex_trait"] = `'${faktoryDexTraitValue}'`;
+  replacements["faktory_dex_trait"] = faktoryDexTraitValue;
   replacements[
     `${faktoryDexTraitValue}/faktory_dex_trait`
-  ] = `'${faktoryDexTraitValue}'`;
+  ] = faktoryDexTraitValue;
 
   // 6. Add DAO manifest
   replacements[
@@ -317,7 +317,7 @@ export function generateTemplateReplacements(
         templateKeyName = `agent_account_trait_${formattedKey}`;
       }
 
-      replacements[templateKeyName] = `'${traitValue}'`;
+      replacements[templateKeyName] = traitValue;
 
       // Construct the toReplace pattern based on templateKeySymbol and the specific parts of the agent trait name
       // e.g., for AGENT_ACCOUNT_PROPOSALS -> .aibtc-agent-account-traits.aibtc-proposals
@@ -330,7 +330,7 @@ export function generateTemplateReplacements(
         const toReplacePattern = `.${templateKeySymbol}-agent-account-traits.${lastPart}`;
         replacements[
           `${toReplacePattern}/${templateKeyName}`
-        ] = `'${traitValue}'`;
+        ] = traitValue;
       }
     }
   });
