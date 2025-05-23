@@ -1,6 +1,6 @@
 import { StacksNetworkName } from "@stacks/network";
 import { getKnownTraits, KnownTraits } from "./known-traits";
-import { getKnownAddresses, KnownAddresses } from "./known-addresses";
+import { getKnownAddresses } from "./known-addresses";
 import {
   CONTRACT_TYPES,
   CONTRACT_SUBTYPES,
@@ -40,9 +40,8 @@ export function generateTemplateReplacements(
     if (traitParts.length >= 2) {
       const contractPath = traitParts.slice(0, -1).join(".");
       const traitName = traitParts[traitParts.length - 1];
-      replacements[
-        `${contractPath}.${traitName}/trait_${key.toLowerCase()}`
-      ] = value;
+      replacements[`${contractPath}.${traitName}/trait_${key.toLowerCase()}`] =
+        value;
     }
   });
 
@@ -247,9 +246,8 @@ export function generateTemplateReplacements(
   replacements[`${addresses.BITFLOW_CORE}/bitflow_core_contract`] =
     addresses.BITFLOW_CORE; // Composite key for xyk-pool
 
-  replacements[
-    `.${templateKeySymbol}-run-cost/base_contract_dao_run_cost`
-  ] = addresses.AIBTC_RUN_COST; // Adjusted to use templateKeySymbol
+  replacements[`.${templateKeySymbol}-run-cost/base_contract_dao_run_cost`] =
+    addresses.AIBTC_RUN_COST; // Adjusted to use templateKeySymbol
   replacements["base_contract_dao_run_cost"] = addresses.AIBTC_RUN_COST;
 
   // Add origin_address (typically deployer)
@@ -284,9 +282,8 @@ export function generateTemplateReplacements(
       ? "MAINNET_FAKTORY_DEX_TRAIT_PLACEHOLDER"
       : "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1.dex-trait";
   replacements["faktory_dex_trait"] = faktoryDexTraitValue;
-  replacements[
-    `${faktoryDexTraitValue}/faktory_dex_trait`
-  ] = faktoryDexTraitValue;
+  replacements[`${faktoryDexTraitValue}/faktory_dex_trait`] =
+    faktoryDexTraitValue;
 
   // 6. Add DAO manifest
   replacements[
@@ -328,9 +325,7 @@ export function generateTemplateReplacements(
         // The specific part (e.g. "aibtc-proposals") is derived from the known trait string.
         // The "agent-account-traits" part is assumed based on the error messages.
         const toReplacePattern = `.${templateKeySymbol}-agent-account-traits.${lastPart}`;
-        replacements[
-          `${toReplacePattern}/${templateKeyName}`
-        ] = traitValue;
+        replacements[`${toReplacePattern}/${templateKeyName}`] = traitValue;
       }
     }
   });
