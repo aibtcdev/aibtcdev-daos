@@ -317,11 +317,14 @@ describe("Contract Generator", () => {
     // Agent Trait references
     agent_account_trait_account:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account",
-    agent_account_trait_faktory_dex_approval: // Note: key was different
+    // Note: key was different
+    agent_account_trait_faktory_dex_approval:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-faktory-dex",
-    agent_account_trait_proposals: // Note: key was different
+    // Note: key was different
+    agent_account_trait_proposals:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-proposals",
-    agent_account_trait_faktory_buy_sell: // Note: key was different
+    // Note: key was different
+    agent_account_trait_faktory_buy_sell:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.faktory-buy-sell",
 
     // SIP Trait references
@@ -356,7 +359,7 @@ describe("Contract Generator", () => {
     // The generateTemplateReplacements function is the source of truth for all standard keyNames.
     // It's best to align test replacements with those known keyNames.
     dao_trait_charter: ".test-traits.charter", // Example, add if needed by test contracts
-    dao_trait_epoch: ".test-traits.epoch",     // Example, add if needed
+    dao_trait_epoch: ".test-traits.epoch", // Example, add if needed
     // ... etc. for other specific traits or contract aliases used by the test contracts.
   };
 
@@ -503,14 +506,20 @@ describe("Contract Generator", () => {
 
     // Save report for inspection if issues are found
     if (issues.length > 0) {
-      const outputPath = path.join(outputDir, "template-scan-issues-report.json");
+      const outputPath = path.join(
+        outputDir,
+        "template-scan-issues-report.json"
+      );
       // Note: TemplateScanner.saveReportAsJson is async, ensure to await it if used here.
       // For simplicity in this test, we'll just log if issues are found.
       // await TemplateScanner.saveReportAsJson(issues, outputPath); // If you want to save it
-      dbgLog(`Template scan found ${issues.length} issues. Full report available in template-scan-report.json if run via npm script.`, {
-        logType: "error",
-        titleBefore: "Template Scan Issues Found in Test",
-      });
+      dbgLog(
+        `Template scan found ${issues.length} issues. Full report available in template-scan-report.json if run via npm script.`,
+        {
+          logType: "error",
+          titleBefore: "Template Scan Issues Found in Test",
+        }
+      );
       // Optionally print issues to console for easier debugging in test output
       TemplateScanner.printReport(issues);
     }
@@ -532,22 +541,48 @@ describe("TemplateScanner.validateContractReplacements", () => {
   it("should return valid: true for a contract with all replacements", () => {
     const contractName = "aibtc-base-dao"; // A contract known to exist
     // Use a comprehensive set of replacements, potentially from generateTemplateReplacements
-    const testReplacements = generateTemplateReplacements("devnet");
+    const testReplacements = generateTemplateReplacements("testnet");
+
+    //console.log("====== Test Replacements ===");
+    //console.log(testReplacements);
+    //console.log("===========================");
 
     const result = TemplateScanner.validateContractReplacements(
       contractName,
       testReplacements
     );
+
+    //console.log("====== Result ===");
+    //console.log(result);
+    //console.log("===========================");
+
     // If this assertion fails, Vitest will print the content of result.missingVariables
-    expect(result.missingVariables, `Expected no missing variables for ${contractName}, but found some. Missing: ${JSON.stringify(result.missingVariables, null, 2)}`).toEqual([]);
+    expect(
+      result.missingVariables,
+      `Expected no missing variables for ${contractName}, but found some. Missing: ${JSON.stringify(
+        result.missingVariables,
+        null,
+        2
+      )}`
+    ).toEqual([]);
     // result.valid is derived from missingVariables.length, so the above check also covers it.
     // We can keep this for clarity or remove it if the above is deemed sufficient.
-    expect(result.valid, `Expected result.valid to be true for ${contractName} when no missing variables are expected. Missing: ${JSON.stringify(result.missingVariables, null, 2)}`).toBe(true);
+    expect(
+      result.valid,
+      `Expected result.valid to be true for ${contractName} when no missing variables are expected. Missing: ${JSON.stringify(
+        result.missingVariables,
+        null,
+        2
+      )}`
+    ).toBe(true);
   });
 
   it("should return valid: false and list missing variables for agent account", () => {
     const contractName = "aibtc-agent-account";
-    const incompleteReplacements = generateTemplateReplacements("devnet", "testcoin");
+    const incompleteReplacements = generateTemplateReplacements(
+      "testnet",
+      "testcoin"
+    );
     // Intentionally remove required replacements for agent accounts
     delete incompleteReplacements["account_owner"];
     delete incompleteReplacements["account_agent"];
@@ -570,7 +605,9 @@ describe("TemplateScanner.validateContractReplacements", () => {
       {}
     );
     expect(result.valid).toBe(false);
-    expect(result.missingVariables.some(v => v.includes("Contract not found"))).toBe(true);
+    expect(
+      result.missingVariables.some((v) => v.includes("Contract not found"))
+    ).toBe(true);
   });
 
   it("should handle contract with missing template file", () => {
@@ -608,8 +645,12 @@ describe("TemplateScanner.validateContractReplacements", () => {
     );
     expect(result.valid).toBe(false);
     expect(
-      result.missingVariables.some(v => v.includes("Contract not found")),
-      `Expected to find "Template not found" in missingVariables. Actual missingVariables: ${JSON.stringify(result.missingVariables, null, 2)}`
+      result.missingVariables.some((v) => v.includes("Contract not found")),
+      `Expected to find "Template not found" in missingVariables. Actual missingVariables: ${JSON.stringify(
+        result.missingVariables,
+        null,
+        2
+      )}`
     ).toBe(true);
 
     registry.getContract = originalGetContract; // Restore original method
