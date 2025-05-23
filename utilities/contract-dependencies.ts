@@ -312,11 +312,7 @@ export function defineTokenContractDependencies(
             "TOKEN",
             "PRELAUNCH"
           )
-          .addContractDependency(
-            "dao_contract_token_pool",
-            "TOKEN",
-            "POOL"
-          )
+          .addContractDependency("dao_contract_token_pool", "TOKEN", "POOL")
           .addTraitDependency("DAO_TOKEN_DEX", "dao_trait_faktory_dex")
           .addTraitDependency("FAKTORY_SIP010", "dao_trait_faktory_sip010")
           .addAddressDependency("SBTC", "base_contract_sbtc")

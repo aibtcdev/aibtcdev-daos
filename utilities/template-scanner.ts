@@ -9,12 +9,11 @@ import { dbgLog } from "./debug-logging";
 // populates contract dependencies.
 import { defineAllDaoContractDependencies } from "./contract-dependencies";
 
-
 export interface ValidationIssue {
-  filePath: string;    // Relative path to the .clar template
-  lineNumber?: number;  // Line number of the template comment
-  toReplace: string;   // The "what to match" part from the comment
-  keyName: string;     // The "key for replacement" part from the comment
+  filePath: string; // Relative path to the .clar template
+  lineNumber?: number; // Line number of the template comment
+  toReplace: string; // The "what to match" part from the comment
+  keyName: string; // The "key for replacement" part from the comment
   issueType: "UnknownKeyName" | "UndeclaredDependency";
   message: string;
 }
@@ -32,7 +31,6 @@ export class TemplateScanner {
     // Ensure dependencies are defined for all registered contracts
     defineAllDaoContractDependencies(registry);
 
-
     const allContracts = registry.getAllContracts();
     const issues: ValidationIssue[] = [];
     const knownKeyNames = new Set(getAllKnownTemplateVariables());
@@ -47,8 +45,12 @@ export class TemplateScanner {
 
         if (fs.existsSync(templatePath)) {
           const templateContent = fs.readFileSync(templatePath, "utf8");
-          const lines = templateContent.split('\n');
-          const templateVariablesFound: Array<{ toReplace: string; keyName: string; lineNumber: number }> = [];
+          const lines = templateContent.split("\n");
+          const templateVariablesFound: Array<{
+            toReplace: string;
+            keyName: string;
+            lineNumber: number;
+          }> = [];
 
           for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
@@ -63,20 +65,26 @@ export class TemplateScanner {
           }
 
           const declaredKeyNames = new Set<string>();
-          contract.requiredAddresses.forEach(dep => declaredKeyNames.add(dep.key));
-          contract.requiredTraits.forEach(dep => declaredKeyNames.add(dep.key));
-          contract.requiredContractAddresses.forEach(dep => declaredKeyNames.add(dep.key));
-          contract.requiredRuntimeValues.forEach(dep => {
+          contract.requiredAddresses.forEach((dep) =>
+            declaredKeyNames.add(dep.key)
+          );
+          contract.requiredTraits.forEach((dep) =>
+            declaredKeyNames.add(dep.key)
+          );
+          contract.requiredContractAddresses.forEach((dep) =>
+            declaredKeyNames.add(dep.key)
+          );
+          contract.requiredRuntimeValues.forEach((dep) => {
             // dep.key could be "toReplace/keyName" from addTemplateVariable via scanTemplateVariables,
             // or just "keyName" from an explicit addRuntimeValue(keyName) in contract-dependencies.ts
-            const parts = dep.key.split('/');
-            if (parts.length > 1 && dep.key.includes('/')) { // Heuristic for composite key
+            const parts = dep.key.split("/");
+            if (parts.length > 1 && dep.key.includes("/")) {
+              // Heuristic for composite key
               declaredKeyNames.add(parts[1]);
             } else {
               declaredKeyNames.add(dep.key);
             }
           });
-
 
           for (const foundVar of templateVariablesFound) {
             // Validation 1: Unknown keyName
@@ -131,9 +139,13 @@ export class TemplateScanner {
       return;
     }
     console.error(`Template scan found ${issues.length} issue(s):`);
-    issues.forEach(issue => {
+    issues.forEach((issue) => {
       console.error(
-        `- ${issue.filePath}${issue.lineNumber ? `:${issue.lineNumber}` : ''}: [${issue.issueType}] ${issue.message} (Comment: ;; /g/${issue.toReplace}/${issue.keyName})`
+        `- ${issue.filePath}${
+          issue.lineNumber ? `:${issue.lineNumber}` : ""
+        }: [${issue.issueType}] ${issue.message} (Comment: ;; /g/${
+          issue.toReplace
+        }/${issue.keyName})`
       );
     });
   }
@@ -141,12 +153,22 @@ export class TemplateScanner {
   /**
    * Saves the validation issue report to a JSON file.
    */
-  static async saveReportAsJson(issues: ValidationIssue[], outputPath: string): Promise<void> {
+  static async saveReportAsJson(
+    issues: ValidationIssue[],
+    outputPath: string
+  ): Promise<void> {
     try {
-      fs.writeFileSync(path.resolve(outputPath), JSON.stringify(issues, null, 2));
+      fs.writeFileSync(
+        path.resolve(outputPath),
+        JSON.stringify(issues, null, 2)
+      );
       console.log(`Template scan report saved to ${outputPath}`);
     } catch (error) {
-      console.error(`Failed to save template scan report: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(
+        `Failed to save template scan report: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
   }
 
@@ -176,7 +198,7 @@ export class TemplateScanner {
       if (!contract) {
         return {
           valid: false,
-          missingVariables: [`Contract not found: ${contractName}`]
+          missingVariables: [`Contract not found: ${contractName}`],
         };
       }
 
@@ -189,7 +211,7 @@ export class TemplateScanner {
       if (!fs.existsSync(templatePath)) {
         return {
           valid: false,
-          missingVariables: [`Template not found: ${templatePath}`]
+          missingVariables: [`Template not found: ${templatePath}`],
         };
       }
 
@@ -197,22 +219,31 @@ export class TemplateScanner {
       const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
       const matches = [...templateContent.matchAll(variableRegex)];
 
-      const variablesInTemplate = matches.map((match) => ({ toReplace: match[1], keyName: match[2] }));
+      const variablesInTemplate = matches.map((match) => ({
+        toReplace: match[1],
+        keyName: match[2],
+      }));
 
-      const missingVariables = variablesInTemplate.filter(variable => {
-        // Check if the keyName has a replacement
-        return !replacements[variable.keyName];
-      }).map(variable => `Missing replacement for keyName: '${variable.keyName}' (from comment ;; /g/${variable.toReplace}/${variable.keyName})`);
-
+      const missingVariables = variablesInTemplate
+        .filter((variable) => {
+          // Check if the keyName has a replacement
+          return !replacements[variable.keyName];
+        })
+        .map(
+          (variable) =>
+            `Missing replacement for keyName: '${variable.keyName}' (from comment ;; /g/${variable.toReplace}/${variable.keyName})`
+        );
 
       return {
         valid: missingVariables.length === 0,
-        missingVariables
+        missingVariables,
       };
     } catch (error) {
       return {
         valid: false,
-        missingVariables: [`Error: ${error instanceof Error ? error.message : String(error)}`]
+        missingVariables: [
+          `Error: ${error instanceof Error ? error.message : String(error)}`,
+        ],
       };
     }
   }
