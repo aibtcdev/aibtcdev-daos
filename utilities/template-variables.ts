@@ -45,16 +45,14 @@ export function generateTemplateReplacements(
 
   // 1. Add all known addresses in both formats
   Object.entries(addresses).forEach(([key, value]) => {
-    const formattedValue = formatIfPrincipal(value);
-    replacements[key.toLowerCase()] = formattedValue;
-    replacements[`address_${key.toLowerCase()}`] = formattedValue;
+    replacements[key.toLowerCase()] = value;
+    replacements[`address_${key.toLowerCase()}`] = value;
   });
 
   // 2. Add all known traits in both formats
   Object.entries(traits).forEach(([key, value]) => {
-    const formattedValue = formatIfPrincipal(value);
-    replacements[key.toLowerCase()] = formattedValue;
-    replacements[`trait_${key.toLowerCase()}`] = formattedValue;
+    replacements[key.toLowerCase()] = value;
+    replacements[`trait_${key.toLowerCase()}`] = value;
 
     const traitParts = value.split(".");
     if (traitParts.length >= 2) {
@@ -62,20 +60,19 @@ export function generateTemplateReplacements(
       const traitName = traitParts[traitParts.length - 1];
       // The key itself should not be formatted, only the value
       replacements[`${contractPath}.${traitName}/trait_${key.toLowerCase()}`] =
-        formattedValue;
+        value;
     }
   });
 
   // Add BASE_SIP010 trait specifically
   const baseSip010Trait = traits["BASE_SIP010"];
   if (baseSip010Trait) {
-    const formattedBaseSip010Trait = formatIfPrincipal(baseSip010Trait);
-    replacements["base_trait_sip010"] = formattedBaseSip010Trait;
+    replacements["base_trait_sip010"] = baseSip010Trait;
     // Add the common toReplace pattern observed in the scanner output
     // The key itself should not be formatted, only the value
     replacements[
       `SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010`
-    ] = formattedBaseSip010Trait;
+    ] = baseSip010Trait;
   }
 
   // Add specific template variable formats for traits as found in .clar files
@@ -166,11 +163,10 @@ export function generateTemplateReplacements(
   traitMappings.forEach((mapping) => {
     const traitValue = traits[mapping.knownTraitKey];
     if (traitValue) {
-      const formattedTraitValue = formatIfPrincipal(traitValue);
       const fullKey = `${mapping.templateToReplacePattern}/${mapping.templateKeyName}`;
       // The key itself should not be formatted, only the value
-      replacements[fullKey] = formattedTraitValue;
-      replacements[mapping.templateKeyName] = formattedTraitValue;
+      replacements[fullKey] = traitValue;
+      replacements[mapping.templateKeyName] = traitValue;
     }
   });
 
@@ -263,27 +259,23 @@ export function generateTemplateReplacements(
   ] = `"https://example.com/metadata/${symbol}.json"`;
 
   // 5. Add external contracts and special cases
-  const formattedSbtc = formatIfPrincipal(addresses.SBTC);
-  replacements["sbtc_contract"] = formattedSbtc;
-  replacements["sbtc_token_contract"] = formattedSbtc;
-  replacements["base_contract_sbtc"] = formattedSbtc;
+  replacements["sbtc_contract"] = addresses.SBTC;
+  replacements["sbtc_token_contract"] = addresses.SBTC;
+  replacements["base_contract_sbtc"] = addresses.SBTC;
 
-  const formattedBitflowCore = formatIfPrincipal(addresses.BITFLOW_CORE);
-  replacements["external_bitflow_core"] = formattedBitflowCore;
-  replacements["bitflow_core_contract"] = formattedBitflowCore; // For xyk-pool
+  replacements["external_bitflow_core"] = addresses.BITFLOW_CORE;
+  replacements["bitflow_core_contract"] = addresses.BITFLOW_CORE; // For xyk-pool
   replacements[`${addresses.BITFLOW_CORE}/bitflow_core_contract`] = // Key not formatted
-    formattedBitflowCore; // Composite key for xyk-pool
+    addresses.BITFLOW_CORE; // Composite key for xyk-pool
 
-  const formattedAibtcRunCost = formatIfPrincipal(addresses.AIBTC_RUN_COST);
   replacements[`.${templateKeySymbol}-run-cost/base_contract_dao_run_cost`] = // Key not formatted
-    formattedAibtcRunCost; // Adjusted to use templateKeySymbol
-  replacements["base_contract_dao_run_cost"] = formattedAibtcRunCost;
+    addresses.AIBTC_RUN_COST; // Adjusted to use templateKeySymbol
+  replacements["base_contract_dao_run_cost"] = addresses.AIBTC_RUN_COST;
 
   // Add origin_address (typically deployer)
-  const formattedDeployer = formatIfPrincipal(addresses.DEPLOYER);
-  replacements["origin_address"] = formattedDeployer;
+  replacements["origin_address"] = addresses.DEPLOYER;
   replacements[`${addresses.DEPLOYER.split(".")[0]}/origin_address`] = // Key not formatted
-    formattedDeployer; // Matches the toReplace from error
+    addresses.DEPLOYER; // Matches the toReplace from error
 
   // Add specific contract name aliases if they differ from standard generation
   // These are based on the UnknownKeyName errors for specific templates
@@ -311,10 +303,9 @@ export function generateTemplateReplacements(
     network === "mainnet"
       ? "MAINNET_FAKTORY_DEX_TRAIT_PLACEHOLDER" // This might need formatting if it becomes a real principal
       : "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1.dex-trait";
-  const formattedFaktoryDexTraitValue = formatIfPrincipal(faktoryDexTraitValue);
-  replacements["faktory_dex_trait"] = formattedFaktoryDexTraitValue;
+  replacements["faktory_dex_trait"] = faktoryDexTraitValue;
   replacements[`${faktoryDexTraitValue}/faktory_dex_trait`] = // Key not formatted
-    formattedFaktoryDexTraitValue;
+    faktoryDexTraitValue;
 
   // 6. Add DAO manifest
   replacements[
@@ -333,7 +324,6 @@ export function generateTemplateReplacements(
   agentTraitKeys.forEach((key) => {
     const traitValue = traits[key];
     if (traitValue) {
-      const formattedTraitValue = formatIfPrincipal(traitValue);
       const lowerKey = (key as string).toLowerCase();
       let templateKeyName: string;
 
@@ -346,7 +336,7 @@ export function generateTemplateReplacements(
         templateKeyName = `agent_account_trait_${formattedKey}`;
       }
 
-      replacements[templateKeyName] = formattedTraitValue;
+      replacements[templateKeyName] = traitValue;
 
       // Construct the toReplace pattern based on templateKeySymbol and the specific parts of the agent trait name
       // e.g., for AGENT_ACCOUNT_PROPOSALS -> .aibtc-agent-account-traits.aibtc-proposals
@@ -357,35 +347,37 @@ export function generateTemplateReplacements(
         // The specific part (e.g. "aibtc-proposals") is derived from the known trait string.
         // The "agent-account-traits" part is assumed based on the error messages.
         const toReplacePattern = `.${templateKeySymbol}-agent-account-traits.${lastPart}`;
-        replacements[`${toReplacePattern}/${templateKeyName}`] = formattedTraitValue; // Key not formatted
+        replacements[`${toReplacePattern}/${templateKeyName}`] = traitValue; // Key not formatted
       }
     }
   });
 
-  const formattedDeployerForAgent = formatIfPrincipal(addresses.DEPLOYER);
   replacements[`${addresses.DEPLOYER.split(".")[0]}/account_owner`] = // Key not formatted
-    formattedDeployerForAgent; // Adjusted for dynamic deployer prefix
-  replacements["account_owner"] = formattedDeployerForAgent;
+    addresses.DEPLOYER; // Adjusted for dynamic deployer prefix
+  replacements["account_owner"] = addresses.DEPLOYER;
 
   // Assuming ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG is a fixed address or needs to be in known-addresses
   const defaultAgentAddress = "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG";
-  const formattedDefaultAgentAddress = formatIfPrincipal(defaultAgentAddress);
   replacements[`${defaultAgentAddress.split(".")[0]}/account_agent`] = // Key not formatted
-    formattedDefaultAgentAddress;
-  replacements["account_agent"] = formattedDefaultAgentAddress;
+    defaultAgentAddress;
+  replacements["account_agent"] = defaultAgentAddress;
 
-  // 8. Merge with custom replacements (which take precedence)
-  const formattedCustomReplacements: Record<string, string> = {};
+  // 8. Merge custom replacements (raw values, these take precedence)
   for (const key in customReplacements) {
     if (Object.prototype.hasOwnProperty.call(customReplacements, key)) {
-      formattedCustomReplacements[key] = formatIfPrincipal(customReplacements[key]);
+      replacements[key] = customReplacements[key];
     }
   }
 
-  return {
-    ...replacements,
-    ...formattedCustomReplacements,
-  };
+  // 9. Format all values in the final replacements object
+  const finalReplacements: Record<string, string> = {};
+  for (const key in replacements) {
+    if (Object.prototype.hasOwnProperty.call(replacements, key)) {
+      finalReplacements[key] = formatIfPrincipal(replacements[key]);
+    }
+  }
+
+  return finalReplacements;
 }
 
 /**
