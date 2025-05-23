@@ -95,6 +95,7 @@ export function defineExtensionContractDependencies(
           .addTraitDependency("DAO_EXTENSION", "dao_trait_extension")
           .addTraitDependency("DAO_MESSAGING", "dao_trait_messaging")
           .addContractDependency("dao_contract_base", "BASE", "DAO")
+          .addContractDependency("dao_contract_token", "TOKEN", "DAO")
           .addRuntimeValue("dao_token_symbol");
         break;
 

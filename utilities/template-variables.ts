@@ -39,6 +39,14 @@ export function generateTemplateReplacements(
     }
   });
 
+  // Add BASE_SIP010 trait specifically
+  const baseSip010Trait = traits["BASE_SIP010"];
+  if (baseSip010Trait) {
+    replacements["base_trait_sip010"] = `'${baseSip010Trait}'`;
+    // Add the common toReplace pattern observed in the scanner output
+    replacements[`SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010`] = `'${baseSip010Trait}'`;
+  }
+
   // Add specific template variable formats for traits as found in .clar files
   const traitMappings: { templateKeyName: string, knownTraitKey: keyof KnownTraits, templateToReplacePattern: string
 }[] = [
