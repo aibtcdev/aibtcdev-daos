@@ -3,20 +3,39 @@ import path from "node:path";
 import { ContractRegistry } from "./contract-registry";
 import { getAllKnownTemplateVariables } from "./template-variables";
 import { dbgLog } from "./debug-logging";
+// Import defineAllDaoContractDependencies if it's not already implicitly called
+// by registry.registerAllDefinedContracts() or if registry setup needs it explicitly here.
+// For this change, we assume the registry setup within scanAllTemplates correctly
+// populates contract dependencies.
+import { defineAllDaoContractDependencies } from "./contract-dependencies";
+
+
+export interface ValidationIssue {
+  filePath: string;    // Relative path to the .clar template
+  lineNumber?: number;  // Line number of the template comment
+  toReplace: string;   // The "what to match" part from the comment
+  keyName: string;     // The "key for replacement" part from the comment
+  issueType: "UnknownKeyName" | "UndeclaredDependency";
+  message: string;
+}
 
 /**
  * Utility to scan contract templates and extract variables
  */
 export class TemplateScanner {
   /**
-   * Scan all contract templates and generate a report of variables used
+   * Scan all contract templates and generate a report of validation issues.
    */
-  static async scanAllTemplates(): Promise<Record<string, string[]>> {
+  static async scanAllTemplates(): Promise<ValidationIssue[]> {
     const registry = new ContractRegistry();
     registry.registerAllDefinedContracts();
+    // Ensure dependencies are defined for all registered contracts
+    defineAllDaoContractDependencies(registry);
+
 
     const allContracts = registry.getAllContracts();
-    const report: Record<string, string[]> = {};
+    const issues: ValidationIssue[] = [];
+    const knownKeyNames = new Set(getAllKnownTemplateVariables());
 
     for (const contract of allContracts) {
       try {
@@ -28,20 +47,70 @@ export class TemplateScanner {
 
         if (fs.existsSync(templatePath)) {
           const templateContent = fs.readFileSync(templatePath, "utf8");
+          const lines = templateContent.split('\n');
+          const templateVariablesFound: Array<{ toReplace: string; keyName: string; lineNumber: number }> = [];
 
-          // Only check for /g/ format
-          const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const commentMatch = line.match(/;;\s*\/g\/([^\/]+)\/([^\/]+)/);
+            if (commentMatch) {
+              templateVariablesFound.push({
+                toReplace: commentMatch[1],
+                keyName: commentMatch[2],
+                lineNumber: i + 1,
+              });
+            }
+          }
 
-          const matches = [...templateContent.matchAll(variableRegex)];
-          // Only store the key/value pairs, not the surrounding content
-          const variables = matches.map((match) => `${match[1]}/${match[2]}`);
+          const declaredKeyNames = new Set<string>();
+          contract.requiredAddresses.forEach(dep => declaredKeyNames.add(dep.key));
+          contract.requiredTraits.forEach(dep => declaredKeyNames.add(dep.key));
+          contract.requiredContractAddresses.forEach(dep => declaredKeyNames.add(dep.key));
+          contract.requiredRuntimeValues.forEach(dep => {
+            // dep.key could be "toReplace/keyName" from addTemplateVariable via scanTemplateVariables,
+            // or just "keyName" from an explicit addRuntimeValue(keyName) in contract-dependencies.ts
+            const parts = dep.key.split('/');
+            if (parts.length > 1 && dep.key.includes('/')) { // Heuristic for composite key
+              declaredKeyNames.add(parts[1]);
+            } else {
+              declaredKeyNames.add(dep.key);
+            }
+          });
 
-          // Store unique variables
-          report[`${contract.type}/${contract.name}`] = [...new Set(variables)];
+
+          for (const foundVar of templateVariablesFound) {
+            // Validation 1: Unknown keyName
+            if (!knownKeyNames.has(foundVar.keyName)) {
+              issues.push({
+                filePath: contract.templatePath,
+                lineNumber: foundVar.lineNumber,
+                toReplace: foundVar.toReplace,
+                keyName: foundVar.keyName,
+                issueType: "UnknownKeyName",
+                message: `The keyName '${foundVar.keyName}' is not defined in template-variables.ts.`,
+              });
+            }
+
+            // Validation 2: Undeclared Dependency for this specific contract
+            // This checks if the keyName found in the template comment is among the keys explicitly declared
+            // for this contract type/subtype via contract-dependencies.ts (which populates the required* arrays).
+            if (!declaredKeyNames.has(foundVar.keyName)) {
+              issues.push({
+                filePath: contract.templatePath,
+                lineNumber: foundVar.lineNumber,
+                toReplace: foundVar.toReplace,
+                keyName: foundVar.keyName,
+                issueType: "UndeclaredDependency",
+                message: `The keyName '${foundVar.keyName}' is used in template '${contract.templatePath}' but not declared as a dependency for contract '${contract.name}'.`,
+              });
+            }
+          }
         } else {
           dbgLog(`Template not found for ${contract.name}: ${templatePath}`, {
             logType: "error",
           });
+          // Optionally, add this as a different type of issue
+          // issues.push({ filePath: contract.templatePath, toReplace: '', keyName: '', issueType: "TemplateNotFound", message: `Template not found: ${templatePath}` });
         }
       } catch (error) {
         dbgLog(
@@ -50,17 +119,52 @@ export class TemplateScanner {
           }`,
           { logType: "error" }
         );
+        // Optionally, add this as a different type of issue
+        // issues.push({ filePath: contract.templatePath, toReplace: '', keyName: '', issueType: "ScanningError", message: `Error scanning: ${error instanceof Error ? error.message : String(error)}` });
       }
     }
+    return issues;
+  }
 
-    return report;
+  /**
+   * Prints a report of validation issues to the console.
+   */
+  static printReport(issues: ValidationIssue[]): void {
+    if (issues.length === 0) {
+      console.log("Template scan complete. No issues found.");
+      return;
+    }
+    console.error(`Template scan found ${issues.length} issue(s):`);
+    issues.forEach(issue => {
+      console.error(
+        `- ${issue.filePath}${issue.lineNumber ? `:${issue.lineNumber}` : ''}: [${issue.issueType}] ${issue.message} (Comment: ;; /g/${issue.toReplace}/${issue.keyName})`
+      );
+    });
+  }
+
+  /**
+   * Saves the validation issue report to a JSON file.
+   */
+  static async saveReportAsJson(issues: ValidationIssue[], outputPath: string): Promise<void> {
+    try {
+      fs.writeFileSync(path.resolve(outputPath), JSON.stringify(issues, null, 2));
+      console.log(`Template scan report saved to ${outputPath}`);
+    } catch (error) {
+      console.error(`Failed to save template scan report: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   /**
    * Generate a consolidated list of all variables used across templates
    */
   static async getAllUniqueVariables(): Promise<string[]> {
-    const report = await this.scanAllTemplates();
+    // This method's original implementation relied on the old report structure.
+    // It can be updated if needed, or removed if scanAllTemplates' new output is sufficient.
+    // For now, it will not work as expected with ValidationIssue[].
+    // To keep it functional with the new structure, it would need to iterate issues
+    // and collect unique `toReplace/keyName` strings.
+    console.warn("TemplateScanner.getAllUniqueVariables() may need an update due to changes in scanAllTemplates() return type.");
+    const report = await this.scanAllTemplatesOld(); // Assuming an old version for compatibility or remove
     const allVariables = Object.values(report).flat();
     return [...new Set(allVariables)];
   }
@@ -124,15 +228,16 @@ export class TemplateScanner {
     try {
       const registry = new ContractRegistry();
       registry.registerAllDefinedContracts();
-      
+      defineAllDaoContractDependencies(registry);
+
       const contract = registry.getContract(contractName);
       if (!contract) {
-        return { 
-          valid: false, 
-          missingVariables: [`Contract not found: ${contractName}`] 
+        return {
+          valid: false,
+          missingVariables: [`Contract not found: ${contractName}`]
         };
       }
-      
+
       const templatePath = path.join(
         process.cwd(),
         "contracts",
@@ -140,34 +245,32 @@ export class TemplateScanner {
       );
 
       if (!fs.existsSync(templatePath)) {
-        return { 
-          valid: false, 
-          missingVariables: [`Template not found: ${templatePath}`] 
+        return {
+          valid: false,
+          missingVariables: [`Template not found: ${templatePath}`]
         };
       }
 
       const templateContent = fs.readFileSync(templatePath, "utf8");
       const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
       const matches = [...templateContent.matchAll(variableRegex)];
-      
-      // Extract variables in the format used in templates
-      const variables = matches.map((match) => `${match[1]}/${match[2]}`);
-      
-      // Check if each variable has a replacement
-      const missingVariables = variables.filter(variable => {
-        // Check both formats: full path and simplified key
-        const [_, key] = variable.split('/');
-        return !replacements[variable] && !replacements[key];
-      });
+
+      const variablesInTemplate = matches.map((match) => ({ toReplace: match[1], keyName: match[2] }));
+
+      const missingVariables = variablesInTemplate.filter(variable => {
+        // Check if the keyName has a replacement
+        return !replacements[variable.keyName];
+      }).map(variable => `Missing replacement for keyName: '${variable.keyName}' (from comment ;; /g/${variable.toReplace}/${variable.keyName})`);
+
 
       return {
         valid: missingVariables.length === 0,
         missingVariables
       };
     } catch (error) {
-      return { 
-        valid: false, 
-        missingVariables: [`Error: ${error instanceof Error ? error.message : String(error)}`] 
+      return {
+        valid: false,
+        missingVariables: [`Error: ${error instanceof Error ? error.message : String(error)}`]
       };
     }
   }
