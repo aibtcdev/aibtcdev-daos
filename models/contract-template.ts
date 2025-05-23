@@ -148,7 +148,7 @@ export abstract class ContractBase {
    */
   scanTemplateVariables(templateContent: string): this {
     // Extract all variables from template
-    const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
+    const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/\n]+)/g;
     const matches = [...templateContent.matchAll(variableRegex)];
 
     // Add each unique variable as a dependency
