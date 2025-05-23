@@ -216,7 +216,7 @@ export class TemplateScanner {
       }
 
       const templateContent = fs.readFileSync(templatePath, "utf8");
-      const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/]+)/g;
+      const variableRegex = /;;\s*\/g\/([^\/]+)\/([^\/\n]+)/g;
       const matches = [...templateContent.matchAll(variableRegex)];
 
       const variablesInTemplate = matches.map((match) => ({
