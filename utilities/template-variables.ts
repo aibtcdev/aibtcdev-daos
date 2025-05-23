@@ -59,6 +59,7 @@ templateToReplacePattern: `.${templateKeySymbol}-dao-traits.action-proposal-voti
     if (traitValue) {
       const fullKey = `${mapping.templateToReplacePattern}/${mapping.templateKeyName}`;
       replacements[fullKey] = `'${traitValue}'`;
+      replacements[mapping.templateKeyName] = `'${traitValue}'`;
     }
   });
 

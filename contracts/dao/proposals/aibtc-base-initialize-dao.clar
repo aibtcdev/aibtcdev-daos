@@ -6,7 +6,7 @@
 (impl-trait .aibtc-dao-traits.proposal)
 
 ;; /g/aibtc mission goes here/dao_manifest
-(define-constant CFG_DAO_MANIFEST_TEXT "dao mission goes here")
+(define-constant CFG_DAO_MANIFEST_TEXT "aibtc mission goes here")
 ;; /g/.aibtc-faktory/dao_contract_token
 (define-constant CFG_DAO_TOKEN .aibtc-faktory)
 
