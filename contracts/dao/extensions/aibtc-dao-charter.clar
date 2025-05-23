@@ -7,7 +7,7 @@
 
 ;; /g/.aibtc-dao-traits.extension/dao_trait_extension
 (impl-trait .aibtc-dao-traits.extension)
-;; /g/.aibtc-dao-traits.charter/dao_trait_charter
+;; /g/.aibtc-dao-traits.dao-charter/dao_trait_charter
 (impl-trait .aibtc-dao-traits.dao-charter)
 
 ;; constants

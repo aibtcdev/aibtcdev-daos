@@ -1,11 +1,10 @@
-
 ;; 99af7ff63e5e4bd7542e55d88bacc25a7a6f79004f9937ea0bab3ca4c2438061
 ;; aibtc.dev DAO faktory.fun DEX @version 1.0
 
 ;; /g/.aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex
 (impl-trait .aibtc-dao-traits.faktory-dex)
 
-;; TODO: no match on this line? should be fine for testnet
+;; /g/STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1.dex-trait/faktory_dex_trait
 (impl-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1.dex-trait)
 ;; /g/STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait/dao_trait_faktory_sip010
 (use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait)
@@ -69,7 +68,7 @@
       ))
       ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
       (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
-      ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
+        ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
         transfer pre-fee tx-sender .aibtc-pre-faktory none
       ))
       ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch

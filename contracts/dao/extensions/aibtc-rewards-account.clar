@@ -50,6 +50,7 @@
     (recipient principal)
     (amount uint)
   )
+  ;; /g/.aibtc-faktory/dao_contract_token
   (let ((contractBalance (unwrap-panic (contract-call? .aibtc-faktory get-balance SELF))))
     (try! (is-dao-or-extension))
     (asserts! (>= contractBalance amount) ERR_INSUFFICIENT_BALANCE)
@@ -63,6 +64,7 @@
         txSender: tx-sender,
       },
     })
+    ;; /g/.aibtc-faktory/dao_contract_token
     (as-contract (contract-call? .aibtc-faktory transfer amount SELF recipient none))
   )
 )

@@ -28,7 +28,7 @@
 (define-public (send (msg (string-ascii 10000)))
   (let (
       (isFromDao (is-ok (is-dao-or-extension)))
-      ;; /g/.aibtc-base-dao/dao_contract_base
+      ;; /g/.aibtc-faktory/dao_contract_token
       (senderBalance (unwrap! (contract-call? .aibtc-faktory get-balance tx-sender)
         ERR_FETCHING_TOKEN_DATA
       ))
