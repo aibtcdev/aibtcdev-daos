@@ -11,7 +11,7 @@
 (impl-trait .aibtc-agent-account-traits.faktory-dex-approval)
 ;; /g/.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell
 (impl-trait .aibtc-agent-account-traits.faktory-buy-sell)
-;; /g/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
+;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 ;; /g/.aibtc-dao-traits.action/dao_trait_action
 (use-trait action-trait .aibtc-dao-traits.action)
@@ -21,7 +21,7 @@
 (use-trait action-proposal-voting-trait .aibtc-dao-traits.action-proposal-voting)
 ;; /g/.aibtc-dao-traits.faktory-dex/dao_trait_faktory_dex
 (use-trait dao-faktory-dex .aibtc-dao-traits.faktory-dex)
-;; /g/STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait/dao_trait_faktory_token
+;; /g/'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait/dao_trait_faktory_token
 (use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait)
 
 ;; constants
@@ -30,13 +30,13 @@
 (define-constant SELF (as-contract tx-sender))
 
 ;; owner and agent addresses
-;; /g/ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/account_owner
+;; /g/'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/account_owner
 (define-constant ACCOUNT_OWNER 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; owner (user/creator of account, full access)
-;; /g/ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG/account_agent
+;; /g/'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG/account_agent
 (define-constant ACCOUNT_AGENT 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG) ;; agent (can only take approved actions)
 
 ;; pre-approved contracts
-;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
+;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
 (define-constant SBTC_TOKEN 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token) ;; sBTC token
 ;; /g/.aibtc-faktory/dao_contract_token
 (define-constant DAO_TOKEN .aibtc-faktory) ;; DAO token
