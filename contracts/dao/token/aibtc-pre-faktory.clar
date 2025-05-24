@@ -336,7 +336,7 @@
     (asserts! (> actual-seats u0) ERR-INVALID-SEAT-COUNT)
     (asserts! (< current-seats SEATS) ERR-NO-SEATS-LEFT)
     ;; Process payment
-    ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
+    ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
     (match (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer
       (* PRICE-PER-SEAT actual-seats) tx-sender (as-contract tx-sender) none
     )
@@ -389,7 +389,7 @@
     (asserts! (> user-seats u0) ERR-NOT-SEAT-OWNER)
     (var-set target-owner tx-sender)
     ;; Process refund
-    ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
+    ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
     (match (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer
       (* PRICE-PER-SEAT user-seats) tx-sender seat-owner none
     ))
@@ -598,17 +598,17 @@
   (begin
     (var-set market-open true)
     (var-set governance-active true) ;; jason:  in core/action proposal, checks from create proposal, deadlocks anything happening
-    ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
+    ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
     (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer
       DEX-AMOUNT tx-sender DEX-DAO none
     )))
     ;; 0.00250000 BTC to DEX  
-    ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
+    ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
     (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer
       MULTI-SIG-AMOUNT tx-sender FAKTORY1 none
     )))
     ;; 0.00010000 BTC  -> covers contract deployment gaz fees
-    ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
+    ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
     (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer
       FEE-AMOUNT tx-sender FAKTORY1 none
     )))
@@ -729,7 +729,7 @@
     )
     ;; Only distribute if the user's share is greater than zero
     (if (> user-share u0)
-      ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
+      ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
       (match (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
         transfer user-share tx-sender holder none
       ))

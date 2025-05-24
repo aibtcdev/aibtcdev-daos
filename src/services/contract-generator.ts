@@ -158,6 +158,16 @@ export class ContractGeneratorService {
       const displayName = contract.name.replace("aibtc", tokenSymbol);
       contract.setDisplayName(displayName);
 
+      // Escape quotes and other special characters in the DAO mission statement if present
+      // Replace 'DAO_MISSION_STATEMENT' with the actual key used for the mission string
+      const missionKey = "DAO_MISSION_STATEMENT"; 
+      if (customReplacements && typeof customReplacements[missionKey] === 'string') {
+        const originalMission = customReplacements[missionKey];
+        // JSON.stringify escapes necessary characters and wraps the string in quotes.
+        // slice(1, -1) removes these outer quotes.
+        customReplacements[missionKey] = JSON.stringify(originalMission).slice(1, -1);
+      }
+
       // Generate replacements for the specified network
       const networkReplacements = generateTemplateReplacements(
         network,
