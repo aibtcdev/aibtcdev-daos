@@ -1,12 +1,35 @@
 import { StacksNetworkName } from "@stacks/network";
+import { validateStacksAddress } from "@stacks/transactions";
 import { getKnownTraits, KnownTraits } from "./known-traits";
-import { getKnownAddresses, KnownAddresses } from "./known-addresses";
+import { getKnownAddresses } from "./known-addresses";
 import {
   CONTRACT_TYPES,
   CONTRACT_SUBTYPES,
   CONTRACT_NAMES,
   ContractSubtype,
 } from "./contract-types";
+
+/**
+ * Prepends an apostrophe to a string if it's a valid Stacks principal.
+ * A principal can be a simple address (SP... or ST...) or a contract principal (SP...contract-name).
+ * @param value The string value to check and format.
+ * @returns The formatted string with a leading apostrophe if it's a principal, otherwise the original string.
+ */
+function formatIfPrincipal(value: string): string {
+  if (typeof value !== 'string') {
+    return value;
+  }
+  const parts = value.split(".");
+  if (parts.length > 0 && validateStacksAddress(parts[0])) {
+    // It's a principal, ensure only one leading apostrophe.
+    if (value.startsWith("'")) {
+      return value; // Already correctly formatted.
+    } else {
+      return `'${value}`; // Add the leading apostrophe.
+    }
+  }
+  return value; // Not a principal or not a string, return as is.
+}
 
 /**
  * Generate a complete set of template variable replacements for a given network
@@ -33,27 +56,28 @@ export function generateTemplateReplacements(
 
   // 2. Add all known traits in both formats
   Object.entries(traits).forEach(([key, value]) => {
-    replacements[key.toLowerCase()] = `'${value}`;
-    replacements[`trait_${key.toLowerCase()}`] = `'${value}`;
+    replacements[key.toLowerCase()] = value;
+    replacements[`trait_${key.toLowerCase()}`] = value;
 
     const traitParts = value.split(".");
     if (traitParts.length >= 2) {
       const contractPath = traitParts.slice(0, -1).join(".");
       const traitName = traitParts[traitParts.length - 1];
-      replacements[
-        `${contractPath}.${traitName}/trait_${key.toLowerCase()}`
-      ] = `'${value}`;
+      // The key itself should not be formatted, only the value
+      replacements[`${contractPath}.${traitName}/trait_${key.toLowerCase()}`] =
+        value;
     }
   });
 
   // Add BASE_SIP010 trait specifically
   const baseSip010Trait = traits["BASE_SIP010"];
   if (baseSip010Trait) {
-    replacements["base_trait_sip010"] = `'${baseSip010Trait}'`;
+    replacements["base_trait_sip010"] = baseSip010Trait;
     // Add the common toReplace pattern observed in the scanner output
+    // The key itself should not be formatted, only the value
     replacements[
       `SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010`
-    ] = `'${baseSip010Trait}'`;
+    ] = baseSip010Trait;
   }
 
   // Add specific template variable formats for traits as found in .clar files
@@ -145,8 +169,9 @@ export function generateTemplateReplacements(
     const traitValue = traits[mapping.knownTraitKey];
     if (traitValue) {
       const fullKey = `${mapping.templateToReplacePattern}/${mapping.templateKeyName}`;
-      replacements[fullKey] = `'${traitValue}'`;
-      replacements[mapping.templateKeyName] = `'${traitValue}'`;
+      // The key itself should not be formatted, only the value
+      replacements[fullKey] = traitValue;
+      replacements[mapping.templateKeyName] = traitValue;
     }
   });
 
@@ -242,19 +267,19 @@ export function generateTemplateReplacements(
   replacements["sbtc_contract"] = addresses.SBTC;
   replacements["sbtc_token_contract"] = addresses.SBTC;
   replacements["base_contract_sbtc"] = addresses.SBTC;
+
   replacements["external_bitflow_core"] = addresses.BITFLOW_CORE;
   replacements["bitflow_core_contract"] = addresses.BITFLOW_CORE; // For xyk-pool
-  replacements[`${addresses.BITFLOW_CORE}/bitflow_core_contract`] =
+  replacements[`${addresses.BITFLOW_CORE}/bitflow_core_contract`] = // Key not formatted
     addresses.BITFLOW_CORE; // Composite key for xyk-pool
 
-  replacements[
-    `.${templateKeySymbol}-run-cost/base_contract_dao_run_cost`
-  ] = `'${addresses.AIBTC_RUN_COST}'`; // Adjusted to use templateKeySymbol
-  replacements["base_contract_dao_run_cost"] = `'${addresses.AIBTC_RUN_COST}'`;
+  replacements[`.${templateKeySymbol}-run-cost/base_contract_dao_run_cost`] = // Key not formatted
+    addresses.AIBTC_RUN_COST; // Adjusted to use templateKeySymbol
+  replacements["base_contract_dao_run_cost"] = addresses.AIBTC_RUN_COST;
 
   // Add origin_address (typically deployer)
   replacements["origin_address"] = addresses.DEPLOYER;
-  replacements[`${addresses.DEPLOYER.split(".")[0]}/origin_address`] =
+  replacements[`${addresses.DEPLOYER.split(".")[0]}/origin_address`] = // Key not formatted
     addresses.DEPLOYER; // Matches the toReplace from error
 
   // Add specific contract name aliases if they differ from standard generation
@@ -281,12 +306,11 @@ export function generateTemplateReplacements(
   // Ideally, this should be added to KnownTraits for proper multi-network support.
   const faktoryDexTraitValue =
     network === "mainnet"
-      ? "MAINNET_FAKTORY_DEX_TRAIT_PLACEHOLDER"
+      ? "MAINNET_FAKTORY_DEX_TRAIT_PLACEHOLDER" // This might need formatting if it becomes a real principal
       : "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1.dex-trait";
-  replacements["faktory_dex_trait"] = `'${faktoryDexTraitValue}'`;
-  replacements[
-    `${faktoryDexTraitValue}/faktory_dex_trait`
-  ] = `'${faktoryDexTraitValue}'`;
+  replacements["faktory_dex_trait"] = faktoryDexTraitValue;
+  replacements[`${faktoryDexTraitValue}/faktory_dex_trait`] = // Key not formatted
+    faktoryDexTraitValue;
 
   // 6. Add DAO manifest
   replacements[
@@ -317,7 +341,7 @@ export function generateTemplateReplacements(
         templateKeyName = `agent_account_trait_${formattedKey}`;
       }
 
-      replacements[templateKeyName] = `'${traitValue}'`;
+      replacements[templateKeyName] = traitValue;
 
       // Construct the toReplace pattern based on templateKeySymbol and the specific parts of the agent trait name
       // e.g., for AGENT_ACCOUNT_PROPOSALS -> .aibtc-agent-account-traits.aibtc-proposals
@@ -328,27 +352,37 @@ export function generateTemplateReplacements(
         // The specific part (e.g. "aibtc-proposals") is derived from the known trait string.
         // The "agent-account-traits" part is assumed based on the error messages.
         const toReplacePattern = `.${templateKeySymbol}-agent-account-traits.${lastPart}`;
-        replacements[
-          `${toReplacePattern}/${templateKeyName}`
-        ] = `'${traitValue}'`;
+        replacements[`${toReplacePattern}/${templateKeyName}`] = traitValue; // Key not formatted
       }
     }
   });
 
-  replacements[`${addresses.DEPLOYER.split(".")[0]}/account_owner`] =
+  replacements[`${addresses.DEPLOYER.split(".")[0]}/account_owner`] = // Key not formatted
     addresses.DEPLOYER; // Adjusted for dynamic deployer prefix
   replacements["account_owner"] = addresses.DEPLOYER;
+
   // Assuming ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG is a fixed address or needs to be in known-addresses
   const defaultAgentAddress = "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG";
-  replacements[`${defaultAgentAddress.split(".")[0]}/account_agent`] =
+  replacements[`${defaultAgentAddress.split(".")[0]}/account_agent`] = // Key not formatted
     defaultAgentAddress;
   replacements["account_agent"] = defaultAgentAddress;
 
-  // 8. Merge with custom replacements (which take precedence)
-  return {
-    ...replacements,
-    ...customReplacements,
-  };
+  // 8. Merge custom replacements (raw values, these take precedence)
+  for (const key in customReplacements) {
+    if (Object.prototype.hasOwnProperty.call(customReplacements, key)) {
+      replacements[key] = customReplacements[key];
+    }
+  }
+
+  // 9. Format all values in the final replacements object
+  const finalReplacements: Record<string, string> = {};
+  for (const key in replacements) {
+    if (Object.prototype.hasOwnProperty.call(replacements, key)) {
+      finalReplacements[key] = formatIfPrincipal(replacements[key]);
+    }
+  }
+
+  return finalReplacements;
 }
 
 /**

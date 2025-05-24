@@ -11,7 +11,7 @@
 ;; traits
 ;;
 
-;; /g/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
+;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait sip010-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; constants
@@ -484,7 +484,7 @@
   (map-set Owners 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true) ;; tests
   (map-set Owners 'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND true) ;; tests
   ;; set initial assets
-  ;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_sbtc_contract
+  ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_sbtc_contract
   (map-set AllowedAssets 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
     true
   )

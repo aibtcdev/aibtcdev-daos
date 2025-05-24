@@ -10,7 +10,7 @@
 ;; /g/.aibtc-dao-traits.treasury/dao_trait_treasury
 (impl-trait .aibtc-dao-traits.treasury)
 
-;; /g/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
+;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait sip010-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; constants
@@ -28,7 +28,7 @@
 ;; template variables
 ;;
 
-;; /g/STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_token_contract
+;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_token_contract
 (define-constant CFG_SBTC_TOKEN 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token)
 ;; /g/.aibtc-faktory/dao_contract_token
 (define-constant CFG_DAO_TOKEN .aibtc-faktory)
@@ -41,8 +41,10 @@
   principal
   bool
 )
-(map-set AllowedAssets CFG_SBTC_TOKEN true) 
-(map-set AllowedAssets CFG_DAO_TOKEN true) ;; public functions;;
+(map-set AllowedAssets CFG_SBTC_TOKEN true)
+(map-set AllowedAssets CFG_DAO_TOKEN true)
+
+;; public functions
 (define-public (callback
     (sender principal)
     (memo (buff 34))
