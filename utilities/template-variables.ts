@@ -21,9 +21,14 @@ function formatIfPrincipal(value: string): string {
   }
   const parts = value.split(".");
   if (parts.length > 0 && validateStacksAddress(parts[0])) {
-    return `'${value}`;
+    // It's a principal, ensure only one leading apostrophe.
+    if (value.startsWith("'")) {
+      return value; // Already correctly formatted.
+    } else {
+      return `'${value}`; // Add the leading apostrophe.
+    }
   }
-  return value;
+  return value; // Not a principal or not a string, return as is.
 }
 
 /**
