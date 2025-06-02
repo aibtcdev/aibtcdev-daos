@@ -105,3 +105,28 @@ export interface GeneratedDaoContractsResponse {
     error: string;
   }>;
 }
+
+/**
+ * Clarity Contract Error Codes
+ * Provides access to Clarity smart contract error codes and their descriptions.
+ */
+import * as ClarityContractErrorEnums from "./clarity-contract-errors";
+import type {
+  EnrichedErrorCodeDetail, // Changed from ErrorCodeDetail
+  // ContractErrorMap is no longer the primary export type for this service
+} from "./contract-error-service";
+import {
+  getAllErrorDetails, // New function
+  getErrorsByContractDetails, // New function (renamed for clarity)
+  findErrorDetails, // New flexible search function
+  getErrorDescription, // Revised function
+} from "./contract-error-service";
+
+export type { EnrichedErrorCodeDetail }; // Exporting the new detail type
+export {
+  ClarityContractErrorEnums,
+  getAllErrorDetails,
+  getErrorsByContractDetails,
+  findErrorDetails,
+  getErrorDescription,
+};
