@@ -39,10 +39,10 @@ import type {
   ContractSubtype,
   AllContractSubtypes,
 } from "../../../utilities/contract-types";
-import { 
-  CONTRACT_NAMES, 
-  CONTRACT_TYPES, 
-  CONTRACT_SUBTYPES 
+import {
+  CONTRACT_NAMES,
+  CONTRACT_TYPES,
+  CONTRACT_SUBTYPES,
 } from "../../../utilities/contract-types";
 
 export type { ContractType, ContractSubtype, AllContractSubtypes };
@@ -105,3 +105,25 @@ export interface GeneratedDaoContractsResponse {
     error: string;
   }>;
 }
+
+/**
+ * Clarity Contract Error Codes
+ * Provides access to Clarity smart contract error codes and their descriptions.
+ */
+import * as ClarityContractErrorEnums from "./clarity-contract-errors";
+import type { EnrichedErrorCodeDetail } from "./contract-error-service";
+import {
+  getAllErrorDetails,
+  getErrorsByContractDetails,
+  findErrorDetails,
+  getErrorDescription,
+} from "./contract-error-service";
+
+export type { EnrichedErrorCodeDetail };
+export {
+  ClarityContractErrorEnums,
+  getAllErrorDetails,
+  getErrorsByContractDetails,
+  findErrorDetails,
+  getErrorDescription,
+};
