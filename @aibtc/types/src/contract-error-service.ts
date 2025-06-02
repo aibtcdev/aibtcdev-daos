@@ -1,8 +1,8 @@
 import {
   ContractType,
   ContractSubtype,
-  CONTRACT_NAMES, // Import CONTRACT_NAMES
-} from "../../../utilities/contract-types"; // Adjusted path
+  CONTRACT_NAMES,
+} from "../../../utilities/contract-types";
 import * as ClarityErrors from "./clarity-contract-errors";
 
 export interface EnrichedErrorCodeDetail {
@@ -43,8 +43,7 @@ const errorDefinitions: {
       enumObject: ClarityErrors.ErrCodeBaseDao,
       descriptions: {
         ERR_UNAUTHORIZED: "Sender is not authorized to perform this action.",
-        ERR_ALREADY_EXECUTED:
-          "The proposal or action has already been executed.",
+        ERR_ALREADY_EXECUTED: "The proposal has already been executed.",
         ERR_INVALID_EXTENSION:
           "The specified extension is not valid or recognized.",
         ERR_NO_EMPTY_LISTS: "Input lists cannot be empty.",
@@ -59,22 +58,28 @@ const errorDefinitions: {
       descriptions: {
         ERR_NOT_DAO_OR_EXTENSION:
           "Caller is not the DAO or an authorized extension.",
-        ERR_FETCHING_TOKEN_DATA: "Failed to fetch token data.",
-        ERR_INSUFFICIENT_BALANCE: "Insufficient token balance for the action.",
-        ERR_PROPOSAL_NOT_FOUND: "The specified proposal was not found.",
+        ERR_FETCHING_TOKEN_DATA: "Failed to fetch on-chain token data.",
+        ERR_INSUFFICIENT_BALANCE:
+          "Insufficient DAO token balance to create the proposal.",
+        ERR_PROPOSAL_NOT_FOUND: "The specified proposal ID was not found.",
         ERR_PROPOSAL_VOTING_ACTIVE: "Voting on the proposal is still active.",
         ERR_PROPOSAL_EXECUTION_DELAY:
           "Proposal execution delay has not passed.",
-        ERR_PROPOSAL_RATE_LIMIT: "Proposal creation rate limit exceeded.",
-        ERR_SAVING_PROPOSAL: "Failed to save the proposal.",
+        ERR_PROPOSAL_RATE_LIMIT:
+          "Proposal creation rate limit exceeded (only 1 per Bitcoin block).",
+        ERR_SAVING_PROPOSAL: "Failed to save the proposal details.",
         ERR_PROPOSAL_ALREADY_CONCLUDED:
           "The proposal has already been concluded.",
         ERR_RETRIEVING_START_BLOCK_HASH:
           "Failed to retrieve start block hash for voting.",
-        ERR_VOTE_TOO_SOON: "Vote cast before voting period started.",
-        ERR_VOTE_TOO_LATE: "Vote cast after voting period ended.",
-        ERR_ALREADY_VOTED: "The voter has already voted on this proposal.",
-        ERR_INVALID_ACTION: "The proposed action is invalid.",
+        ERR_VOTE_TOO_SOON:
+          "Vote cast before voting period started, or veto cast before veto period started.",
+        ERR_VOTE_TOO_LATE:
+          "Vote cast after voting period ended, or veto cast after veto period ended.",
+        ERR_ALREADY_VOTED:
+          "The voter has already cast a veto vote on this proposal.",
+        ERR_INVALID_ACTION:
+          "This contract or the proposed action contract is not an extension in the DAO.",
       },
     },
     DAO_CHARTER: {
