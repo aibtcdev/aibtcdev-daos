@@ -30,9 +30,11 @@ const errorDefinitions: {
       enumObject: ClarityErrors.ErrCodeAgentAccount,
       descriptions: {
         ERR_UNAUTHORIZED: "Sender is not authorized to perform this action.",
-        ERR_UNKNOWN_ASSET: "The specified asset is not recognized or supported.",
+        ERR_UNKNOWN_ASSET:
+          "The specified asset is not recognized or supported.",
         ERR_OPERATION_FAILED: "The requested operation failed to complete.",
-        ERR_BUY_SELL_NOT_ALLOWED: "Buying or selling is not currently allowed.",
+        ERR_BUY_SELL_NOT_ALLOWED:
+          "Buying or selling is not currently allowed by the agent.",
       },
     },
   },
@@ -40,11 +42,14 @@ const errorDefinitions: {
     DAO: {
       enumObject: ClarityErrors.ErrCodeBaseDao,
       descriptions: {
-        ERR_UNAUTHORIZED: "Sender is not authorized.",
-        ERR_ALREADY_EXECUTED: "The proposal or action has already been executed.",
-        ERR_INVALID_EXTENSION: "The specified extension is not valid or recognized.",
+        ERR_UNAUTHORIZED: "Sender is not authorized to perform this action.",
+        ERR_ALREADY_EXECUTED:
+          "The proposal or action has already been executed.",
+        ERR_INVALID_EXTENSION:
+          "The specified extension is not valid or recognized.",
         ERR_NO_EMPTY_LISTS: "Input lists cannot be empty.",
-        ERR_DAO_ALREADY_CONSTRUCTED: "The DAO has already been constructed/initialized.",
+        ERR_DAO_ALREADY_CONSTRUCTED:
+          "The DAO has already been constructed/initialized.",
       },
     },
   },
@@ -52,16 +57,20 @@ const errorDefinitions: {
     ACTION_PROPOSAL_VOTING: {
       enumObject: ClarityErrors.ErrCodeActionProposalVoting,
       descriptions: {
-        ERR_NOT_DAO_OR_EXTENSION: "Caller is not the DAO or an authorized extension.",
+        ERR_NOT_DAO_OR_EXTENSION:
+          "Caller is not the DAO or an authorized extension.",
         ERR_FETCHING_TOKEN_DATA: "Failed to fetch token data.",
         ERR_INSUFFICIENT_BALANCE: "Insufficient token balance for the action.",
         ERR_PROPOSAL_NOT_FOUND: "The specified proposal was not found.",
         ERR_PROPOSAL_VOTING_ACTIVE: "Voting on the proposal is still active.",
-        ERR_PROPOSAL_EXECUTION_DELAY: "Proposal execution delay has not passed.",
+        ERR_PROPOSAL_EXECUTION_DELAY:
+          "Proposal execution delay has not passed.",
         ERR_PROPOSAL_RATE_LIMIT: "Proposal creation rate limit exceeded.",
         ERR_SAVING_PROPOSAL: "Failed to save the proposal.",
-        ERR_PROPOSAL_ALREADY_CONCLUDED: "The proposal has already been concluded.",
-        ERR_RETRIEVING_START_BLOCK_HASH: "Failed to retrieve start block hash for voting.",
+        ERR_PROPOSAL_ALREADY_CONCLUDED:
+          "The proposal has already been concluded.",
+        ERR_RETRIEVING_START_BLOCK_HASH:
+          "Failed to retrieve start block hash for voting.",
         ERR_VOTE_TOO_SOON: "Vote cast before voting period started.",
         ERR_VOTE_TOO_LATE: "Vote cast after voting period ended.",
         ERR_ALREADY_VOTED: "The voter has already voted on this proposal.",
@@ -71,7 +80,8 @@ const errorDefinitions: {
     DAO_CHARTER: {
       enumObject: ClarityErrors.ErrCodeDaoCharter,
       descriptions: {
-        ERR_NOT_DAO_OR_EXTENSION: "Caller is not the DAO or an authorized extension.",
+        ERR_NOT_DAO_OR_EXTENSION:
+          "Caller is not the DAO or an authorized extension.",
         ERR_SAVING_CHARTER: "Failed to save the DAO charter.",
         ERR_CHARTER_TOO_SHORT: "The provided charter is too short.",
         ERR_CHARTER_TOO_LONG: "The provided charter is too long.",
@@ -80,36 +90,44 @@ const errorDefinitions: {
     DAO_USERS: {
       enumObject: ClarityErrors.ErrCodeDaoUsers,
       descriptions: {
-        ERR_NOT_DAO_OR_EXTENSION: "Caller is not the DAO or an authorized extension.",
+        ERR_NOT_DAO_OR_EXTENSION:
+          "Caller is not the DAO or an authorized extension.",
         ERR_USER_NOT_FOUND: "The specified user was not found.",
       },
     },
     ONCHAIN_MESSAGING: {
       enumObject: ClarityErrors.ErrCodeOnchainMessaging,
       descriptions: {
-        ERR_NOT_DAO_OR_EXTENSION: "Caller is not the DAO or an authorized extension.",
+        ERR_NOT_DAO_OR_EXTENSION:
+          "Caller is not the DAO or an authorized extension.",
         ERR_INVALID_INPUT: "The input provided for messaging is invalid.",
-        ERR_FETCHING_TOKEN_DATA: "Failed to fetch token data for messaging conditions.",
+        ERR_FETCHING_TOKEN_DATA:
+          "Failed to fetch token data for messaging conditions.",
       },
     },
     REWARDS_ACCOUNT: {
       enumObject: ClarityErrors.ErrCodeRewardsAccount,
       descriptions: {
-        ERR_NOT_DAO_OR_EXTENSION: "Caller is not the DAO or an authorized extension.",
-        ERR_INSUFFICIENT_BALANCE: "Insufficient balance in the rewards account.",
+        ERR_NOT_DAO_OR_EXTENSION:
+          "Caller is not the DAO or an authorized extension.",
+        ERR_INSUFFICIENT_BALANCE:
+          "Insufficient balance in the rewards account.",
       },
     },
     TOKEN_OWNER: {
       enumObject: ClarityErrors.ErrCodeTokenOwner,
       descriptions: {
-        ERR_NOT_DAO_OR_EXTENSION: "Caller is not the DAO or an authorized extension.",
+        ERR_NOT_DAO_OR_EXTENSION:
+          "Caller is not the DAO or an authorized extension.",
       },
     },
     TREASURY: {
       enumObject: ClarityErrors.ErrCodeTreasury,
       descriptions: {
-        ERR_NOT_DAO_OR_EXTENSION: "Caller is not the DAO or an authorized extension.",
-        ERR_ASSET_NOT_ALLOWED: "The specified asset is not allowed in the treasury.",
+        ERR_NOT_DAO_OR_EXTENSION:
+          "Caller is not the DAO or an authorized extension.",
+        ERR_ASSET_NOT_ALLOWED:
+          "The specified asset is not allowed in the treasury.",
       },
     },
   },
@@ -117,8 +135,10 @@ const errorDefinitions: {
     SEND_MESSAGE: {
       enumObject: ClarityErrors.ErrCodeActionSendMessage,
       descriptions: {
-        ERR_NOT_DAO_OR_EXTENSION: "Caller is not the DAO or an authorized extension.",
-        ERR_INVALID_PARAMETERS: "Invalid parameters provided for sending a message.",
+        ERR_NOT_DAO_OR_EXTENSION:
+          "Caller is not the DAO or an authorized extension.",
+        ERR_INVALID_PARAMETERS:
+          "Invalid parameters provided for sending a message.",
       },
     },
   },
@@ -132,10 +152,14 @@ function initializeErrorService(): void {
     const subtypesOfType = errorDefinitions[contractType];
     if (subtypesOfType) {
       for (const subtypeKey in subtypesOfType) {
-        const contractSubtype = subtypeKey as ContractSubtype<typeof contractType>;
+        const contractSubtype = subtypeKey as ContractSubtype<
+          typeof contractType
+        >;
         // The type assertion here is necessary because TypeScript can't infer
         // that subtypeKey is a valid key for subtypesOfType within this generic loop.
-        const definition = (subtypesOfType as any)[contractSubtype] as ContractSpecificErrorDefinition | undefined;
+        const definition = (subtypesOfType as any)[contractSubtype] as
+          | ContractSpecificErrorDefinition
+          | undefined;
 
         if (definition) {
           const officialContractName =
@@ -143,15 +167,20 @@ function initializeErrorService(): void {
             `${contractType}-${contractSubtype}-UnknownName`;
 
           for (const enumMemberName in definition.enumObject) {
-            if (isNaN(Number(enumMemberName))) { // Filter out reverse numeric mappings from enums
-              const numericCode = definition.enumObject[enumMemberName] as number;
+            if (isNaN(Number(enumMemberName))) {
+              // Filter out reverse numeric mappings from enums
+              const numericCode = definition.enumObject[
+                enumMemberName
+              ] as number;
               allErrorDetailsList.push({
                 contractType: contractType,
                 contractSubtype: contractSubtype,
                 contractName: officialContractName,
                 code: numericCode,
                 name: enumMemberName,
-                description: definition.descriptions[enumMemberName] || "No description available.",
+                description:
+                  definition.descriptions[enumMemberName] ||
+                  "No description available.",
               });
             }
           }
@@ -220,10 +249,10 @@ export function findErrorDetails(params: {
     let numericCode: number | undefined;
     let searchName: string | undefined;
 
-    if (typeof params.identifier === 'number') {
+    if (typeof params.identifier === "number") {
       numericCode = params.identifier;
-    } else if (typeof params.identifier === 'string') {
-      if (params.identifier.toLowerCase().startsWith('u')) {
+    } else if (typeof params.identifier === "string") {
+      if (params.identifier.toLowerCase().startsWith("u")) {
         const potentialCode = parseInt(params.identifier.substring(1), 10);
         if (!isNaN(potentialCode)) {
           numericCode = potentialCode;
@@ -231,12 +260,15 @@ export function findErrorDetails(params: {
           searchName = params.identifier; // Not a 'uXXXX' format, treat as name
         }
       } else {
-         // If it's a string that can be parsed as a number, treat it as a code.
+        // If it's a string that can be parsed as a number, treat it as a code.
         const potentialCode = parseInt(params.identifier, 10);
-        if (!isNaN(potentialCode) && String(potentialCode) === params.identifier) {
-            numericCode = potentialCode;
+        if (
+          !isNaN(potentialCode) &&
+          String(potentialCode) === params.identifier
+        ) {
+          numericCode = potentialCode;
         } else {
-            searchName = params.identifier; // Treat as name
+          searchName = params.identifier; // Treat as name
         }
       }
     }

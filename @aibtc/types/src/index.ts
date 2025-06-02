@@ -39,10 +39,10 @@ import type {
   ContractSubtype,
   AllContractSubtypes,
 } from "../../../utilities/contract-types";
-import { 
-  CONTRACT_NAMES, 
-  CONTRACT_TYPES, 
-  CONTRACT_SUBTYPES 
+import {
+  CONTRACT_NAMES,
+  CONTRACT_TYPES,
+  CONTRACT_SUBTYPES,
 } from "../../../utilities/contract-types";
 
 export type { ContractType, ContractSubtype, AllContractSubtypes };
