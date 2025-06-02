@@ -16,7 +16,7 @@ export interface EnrichedErrorCodeDetail {
 
 // Internal structure for defining errors, similar to contract-types.ts
 interface ContractSpecificErrorDefinition {
-  enumObject: Record<string, number>; // The error enum itself
+  enumObject: Record<string, string | number>; // The error enum itself
   descriptions: Record<string, string>; // Map of enum key (string) to its description
 }
 
@@ -144,7 +144,7 @@ function initializeErrorService(): void {
 
           for (const enumMemberName in definition.enumObject) {
             if (isNaN(Number(enumMemberName))) { // Filter out reverse numeric mappings from enums
-              const numericCode = definition.enumObject[enumMemberName];
+              const numericCode = definition.enumObject[enumMemberName] as number;
               allErrorDetailsList.push({
                 contractType: contractType,
                 contractSubtype: contractSubtype,
