@@ -1,3 +1,5 @@
+const testError = 
+
 /**
  * This file contains example contract templates for testing the template processor
  */
