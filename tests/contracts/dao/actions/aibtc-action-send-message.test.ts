@@ -66,7 +66,7 @@ describe(`public functions: ${contractName}`, () => {
     // pass the action proposal
     passActionProposal(
       "SEND_MESSAGE",
-      Cl.stringAscii(memo),
+      Cl.stringUtf8(memo),
       deployer,
       deployer,
       voters,
