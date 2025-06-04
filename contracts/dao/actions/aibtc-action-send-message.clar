@@ -27,7 +27,7 @@
 )
 
 (define-public (run (parameters (buff 2048)))
-  (let ((message (unwrap! (from-consensus-buff? (string-ascii 2043) parameters)
+  (let ((message (unwrap! (from-consensus-buff? (string-utf8 2043) parameters)
       ERR_INVALID_PARAMETERS
     )))
     (try! (is-dao-or-extension))
@@ -37,7 +37,7 @@
 )
 
 (define-public (check-parameters (parameters (buff 2048)))
-  (let ((message (unwrap! (from-consensus-buff? (string-ascii 2043) parameters)
+  (let ((message (unwrap! (from-consensus-buff? (string-utf8 2043) parameters)
       ERR_INVALID_PARAMETERS
     )))
     ;; check there is a message
