@@ -29,7 +29,7 @@ const intializeDaoAddress = registry.getContractAddressByTypeAndSubtype(
 const ErrCode = ErrCodeDaoCharter;
 
 const expectedDaoCharterVersion = Cl.uint(1);
-const expectedDaoCharterString = Cl.stringAscii("aibtc mission goes here");
+const expectedDaoCharterString = Cl.stringUtf8("aibtc mission goes here");
 const expectedDaoCharter = Cl.tuple({
   burnHeight: Cl.uint(4), // deployed btc block height
   caller: Cl.principal(intializeDaoAddress),
@@ -66,7 +66,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "set-dao-charter",
-      [Cl.stringAscii("Test Charter")],
+      [Cl.stringUtf8("Test Charter")],
       address1
     );
     // assert

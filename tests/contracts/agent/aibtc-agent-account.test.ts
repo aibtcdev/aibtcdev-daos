@@ -621,7 +621,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("create-action-proposal() fails if caller is not authorized (user or agent)", () => {
     // arrange
-    const message = Cl.stringAscii("hello world");
+    const message = Cl.stringUtf8("hello world");
     setupAgentAccount(deployer);
 
     // act
@@ -643,7 +643,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("create-action-proposal() succeeds when called by owner", () => {
     // arrange
-    const message = Cl.stringAscii("hello world");
+    const message = Cl.stringUtf8("hello world");
     setupAgentAccount(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
@@ -672,7 +672,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("create-action-proposal() emits the correct notification event", () => {
     // arrange
-    const message = Cl.stringAscii("hello world");
+    const message = Cl.stringUtf8("hello world");
     const expectedEvent = {
       notification: "aibtc-agent-account/create-action-proposal",
       payload: {
@@ -741,7 +741,7 @@ describe(`public functions: ${contractName}`, () => {
     constructDao(deployer);
 
     // Create a proposal first
-    const message = Cl.stringAscii("hello world");
+    const message = Cl.stringUtf8("hello world");
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -793,7 +793,7 @@ describe(`public functions: ${contractName}`, () => {
     constructDao(deployer);
 
     // Create a proposal first
-    const message = Cl.stringAscii("hello world");
+    const message = Cl.stringUtf8("hello world");
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -856,7 +856,7 @@ describe(`public functions: ${contractName}`, () => {
     fundVoters([deployer]);
     constructDao(deployer);
     // Create a proposal first
-    const message = Cl.stringAscii("hello world");
+    const message = Cl.stringUtf8("hello world");
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -897,7 +897,7 @@ describe(`public functions: ${contractName}`, () => {
     fundVoters([deployer]);
     constructDao(deployer);
     // Create a proposal first
-    const message = Cl.stringAscii("hello world");
+    const message = Cl.stringUtf8("hello world");
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -958,7 +958,7 @@ describe(`public functions: ${contractName}`, () => {
     constructDao(deployer);
 
     // Create a proposal first
-    const message = Cl.stringAscii("hello world");
+    const message = Cl.stringUtf8("hello world");
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -1025,7 +1025,7 @@ describe(`public functions: ${contractName}`, () => {
     constructDao(deployer);
 
     // Create a proposal first
-    const message = Cl.stringAscii("hello world");
+    const message = Cl.stringUtf8("hello world");
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -1800,7 +1800,7 @@ describe(`read-only functions: ${contractName}`, () => {
     constructDao(deployer);
 
     // Create a proposal first
-    const message = Cl.stringAscii("hello world");
+    const message = Cl.stringUtf8("hello world");
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",

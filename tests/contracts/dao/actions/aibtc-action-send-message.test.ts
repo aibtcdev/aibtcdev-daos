@@ -46,7 +46,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////
   it("run() fails if called directly", () => {
     // act
-    const message = Cl.stringAscii("hello world");
+    const message = Cl.stringUtf8("hello world");
     const receipt = simnet.callPublicFn(
       contractAddress,
       "run",
@@ -66,7 +66,7 @@ describe(`public functions: ${contractName}`, () => {
     // pass the action proposal
     passActionProposal(
       "SEND_MESSAGE",
-      Cl.stringAscii(memo),
+      Cl.stringUtf8(memo),
       deployer,
       deployer,
       voters,

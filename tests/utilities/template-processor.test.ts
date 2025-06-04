@@ -185,7 +185,7 @@ describe("Template Processor", () => {
 
     // Check that the replacements were made
     expect(processed).toContain(
-      '(define-constant CFG_DAO_MANIFEST_TEXT "The mission of this DAO is to test template processing")'
+      '(define-constant CFG_DAO_MANIFEST_TEXT u"The mission of this DAO is to test template processing")'
     );
     expect(processed).toContain(
       "(define-constant CFG_DAO_TOKEN .test-token-contract)"

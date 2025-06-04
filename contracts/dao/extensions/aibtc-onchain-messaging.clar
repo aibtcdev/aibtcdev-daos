@@ -25,7 +25,7 @@
   (ok true)
 )
 
-(define-public (send (msg (string-ascii 10000)))
+(define-public (send (msg (string-utf8 10000)))
   (let (
       (isFromDao (is-ok (is-dao-or-extension)))
       ;; /g/.aibtc-faktory/dao_contract_token
