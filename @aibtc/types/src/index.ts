@@ -53,11 +53,9 @@ export { CONTRACT_NAMES, CONTRACT_TYPES, CONTRACT_SUBTYPES };
  * These are used to define the types of responses that can be returned by the API.
  */
 
-// API Response interface
 import type { ApiResponse } from "../../../src/utils/response-utils";
 export type { ApiResponse };
 
-// API response types for specific endpoints
 export interface ContractTypesResponse {
   types: Record<string, string[]>;
 }
@@ -132,6 +130,25 @@ export {
  * Clarity Helpers
  * Provides utility functions for working with Clarity values, such as formatting serialized buffers.
  */
-
 import { formatSerializedBuffer } from "./clarity-helpers";
 export { formatSerializedBuffer };
+
+/**
+ * Proposal Status Types
+ * These types are used to represent the status of a proposal in the AIBTC DAO.
+ */
+import type { ProposalInputParams, ProposalStatus } from "./proposal-status";
+import {
+  getProposalStatus,
+  PROPOSAL_STATUSES,
+  verifyProposalInputParams,
+  isProposalStatus,
+} from "./proposal-status";
+
+export type { ProposalInputParams, ProposalStatus };
+export {
+  getProposalStatus,
+  PROPOSAL_STATUSES,
+  verifyProposalInputParams,
+  isProposalStatus,
+};
