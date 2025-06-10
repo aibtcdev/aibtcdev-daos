@@ -17,44 +17,44 @@
     (try! (contract-call? .aibtc-base-dao set-extensions
       (list
         ;; initial DAO extensions (features)
-        ;; /g/.aibtc-action-proposal-voting/dao_contract_action_proposal_voting
         {
+          ;; /g/.aibtc-action-proposal-voting/dao_contract_action_proposal_voting
           extension: .aibtc-action-proposal-voting,
           enabled: true,
         }
-        ;; /g/.aibtc-dao-charter/dao_contract_charter
         {
+          ;; /g/.aibtc-dao-charter/dao_contract_charter
           extension: .aibtc-dao-charter,
           enabled: true,
         }
-        ;; /g/.aibtc-dao-epoch/dao_contract_epoch
         {
+          ;; /g/.aibtc-dao-epoch/dao_contract_epoch
           extension: .aibtc-dao-epoch,
           enabled: true,
         }
-        ;; /g/.aibtc-dao-users/dao_contract_users
         {
+          ;; /g/.aibtc-dao-users/dao_contract_users
           extension: .aibtc-dao-users,
           enabled: true,
         }
-        ;; /g/.aibtc-onchain-messaging/dao_contract_messaging
         {
+          ;; /g/.aibtc-onchain-messaging/dao_contract_messaging
           extension: .aibtc-onchain-messaging,
           enabled: true,
         }
-        ;; /g/.aibtc-token-owner/dao_contract_token_owner
         {
+          ;; /g/.aibtc-token-owner/dao_contract_token_owner
           extension: .aibtc-token-owner,
           enabled: true,
         }
-        ;; /g/.aibtc-treasury/dao_contract_treasury
         {
+          ;; /g/.aibtc-treasury/dao_contract_treasury
           extension: .aibtc-treasury,
           enabled: true,
         }
         ;; initial action proposals (as extensions)
-        ;; /g/.aibtc-action-send-message/dao_action_send_message
         {
+          ;; /g/.aibtc-action-send-message/dao_action_send_message
           extension: .aibtc-action-send-message,
           enabled: true,
         }
