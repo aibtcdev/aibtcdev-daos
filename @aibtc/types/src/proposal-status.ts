@@ -1,24 +1,38 @@
 /**
- * Proposal Status Types
- * These types represent the possible statuses of a proposal in the AIBTC DAO.
- * They are used to track the lifecycle of a proposal from creation to execution.
+ * @file Defines types and helper functions for tracking the lifecycle and status of AIBTC DAO proposals.
+ * @packageDocumentation
  */
 
 /**
- * Base definition for a proposal, defines expected parameters
+ * Defines the input parameters required to determine the status of a DAO proposal.
+ * These parameters represent key block heights and timing details in a proposal's lifecycle.
  */
-
 export interface ProposalInputParams {
+  /** The current Bitcoin block height. */
   current_btc_block: number;
+  /** The Bitcoin block height at which voting is scheduled to start. */
   vote_start: number;
+  /** The Bitcoin block height at which voting is scheduled to end. */
   vote_end: number;
+  /** The duration (in blocks) of the delay before voting can begin after proposal creation. */
   voting_delay: number;
+  /** The duration (in blocks) of the voting period. */
   voting_period: number;
+  /** The Bitcoin block height at which the proposal becomes executable. */
   exec_start: number;
+  /** The Bitcoin block height at which the proposal execution window closes. */
   exec_end: number;
+  /** Optional flag indicating if the proposal has been successfully concluded. Defaults to false. */
   concluded?: boolean;
 }
 
+/**
+ * Verifies if the provided object conforms to the {@link ProposalInputParams} interface.
+ * This is a utility function that checks for the presence and correct types of required properties.
+ *
+ * @param proposalInputParams - The object to be verified.
+ * @returns `true` if the object is a valid `ProposalInputParams`, `false` otherwise.
+ */
 export function verifyProposalInputParams(
   proposalInputParams: ProposalInputParams
 ): boolean {
@@ -35,9 +49,9 @@ export function verifyProposalInputParams(
 }
 
 /**
- * Proposal lifecycle status
+ * A constant array of all possible proposal statuses.
+ * This defines the complete set of states a proposal can be in throughout its lifecycle.
  */
-
 export const PROPOSAL_STATUSES = [
   "created", // until we confirm the TX is mined
   "voting_delay", // after proposal is created, but before voting starts
@@ -48,10 +62,23 @@ export const PROPOSAL_STATUSES = [
   "concluded", // proposal is concluded, final state
 ] as const;
 
+/**
+ * Represents the status of a DAO proposal.
+ * The status is derived from the {@link PROPOSAL_STATUSES} constant array.
+ *
+ * @example
+ * ```
+ * let currentStatus: ProposalStatus = "voting_active";
+ * ```
+ */
 export type ProposalStatus = (typeof PROPOSAL_STATUSES)[number];
 
 /**
- * Helper function to get the status of a proposal
+ * Calculates the current status of a proposal based on its timing parameters and the current block height.
+ *
+ * @param proposalInputParams - An object containing the proposal's timing data and the current block height.
+ * @returns The calculated `ProposalStatus` for the given proposal.
+ * @throws {Error} If the `proposalInputParams` object is invalid or missing required properties.
  */
 export function getProposalStatus(
   proposalInputParams: ProposalInputParams
@@ -101,6 +128,19 @@ export function getProposalStatus(
   return "created";
 }
 
+/**
+ * A type guard function to check if a given string is a valid `ProposalStatus`.
+ *
+ * @param status - The string to check.
+ * @returns `true` if the string is a valid `ProposalStatus`, otherwise `false`.
+ *
+ * @example
+ * ```
+ * if (isProposalStatus(userInput)) {
+ *   // userInput is now typed as ProposalStatus
+ * }
+ * ```
+ */
 export function isProposalStatus(status: string): status is ProposalStatus {
   return PROPOSAL_STATUSES.includes(status as ProposalStatus);
 }
