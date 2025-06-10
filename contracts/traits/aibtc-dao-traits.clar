@@ -98,7 +98,7 @@
 ;; used to guide decision-making and proposals
 (define-trait dao-charter (
   (set-dao-charter
-    ((string-ascii 4096))
+    ((string-utf8 4096))
     (response bool uint)
   )
 ))
@@ -136,7 +136,7 @@
 ;; messages can verifiably indicate the sender is the dao by using a proposal
 (define-trait messaging (
   (send
-    ((string-ascii 10000))
+    ((string-utf8 10000))
     (response bool uint)
   )
 ))

@@ -27,7 +27,7 @@
 ;; data vars
 ;;
 
-(define-data-var daoCharter (string-ascii 4096) "")
+(define-data-var daoCharter (string-utf8 4096) u"")
 (define-data-var currentVersion uint u0)
 
 ;; data maps
@@ -40,7 +40,7 @@
     createdAt: uint, ;; block height
     caller: principal, ;; contract caller
     sender: principal, ;; tx-sender
-    charter: (string-ascii 4096), ;; charter text
+    charter: (string-utf8 4096), ;; charter text
   }
 )
 
@@ -54,7 +54,7 @@
   (ok true)
 )
 
-(define-public (set-dao-charter (charter (string-ascii 4096)))
+(define-public (set-dao-charter (charter (string-utf8 4096)))
   (let ((newVersion (+ (var-get currentVersion) u1)))
     ;; check if sender is dao or extension
     (try! (is-dao-or-extension))
@@ -119,9 +119,9 @@
 ;; private functions
 ;;
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_contract_base
   (ok (asserts!
     (or
+      ;; /g/.aibtc-base-dao/dao_contract_base
       (is-eq tx-sender .aibtc-base-dao)
       ;; /g/.aibtc-base-dao/dao_contract_base
       (contract-call? .aibtc-base-dao is-extension contract-caller)
