@@ -4,8 +4,8 @@ import { DEVNET_DEPLOYER, SBTC_CONTRACT } from "./contract-helpers";
 import { setupDaoContractRegistry } from "./contract-registry";
 import { dbgLog } from "./debug-logging";
 
-export const VOTING_DELAY = 144;
-export const VOTING_PERIOD = 288;
+export const VOTING_DELAY = 1;
+export const VOTING_PERIOD = 3;
 
 // Create a singleton registry instance for use in helpers
 const registry = setupDaoContractRegistry();
