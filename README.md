@@ -1,5 +1,7 @@
 # AIBTC DAO Platform
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/aibtcdev/aibtcdev-daos)
+
 A decentralized autonomous organization (DAO) platform built on the Stacks blockchain.
 
 ## Purpose
