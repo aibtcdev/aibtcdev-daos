@@ -1482,7 +1482,7 @@ describe(`public functions: ${contractName}`, () => {
     const dex = tokenDexContractAddress;
     const asset = daoTokenAddress;
     const expectedEvent = {
-      notification: "aibtc-agent-account/acct-buy-asset",
+      notification: "aibtc-agent-account/faktory-buy-asset",
       payload: {
         dexContract: dex,
         asset: asset,
@@ -1623,7 +1623,7 @@ describe(`public functions: ${contractName}`, () => {
     const dex = tokenDexContractAddress;
     const asset = daoTokenAddress;
     const expectedEvent = {
-      notification: "aibtc-agent-account/acct-sell-asset",
+      notification: "aibtc-agent-account/faktory-sell-asset",
       payload: {
         dexContract: dex,
         asset: asset,
@@ -1756,7 +1756,7 @@ describe(`read-only functions: ${contractName}`, () => {
     expect(configData).toEqual(expectedConfig);
   });
 
-  it("agent can buy assets when authorized", () => {
+  it("agent can buy/sell assets when authorized and fails when revoked", () => {
     // arrange
     setupAgentAccount(deployer);
     const amount = 1000000;
@@ -1773,7 +1773,7 @@ describe(`read-only functions: ${contractName}`, () => {
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // Enable agent buy/sell
-    const permissionReceipt = simnet.callPublicFn(
+    let permissionReceipt = simnet.callPublicFn(
       contractAddress,
       "set-agent-can-buy-sell-assets",
       [Cl.bool(true)],
@@ -1791,11 +1791,31 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
+
+    // Revoke agent buy/sell
+    permissionReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-buy-sell-assets",
+      [Cl.bool(false)],
+      deployer
+    );
+    expect(permissionReceipt.result).toBeOk(Cl.bool(true));
+
+    // act - agent calls buy function again
+    const receipt2 = simnet.callPublicFn(
+      contractAddress,
+      "faktory-buy-asset",
+      [Cl.principal(dex), Cl.principal(asset), Cl.uint(amount)],
+      address2 // agent address
+    );
+
+    // assert
+    expect(receipt2.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
   });
 
-  it("agent can vote on proposals when authorized", () => {
+  it("agent can use proposals when authorized and fails when revoked", () => {
     // arrange
-    const proposalId = 1;
+    let proposalId = 1;
     const vote = true;
     setupAgentAccount(deployer);
     fundVoters([deployer]);
@@ -1811,7 +1831,7 @@ describe(`read-only functions: ${contractName}`, () => {
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // Owner enables agent to use proposals
-    const permissionReceipt = simnet.callPublicFn(
+    let permissionReceipt = simnet.callPublicFn(
       contractAddress,
       "set-agent-can-use-proposals",
       [Cl.bool(true)],
@@ -1851,14 +1871,57 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
+
+    // Revoke agent proposal permission
+    permissionReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-use-proposals",
+      [Cl.bool(false)],
+      deployer
+    );
+    expect(permissionReceipt.result).toBeOk(Cl.bool(true));
+
+    // Create a second proposal
+    proposalId = 2;
+    const createProposalReceipt2 = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.principal(sendMessageActionContractAddress),
+        formatSerializedBuffer(message),
+        Cl.some(Cl.stringAscii("Test memo 2")),
+      ],
+      deployer // owner still has to create it
+    );
+    expect(createProposalReceipt2.result).toBeOk(Cl.bool(true));
+
+    // progress chain into voting period
+    simnet.mineEmptyBlocks(VOTING_DELAY);
+
+    // act - agent votes on second proposal
+    const receipt2 = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(proposalId),
+        Cl.bool(vote),
+      ],
+      address2 // agent address
+    );
+
+    // assert
+    expect(receipt2.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
   });
 
-  it("agent can approve contracts when authorized", () => {
+  it("agent can approve/revoke contracts when authorized and fails when revoked", () => {
     // arrange
     const newContract = `${deployer}.some-new-contract`;
+    const anotherContract = `${deployer}.another-new-contract`;
 
     // Owner enables agent to approve/revoke contracts
-    const permissionReceipt = simnet.callPublicFn(
+    let permissionReceipt = simnet.callPublicFn(
       contractAddress,
       "set-agent-can-approve-revoke-contracts",
       [Cl.bool(true)],
@@ -1883,5 +1946,25 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
     expect(isApproved.result).toStrictEqual(Cl.bool(true));
+
+    // Revoke agent permission
+    permissionReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-approve-revoke-contracts",
+      [Cl.bool(false)],
+      deployer
+    );
+    expect(permissionReceipt.result).toBeOk(Cl.bool(true));
+
+    // act - agent tries to approve another contract
+    const receipt2 = simnet.callPublicFn(
+      contractAddress,
+      "approve-contract",
+      [Cl.principal(anotherContract)],
+      address2 // agent address
+    );
+
+    // assert
+    expect(receipt2.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
   });
 });

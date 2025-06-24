@@ -245,7 +245,7 @@
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
-      notification: "aibtc-agent-account/acct-buy-asset",
+      notification: "aibtc-agent-account/faktory-buy-asset",
       payload: {
         dexContract: (contract-of faktory-dex),
         asset: (contract-of asset),
@@ -271,7 +271,7 @@
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
-      notification: "aibtc-agent-account/acct-sell-asset",
+      notification: "aibtc-agent-account/faktory-sell-asset",
       payload: {
         dexContract: (contract-of faktory-dex),
         asset: (contract-of asset),
