@@ -1051,6 +1051,81 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
   });
 
+  it("conclude-action-proposal() fails if contract is not approved", () => {
+    // arrange
+    const proposalId = 1;
+    setupAgentAccount(deployer);
+    fundVoters([deployer]);
+    constructDao(deployer);
+
+    // approve the proposal contract to create the proposal
+    const approveReceipt = simnet.callPublicFn(
+      contractAddress,
+      "approve-contract",
+      [Cl.principal(actionProposalsContractAddress)],
+      deployer
+    );
+    expect(approveReceipt.result).toBeOk(Cl.bool(true));
+
+    // Create a proposal first
+    const message = Cl.stringUtf8("hello world");
+    const createProposalReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.principal(sendMessageActionContractAddress),
+        formatSerializedBuffer(message),
+        Cl.some(Cl.stringAscii("Test memo")),
+      ],
+      deployer
+    );
+    expect(createProposalReceipt.result).toBeOk(Cl.bool(true));
+
+    // progress chain into voting period
+    simnet.mineEmptyBlocks(VOTING_DELAY);
+
+    // Vote on the proposal
+    const voteReceipt = simnet.callPublicFn(
+      contractAddress,
+      "vote-on-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(proposalId),
+        Cl.bool(true),
+      ],
+      deployer
+    );
+    expect(voteReceipt.result).toBeOk(Cl.bool(true));
+
+    // progress chain into execution period
+    simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY);
+
+    // revoke the proposal contract approval
+    const revokeReceipt = simnet.callPublicFn(
+      contractAddress,
+      "revoke-contract",
+      [Cl.principal(actionProposalsContractAddress)],
+      deployer
+    );
+    expect(revokeReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "conclude-action-proposal",
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(proposalId),
+        Cl.principal(sendMessageActionContractAddress),
+      ],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_CONTRACT_NOT_APPROVED));
+  });
+
   it("conclude-action-proposal() succeeds when called by owner", () => {
     // arrange
     const proposalId = 1;
