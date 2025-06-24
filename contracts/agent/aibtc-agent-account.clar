@@ -36,10 +36,9 @@
 (define-constant ACCOUNT_AGENT 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG) ;; agent (can only take approved actions)
 
 ;; error codes
-(define-constant ERR_UNAUTHORIZED (err u1100))
+(define-constant ERR_CALLER_NOT_OWNER (err u1100))
 (define-constant ERR_CONTRACT_NOT_APPROVED (err u1101))
-(define-constant ERR_OPERATION_FAILED (err u1102))
-(define-constant ERR_BUY_SELL_NOT_ALLOWED (err u1103))
+(define-constant ERR_OPERATION_NOT_ALLOWED (err u1103))
 
 ;; data maps
 (define-map ApprovedContracts
@@ -94,7 +93,7 @@
 ;; only the owner can withdraw STX from this contract
 (define-public (withdraw-stx (amount uint))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) ERR_CALLER_NOT_OWNER)
     (print {
       notification: "aibtc-agent-account/withdraw-stx",
       payload: {
@@ -114,7 +113,7 @@
     (amount uint)
   )
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) ERR_CALLER_NOT_OWNER)
     (asserts! (is-approved-contract (contract-of ft)) ERR_CONTRACT_NOT_APPROVED)
     (print {
       notification: "aibtc-agent-account/withdraw-ft",
@@ -140,7 +139,7 @@
     (memo (optional (string-ascii 1024)))
   )
   (begin
-    (asserts! (use-proposals-allowed) ERR_UNAUTHORIZED)
+    (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)
     (asserts! (is-approved-contract (contract-of votingContract))
       ERR_CONTRACT_NOT_APPROVED
     )
@@ -165,7 +164,7 @@
     (vote bool)
   )
   (begin
-    (asserts! (use-proposals-allowed) ERR_UNAUTHORIZED)
+    (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)
     (asserts! (is-approved-contract (contract-of votingContract))
       ERR_CONTRACT_NOT_APPROVED
     )
@@ -189,7 +188,7 @@
     (proposalId uint)
   )
   (begin
-    (asserts! (use-proposals-allowed) ERR_UNAUTHORIZED)
+    (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)
     (asserts! (is-approved-contract (contract-of votingContract))
       ERR_CONTRACT_NOT_APPROVED
     )
@@ -213,7 +212,7 @@
     (action <action-trait>)
   )
   (begin
-    (asserts! (use-proposals-allowed) ERR_UNAUTHORIZED)
+    (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)
     (asserts! (is-approved-contract (contract-of votingContract))
       ERR_CONTRACT_NOT_APPROVED
     )
@@ -241,7 +240,7 @@
     (amount uint)
   )
   (begin
-    (asserts! (buy-sell-tokens-allowed) ERR_BUY_SELL_NOT_ALLOWED)
+    (asserts! (buy-sell-tokens-allowed) ERR_OPERATION_NOT_ALLOWED)
     (asserts! (is-approved-contract (contract-of faktory-dex))
       ERR_CONTRACT_NOT_APPROVED
     )
@@ -267,7 +266,7 @@
     (amount uint)
   )
   (begin
-    (asserts! (buy-sell-tokens-allowed) ERR_BUY_SELL_NOT_ALLOWED)
+    (asserts! (buy-sell-tokens-allowed) ERR_OPERATION_NOT_ALLOWED)
     (asserts! (is-approved-contract (contract-of faktory-dex))
       ERR_CONTRACT_NOT_APPROVED
     )
@@ -290,7 +289,7 @@
 ;; the owner can set whether the agent can use proposals
 (define-public (set-agent-can-use-proposals (canUseProposals bool))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) ERR_CALLER_NOT_OWNER)
     (print {
       notification: "aibtc-agent-account/set-agent-can-use-proposals",
       payload: {
@@ -306,7 +305,7 @@
 ;; the owner can set whether the agent can approve/revoke contracts
 (define-public (set-agent-can-approve-revoke-contracts (canApproveRevokeContracts bool))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) ERR_CALLER_NOT_OWNER)
     (print {
       notification: "aibtc-agent-account/set-agent-can-approve-revoke-contracts",
       payload: {
@@ -322,7 +321,7 @@
 ;; the owner can set whether the agent can buy/sell tokens
 (define-public (set-agent-can-buy-sell-assets (canBuySell bool))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (is-owner) ERR_CALLER_NOT_OWNER)
     (print {
       notification: "aibtc-agent-account/set-agent-can-buy-sell-assets",
       payload: {
@@ -338,7 +337,7 @@
 ;; the owner or the agent (if enabled) can approve a contract for use with the agent account
 (define-public (approve-contract (contract principal))
   (begin
-    (asserts! (approve-revoke-contract-allowed) ERR_UNAUTHORIZED)
+    (asserts! (approve-revoke-contract-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/approve-contract",
       payload: {
@@ -355,7 +354,7 @@
 ;; the owner or the agent (if enabled) can revoke a contract from use with the agent account
 (define-public (revoke-contract (contract principal))
   (begin
-    (asserts! (approve-revoke-contract-allowed) ERR_UNAUTHORIZED)
+    (asserts! (approve-revoke-contract-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/revoke-contract",
       payload: {
