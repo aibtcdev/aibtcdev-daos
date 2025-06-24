@@ -1,5 +1,5 @@
 ;; title: aibtc-agent-account
-;; version: 1.0.0
+;; version: 2.0.0
 ;; summary: A special account contract between a user and an agent for managing assets and DAO interactions. Only the user can withdraw funds.
 
 ;; traits
@@ -35,37 +35,26 @@
 ;; /g/'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG/account_agent
 (define-constant ACCOUNT_AGENT 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG) ;; agent (can only take approved actions)
 
-;; pre-approved contracts
-;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
-(define-constant SBTC_TOKEN 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token) ;; sBTC token
-;; /g/.aibtc-faktory/dao_contract_token
-(define-constant DAO_TOKEN .aibtc-faktory) ;; DAO token
-;; /g/.aibtc-faktory-dex/dao_contract_token_dex
-(define-constant DAO_TOKEN_DEX .aibtc-faktory-dex) ;; DAO token DEX
-
 ;; error codes
 (define-constant ERR_UNAUTHORIZED (err u1100))
-(define-constant ERR_UNKNOWN_ASSET (err u1101))
+(define-constant ERR_CONTRACT_NOT_APPROVED (err u1101))
 (define-constant ERR_OPERATION_FAILED (err u1102))
 (define-constant ERR_BUY_SELL_NOT_ALLOWED (err u1103))
 
 ;; data maps
-(define-map ApprovedAssets
-  principal
-  bool
-)
-(define-map ApprovedDexes
+(define-map ApprovedContracts
   principal
   bool
 )
 
 ;; data vars
-(define-data-var agentCanBuySell bool false)
+(define-data-var agentCanUseProposals bool false)
+(define-data-var agentCanApproveRevokeContracts bool false)
+(define-data-var agentCanBuySellTokens bool false)
 
 ;; public functions
 
-;; Asset Management Functions
-
+;; anyone can deposit STX to this contract
 (define-public (deposit-stx (amount uint))
   (begin
     (print {
@@ -81,12 +70,13 @@
   )
 )
 
+;; anyone can deposit FT to this contract if the asset contract is approved
 (define-public (deposit-ft
     (ft <ft-trait>)
     (amount uint)
   )
   (begin
-    (asserts! (is-approved-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
+    (asserts! (is-approved-contract (contract-of ft)) ERR_CONTRACT_NOT_APPROVED)
     (print {
       notification: "aibtc-agent-account/deposit-ft",
       payload: {
@@ -101,6 +91,7 @@
   )
 )
 
+;; only the owner can withdraw STX from this contract
 (define-public (withdraw-stx (amount uint))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
@@ -117,13 +108,14 @@
   )
 )
 
+;; only the owner can withdraw FT from this contract if the asset contract is approved
 (define-public (withdraw-ft
     (ft <ft-trait>)
     (amount uint)
   )
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (asserts! (is-approved-asset (contract-of ft)) ERR_UNKNOWN_ASSET)
+    (asserts! (is-approved-contract (contract-of ft)) ERR_CONTRACT_NOT_APPROVED)
     (print {
       notification: "aibtc-agent-account/withdraw-ft",
       payload: {
@@ -138,120 +130,134 @@
   )
 )
 
-(define-public (approve-asset (asset principal))
+;; the owner or the agent (if enabled) can approve a contract for use with the agent account
+(define-public (approve-contract (contract principal))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (approve-revoke-contract-allowed) ERR_UNAUTHORIZED)
     (print {
-      notification: "aibtc-agent-account/approve-asset",
+      notification: "aibtc-agent-account/approve-contract",
       payload: {
-        asset: asset,
+        contract: contract,
         approved: true,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (ok (map-set ApprovedAssets asset true))
+    (ok (map-set ApprovedContracts asset true))
   )
 )
 
+;; the owner or the agent (if enabled) can revoke a contract from use with the agent account
 (define-public (revoke-asset (asset principal))
   (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (asserts! (approve-revoke-contract-allowed) ERR_UNAUTHORIZED)
     (print {
-      notification: "aibtc-agent-account/revoke-asset",
+      notification: "aibtc-agent-account/revoke-contract",
       payload: {
-        asset: asset,
+        contract: contract,
         approved: false,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (ok (map-set ApprovedAssets asset false))
+    (ok (map-set ApprovedContracts asset false))
   )
 )
 
 ;; DAO Interaction Functions
 
 (define-public (create-action-proposal
-    (voting-contract <action-proposal-voting-trait>)
+    (votingContract <action-proposal-voting-trait>)
     (action <action-trait>)
     (parameters (buff 2048))
     (memo (optional (string-ascii 1024)))
   )
   (begin
-    (asserts! (is-authorized) ERR_UNAUTHORIZED)
+    (asserts! (use-proposals-allowed) ERR_UNAUTHORIZED)
+    (asserts! (is-approved-contract (contract-of votingContract))
+      ERR_CONTRACT_NOT_APPROVED
+    )
     (print {
       notification: "aibtc-agent-account/create-action-proposal",
       payload: {
-        proposalContract: (contract-of voting-contract),
+        proposalContract: (contract-of votingContract),
         action: (contract-of action),
         parameters: parameters,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (as-contract (contract-call? voting-contract create-action-proposal action parameters memo))
+    (as-contract (contract-call? votingContract create-action-proposal action parameters memo))
   )
 )
 
 (define-public (vote-on-action-proposal
-    (voting-contract <action-proposal-voting-trait>)
+    (votingContract <action-proposal-voting-trait>)
     (proposalId uint)
     (vote bool)
   )
   (begin
-    (asserts! (is-authorized) ERR_UNAUTHORIZED)
+    (asserts! (use-proposals-allowed) ERR_UNAUTHORIZED)
+    (asserts! (is-approved-contract (contract-of votingContract))
+      ERR_CONTRACT_NOT_APPROVED
+    )
     (print {
       notification: "aibtc-agent-account/vote-on-action-proposal",
       payload: {
-        proposalContract: (contract-of voting-contract),
+        proposalContract: (contract-of votingContract),
         proposalId: proposalId,
         vote: vote,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (as-contract (contract-call? voting-contract vote-on-action-proposal proposalId vote))
+    (as-contract (contract-call? votingContract vote-on-action-proposal proposalId vote))
   )
 )
 
 (define-public (veto-action-proposal
-    (voting-contract <action-proposal-voting-trait>)
+    (votingContract <action-proposal-voting-trait>)
     (proposalId uint)
   )
   (begin
-    (asserts! (is-authorized) ERR_UNAUTHORIZED)
+    (asserts! (use-proposals-allowed) ERR_UNAUTHORIZED)
+    (asserts! (is-approved-contract (contract-of votingContract))
+      ERR_CONTRACT_NOT_APPROVED
+    )
     (print {
       notification: "aibtc-agent-account/veto-action-proposal",
       payload: {
-        proposalContract: (contract-of voting-contract),
+        proposalContract: (contract-of votingContract),
         proposalId: proposalId,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (as-contract (contract-call? voting-contract veto-action-proposal proposalId))
+    (as-contract (contract-call? votingContract veto-action-proposal proposalId))
   )
 )
 
 (define-public (conclude-action-proposal
-    (voting-contract <action-proposal-voting-trait>)
+    (votingContract <action-proposal-voting-trait>)
     (proposalId uint)
     (action <action-trait>)
   )
   (begin
-    (asserts! (is-authorized) ERR_UNAUTHORIZED)
+    (asserts! (use-proposals-allowed) ERR_UNAUTHORIZED)
+    (asserts! (is-approved-contract (contract-of votingContract))
+      ERR_CONTRACT_NOT_APPROVED
+    )
     (print {
       notification: "aibtc-agent-account/conclude-action-proposal",
       payload: {
-        proposalContract: (contract-of voting-contract),
+        proposalContract: (contract-of votingContract),
         proposalId: proposalId,
         action: (contract-of action),
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (as-contract (contract-call? voting-contract conclude-action-proposal proposalId action))
+    (as-contract (contract-call? votingContract conclude-action-proposal proposalId action))
   )
 )
 
@@ -263,8 +269,10 @@
     (amount uint)
   )
   (begin
-    (asserts! (buy-sell-allowed) ERR_BUY_SELL_NOT_ALLOWED)
-    (asserts! (is-approved-dex (contract-of faktory-dex)) ERR_UNKNOWN_ASSET)
+    (asserts! (buy-sell-tokens-allowed) ERR_BUY_SELL_NOT_ALLOWED)
+    (asserts! (is-approved-contract (contract-of faktory-dex))
+      ERR_CONTRACT_NOT_APPROVED
+    )
     (print {
       notification: "aibtc-agent-account/acct-buy-asset",
       payload: {
@@ -285,8 +293,10 @@
     (amount uint)
   )
   (begin
-    (asserts! (buy-sell-allowed) ERR_BUY_SELL_NOT_ALLOWED)
-    (asserts! (is-approved-dex (contract-of faktory-dex)) ERR_UNKNOWN_ASSET)
+    (asserts! (buy-sell-tokens-allowed) ERR_BUY_SELL_NOT_ALLOWED)
+    (asserts! (is-approved-contract (contract-of faktory-dex))
+      ERR_CONTRACT_NOT_APPROVED
+    )
     (print {
       notification: "aibtc-agent-account/acct-sell-asset",
       payload: {
@@ -301,38 +311,6 @@
   )
 )
 
-(define-public (acct-approve-dex (faktory-dex <dao-faktory-dex>))
-  (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (print {
-      notification: "aibtc-agent-account/acct-approve-dex",
-      payload: {
-        dexContract: (contract-of faktory-dex),
-        approved: true,
-        sender: tx-sender,
-        caller: contract-caller,
-      },
-    })
-    (ok (map-set ApprovedDexes (contract-of faktory-dex) true))
-  )
-)
-
-(define-public (acct-revoke-dex (faktory-dex <dao-faktory-dex>))
-  (begin
-    (asserts! (is-owner) ERR_UNAUTHORIZED)
-    (print {
-      notification: "aibtc-agent-account/acct-revoke-dex",
-      payload: {
-        dexContract: (contract-of faktory-dex),
-        approved: false,
-        sender: tx-sender,
-        caller: contract-caller,
-      },
-    })
-    (ok (map-set ApprovedDexes (contract-of faktory-dex) false))
-  )
-)
-
 (define-public (set-agent-can-buy-sell (canBuySell bool))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
@@ -344,18 +322,14 @@
         caller: contract-caller,
       },
     })
-    (ok (var-set agentCanBuySell canBuySell))
+    (ok (var-set agentCanBuySellTokens canBuySell))
   )
 )
 
 ;; read only functions
 
-(define-read-only (is-approved-asset (asset principal))
-  (default-to false (map-get? ApprovedAssets asset))
-)
-
-(define-read-only (is-approved-dex (dex principal))
-  (default-to false (map-get? ApprovedDexes dex))
+(define-read-only (is-approved-contract (contract principal))
+  (default-to false (map-get? ApprovedContracts contract))
 )
 
 (define-read-only (get-configuration)
@@ -371,10 +345,6 @@
 
 ;; private functions
 
-(define-private (is-authorized)
-  (or (is-eq contract-caller ACCOUNT_OWNER) (is-eq contract-caller ACCOUNT_AGENT))
-)
-
 (define-private (is-owner)
   (is-eq contract-caller ACCOUNT_OWNER)
 )
@@ -383,15 +353,23 @@
   (is-eq contract-caller ACCOUNT_AGENT)
 )
 
-(define-private (buy-sell-allowed)
-  (or (is-owner) (and (is-agent) (var-get agentCanBuySell)))
+(define-private (is-authorized)
+  (or (is-owner) (is-agent))
+)
+
+(define-private (use-proposals-allowed)
+  (or (is-owner) (and (is-agent) (var-get agentCanUseProposals)))
+)
+
+(define-private (approve-revoke-contract-allowed)
+  (or (is-owner) (and (is-agent) (var-get agentCanApproveRevokeContracts)))
+)
+
+(define-private (buy-sell-tokens-allowed)
+  (or (is-owner) (and (is-agent) (var-get agentCanBuySellTokens)))
 )
 
 (begin
-  ;; initialize approved contracts
-  (map-set ApprovedAssets SBTC_TOKEN true)
-  (map-set ApprovedAssets DAO_TOKEN true)
-  (map-set ApprovedDexes DAO_TOKEN_DEX true)
   ;; print creation event
   (print {
     notification: "aibtc-agent-account/user-agent-account-created",
