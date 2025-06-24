@@ -7,8 +7,6 @@
 (impl-trait .aibtc-agent-account-traits.aibtc-account)
 ;; /g/.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals
 (impl-trait .aibtc-agent-account-traits.aibtc-proposals)
-;; /g/.aibtc-agent-account-traits.faktory-dex-approval/agent_account_trait_faktory_dex_approval
-(impl-trait .aibtc-agent-account-traits.faktory-dex-approval)
 ;; /g/.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell
 (impl-trait .aibtc-agent-account-traits.faktory-buy-sell)
 ;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
@@ -127,40 +125,6 @@
       },
     })
     (as-contract (contract-call? ft transfer amount SELF ACCOUNT_OWNER none))
-  )
-)
-
-;; the owner or the agent (if enabled) can approve a contract for use with the agent account
-(define-public (approve-contract (contract principal))
-  (begin
-    (asserts! (approve-revoke-contract-allowed) ERR_UNAUTHORIZED)
-    (print {
-      notification: "aibtc-agent-account/approve-contract",
-      payload: {
-        contract: contract,
-        approved: true,
-        sender: tx-sender,
-        caller: contract-caller,
-      },
-    })
-    (ok (map-set ApprovedContracts contract true))
-  )
-)
-
-;; the owner or the agent (if enabled) can revoke a contract from use with the agent account
-(define-public (revoke-contract (contract principal))
-  (begin
-    (asserts! (approve-revoke-contract-allowed) ERR_UNAUTHORIZED)
-    (print {
-      notification: "aibtc-agent-account/revoke-contract",
-      payload: {
-        contract: contract,
-        approved: false,
-        sender: tx-sender,
-        caller: contract-caller,
-      },
-    })
-    (ok (map-set ApprovedContracts contract false))
   )
 )
 
@@ -366,6 +330,40 @@
       },
     })
     (ok (var-set agentCanBuySellTokens canBuySell))
+  )
+)
+
+;; the owner or the agent (if enabled) can approve a contract for use with the agent account
+(define-public (approve-contract (contract principal))
+  (begin
+    (asserts! (approve-revoke-contract-allowed) ERR_UNAUTHORIZED)
+    (print {
+      notification: "aibtc-agent-account/approve-contract",
+      payload: {
+        contract: contract,
+        approved: true,
+        sender: tx-sender,
+        caller: contract-caller,
+      },
+    })
+    (ok (map-set ApprovedContracts contract true))
+  )
+)
+
+;; the owner or the agent (if enabled) can revoke a contract from use with the agent account
+(define-public (revoke-contract (contract principal))
+  (begin
+    (asserts! (approve-revoke-contract-allowed) ERR_UNAUTHORIZED)
+    (print {
+      notification: "aibtc-agent-account/revoke-contract",
+      payload: {
+        contract: contract,
+        approved: false,
+        sender: tx-sender,
+        caller: contract-caller,
+      },
+    })
+    (ok (map-set ApprovedContracts contract false))
   )
 )
 

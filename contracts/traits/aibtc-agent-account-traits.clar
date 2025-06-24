@@ -29,14 +29,6 @@
     (<sip010-trait> uint)
     (response bool uint)
   )
-  (approve-asset
-    (principal)
-    (response bool uint)
-  )
-  (revoke-asset
-    (principal)
-    (response bool uint)
-  )
 ))
 
 (define-trait aibtc-proposals (
@@ -58,13 +50,13 @@
   )
 ))
 
-(define-trait faktory-dex-approval (
-  (acct-approve-dex
-    (<dao-faktory-dex>)
+(define-trait aibtc-account-config (
+    (approve-asset
+    (principal)
     (response bool uint)
   )
-  (acct-revoke-dex
-    (<dao-faktory-dex>)
+  (revoke-asset
+    (principal)
     (response bool uint)
   )
 ))
