@@ -50,24 +50,36 @@
   )
 ))
 
-(define-trait aibtc-account-config (
-    (approve-asset
-    (principal)
+(define-trait faktory-buy-sell (
+  (faktory-buy-asset
+    (<dao-faktory-dex> <faktory-token> uint)
     (response bool uint)
   )
-  (revoke-asset
-    (principal)
+  (faktory-sell-asset
+    (<dao-faktory-dex> <faktory-token> uint)
     (response bool uint)
   )
 ))
 
-(define-trait faktory-buy-sell (
-  (acct-buy-asset
-    (<dao-faktory-dex> <faktory-token> uint)
+(define-trait aibtc-account-config (
+  (set-agent-can-use-proposals
+    (bool)
     (response bool uint)
   )
-  (acct-sell-asset
-    (<dao-faktory-dex> <faktory-token> uint)
+  (set-agent-can-approve-revoke-contracts
+    (bool)
+    (response bool uint)
+  )
+  (set-agent-can-buy-sell-assets
+    (bool)
+    (response bool uint)
+  )
+  (approve-contract
+    (principal)
+    (response bool uint)
+  )
+  (revoke-contract
+    (principal)
     (response bool uint)
   )
 ))
