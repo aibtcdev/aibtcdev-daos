@@ -392,10 +392,6 @@
   (is-eq contract-caller ACCOUNT_AGENT)
 )
 
-(define-private (is-authorized)
-  (or (is-owner) (is-agent))
-)
-
 (define-private (use-proposals-allowed)
   (or (is-owner) (and (is-agent) (var-get agentCanUseProposals)))
 )
