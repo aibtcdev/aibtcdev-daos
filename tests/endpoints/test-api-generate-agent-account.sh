@@ -14,9 +14,7 @@ test_api_generate_agent_account() {
         "tokenSymbol":"AIBTC",
         "customReplacements": {
             "account_owner": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
-            "account_agent": "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
-            "dao_contract_token": "ST000000000000000000002AMW42H.aibtc-token",
-            "dao_contract_token_dex": "ST000000000000000000002AMW42H.aibtc-faktory-dex"
+            "account_agent": "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG"
         }
     }'
     
@@ -97,9 +95,7 @@ test_api_generate_agent_account() {
         "network":"devnet",
         "tokenSymbol":"AIBTC",
         "customReplacements": {
-            "account_agent": "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
-            "dao_contract_token": "ST000000000000000000002AMW42H.aibtc-token",
-            "dao_contract_token_dex": "ST000000000000000000002AMW42H.aibtc-faktory-dex"
+            "account_agent": "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG"
         }
     }'
     
@@ -125,9 +121,7 @@ test_api_generate_agent_account() {
         "network":"devnet",
         "tokenSymbol":"AIBTC",
         "customReplacements": {
-            "account_owner": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
-            "dao_contract_token": "ST000000000000000000002AMW42H.aibtc-token",
-            "dao_contract_token_dex": "ST000000000000000000002AMW42H.aibtc-faktory-dex"
+            "account_owner": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
         }
     }'
     

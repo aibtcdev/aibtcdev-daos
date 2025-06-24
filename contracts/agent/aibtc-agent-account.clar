@@ -49,7 +49,7 @@
 ;; data vars
 (define-data-var agentCanUseProposals bool false)
 (define-data-var agentCanApproveRevokeContracts bool false)
-(define-data-var agentCanBuySellTokens bool false)
+(define-data-var agentCanBuySellAssets bool false)
 
 ;; public functions
 
@@ -81,8 +81,8 @@
       payload: {
         amount: amount,
         assetContract: (contract-of ft),
-        sender: tx-sender,
-        caller: contract-caller,
+        txSender: tx-sender,
+        contractCaller: contract-caller,
         recipient: SELF,
       },
     })
@@ -240,7 +240,7 @@
     (amount uint)
   )
   (begin
-    (asserts! (buy-sell-tokens-allowed) ERR_OPERATION_NOT_ALLOWED)
+    (asserts! (buy-sell-assets-allowed) ERR_OPERATION_NOT_ALLOWED)
     (asserts! (is-approved-contract (contract-of faktory-dex))
       ERR_CONTRACT_NOT_APPROVED
     )
@@ -266,7 +266,7 @@
     (amount uint)
   )
   (begin
-    (asserts! (buy-sell-tokens-allowed) ERR_OPERATION_NOT_ALLOWED)
+    (asserts! (buy-sell-assets-allowed) ERR_OPERATION_NOT_ALLOWED)
     (asserts! (is-approved-contract (contract-of faktory-dex))
       ERR_CONTRACT_NOT_APPROVED
     )
@@ -330,7 +330,7 @@
         caller: contract-caller,
       },
     })
-    (ok (var-set agentCanBuySellTokens canBuySell))
+    (ok (var-set agentCanBuySellAssets canBuySell))
   )
 )
 
@@ -404,8 +404,8 @@
   (or (is-owner) (and (is-agent) (var-get agentCanApproveRevokeContracts)))
 )
 
-(define-private (buy-sell-tokens-allowed)
-  (or (is-owner) (and (is-agent) (var-get agentCanBuySellTokens)))
+(define-private (buy-sell-assets-allowed)
+  (or (is-owner) (and (is-agent) (var-get agentCanBuySellAssets)))
 )
 
 (begin

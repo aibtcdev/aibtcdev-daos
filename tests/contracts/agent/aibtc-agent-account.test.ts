@@ -244,8 +244,8 @@ describe(`public functions: ${contractName}`, () => {
       payload: {
         amount: amount.toString(),
         assetContract: SBTC_CONTRACT,
-        sender: deployer,
-        caller: deployer,
+        txSender: deployer,
+        contractCaller: deployer,
         recipient: contractAddress,
       },
     };
