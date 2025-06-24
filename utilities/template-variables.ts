@@ -321,7 +321,7 @@ export function generateTemplateReplacements(
   // 7. Add agent account specific replacements
   const agentTraitKeys: (keyof KnownTraits)[] = [
     "AGENT_ACCOUNT",
-    "AGENT_FAKTORY_DEX_APPROVAL",
+    "AGENT_ACCOUNT_CONFIG",
     "AGENT_ACCOUNT_PROPOSALS",
     "AGENT_FAKTORY_BUY_SELL",
   ];
