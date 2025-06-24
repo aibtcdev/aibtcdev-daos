@@ -7,6 +7,8 @@
 (impl-trait .aibtc-agent-account-traits.aibtc-account)
 ;; /g/.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals
 (impl-trait .aibtc-agent-account-traits.aibtc-proposals)
+;; /g/.aibtc-agent-account-traits.aibtc-account-config/agent_account_trait_account_config
+(impl-trait .aibtc-agent-account-traits.aibtc-account-config)
 ;; /g/.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell
 (impl-trait .aibtc-agent-account-traits.faktory-buy-sell)
 ;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
@@ -318,11 +320,11 @@
 )
 
 ;; the owner can set whether the agent can buy/sell tokens
-(define-public (set-agent-can-buy-sell (canBuySell bool))
+(define-public (set-agent-can-buy-sell-assets (canBuySell bool))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
     (print {
-      notification: "aibtc-agent-account/set-agent-can-buy-sell",
+      notification: "aibtc-agent-account/set-agent-can-buy-sell-assets",
       payload: {
         canBuySell: canBuySell,
         sender: tx-sender,
