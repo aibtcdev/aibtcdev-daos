@@ -143,12 +143,12 @@
         caller: contract-caller,
       },
     })
-    (ok (map-set ApprovedContracts asset true))
+    (ok (map-set ApprovedContracts contract true))
   )
 )
 
 ;; the owner or the agent (if enabled) can revoke a contract from use with the agent account
-(define-public (revoke-asset (asset principal))
+(define-public (revoke-contract (contract principal))
   (begin
     (asserts! (approve-revoke-contract-allowed) ERR_UNAUTHORIZED)
     (print {
@@ -160,12 +160,13 @@
         caller: contract-caller,
       },
     })
-    (ok (map-set ApprovedContracts asset false))
+    (ok (map-set ApprovedContracts contract false))
   )
 )
 
 ;; DAO Interaction Functions
 
+;; the owner or the agent (if enabled) can create proposals if the proposal voting contract is approved
 (define-public (create-action-proposal
     (votingContract <action-proposal-voting-trait>)
     (action <action-trait>)
@@ -191,6 +192,7 @@
   )
 )
 
+;; the owner or the agent (if enabled) can vote on action proposals if the proposal voting contract is approved
 (define-public (vote-on-action-proposal
     (votingContract <action-proposal-voting-trait>)
     (proposalId uint)
@@ -215,6 +217,7 @@
   )
 )
 
+;; the owner or the agent (if enabled) can veto action proposals if the proposal voting contract is approved
 (define-public (veto-action-proposal
     (votingContract <action-proposal-voting-trait>)
     (proposalId uint)
@@ -237,6 +240,7 @@
   )
 )
 
+;; the owner or the agent (if enabled) can conclude action proposals if the proposal voting contract is approved
 (define-public (conclude-action-proposal
     (votingContract <action-proposal-voting-trait>)
     (proposalId uint)
@@ -263,7 +267,9 @@
 
 ;; Faktory DEX Trading Functions
 
-(define-public (acct-buy-asset
+;; the owner or the agent (if enabled) can buy assets on the Faktory DEX if the DEX contract is approved
+;; requires sBTC to be deposited in the agent account
+(define-public (faktory-buy-asset
     (faktory-dex <dao-faktory-dex>)
     (asset <faktory-token>)
     (amount uint)
@@ -287,7 +293,9 @@
   )
 )
 
-(define-public (acct-sell-asset
+;; the owner or the agent (if enabled) can sell assets on the Faktory DEX if the DEX contract is approved
+;; requires the asset to be deposited in the agent account
+(define-public (faktory-sell-asset
     (faktory-dex <dao-faktory-dex>)
     (asset <faktory-token>)
     (amount uint)
@@ -311,6 +319,41 @@
   )
 )
 
+;; Agent Account Configuration Functions
+
+;; the owner can set whether the agent can use proposals
+(define-public (set-agent-can-use-proposals (canUseProposals bool))
+  (begin
+    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (print {
+      notification: "aibtc-agent-account/set-agent-can-use-proposals",
+      payload: {
+        canUseProposals: canUseProposals,
+        sender: tx-sender,
+        caller: contract-caller,
+      },
+    })
+    (ok (var-set agentCanUseProposals canUseProposals))
+  )
+)
+
+;; the owner can set whether the agent can approve/revoke contracts
+(define-public (set-agent-can-approve-revoke-contracts (canApproveRevokeContracts bool))
+  (begin
+    (asserts! (is-owner) ERR_UNAUTHORIZED)
+    (print {
+      notification: "aibtc-agent-account/set-agent-can-approve-revoke-contracts",
+      payload: {
+        canApproveRevokeContracts: canApproveRevokeContracts,
+        sender: tx-sender,
+        caller: contract-caller,
+      },
+    })
+    (ok (var-set agentCanApproveRevokeContracts canApproveRevokeContracts))
+  )
+)
+
+;; the owner can set whether the agent can buy/sell tokens
 (define-public (set-agent-can-buy-sell (canBuySell bool))
   (begin
     (asserts! (is-owner) ERR_UNAUTHORIZED)
@@ -337,9 +380,6 @@
     account: SELF,
     agent: ACCOUNT_AGENT,
     owner: ACCOUNT_OWNER,
-    daoToken: DAO_TOKEN,
-    daoTokenDex: DAO_TOKEN_DEX,
-    sbtcToken: SBTC_TOKEN,
   }
 )
 
