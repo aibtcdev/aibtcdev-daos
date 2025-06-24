@@ -31,7 +31,7 @@ type DaoTraits = {
 type AgentTraits = {
   AGENT_ACCOUNT: string;
   AGENT_ACCOUNT_PROPOSALS: string;
-  AGENT_FAKTORY_DEX_APPROVAL: string;
+  AGENT_ACCOUNT_CONFIG: string;
   AGENT_FAKTORY_BUY_SELL: string;
 };
 
@@ -82,10 +82,10 @@ const mainnetTraits: KnownTraits = {
   // Agent traits
   AGENT_ACCOUNT:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-account",
-  AGENT_FAKTORY_DEX_APPROVAL:
-    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.faktory-dex-approval",
   AGENT_ACCOUNT_PROPOSALS:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-proposals",
+  AGENT_ACCOUNT_CONFIG:
+    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-account-config",
   AGENT_FAKTORY_BUY_SELL:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.faktory-buy-sell",
 };
@@ -134,10 +134,10 @@ const testnetTraits: KnownTraits = {
   // Agent traits
   AGENT_ACCOUNT:
     "ST2RGXKTT1ME8DPKHZAVDWKYWRM0CWZ6EGC8GDNGC.aibtc-agent-account-traits.aibtc-account",
-  AGENT_FAKTORY_DEX_APPROVAL:
-    "ST2RGXKTT1ME8DPKHZAVDWKYWRM0CWZ6EGC8GDNGC.aibtc-agent-account-traits.faktory-dex-approval",
   AGENT_ACCOUNT_PROPOSALS:
     "ST2RGXKTT1ME8DPKHZAVDWKYWRM0CWZ6EGC8GDNGC.aibtc-agent-account-traits.aibtc-proposals",
+  AGENT_ACCOUNT_CONFIG:
+    "ST2RGXKTT1ME8DPKHZAVDWKYWRM0CWZ6EGC8GDNGC.aibtc-agent-account-traits.aibtc-account-config",
   AGENT_FAKTORY_BUY_SELL:
     "ST2RGXKTT1ME8DPKHZAVDWKYWRM0CWZ6EGC8GDNGC.aibtc-agent-account-traits.faktory-buy-sell",
 };
@@ -184,10 +184,10 @@ const devnetTraits: KnownTraits = {
   // Agent traits
   AGENT_ACCOUNT:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account",
-  AGENT_FAKTORY_DEX_APPROVAL:
-    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.faktory-dex-approval",
   AGENT_ACCOUNT_PROPOSALS:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-proposals",
+  AGENT_ACCOUNT_CONFIG:
+    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-config",
   AGENT_FAKTORY_BUY_SELL:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.faktory-buy-sell",
 };
