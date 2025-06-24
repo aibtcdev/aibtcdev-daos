@@ -1589,7 +1589,11 @@ describe(`public functions: ${contractName}`, () => {
   it("faktory-sell-asset() succeeds when called by owner with approved contract", () => {
     // arrange
     setupAgentAccount(deployer);
-    const amount = 100000000000;
+
+    // Get the actual balance of the agent account
+    const agentBalances = getBalancesForPrincipal(contractAddress);
+    const agentDaoTokenBalance = agentBalances.get(DAO_TOKEN_ASSETS_MAP)!;
+    expect(agentDaoTokenBalance).toBeGreaterThan(0);
 
     // Approve the dex contract
     const approveReceipt = simnet.callPublicFn(
@@ -1607,7 +1611,7 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(tokenDexContractAddress),
         Cl.principal(daoTokenAddress),
-        Cl.uint(amount),
+        Cl.uint(agentDaoTokenBalance),
       ],
       deployer
     );
@@ -1619,7 +1623,11 @@ describe(`public functions: ${contractName}`, () => {
   it("faktory-sell-asset() emits the correct notification event", () => {
     // arrange
     setupAgentAccount(deployer);
-    const amount = "1000000";
+
+    const agentBalances = getBalancesForPrincipal(contractAddress);
+    const agentDaoTokenBalance = agentBalances.get(DAO_TOKEN_ASSETS_MAP)!;
+    expect(agentDaoTokenBalance).toBeGreaterThan(0);
+
     const dex = tokenDexContractAddress;
     const asset = daoTokenAddress;
     const expectedEvent = {
@@ -1627,7 +1635,7 @@ describe(`public functions: ${contractName}`, () => {
       payload: {
         dexContract: dex,
         asset: asset,
-        amount: amount,
+        amount: agentDaoTokenBalance.toString(),
         sender: deployer,
         caller: deployer,
       },
@@ -1646,7 +1654,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "faktory-sell-asset",
-      [Cl.principal(dex), Cl.principal(asset), Cl.uint(amount)],
+      [Cl.principal(dex), Cl.principal(asset), Cl.uint(agentDaoTokenBalance)],
       deployer
     );
 
