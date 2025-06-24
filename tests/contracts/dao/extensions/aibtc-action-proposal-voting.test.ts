@@ -73,7 +73,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(`${deployer}.unknown-action`),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       address1
@@ -112,7 +112,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -124,7 +124,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -140,7 +140,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -158,7 +158,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       address1
@@ -177,7 +177,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -212,7 +212,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -235,7 +235,7 @@ describe(`public functions: ${contractName}`, () => {
     fundVoters([deployer]);
     passActionProposal(
       "SEND_MESSAGE",
-      Cl.stringAscii("test"),
+      Cl.stringUtf8("test"),
       deployer,
       deployer,
       [deployer]
@@ -262,7 +262,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -288,7 +288,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -316,7 +316,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -351,7 +351,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -378,7 +378,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -435,7 +435,7 @@ describe(`public functions: ${contractName}`, () => {
     fundVoters([deployer]);
     passActionProposal(
       "SEND_MESSAGE",
-      Cl.stringAscii("test"),
+      Cl.stringUtf8("test"),
       deployer,
       deployer,
       [deployer]
@@ -462,7 +462,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -488,7 +488,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -516,7 +516,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -551,7 +551,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -596,7 +596,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -630,7 +630,7 @@ describe(`public functions: ${contractName}`, () => {
     fundVoters([deployer]);
     passActionProposal(
       "SEND_MESSAGE",
-      Cl.stringAscii("test"),
+      Cl.stringUtf8("test"),
       deployer,
       deployer,
       [deployer]
@@ -657,7 +657,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -692,7 +692,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -729,7 +729,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer
@@ -766,7 +766,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(actionContractAddress),
-        formatSerializedBuffer(Cl.stringAscii("test")),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
       deployer

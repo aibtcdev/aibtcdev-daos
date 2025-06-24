@@ -47,7 +47,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "send",
-      [Cl.stringAscii("")],
+      [Cl.stringUtf8("")],
       address1
     );
     // assert
@@ -60,7 +60,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "send",
-      [Cl.stringAscii("Test message")],
+      [Cl.stringUtf8("Test message")],
       address1
     );
     // assert
