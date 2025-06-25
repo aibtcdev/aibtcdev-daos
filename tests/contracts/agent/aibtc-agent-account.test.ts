@@ -1843,6 +1843,7 @@ describe(`read-only functions: ${contractName}`, () => {
       account: contractAddress,
       agent: address2,
       owner: deployer,
+      sbtc: SBTC_CONTRACT,
     };
 
     // act
