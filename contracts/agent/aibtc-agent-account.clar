@@ -47,15 +47,16 @@
 )
 
 ;; data vars
-(define-data-var agentCanUseProposals bool false)
-(define-data-var agentCanApproveRevokeContracts bool false)
+(define-data-var agentCanUseProposals bool true)
+(define-data-var agentCanApproveRevokeContracts bool true)
 (define-data-var agentCanBuySellAssets bool false)
 
 ;; public functions
 
-;; anyone can deposit STX to this contract
+;; the owner or agent can deposit STX to this contract
 (define-public (deposit-stx (amount uint))
   (begin
+    (asserts! (is-owner-or-agent-sender) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/deposit-stx",
       payload: {
@@ -69,12 +70,13 @@
   )
 )
 
-;; anyone can deposit FT to this contract if the asset contract is approved
+;; the owner or agent can deposit FT to this contract if the asset contract is approved
 (define-public (deposit-ft
     (ft <ft-trait>)
     (amount uint)
   )
   (begin
+    (asserts! (is-owner-or-agent-sender) ERR_OPERATION_NOT_ALLOWED)
     (asserts! (is-approved-contract (contract-of ft)) ERR_CONTRACT_NOT_APPROVED)
     (print {
       notification: "aibtc-agent-account/deposit-ft",
@@ -390,6 +392,13 @@
 
 (define-private (is-agent)
   (is-eq contract-caller ACCOUNT_AGENT)
+)
+
+(define-private (is-owner-or-agent-sender)
+  (or
+    (is-eq tx-sender ACCOUNT_OWNER)
+    (is-eq tx-sender ACCOUNT_AGENT)
+  )
 )
 
 (define-private (use-proposals-allowed)
