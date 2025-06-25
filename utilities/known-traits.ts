@@ -133,13 +133,13 @@ const testnetTraits: KnownTraits = {
     "ST2RGXKTT1ME8DPKHZAVDWKYWRM0CWZ6EGC8GDNGC.aibtc-dao-traits.dao-users",
   // Agent traits
   AGENT_ACCOUNT:
-    "ST2RGXKTT1ME8DPKHZAVDWKYWRM0CWZ6EGC8GDNGC.aibtc-agent-account-traits.aibtc-account",
+    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-account",
   AGENT_ACCOUNT_PROPOSALS:
-    "ST2RGXKTT1ME8DPKHZAVDWKYWRM0CWZ6EGC8GDNGC.aibtc-agent-account-traits.aibtc-proposals",
+    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-proposals",
   AGENT_ACCOUNT_CONFIG:
-    "ST2RGXKTT1ME8DPKHZAVDWKYWRM0CWZ6EGC8GDNGC.aibtc-agent-account-traits.aibtc-account-config",
+    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-account-config",
   AGENT_FAKTORY_BUY_SELL:
-    "ST2RGXKTT1ME8DPKHZAVDWKYWRM0CWZ6EGC8GDNGC.aibtc-agent-account-traits.faktory-buy-sell",
+    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.faktory-buy-sell",
 };
 
 const devnetTraits: KnownTraits = {
