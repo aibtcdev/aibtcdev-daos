@@ -53,7 +53,7 @@
 
 ;; public functions
 
-;; anyone can deposit STX to this contract
+;; the owner or agent can deposit STX to this contract
 (define-public (deposit-stx (amount uint))
   (begin
     (asserts! (is-owner-or-agent-sender) ERR_OPERATION_NOT_ALLOWED)
@@ -70,7 +70,7 @@
   )
 )
 
-;; anyone can deposit FT to this contract if the asset contract is approved
+;; the owner or agent can deposit FT to this contract if the asset contract is approved
 (define-public (deposit-ft
     (ft <ft-trait>)
     (amount uint)

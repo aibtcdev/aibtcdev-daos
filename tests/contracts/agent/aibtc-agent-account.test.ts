@@ -120,6 +120,22 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // deposit-stx() tests
   ////////////////////////////////////////
+  it("deposit-stx() fails if caller is not the owner or agent", () => {
+    // arrange
+    const amount = 1000000; // 1 STX
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "deposit-stx",
+      [Cl.uint(amount)],
+      address3
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
+  });
+
   it("deposit-stx() succeeds and deposits STX to the agent account", () => {
     // arrange
     const agentAccountBalances = getBalancesForPrincipal(contractAddress);
@@ -176,6 +192,22 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // deposit-ft() tests
   ////////////////////////////////////////
+  it("deposit-ft() fails if caller is not the owner or agent", () => {
+    // arrange
+    const amount = 10000000;
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "deposit-ft",
+      [Cl.principal(SBTC_CONTRACT), Cl.uint(amount)],
+      address3
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
+  });
+
   it("deposit-ft() fails if contract is not approved", () => {
     // arrange
     const amount = 10000000;
