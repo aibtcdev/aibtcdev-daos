@@ -387,6 +387,7 @@
     account: SELF,
     agent: ACCOUNT_AGENT,
     owner: ACCOUNT_OWNER,
+    sbtc: SBTC_TOKEN,
   }
 )
 
