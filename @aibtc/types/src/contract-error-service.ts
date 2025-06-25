@@ -29,12 +29,12 @@ const errorDefinitions: {
     AGENT_ACCOUNT: {
       enumObject: ClarityErrors.ErrCodeAgentAccount,
       descriptions: {
-        ERR_UNAUTHORIZED: "Sender is not authorized to perform this action.",
-        ERR_UNKNOWN_ASSET:
-          "The specified asset is not recognized or supported.",
-        ERR_OPERATION_FAILED: "The requested operation failed to complete.",
-        ERR_BUY_SELL_NOT_ALLOWED:
-          "Buying or selling is not currently allowed by the agent.",
+        ERR_CALLER_NOT_OWNER:
+          "The caller is not the owner of the agent account.",
+        ERR_CONTRACT_NOT_APPROVED:
+          "The specified contract is not approved for interaction.",
+        ERR_OPERATION_NOT_ALLOWED:
+          "The requested operation is not allowed for the caller.",
       },
     },
   },

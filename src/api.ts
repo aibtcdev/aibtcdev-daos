@@ -476,8 +476,6 @@ export function createApiRouter(registry: ContractRegistry) {
         validateCustomReplacements(customReplacements, [
           "account_owner",
           "account_agent",
-          "dao_contract_token",
-          "dao_contract_token_dex",
         ]);
 
         if (!contractName) {

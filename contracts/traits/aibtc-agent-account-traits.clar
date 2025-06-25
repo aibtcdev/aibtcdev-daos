@@ -29,14 +29,6 @@
     (<sip010-trait> uint)
     (response bool uint)
   )
-  (approve-asset
-    (principal)
-    (response bool uint)
-  )
-  (revoke-asset
-    (principal)
-    (response bool uint)
-  )
 ))
 
 (define-trait aibtc-proposals (
@@ -58,24 +50,36 @@
   )
 ))
 
-(define-trait faktory-dex-approval (
-  (acct-approve-dex
-    (<dao-faktory-dex>)
+(define-trait faktory-buy-sell (
+  (faktory-buy-asset
+    (<dao-faktory-dex> <faktory-token> uint)
     (response bool uint)
   )
-  (acct-revoke-dex
-    (<dao-faktory-dex>)
+  (faktory-sell-asset
+    (<dao-faktory-dex> <faktory-token> uint)
     (response bool uint)
   )
 ))
 
-(define-trait faktory-buy-sell (
-  (acct-buy-asset
-    (<dao-faktory-dex> <faktory-token> uint)
+(define-trait aibtc-account-config (
+  (set-agent-can-use-proposals
+    (bool)
     (response bool uint)
   )
-  (acct-sell-asset
-    (<dao-faktory-dex> <faktory-token> uint)
+  (set-agent-can-approve-revoke-contracts
+    (bool)
+    (response bool uint)
+  )
+  (set-agent-can-buy-sell-assets
+    (bool)
+    (response bool uint)
+  )
+  (approve-contract
+    (principal)
+    (response bool uint)
+  )
+  (revoke-contract
+    (principal)
     (response bool uint)
   )
 ))

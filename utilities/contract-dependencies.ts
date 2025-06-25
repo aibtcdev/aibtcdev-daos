@@ -369,8 +369,8 @@ export function defineAgentContractDependencies(
             "agent_account_trait_proposals"
           )
           .addTraitDependency(
-            "AGENT_FAKTORY_DEX_APPROVAL",
-            "agent_account_trait_faktory_dex_approval"
+            "AGENT_ACCOUNT_CONFIG",
+            "agent_account_trait_account_config"
           )
           .addTraitDependency(
             "AGENT_FAKTORY_BUY_SELL",
