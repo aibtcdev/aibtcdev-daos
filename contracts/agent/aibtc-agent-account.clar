@@ -56,6 +56,7 @@
 ;; anyone can deposit STX to this contract
 (define-public (deposit-stx (amount uint))
   (begin
+    (asserts! (is-owner-or-agent-sender) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/deposit-stx",
       payload: {
@@ -75,6 +76,7 @@
     (amount uint)
   )
   (begin
+    (asserts! (is-owner-or-agent-sender) ERR_OPERATION_NOT_ALLOWED)
     (asserts! (is-approved-contract (contract-of ft)) ERR_CONTRACT_NOT_APPROVED)
     (print {
       notification: "aibtc-agent-account/deposit-ft",
@@ -390,6 +392,13 @@
 
 (define-private (is-agent)
   (is-eq contract-caller ACCOUNT_AGENT)
+)
+
+(define-private (is-owner-or-agent-sender)
+  (or
+    (is-eq tx-sender ACCOUNT_OWNER)
+    (is-eq tx-sender ACCOUNT_AGENT)
+  )
 )
 
 (define-private (use-proposals-allowed)
