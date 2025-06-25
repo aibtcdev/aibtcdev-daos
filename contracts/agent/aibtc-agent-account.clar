@@ -47,8 +47,8 @@
 )
 
 ;; data vars
-(define-data-var agentCanUseProposals bool false)
-(define-data-var agentCanApproveRevokeContracts bool false)
+(define-data-var agentCanUseProposals bool true)
+(define-data-var agentCanApproveRevokeContracts bool true)
 (define-data-var agentCanBuySellAssets bool false)
 
 ;; public functions
