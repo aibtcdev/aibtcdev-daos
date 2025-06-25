@@ -35,6 +35,9 @@
 ;; /g/'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG/account_agent
 (define-constant ACCOUNT_AGENT 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG) ;; agent (can only take approved actions)
 
+;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
+(define-constant SBTC_TOKEN 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token) ;; sBTC token
+
 ;; error codes
 (define-constant ERR_CALLER_NOT_OWNER (err u1100))
 (define-constant ERR_CONTRACT_NOT_APPROVED (err u1101))
@@ -45,6 +48,9 @@
   principal
   bool
 )
+
+;; insert sBTC token into approved contracts
+(map-set ApprovedContracts SBTC_TOKEN true)
 
 ;; data vars
 (define-data-var agentCanUseProposals bool true)
