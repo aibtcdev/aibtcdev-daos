@@ -23,11 +23,11 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.13.1",
-    "agents": "^0.0.97",
+    "agents": "^0.0.98",
     "hono": "^4.8.3"
   },
   "devDependencies": {
-    "@aibtc/types": "^0.5.0",
+    "@aibtc/types": "^0.6.0",
     "@cloudflare/vite-plugin": "^1.7.5",
     "@cloudflare/workers-types": "^4.20250620.0",
     "@hirosystems/clarinet-sdk": "^3.1.0",
@@ -38,11 +38,11 @@
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
     "vite-plugin-ssr-hot-reload": "^0.5.0",
-    "vite-plugin-static-copy": "^3.0.2",
+    "vite-plugin-static-copy": "^3.1.0",
     "vitest": "^3.2.4",
     "vitest-environment-clarinet": "^2.3.0",
     "workers-mcp": "^0.0.13",
-    "wrangler": "^4.21.1",
+    "wrangler": "^4.21.2",
     "zod": "^3.25.67"
   }
 }
