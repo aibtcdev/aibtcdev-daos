@@ -16,7 +16,11 @@ const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "DAO_USERS"
 );
 const contractName = contractAddress.split(".")[1];
-const daoAddress = registry.getContractAddress("aibtc-base-dao", deployer);
+const daoAddress = registry.getContractAddressByTypeAndSubtype("BASE", "DAO");
+
+console.log("Contract address:", contractAddress);
+console.log("Contract name:", contractName);
+console.log("DAO address:", daoAddress);
 
 // import error codes
 const ErrCode = ErrCodeDaoUsers;
@@ -102,7 +106,7 @@ describe(`DAO-context functions: ${contractName}`, () => {
       contractAddress,
       "get-or-create-user-index",
       [Cl.principal(address1)],
-      daoAddress
+      deployer
     );
 
     // assert
@@ -119,8 +123,12 @@ describe(`DAO-context functions: ${contractName}`, () => {
       deployer
     ).result;
 
-    expect(userData).toSatisfy((r: any) => r.value.data.address.value === address1);
-    expect(userData).toSatisfy((r: any) => r.value.data.reputation.value === 0n);
+    expect(userData).toSatisfy(
+      (r: any) => r.value.data.address.value === address1
+    );
+    expect(userData).toSatisfy(
+      (r: any) => r.value.data.reputation.value === 0n
+    );
     expect(userData).toSatisfy((r: any) => r.value.data.createdAt.value > 0n);
   });
 
@@ -130,7 +138,7 @@ describe(`DAO-context functions: ${contractName}`, () => {
       contractAddress,
       "get-or-create-user-index",
       [Cl.principal(address1)],
-      daoAddress
+      deployer
     );
     const originalUserData = cvToValue(
       simnet.callReadOnlyFn(
@@ -146,7 +154,7 @@ describe(`DAO-context functions: ${contractName}`, () => {
       contractAddress,
       "increase-user-reputation",
       [Cl.principal(address1), Cl.uint(100)],
-      daoAddress
+      deployer
     );
 
     // assert
@@ -169,13 +177,13 @@ describe(`DAO-context functions: ${contractName}`, () => {
       contractAddress,
       "get-or-create-user-index",
       [Cl.principal(address1)],
-      daoAddress
+      deployer
     );
     simnet.callPublicFn(
       contractAddress,
       "increase-user-reputation",
       [Cl.principal(address1), Cl.uint(100)],
-      daoAddress
+      deployer
     );
     const originalUserData = cvToValue(
       simnet.callReadOnlyFn(
@@ -192,7 +200,7 @@ describe(`DAO-context functions: ${contractName}`, () => {
       contractAddress,
       "decrease-user-reputation",
       [Cl.principal(address1), Cl.uint(30)],
-      daoAddress
+      deployer
     );
 
     // assert
