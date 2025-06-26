@@ -1,4 +1,10 @@
-import { Cl, cvToValue } from "@stacks/transactions";
+import {
+  Cl,
+  ClarityType,
+  cvToValue,
+  SomeCV,
+  TupleCV,
+} from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeDaoUsers } from "../../../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
@@ -10,6 +16,13 @@ import {
   VOTING_DELAY,
   VOTING_PERIOD,
 } from "../../../../utilities/dao-helpers";
+import { convertClarityTuple } from "../../../../utilities/contract-helpers";
+
+type DaoUserData = {
+  address: string;
+  createdAt: bigint;
+  reputation: bigint;
+};
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -99,13 +112,14 @@ describe(`public functions: ${contractName}`, () => {
     expect(proposeActionReceipt.result).toBeOk(Cl.bool(true));
 
     // assert
+    const expectedUserIndex = Cl.some(Cl.uint(1));
     const newUserIndex = simnet.callReadOnlyFn(
       contractAddress,
       "get-user-index",
       [Cl.principal(address1)],
       deployer
     ).result;
-    expect(newUserIndex).toStrictEqual(Cl.some(Cl.uint(1)));
+    expect(newUserIndex).toStrictEqual(expectedUserIndex);
 
     const userDataResult = simnet.callReadOnlyFn(
       contractAddress,
@@ -115,7 +129,12 @@ describe(`public functions: ${contractName}`, () => {
     ).result;
 
     // extract dynamic createdAt value to build expected object
-    const createdAt = cvToValue(userDataResult).createdAt;
+    expect(userDataResult.type).toBe(ClarityType.OptionalSome);
+    const userDataResultSome = userDataResult as SomeCV;
+    const userDataResultTuple = userDataResultSome.value as TupleCV;
+    const userDataResultObj =
+      convertClarityTuple<DaoUserData>(userDataResultTuple);
+    const createdAt = userDataResultObj.createdAt;
     expect(createdAt).toBeGreaterThan(0n);
 
     const expectedUserData = Cl.some(
@@ -156,8 +175,14 @@ describe(`public functions: ${contractName}`, () => {
       "ACTIONS",
       "SEND_MESSAGE"
     );
-    const actionProposalContractAddress = `${deployer}.${actionProposalsContract.name}`;
-    const sendMessageContractAddress = `${deployer}.${sendMessageContract.name}`;
+    expect(actionProposalsContract).toBeDefined();
+    expect(sendMessageContract).toBeDefined();
+    const actionProposalContractAddress = `${deployer}.${
+      actionProposalsContract!.name
+    }`;
+    const sendMessageContractAddress = `${deployer}.${
+      sendMessageContract!.name
+    }`;
 
     // Create proposal from address1. This will create the user.
     const proposeActionReceipt = simnet.callPublicFn(
@@ -275,12 +300,18 @@ describe(`public functions: ${contractName}`, () => {
       "EXTENSIONS",
       "ACTION_PROPOSAL_VOTING"
     );
-    const actionProposalContractAddress = `${deployer}.${actionProposalsContract.name}`;
+    expect(actionProposalsContract).toBeDefined();
+    const actionProposalContractAddress = `${deployer}.${
+      actionProposalsContract!.name
+    }`;
     const sendMessageContract = registry.getContractByTypeAndSubtype(
       "ACTIONS",
       "SEND_MESSAGE"
     );
-    const sendMessageContractAddress = `${deployer}.${sendMessageContract.name}`;
+    expect(sendMessageContract).toBeDefined();
+    const sendMessageContractAddress = `${deployer}.${
+      sendMessageContract!.name
+    }`;
 
     // progress chain to allow another proposal
     simnet.mineEmptyBurnBlock();
