@@ -23,16 +23,11 @@ const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "DAO_USERS"
 );
 const contractName = contractAddress.split(".")[1];
-const daoAddress = registry.getContractAddressByTypeAndSubtype("BASE", "DAO");
-
-console.log("Contract address:", contractAddress);
-console.log("Contract name:", contractName);
-console.log("DAO address:", daoAddress);
 
 // import error codes
 const ErrCode = ErrCodeDaoUsers;
 
-describe(`public functions (direct calls): ${contractName}`, () => {
+describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // callback() tests
   ////////////////////////////////////////
@@ -67,40 +62,6 @@ describe(`public functions (direct calls): ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
 
-  ////////////////////////////////////////
-  // increase-user-reputation() tests
-  ////////////////////////////////////////
-  it("increase-user-reputation() fails if called directly", () => {
-    // arrange
-    // act
-    const receipt = simnet.callPublicFn(
-      contractAddress,
-      "increase-user-reputation",
-      [Cl.principal(address1), Cl.uint(5)],
-      address1
-    );
-    // assert - if a user is not found this this error path first
-    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_USER_NOT_FOUND));
-  });
-
-  ////////////////////////////////////////
-  // decrease-user-reputation() tests
-  ////////////////////////////////////////
-  it("decrease-user-reputation() fails if called directly", () => {
-    // arrange
-    // act
-    const receipt = simnet.callPublicFn(
-      contractAddress,
-      "decrease-user-reputation",
-      [Cl.principal(address1), Cl.uint(5)],
-      address1
-    );
-    // assert - if a user is not found this this error path first
-    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_USER_NOT_FOUND));
-  });
-});
-
-describe(`DAO-context functions: ${contractName}`, () => {
   it("get-or-create-user-index() creates a user when a proposal is made", () => {
     // arrange
     constructDao(deployer);
@@ -144,23 +105,37 @@ describe(`DAO-context functions: ${contractName}`, () => {
     ).result;
     expect(newUserIndex).toStrictEqual(Cl.some(Cl.uint(1)));
 
-    const userData = simnet.callReadOnlyFn(
+    const userDataResult = simnet.callReadOnlyFn(
       contractAddress,
       "get-user-data-by-address",
       [Cl.principal(address1)],
       deployer
     ).result;
 
-    expect(userData).toSatisfy(
-      (r: any) => r.value.data.address.value === address1
-    );
-    expect(userData).toSatisfy(
-      (r: any) => r.value.data.reputation.value === 0n
-    );
-    expect(userData).toSatisfy((r: any) => r.value.data.createdAt.value > 0n);
+    expect(userDataResult).not.toBeNone();
+    const userData = cvToValue(userDataResult);
+    expect(userData.address).toBe(address1);
+    expect(userData.reputation).toBe(0n);
+    expect(userData.createdAt).toBeGreaterThan(0n);
   });
 
-  it("increase-user-reputation() updates reputation when a proposal passes and preserves createdAt", () => {
+  ////////////////////////////////////////
+  // increase-user-reputation() tests
+  ////////////////////////////////////////
+  it("increase-user-reputation() fails if called directly", () => {
+    // arrange
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "increase-user-reputation",
+      [Cl.principal(address1), Cl.uint(5)],
+      address1
+    );
+    // assert - if a user is not found this this error path first
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_USER_NOT_FOUND));
+  });
+
+  it("increase-user-reputation() is called when a proposal passes", () => {
     // arrange
     constructDao(deployer);
     fundVoters([deployer, address1]);
@@ -188,14 +163,14 @@ describe(`DAO-context functions: ${contractName}`, () => {
     );
     expect(proposeActionReceipt.result).toBeOk(Cl.bool(true));
 
-    const originalUserData = cvToValue(
-      simnet.callReadOnlyFn(
-        contractAddress,
-        "get-user-data-by-address",
-        [Cl.principal(address1)],
-        deployer
-      ).result
-    );
+    const originalUserDataResult = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-user-data-by-address",
+      [Cl.principal(address1)],
+      deployer
+    ).result;
+    expect(originalUserDataResult).not.toBeNone();
+    const originalUserData = cvToValue(originalUserDataResult);
     expect(originalUserData.reputation).toBe(0n);
 
     // act: pass the proposal
@@ -221,22 +196,37 @@ describe(`DAO-context functions: ${contractName}`, () => {
     expect(concludeProposalReceipt.result).toBeOk(Cl.bool(true));
 
     // assert
-    const updatedUserData = cvToValue(
-      simnet.callReadOnlyFn(
-        contractAddress,
-        "get-user-data-by-address",
-        [Cl.principal(address1)],
-        deployer
-      ).result
-    );
+    const updatedUserDataResult = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-user-data-by-address",
+      [Cl.principal(address1)],
+      deployer
+    ).result;
+    expect(updatedUserDataResult).not.toBeNone();
+    const updatedUserData = cvToValue(updatedUserDataResult);
     expect(updatedUserData.reputation).toBe(1n); // REP_SUCCESS is u1
     expect(updatedUserData.createdAt).toBe(originalUserData.createdAt);
   });
 
-  it("decrease-user-reputation() updates reputation when a proposal fails and preserves createdAt", () => {
+  ////////////////////////////////////////
+  // decrease-user-reputation() tests
+  ////////////////////////////////////////
+  it("decrease-user-reputation() fails if called directly", () => {
+    // arrange
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "decrease-user-reputation",
+      [Cl.principal(address1), Cl.uint(5)],
+      address1
+    );
+    // assert - if a user is not found this this error path first
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_USER_NOT_FOUND));
+  });
+
+  it("decrease-user-reputation() is called when a proposal fails", () => {
     // arrange: create user and give them some reputation first
     constructDao(deployer);
-    fundVoters([deployer, address1]);
     passActionProposal(
       "SEND_MESSAGE",
       Cl.stringUtf8("test"),
@@ -245,14 +235,14 @@ describe(`DAO-context functions: ${contractName}`, () => {
       [deployer, address1] // voters
     );
 
-    const originalUserData = cvToValue(
-      simnet.callReadOnlyFn(
-        contractAddress,
-        "get-user-data-by-address",
-        [Cl.principal(address1)],
-        deployer
-      ).result
-    );
+    const originalUserDataResult = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-user-data-by-address",
+      [Cl.principal(address1)],
+      deployer
+    ).result;
+    expect(originalUserDataResult).not.toBeNone();
+    const originalUserData = cvToValue(originalUserDataResult);
     // REP_SUCCESS is u1
     expect(originalUserData.reputation).toBe(1n);
 
@@ -274,6 +264,16 @@ describe(`DAO-context functions: ${contractName}`, () => {
     // fund voter for second proposal
     fundVoters([address1]);
 
+    // Get the current proposal count to determine the new proposal's ID
+    const proposalCountResult = simnet.callReadOnlyFn(
+      actionProposalContractAddress,
+      "get-total-proposals",
+      [],
+      deployer
+    ).result;
+    const proposalCount = cvToValue(proposalCountResult).proposalCount;
+    const proposalId = proposalCount + 1n;
+
     const proposeActionReceipt = simnet.callPublicFn(
       actionProposalContractAddress,
       "create-action-proposal",
@@ -285,7 +285,6 @@ describe(`DAO-context functions: ${contractName}`, () => {
       address1 // creator
     );
     expect(proposeActionReceipt.result).toBeOk(Cl.bool(true));
-    const proposalId = 2;
 
     // progress past the voting delay
     simnet.mineEmptyBlocks(VOTING_DELAY);
@@ -312,14 +311,14 @@ describe(`DAO-context functions: ${contractName}`, () => {
     expect(concludeProposalReceipt.result).toBeOk(Cl.bool(false));
 
     // assert
-    const updatedUserData = cvToValue(
-      simnet.callReadOnlyFn(
-        contractAddress,
-        "get-user-data-by-address",
-        [Cl.principal(address1)],
-        deployer
-      ).result
-    );
+    const updatedUserDataResult = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-user-data-by-address",
+      [Cl.principal(address1)],
+      deployer
+    ).result;
+    expect(updatedUserDataResult).not.toBeNone();
+    const updatedUserData = cvToValue(updatedUserDataResult);
     // REP_SUCCESS is u1, REP_FAILURE is u2. Reputation is int.
     // Start at 0. After success: 0 + 1 = 1. After failure: 1 - 2 = -1.
     expect(updatedUserData.reputation).toBe(-1n);

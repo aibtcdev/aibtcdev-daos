@@ -1,5 +1,5 @@
 import { expect } from "vitest";
-import { Cl, ClarityValue } from "@stacks/transactions";
+import { Cl, ClarityValue, cvToValue } from "@stacks/transactions";
 import { DEVNET_DEPLOYER, SBTC_CONTRACT } from "./contract-helpers";
 import { setupDaoContractRegistry } from "./contract-registry";
 import { dbgLog } from "./debug-logging";
@@ -193,6 +193,16 @@ export function passActionProposal(
   const actionProposalContractAddress = `${deployer}.${actionProposalsContract.name}`;
   const proposedActionContractAddress = `${deployer}.${proposedActionContract.name}`;
 
+  // Get the current proposal count to determine the new proposal's ID
+  const proposalCountResult = simnet.callReadOnlyFn(
+    actionProposalContractAddress,
+    "get-total-proposals",
+    [],
+    deployer
+  ).result;
+  const proposalCount = cvToValue(proposalCountResult).proposalCount;
+  const proposalId = proposalCount + 1n;
+
   // create action proposal
   const proposeActionReceipt = simnet.callPublicFn(
     actionProposalContractAddress,
@@ -214,7 +224,7 @@ export function passActionProposal(
     const voteReceipt = simnet.callPublicFn(
       actionProposalContractAddress,
       "vote-on-action-proposal",
-      [Cl.uint(1), Cl.bool(true)],
+      [Cl.uint(proposalId), Cl.bool(true)],
       voter
     );
     expect(voteReceipt.result).toBeOk(Cl.bool(true));
@@ -227,7 +237,7 @@ export function passActionProposal(
   const concludeProposalReceipt = simnet.callPublicFn(
     actionProposalContractAddress,
     "conclude-action-proposal",
-    [Cl.uint(1), Cl.principal(proposedActionContractAddress)],
+    [Cl.uint(proposalId), Cl.principal(proposedActionContractAddress)],
     deployer
   );
   dbgLog(concludeProposalReceipt);
