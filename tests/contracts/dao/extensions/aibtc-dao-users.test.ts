@@ -203,7 +203,12 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address1)],
       deployer
     ).result;
-    const createdAt = cvToValue(originalUserDataResult).createdAt;
+    expect(originalUserDataResult.type).toBe(ClarityType.OptionalSome);
+    const originalUserDataTuple = (originalUserDataResult as SomeCV)
+      .value as TupleCV;
+    const originalUserDataObj =
+      convertClarityTuple<DaoUserData>(originalUserDataTuple);
+    const createdAt = originalUserDataObj.createdAt;
     const expectedOriginalUserData = Cl.some(
       Cl.tuple({
         address: Cl.principal(address1),
@@ -285,7 +290,12 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address1)],
       deployer
     ).result;
-    const createdAt = cvToValue(originalUserDataResult).createdAt;
+    expect(originalUserDataResult.type).toBe(ClarityType.OptionalSome);
+    const originalUserDataTuple = (originalUserDataResult as SomeCV)
+      .value as TupleCV;
+    const originalUserDataObj =
+      convertClarityTuple<DaoUserData>(originalUserDataTuple);
+    const createdAt = originalUserDataObj.createdAt;
     const expectedOriginalUserData = Cl.some(
       Cl.tuple({
         address: Cl.principal(address1),
