@@ -1,5 +1,5 @@
-import { Cl } from "@stacks/transactions";
-import { describe, expect, it } from "vitest";
+import { Cl, cvToValue } from "@stacks/transactions";
+import { beforeEach, describe, expect, it } from "vitest";
 import { ErrCodeDaoUsers } from "../../../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 import { constructDao, fundVoters } from "../../../../utilities/dao-helpers";
@@ -16,11 +16,12 @@ const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "DAO_USERS"
 );
 const contractName = contractAddress.split(".")[1];
+const daoAddress = registry.getContractAddress("aibtc-base-dao", deployer);
 
 // import error codes
 const ErrCode = ErrCodeDaoUsers;
 
-describe(`public functions: ${contractName}`, () => {
+describe(`public functions (direct calls): ${contractName}`, () => {
   ////////////////////////////////////////
   // callback() tests
   ////////////////////////////////////////
@@ -69,19 +70,6 @@ describe(`public functions: ${contractName}`, () => {
     );
     // assert - if a user is not found this this error path first
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_USER_NOT_FOUND));
-
-    // arrange
-    fundVoters([deployer]);
-    constructDao(deployer);
-    // act
-    const receipt2 = simnet.callPublicFn(
-      contractAddress,
-      "get-or-create-user-index",
-      [Cl.principal(deployer)],
-      deployer
-    );
-    // assert
-    expect(receipt2.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
 
   ////////////////////////////////////////
@@ -98,19 +86,127 @@ describe(`public functions: ${contractName}`, () => {
     );
     // assert - if a user is not found this this error path first
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_USER_NOT_FOUND));
+  });
+});
 
+describe(`DAO-context functions: ${contractName}`, () => {
+  beforeEach(() => {
     // arrange
     fundVoters([deployer]);
     constructDao(deployer);
+  });
+
+  it("get-or-create-user-index() can create a user when called by the DAO", () => {
     // act
-    const receipt2 = simnet.callPublicFn(
+    const createReceipt = simnet.callPublicFn(
       contractAddress,
       "get-or-create-user-index",
-      [Cl.principal(deployer)],
-      deployer
+      [Cl.principal(address1)],
+      daoAddress
     );
+
     // assert
-    expect(receipt2.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+    expect(createReceipt.result).toBeOk(Cl.uint(1));
+    expect(
+      simnet.callReadOnlyFn(contractAddress, "get-user-count", [], deployer)
+        .result
+    ).toStrictEqual(Cl.uint(1));
+
+    const userData = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-user-data-by-address",
+      [Cl.principal(address1)],
+      deployer
+    ).result;
+
+    expect(userData).toSatisfy((r: any) => r.value.data.address.value === address1);
+    expect(userData).toSatisfy((r: any) => r.value.data.reputation.value === 0n);
+    expect(userData).toSatisfy((r: any) => r.value.data.createdAt.value > 0n);
+  });
+
+  it("increase-user-reputation() updates reputation and preserves createdAt", () => {
+    // arrange: create user
+    simnet.callPublicFn(
+      contractAddress,
+      "get-or-create-user-index",
+      [Cl.principal(address1)],
+      daoAddress
+    );
+    const originalUserData = cvToValue(
+      simnet.callReadOnlyFn(
+        contractAddress,
+        "get-user-data-by-address",
+        [Cl.principal(address1)],
+        deployer
+      ).result
+    );
+
+    // act: increase reputation
+    const increaseReceipt = simnet.callPublicFn(
+      contractAddress,
+      "increase-user-reputation",
+      [Cl.principal(address1), Cl.uint(100)],
+      daoAddress
+    );
+
+    // assert
+    expect(increaseReceipt.result).toBeOk(Cl.bool(true));
+    const updatedUserData = cvToValue(
+      simnet.callReadOnlyFn(
+        contractAddress,
+        "get-user-data-by-address",
+        [Cl.principal(address1)],
+        deployer
+      ).result
+    );
+    expect(updatedUserData.reputation).toBe(100n);
+    expect(updatedUserData.createdAt).toBe(originalUserData.createdAt);
+  });
+
+  it("decrease-user-reputation() updates reputation and preserves createdAt", () => {
+    // arrange: create user and set initial reputation
+    simnet.callPublicFn(
+      contractAddress,
+      "get-or-create-user-index",
+      [Cl.principal(address1)],
+      daoAddress
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "increase-user-reputation",
+      [Cl.principal(address1), Cl.uint(100)],
+      daoAddress
+    );
+    const originalUserData = cvToValue(
+      simnet.callReadOnlyFn(
+        contractAddress,
+        "get-user-data-by-address",
+        [Cl.principal(address1)],
+        deployer
+      ).result
+    );
+    expect(originalUserData.reputation).toBe(100n);
+
+    // act: decrease reputation
+    const decreaseReceipt = simnet.callPublicFn(
+      contractAddress,
+      "decrease-user-reputation",
+      [Cl.principal(address1), Cl.uint(30)],
+      daoAddress
+    );
+
+    // assert
+    expect(decreaseReceipt.result).toBeOk(Cl.bool(true));
+    const updatedUserData = cvToValue(
+      simnet.callReadOnlyFn(
+        contractAddress,
+        "get-user-data-by-address",
+        [Cl.principal(address1)],
+        deployer
+      ).result
+    );
+    expect(updatedUserData.reputation).toBe(70n);
+    expect(updatedUserData.createdAt).toBe(originalUserData.createdAt);
   });
 });
 
