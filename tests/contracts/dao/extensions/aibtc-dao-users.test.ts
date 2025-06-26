@@ -1,5 +1,5 @@
 import { Cl, cvToValue } from "@stacks/transactions";
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ErrCodeDaoUsers } from "../../../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 import {
@@ -101,13 +101,9 @@ describe(`public functions (direct calls): ${contractName}`, () => {
 });
 
 describe(`DAO-context functions: ${contractName}`, () => {
-  beforeEach(() => {
-    // arrange
-    constructDao(deployer);
-  });
-
   it("get-or-create-user-index() creates a user when a proposal is made", () => {
     // arrange
+    constructDao(deployer);
     fundVoters([address1]); // fund the user to create a proposal
     const userIndex = simnet.callReadOnlyFn(
       contractAddress,
@@ -166,6 +162,7 @@ describe(`DAO-context functions: ${contractName}`, () => {
 
   it("increase-user-reputation() updates reputation when a proposal passes and preserves createdAt", () => {
     // arrange
+    constructDao(deployer);
     fundVoters([deployer, address1]);
     const actionProposalsContract = registry.getContractByTypeAndSubtype(
       "EXTENSIONS",
@@ -238,6 +235,7 @@ describe(`DAO-context functions: ${contractName}`, () => {
 
   it("decrease-user-reputation() updates reputation when a proposal fails and preserves createdAt", () => {
     // arrange: create user and give them some reputation first
+    constructDao(deployer);
     fundVoters([deployer, address1]);
     passActionProposal(
       "SEND_MESSAGE",
