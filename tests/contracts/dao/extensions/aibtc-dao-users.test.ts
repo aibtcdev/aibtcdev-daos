@@ -24,6 +24,10 @@ type DaoUserData = {
   reputation: bigint;
 };
 
+type ProposalCount = {
+  proposalCount: bigint;
+};
+
 // setup accounts
 const accounts = simnet.getAccounts();
 const deployer = accounts.get("deployer")!;
@@ -206,8 +210,9 @@ describe(`public functions: ${contractName}`, () => {
     expect(originalUserDataResult.type).toBe(ClarityType.OptionalSome);
     const originalUserDataTuple = (originalUserDataResult as SomeCV)
       .value as TupleCV;
-    const originalUserDataObj =
-      convertClarityTuple<DaoUserData>(originalUserDataTuple);
+    const originalUserDataObj = convertClarityTuple<DaoUserData>(
+      originalUserDataTuple
+    );
     const createdAt = originalUserDataObj.createdAt;
     const expectedOriginalUserData = Cl.some(
       Cl.tuple({
@@ -293,8 +298,9 @@ describe(`public functions: ${contractName}`, () => {
     expect(originalUserDataResult.type).toBe(ClarityType.OptionalSome);
     const originalUserDataTuple = (originalUserDataResult as SomeCV)
       .value as TupleCV;
-    const originalUserDataObj =
-      convertClarityTuple<DaoUserData>(originalUserDataTuple);
+    const originalUserDataObj = convertClarityTuple<DaoUserData>(
+      originalUserDataTuple
+    );
     const createdAt = originalUserDataObj.createdAt;
     const expectedOriginalUserData = Cl.some(
       Cl.tuple({
@@ -336,7 +342,8 @@ describe(`public functions: ${contractName}`, () => {
       [],
       deployer
     ).result as TupleCV;
-    const { proposalCount } = convertClarityTuple(proposalCountResult);
+    const { proposalCount } =
+      convertClarityTuple<ProposalCount>(proposalCountResult);
     const proposalId = proposalCount + 1n;
 
     const proposeActionReceipt = simnet.callPublicFn(
