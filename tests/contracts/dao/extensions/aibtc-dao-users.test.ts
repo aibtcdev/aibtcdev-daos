@@ -335,8 +335,8 @@ describe(`public functions: ${contractName}`, () => {
       "get-total-proposals",
       [],
       deployer
-    ).result;
-    const proposalCount = cvToValue(proposalCountResult).proposalCount;
+    ).result as TupleCV;
+    const { proposalCount } = convertClarityTuple(proposalCountResult);
     const proposalId = proposalCount + 1n;
 
     const proposeActionReceipt = simnet.callPublicFn(
