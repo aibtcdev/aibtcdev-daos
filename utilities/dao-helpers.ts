@@ -200,7 +200,8 @@ export function passActionProposal(
     [],
     deployer
   ).result;
-  const proposalCount = cvToValue(proposalCountResult).proposalCount;
+  const proposalCount =
+    (cvToValue(proposalCountResult).proposalCount.value as bigint) || 0n;
   const proposalId = proposalCount + 1n;
 
   // create action proposal

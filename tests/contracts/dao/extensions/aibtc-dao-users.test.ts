@@ -84,11 +84,13 @@ describe(`public functions: ${contractName}`, () => {
       "ACTIONS",
       "SEND_MESSAGE"
     );
+    expect(actionProposalsContract).toBeDefined();
+    expect(sendMessageContract).toBeDefined();
     const proposeActionReceipt = simnet.callPublicFn(
-      `${deployer}.${actionProposalsContract.name}`,
+      `${deployer}.${actionProposalsContract!.name}`,
       "create-action-proposal",
       [
-        Cl.principal(`${deployer}.${sendMessageContract.name}`),
+        Cl.principal(`${deployer}.${sendMessageContract!.name}`),
         formatSerializedBuffer(Cl.stringUtf8("test")),
         Cl.none(),
       ],
