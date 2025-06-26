@@ -2,7 +2,14 @@ import { Cl, cvToValue } from "@stacks/transactions";
 import { beforeEach, describe, expect, it } from "vitest";
 import { ErrCodeDaoUsers } from "../../../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
-import { constructDao, fundVoters } from "../../../../utilities/dao-helpers";
+import {
+  constructDao,
+  fundVoters,
+  passActionProposal,
+  formatSerializedBuffer,
+  VOTING_DELAY,
+  VOTING_PERIOD,
+} from "../../../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -96,25 +103,50 @@ describe(`public functions (direct calls): ${contractName}`, () => {
 describe(`DAO-context functions: ${contractName}`, () => {
   beforeEach(() => {
     // arrange
-    fundVoters([deployer]);
     constructDao(deployer);
   });
 
-  it("get-or-create-user-index() can create a user when called by the DAO", () => {
-    // act
-    const createReceipt = simnet.callPublicFn(
+  it("get-or-create-user-index() creates a user when a proposal is made", () => {
+    // arrange
+    fundVoters([address1]); // fund the user to create a proposal
+    const userIndex = simnet.callReadOnlyFn(
       contractAddress,
-      "get-or-create-user-index",
+      "get-user-index",
       [Cl.principal(address1)],
       deployer
+    ).result;
+    expect(userIndex).toBeNone(); // user should not exist yet
+
+    // act
+    // Creating a proposal will call get-or-create-user-index
+    const actionProposalsContract = registry.getContractByTypeAndSubtype(
+      "EXTENSIONS",
+      "ACTION_PROPOSAL_VOTING"
     );
+    const sendMessageContract = registry.getContractByTypeAndSubtype(
+      "ACTIONS",
+      "SEND_MESSAGE"
+    );
+    const proposeActionReceipt = simnet.callPublicFn(
+      `${deployer}.${actionProposalsContract.name}`,
+      "create-action-proposal",
+      [
+        Cl.principal(`${deployer}.${sendMessageContract.name}`),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
+        Cl.none(),
+      ],
+      address1
+    );
+    expect(proposeActionReceipt.result).toBeOk(Cl.bool(true));
 
     // assert
-    expect(createReceipt.result).toBeOk(Cl.uint(1));
-    expect(
-      simnet.callReadOnlyFn(contractAddress, "get-user-count", [], deployer)
-        .result
-    ).toStrictEqual(Cl.uint(1));
+    const newUserIndex = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-user-index",
+      [Cl.principal(address1)],
+      deployer
+    ).result;
+    expect(newUserIndex).toStrictEqual(Cl.some(Cl.uint(1)));
 
     const userData = simnet.callReadOnlyFn(
       contractAddress,
@@ -132,14 +164,33 @@ describe(`DAO-context functions: ${contractName}`, () => {
     expect(userData).toSatisfy((r: any) => r.value.data.createdAt.value > 0n);
   });
 
-  it("increase-user-reputation() updates reputation and preserves createdAt", () => {
-    // arrange: create user
-    simnet.callPublicFn(
-      contractAddress,
-      "get-or-create-user-index",
-      [Cl.principal(address1)],
-      deployer
+  it("increase-user-reputation() updates reputation when a proposal passes and preserves createdAt", () => {
+    // arrange
+    fundVoters([deployer, address1]);
+    const actionProposalsContract = registry.getContractByTypeAndSubtype(
+      "EXTENSIONS",
+      "ACTION_PROPOSAL_VOTING"
     );
+    const sendMessageContract = registry.getContractByTypeAndSubtype(
+      "ACTIONS",
+      "SEND_MESSAGE"
+    );
+    const actionProposalContractAddress = `${deployer}.${actionProposalsContract.name}`;
+    const sendMessageContractAddress = `${deployer}.${sendMessageContract.name}`;
+
+    // Create proposal from address1. This will create the user.
+    const proposeActionReceipt = simnet.callPublicFn(
+      actionProposalContractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(sendMessageContractAddress),
+        formatSerializedBuffer(Cl.stringUtf8("test")),
+        Cl.none(),
+      ],
+      address1
+    );
+    expect(proposeActionReceipt.result).toBeOk(Cl.bool(true));
+
     const originalUserData = cvToValue(
       simnet.callReadOnlyFn(
         contractAddress,
@@ -148,17 +199,31 @@ describe(`DAO-context functions: ${contractName}`, () => {
         deployer
       ).result
     );
+    expect(originalUserData.reputation).toBe(0n);
 
-    // act: increase reputation
-    const increaseReceipt = simnet.callPublicFn(
-      contractAddress,
-      "increase-user-reputation",
-      [Cl.principal(address1), Cl.uint(100)],
+    // act: pass the proposal
+    const proposalId = 1;
+    simnet.mineEmptyBlocks(VOTING_DELAY);
+
+    const voteReceipt = simnet.callPublicFn(
+      actionProposalContractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(proposalId), Cl.bool(true)],
       deployer
     );
+    expect(voteReceipt.result).toBeOk(Cl.bool(true));
+
+    simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY + 1);
+
+    const concludeProposalReceipt = simnet.callPublicFn(
+      actionProposalContractAddress,
+      "conclude-action-proposal",
+      [Cl.uint(proposalId), Cl.principal(sendMessageContractAddress)],
+      deployer
+    );
+    expect(concludeProposalReceipt.result).toBeOk(Cl.bool(true));
 
     // assert
-    expect(increaseReceipt.result).toBeOk(Cl.bool(true));
     const updatedUserData = cvToValue(
       simnet.callReadOnlyFn(
         contractAddress,
@@ -167,24 +232,21 @@ describe(`DAO-context functions: ${contractName}`, () => {
         deployer
       ).result
     );
-    expect(updatedUserData.reputation).toBe(100n);
+    expect(updatedUserData.reputation).toBe(1n); // REP_SUCCESS is u1
     expect(updatedUserData.createdAt).toBe(originalUserData.createdAt);
   });
 
-  it("decrease-user-reputation() updates reputation and preserves createdAt", () => {
-    // arrange: create user and set initial reputation
-    simnet.callPublicFn(
-      contractAddress,
-      "get-or-create-user-index",
-      [Cl.principal(address1)],
-      deployer
+  it("decrease-user-reputation() updates reputation when a proposal fails and preserves createdAt", () => {
+    // arrange: create user and give them some reputation first
+    fundVoters([deployer, address1]);
+    passActionProposal(
+      "SEND_MESSAGE",
+      Cl.stringUtf8("test"),
+      deployer,
+      address1, // creator
+      [deployer, address1] // voters
     );
-    simnet.callPublicFn(
-      contractAddress,
-      "increase-user-reputation",
-      [Cl.principal(address1), Cl.uint(100)],
-      deployer
-    );
+
     const originalUserData = cvToValue(
       simnet.callReadOnlyFn(
         contractAddress,
@@ -193,18 +255,65 @@ describe(`DAO-context functions: ${contractName}`, () => {
         deployer
       ).result
     );
-    expect(originalUserData.reputation).toBe(100n);
+    // REP_SUCCESS is u1
+    expect(originalUserData.reputation).toBe(1n);
 
-    // act: decrease reputation
-    const decreaseReceipt = simnet.callPublicFn(
-      contractAddress,
-      "decrease-user-reputation",
-      [Cl.principal(address1), Cl.uint(30)],
+    // act: create a second proposal that will fail
+    const actionProposalsContract = registry.getContractByTypeAndSubtype(
+      "EXTENSIONS",
+      "ACTION_PROPOSAL_VOTING"
+    );
+    const actionProposalContractAddress = `${deployer}.${actionProposalsContract.name}`;
+    const sendMessageContract = registry.getContractByTypeAndSubtype(
+      "ACTIONS",
+      "SEND_MESSAGE"
+    );
+    const sendMessageContractAddress = `${deployer}.${sendMessageContract.name}`;
+
+    // progress chain to allow another proposal
+    simnet.mineEmptyBurnBlock();
+
+    // fund voter for second proposal
+    fundVoters([address1]);
+
+    const proposeActionReceipt = simnet.callPublicFn(
+      actionProposalContractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(sendMessageContractAddress),
+        formatSerializedBuffer(Cl.stringUtf8("another test")),
+        Cl.none(),
+      ],
+      address1 // creator
+    );
+    expect(proposeActionReceipt.result).toBeOk(Cl.bool(true));
+    const proposalId = 2;
+
+    // progress past the voting delay
+    simnet.mineEmptyBlocks(VOTING_DELAY);
+
+    // vote 'no' on the proposal to make it fail
+    const voteReceipt = simnet.callPublicFn(
+      actionProposalContractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(proposalId), Cl.bool(false)],
       deployer
     );
+    expect(voteReceipt.result).toBeOk(Cl.bool(true));
+
+    // progress past the voting period and execution delay
+    simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY + 1);
+
+    // conclude the proposal
+    const concludeProposalReceipt = simnet.callPublicFn(
+      actionProposalContractAddress,
+      "conclude-action-proposal",
+      [Cl.uint(proposalId), Cl.principal(sendMessageContractAddress)],
+      deployer
+    );
+    expect(concludeProposalReceipt.result).toBeOk(Cl.bool(false));
 
     // assert
-    expect(decreaseReceipt.result).toBeOk(Cl.bool(true));
     const updatedUserData = cvToValue(
       simnet.callReadOnlyFn(
         contractAddress,
@@ -213,7 +322,9 @@ describe(`DAO-context functions: ${contractName}`, () => {
         deployer
       ).result
     );
-    expect(updatedUserData.reputation).toBe(70n);
+    // REP_SUCCESS is u1, REP_FAILURE is u2. Reputation is int.
+    // Start at 0. After success: 0 + 1 = 1. After failure: 1 - 2 = -1.
+    expect(updatedUserData.reputation).toBe(-1n);
     expect(updatedUserData.createdAt).toBe(originalUserData.createdAt);
   });
 });
