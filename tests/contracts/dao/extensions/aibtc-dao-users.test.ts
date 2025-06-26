@@ -114,11 +114,18 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     ).result;
 
-    expect(userDataResult).not.toBeNone();
-    const userData = cvToValue(userDataResult);
-    expect(userData.address).toBe(address1);
-    expect(userData.reputation).toBe(0n);
-    expect(userData.createdAt).toBeGreaterThan(0n);
+    // extract dynamic createdAt value to build expected object
+    const createdAt = cvToValue(userDataResult).createdAt;
+    expect(createdAt).toBeGreaterThan(0n);
+
+    const expectedUserData = Cl.some(
+      Cl.tuple({
+        address: Cl.principal(address1),
+        createdAt: Cl.uint(createdAt),
+        reputation: Cl.int(0),
+      })
+    );
+    expect(userDataResult).toStrictEqual(expectedUserData);
   });
 
   ////////////////////////////////////////
@@ -171,9 +178,15 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address1)],
       deployer
     ).result;
-    expect(originalUserDataResult).not.toBeNone();
-    const originalUserData = cvToValue(originalUserDataResult);
-    expect(originalUserData.reputation).toBe(0n);
+    const createdAt = cvToValue(originalUserDataResult).createdAt;
+    const expectedOriginalUserData = Cl.some(
+      Cl.tuple({
+        address: Cl.principal(address1),
+        createdAt: Cl.uint(createdAt),
+        reputation: Cl.int(0),
+      })
+    );
+    expect(originalUserDataResult).toStrictEqual(expectedOriginalUserData);
 
     // act: pass the proposal
     const proposalId = 1;
@@ -204,10 +217,14 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address1)],
       deployer
     ).result;
-    expect(updatedUserDataResult).not.toBeNone();
-    const updatedUserData = cvToValue(updatedUserDataResult);
-    expect(updatedUserData.reputation).toBe(1n); // REP_SUCCESS is u1
-    expect(updatedUserData.createdAt).toBe(originalUserData.createdAt);
+    const expectedUpdatedUserData = Cl.some(
+      Cl.tuple({
+        address: Cl.principal(address1),
+        createdAt: Cl.uint(createdAt),
+        reputation: Cl.int(1), // REP_SUCCESS is u1
+      })
+    );
+    expect(updatedUserDataResult).toStrictEqual(expectedUpdatedUserData);
   });
 
   ////////////////////////////////////////
@@ -243,10 +260,15 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address1)],
       deployer
     ).result;
-    expect(originalUserDataResult).not.toBeNone();
-    const originalUserData = cvToValue(originalUserDataResult);
-    // REP_SUCCESS is u1
-    expect(originalUserData.reputation).toBe(1n);
+    const createdAt = cvToValue(originalUserDataResult).createdAt;
+    const expectedOriginalUserData = Cl.some(
+      Cl.tuple({
+        address: Cl.principal(address1),
+        createdAt: Cl.uint(createdAt),
+        reputation: Cl.int(1), // REP_SUCCESS is u1
+      })
+    );
+    expect(originalUserDataResult).toStrictEqual(expectedOriginalUserData);
 
     // act: create a second proposal that will fail
     const actionProposalsContract = registry.getContractByTypeAndSubtype(
@@ -319,12 +341,16 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(address1)],
       deployer
     ).result;
-    expect(updatedUserDataResult).not.toBeNone();
-    const updatedUserData = cvToValue(updatedUserDataResult);
-    // REP_SUCCESS is u1, REP_FAILURE is u2. Reputation is int.
-    // Start at 0. After success: 0 + 1 = 1. After failure: 1 - 2 = -1.
-    expect(updatedUserData.reputation).toBe(-1n);
-    expect(updatedUserData.createdAt).toBe(originalUserData.createdAt);
+    const expectedUpdatedUserData = Cl.some(
+      Cl.tuple({
+        address: Cl.principal(address1),
+        createdAt: Cl.uint(createdAt),
+        // REP_SUCCESS is u1, REP_FAILURE is u2. Reputation is int.
+        // Start at 1. After failure: 1 - 2 = -1.
+        reputation: Cl.int(-1),
+      })
+    );
+    expect(updatedUserDataResult).toStrictEqual(expectedUpdatedUserData);
   });
 });
 
