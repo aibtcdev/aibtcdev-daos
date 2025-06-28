@@ -130,7 +130,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeSome(expectedDaoCharterString);
+    expect(result).toBeSome(expectedDaoCharter);
   });
 
   ////////////////////////////////////////

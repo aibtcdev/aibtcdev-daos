@@ -106,10 +106,7 @@
 )
 
 (define-read-only (get-current-dao-charter)
-  (match (map-get? CharterVersions (var-get currentVersion))
-    charter-data (some (get charter charter-data))
-    none
-  )
+  (map-get? CharterVersions (var-get currentVersion))
 )
 
 (define-read-only (get-dao-charter (version uint))
