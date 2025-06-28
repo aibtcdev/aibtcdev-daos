@@ -69,7 +69,7 @@
           payload: {
             userIndex: userIndex,
             address: address,
-            createdAt: DEPLOYED_BURN_BLOCK,
+            createdAt: burn-block-height,
             contractCaller: contract-caller,
             txSender: tx-sender,
           },
@@ -77,7 +77,7 @@
         (map-insert UserIndexes address userIndex)
         (map-insert UserData userIndex {
           address: address,
-          createdAt: DEPLOYED_BURN_BLOCK,
+          createdAt: burn-block-height,
           reputation: 0,
         })
         (var-set userCount userIndex)
@@ -103,16 +103,13 @@
       payload: {
         userIndex: userIndex,
         address: address,
-        createdAt: DEPLOYED_BURN_BLOCK,
         contractCaller: contract-caller,
         txSender: tx-sender,
       },
     })
-    (map-set UserData userIndex {
-      address: address,
-      createdAt: DEPLOYED_BURN_BLOCK,
-      reputation: (+ (get reputation userData) increaseAmount),
-    })
+    (map-set UserData userIndex
+      (merge userData { reputation: (+ (get reputation userData) increaseAmount) })
+    )
     (ok true)
   )
 )
@@ -133,16 +130,13 @@
       payload: {
         userIndex: userIndex,
         address: address,
-        createdAt: DEPLOYED_BURN_BLOCK,
         contractCaller: contract-caller,
         txSender: tx-sender,
       },
     })
-    (map-set UserData userIndex {
-      address: address,
-      createdAt: DEPLOYED_BURN_BLOCK,
-      reputation: (- (get reputation userData) decreaseAmount),
-    })
+    (map-set UserData userIndex
+      (merge userData { reputation: (- (get reputation userData) decreaseAmount) })
+    )
     (ok true)
   )
 )
