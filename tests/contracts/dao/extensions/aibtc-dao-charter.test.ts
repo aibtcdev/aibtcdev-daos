@@ -79,10 +79,10 @@ describe(`public functions: ${contractName}`, () => {
       constructDao(deployer);
       // act
       const receipt = simnet.callPublicFn(
-        contractAddress,
+        baseDaoContractAddress,
         "set-dao-charter",
         [Cl.stringUtf8("")],
-        baseDaoContractAddress
+        deployer
       );
       // assert
       expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_CHARTER_TOO_SHORT));
@@ -94,10 +94,10 @@ describe(`public functions: ${contractName}`, () => {
       const longString = "a".repeat(4097);
       // act
       const receipt = simnet.callPublicFn(
-        contractAddress,
+        baseDaoContractAddress,
         "set-dao-charter",
         [Cl.stringUtf8(longString)],
-        baseDaoContractAddress
+        deployer
       );
       // assert
       expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_CHARTER_TOO_LONG));
@@ -110,10 +110,10 @@ describe(`public functions: ${contractName}`, () => {
 
       // act
       const receipt = simnet.callPublicFn(
-        contractAddress,
+        baseDaoContractAddress,
         "set-dao-charter",
         [Cl.stringUtf8(newCharterString)],
-        baseDaoContractAddress
+        deployer
       );
 
       // assert
