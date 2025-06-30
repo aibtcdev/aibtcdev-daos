@@ -174,15 +174,17 @@ describe("Template Processor", () => {
     const replacements = createReplacementsMap({
       dao_manifest: "The mission of this DAO is to test template processing",
       dao_contract_token: ".test-token-contract",
+      sbtc_token_contract: "'ST000000000000000000002AMW42H.sbtc-token'",
+      dao_trait_proposal: ".test-traits.proposal",
       dao_contract_base: ".test-base-dao",
       dao_contract_action_proposal_voting: ".test-proposal-voting",
       dao_contract_charter: ".test-dao-charter",
       dao_contract_epoch: ".test-dao-epoch",
       dao_contract_users: ".test-dao-users",
       dao_contract_messaging: ".test-messaging",
-      dao_token_owner_contract: ".test-token-owner",
+      dao_contract_token_owner: ".test-token-owner",
       dao_contract_treasury: ".test-treasury",
-      dao_action_send_message_contract: ".test-send-message",
+      dao_action_send_message: ".test-send-message",
       dao_token_symbol: "TEST",
     });
 
@@ -202,7 +204,9 @@ describe("Template Processor", () => {
     expect(processed).toContain("enabled: true");
     expect(processed).toContain("extension: .test-dao-charter");
     expect(processed).toContain("enabled: true");
-    expect(processed).toContain('notification: "TEST-base-dao/execute"');
+    expect(processed).toContain(
+      'notification: "TEST-base-initialize-dao/execute"'
+    );
   });
 
   it("should process token owner template", async () => {
@@ -343,13 +347,14 @@ describe("Contract Generator", () => {
     dao_contract_charter: ".test-dao-charter",
     dao_contract_epoch: ".test-dao-epoch",
     dao_contract_messaging: ".test-messaging",
-    dao_token_owner_contract: ".test-token-owner",
-    dao_action_send_message_contract: ".test-send-message",
+    dao_contract_token_owner: ".test-token-owner",
+    dao_action_send_message: ".test-send-message",
     base_contract_dao_run_cost: ".test-dao-run-cost",
     dao_contract_rewards_account: ".test-rewards-account",
 
     // External contracts
     sbtc_contract: "ST000000000000000000002AMW42H.sbtc-token",
+    sbtc_token_contract: "'ST000000000000000000002AMW42H.sbtc-token'",
 
     // Configuration values
     dao_manifest: "The mission of this DAO is to test template processing",

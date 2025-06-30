@@ -26,6 +26,23 @@ type SIP019PrintEvent = {
   payload: unknown;
 };
 
+export function convertClarityTuple<T>(clarityValue: ClarityValue): T {
+  if (clarityValue.type !== ClarityType.Tuple) {
+    throw new Error(
+      `Invalid format: expected tuple, got ${
+        clarityValue.type
+      }. Value: ${JSON.stringify(clarityValue)}`
+    );
+  }
+  const tupleValue = clarityValue.value;
+  return Object.fromEntries(
+    Object.entries(tupleValue).map(([key, value]) => [
+      key,
+      cvToValue(value as ClarityValue),
+    ])
+  ) as T;
+}
+
 export function convertSIP019PrintEvent(event: ClarityEvent): SIP019PrintEvent {
   // check if the event is a print event
   if (event.event !== "print_event") {

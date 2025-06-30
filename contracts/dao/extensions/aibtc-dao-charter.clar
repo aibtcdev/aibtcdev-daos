@@ -27,7 +27,6 @@
 ;; data vars
 ;;
 
-(define-data-var daoCharter (string-utf8 4096) u"")
 (define-data-var currentVersion uint u0)
 
 ;; data maps
@@ -55,7 +54,10 @@
 )
 
 (define-public (set-dao-charter (charter (string-utf8 4096)))
-  (let ((newVersion (+ (var-get currentVersion) u1)))
+  (let ((newVersion (+ (var-get currentVersion) u1))
+        (previousCharter (match (map-get? CharterVersions (var-get currentVersion))
+          cv (get charter cv)
+          u"")))
     ;; check if sender is dao or extension
     (try! (is-dao-or-extension))
     ;; check length of charter
@@ -83,14 +85,12 @@
         txSender: tx-sender,
         dao: SELF,
         charter: charter,
-        previousCharter: (var-get daoCharter),
+        previousCharter: previousCharter,
         version: newVersion,
       },
     })
     ;; increment charter version
     (var-set currentVersion newVersion)
-    ;; set new charter
-    (var-set daoCharter charter)
     ;; return success
     (ok true)
   )
@@ -106,10 +106,7 @@
 )
 
 (define-read-only (get-current-dao-charter)
-  (if (> (var-get currentVersion) u0)
-    (some (var-get daoCharter))
-    none
-  )
+  (map-get? CharterVersions (var-get currentVersion))
 )
 
 (define-read-only (get-dao-charter (version uint))
