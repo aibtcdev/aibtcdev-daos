@@ -209,6 +209,7 @@ export function defineProposalContractDependencies(
           .addTraitDependency("DAO_PROPOSAL", "dao_trait_proposal")
           .addContractDependency("dao_contract_base", "BASE", "DAO")
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
+          .addAddressDependency("SBTC", "sbtc_token_contract")
           .addContractDependency(
             "dao_contract_action_proposal_voting",
             "EXTENSIONS",
