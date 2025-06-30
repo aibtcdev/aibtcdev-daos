@@ -2,11 +2,6 @@
 ;; version: 2.0.0
 ;; summary: A smart contract that holds funds used for proposal rewards.
 
-;; when a proposal is created, voted on, and/or concluded (TBD)
-;; it will check and transfer a fixed amount of tokens to this contract
-
-;; when a proposal is concluded, it will call this contract to transfer the reward
-
 ;; traits
 ;;
 
@@ -29,12 +24,6 @@
 (define-constant DEPLOYED_BURN_BLOCK burn-block-height)
 (define-constant DEPLOYED_STACKS_BLOCK stacks-block-height)
 (define-constant SELF (as-contract tx-sender))
-
-;; template variables
-;;
-
-;; data maps
-;;
 
 ;; public functions
 ;;
@@ -73,9 +62,9 @@
 ;;
 
 (define-private (is-dao-or-extension)
-  ;; /g/.aibtc-base-dao/dao_contract_base
   (ok (asserts!
     (or
+      ;; /g/.aibtc-base-dao/dao_contract_base
       (is-eq tx-sender .aibtc-base-dao)
       ;; /g/.aibtc-base-dao/dao_contract_base
       (contract-call? .aibtc-base-dao is-extension contract-caller)
