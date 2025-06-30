@@ -202,7 +202,9 @@ describe("Template Processor", () => {
     expect(processed).toContain("enabled: true");
     expect(processed).toContain("extension: .test-dao-charter");
     expect(processed).toContain("enabled: true");
-    expect(processed).toContain('notification: "TEST-base-dao/execute"');
+    expect(processed).toContain(
+      'notification: "TEST-initialize-base-dao/execute"'
+    );
   });
 
   it("should process token owner template", async () => {
