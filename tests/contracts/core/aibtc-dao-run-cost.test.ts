@@ -24,7 +24,7 @@ const ERR_PROPOSAL_MISMATCH = 1002;
 const ERR_SAVING_PROPOSAL = 1003;
 
 // Proposal expiration constant from the contract
-const PROPOSAL_EXPIRATION = 48;
+const PROPOSAL_EXPIRATION = 144;
 
 // Constants for testing
 const SET_OWNER = Cl.uint(1);
