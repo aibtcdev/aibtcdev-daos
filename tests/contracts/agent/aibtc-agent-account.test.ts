@@ -80,20 +80,6 @@ function setupAgentAccount(sender: string, satsAmount: number = 1000000) {
   const senderSbtcBalance = senderBalances.get(SBTC_ASSETS_MAP)!;
   const senderDaoTokenBalance = senderBalances.get(DAO_TOKEN_ASSETS_MAP)!;
 
-  // approve contracts for deposit
-  simnet.callPublicFn(
-    contractAddress,
-    "approve-contract",
-    [Cl.principal(SBTC_CONTRACT)],
-    sender
-  );
-  simnet.callPublicFn(
-    contractAddress,
-    "approve-contract",
-    [Cl.principal(daoTokenAddress)],
-    sender
-  );
-
   // deposit sBTC to the agent account
   const depositReceiptSbtc = simnet.callPublicFn(
     contractAddress,
@@ -208,32 +194,6 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
   });
 
-  it("deposit-ft() fails if contract is not approved", () => {
-    // arrange
-    const amount = 10000000;
-    const unapprovedToken = `${deployer}.unknown-token`;
-
-    // get sBTC from the faucet
-    const faucetReceipt = simnet.callPublicFn(
-      SBTC_CONTRACT,
-      "faucet",
-      [],
-      deployer
-    );
-    expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-
-    // act
-    const receipt = simnet.callPublicFn(
-      contractAddress,
-      "deposit-ft",
-      [Cl.principal(unapprovedToken), Cl.uint(amount)],
-      deployer
-    );
-
-    // assert
-    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_CONTRACT_NOT_APPROVED));
-  });
-
   it("deposit-ft() succeeds and transfers sBTC to the account", () => {
     // arrange
     const sbtcAmount = 100000000;
@@ -246,15 +206,6 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-
-    // approve the contract
-    const approveReceipt = simnet.callPublicFn(
-      contractAddress,
-      "approve-contract",
-      [Cl.principal(SBTC_CONTRACT)],
-      deployer
-    );
-    expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // act
     const receipt = simnet.callPublicFn(
@@ -290,15 +241,6 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-
-    // approve the contract
-    const approveReceipt = simnet.callPublicFn(
-      contractAddress,
-      "approve-contract",
-      [Cl.principal(SBTC_CONTRACT)],
-      deployer
-    );
-    expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // act
     const receipt = simnet.callPublicFn(
@@ -447,15 +389,6 @@ describe(`public functions: ${contractName}`, () => {
     );
     expect(faucetReceipt.result).toBeOk(Cl.bool(true));
 
-    // approve the contract
-    const approveReceipt = simnet.callPublicFn(
-      contractAddress,
-      "approve-contract",
-      [Cl.principal(SBTC_CONTRACT)],
-      deployer
-    );
-    expect(approveReceipt.result).toBeOk(Cl.bool(true));
-
     // deposit ft so we can withdraw
     const depositReceipt = simnet.callPublicFn(
       contractAddress,
@@ -499,15 +432,6 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     );
     expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-
-    // approve the contract
-    const approveReceipt = simnet.callPublicFn(
-      contractAddress,
-      "approve-contract",
-      [Cl.principal(SBTC_CONTRACT)],
-      deployer
-    );
-    expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // deposit ft so we can withdraw
     const depositReceipt = simnet.callPublicFn(
