@@ -76,14 +76,13 @@
   )
 )
 
-;; the owner or agent can deposit FT to this contract if the asset contract is approved
+;; the owner or agent can deposit FT to this contract which will approve the asset contract
 (define-public (deposit-ft
     (ft <ft-trait>)
     (amount uint)
   )
   (begin
     (asserts! (is-owner-or-agent-sender) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of ft)) ERR_CONTRACT_NOT_APPROVED)
     (print {
       notification: "aibtc-agent-account/deposit-ft",
       payload: {
@@ -94,6 +93,7 @@
         recipient: SELF,
       },
     })
+    (map-set ApprovedContracts (contract-of ft) true)
     (contract-call? ft transfer amount contract-caller SELF none)
   )
 )
