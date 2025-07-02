@@ -35,7 +35,7 @@
 (define-constant SET_CONFIRMATIONS u4)
 
 ;; proposal expiration
-(define-constant PROPOSAL_EXPIRATION u48) ;; 48 blocks / 8 hours
+(define-constant PROPOSAL_EXPIRATION u144) ;; 144 blocks / 24 hours
 
 ;; data vars
 ;;
