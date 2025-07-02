@@ -20,6 +20,7 @@ const contractName = contractAddress.split(".")[1];
 // Error constants from the contract
 const ERR_NOT_OWNER = 1000;
 const ERR_ASSET_NOT_ALLOWED = 1001;
+const ERR_PROPOSAL_MISMATCH = 1002;
 
 // Proposal expiration constant from the contract
 const PROPOSAL_EXPIRATION = 48;
@@ -407,16 +408,134 @@ describe(`edge cases: ${contractName}`, () => {
       address2
     );
 
-    // Try to execute again with a different value
+    // Try to add another confirmation from a 4th owner with the same params
     const receipt = simnet.callPublicFn(
       contractAddress,
       "set-owner",
-      [nonce, Cl.principal(address5), Cl.bool(false)],
+      [nonce, Cl.principal(address5), Cl.bool(true)],
       address3
     );
 
-    // Should be ok but execution should fail (returns false)
+    // Should be ok but execution should fail (returns false) because it's already executed
     expect(receipt.result).toBeOk(Cl.bool(false));
+  });
+
+  it("set-owner() fails if confirmation has mismatched parameters", () => {
+    // arrange
+    const nonce = Cl.uint(400);
+    // First confirmation creates proposal
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address5), Cl.bool(true)],
+      deployer
+    );
+
+    // act: Second confirmation with different parameters
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address5), Cl.bool(false)], // different status
+      address1
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ERR_PROPOSAL_MISMATCH));
+  });
+
+  it("set-asset() fails if confirmation has mismatched parameters", () => {
+    // arrange
+    const nonce = Cl.uint(401);
+    simnet.callPublicFn(
+      contractAddress,
+      "set-asset",
+      [nonce, Cl.principal(mockTokenAddress), Cl.bool(true)],
+      deployer
+    );
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "set-asset",
+      [nonce, Cl.principal(mockTokenAddress), Cl.bool(false)], // different enabled
+      address1
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ERR_PROPOSAL_MISMATCH));
+  });
+
+  it("transfer-dao-token() fails if confirmation has mismatched parameters", () => {
+    // arrange
+    const nonce = Cl.uint(402);
+    simnet.callPublicFn(
+      contractAddress,
+      "set-asset",
+      [Cl.uint(10), Cl.principal(mockTokenAddress), Cl.bool(true)],
+      deployer
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-asset",
+      [Cl.uint(10), Cl.principal(mockTokenAddress), Cl.bool(true)],
+      address1
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-asset",
+      [Cl.uint(10), Cl.principal(mockTokenAddress), Cl.bool(true)],
+      address2
+    );
+
+    simnet.callPublicFn(
+      contractAddress,
+      "transfer-dao-token",
+      [
+        nonce,
+        Cl.principal(mockTokenAddress),
+        Cl.uint(100),
+        Cl.principal(address3),
+      ],
+      deployer
+    );
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "transfer-dao-token",
+      [
+        nonce,
+        Cl.principal(mockTokenAddress),
+        Cl.uint(200), // different amount
+        Cl.principal(address3),
+      ],
+      address1
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ERR_PROPOSAL_MISMATCH));
+  });
+
+  it("set-confirmations() fails if confirmation has mismatched parameters", () => {
+    // arrange
+    const nonce = Cl.uint(403);
+    simnet.callPublicFn(
+      contractAddress,
+      "set-confirmations",
+      [nonce, Cl.uint(4)],
+      deployer
+    );
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "set-confirmations",
+      [nonce, Cl.uint(5)], // different required
+      address1
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ERR_PROPOSAL_MISMATCH));
   });
 });
 
@@ -718,7 +837,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const expectedProposal = Cl.tuple({
       who: Cl.principal(address3),
       status: Cl.bool(true),
-      executed: Cl.bool(false),
+      executed: Cl.none(),
       created: Cl.uint(4), // set by contract
     });
     simnet.callPublicFn(
@@ -753,6 +872,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const expectedProposal = Cl.tuple({
       token: Cl.principal(mockTokenAddress),
       enabled: Cl.bool(true),
+      executed: Cl.none(),
       created: Cl.uint(4), // set by contract
     });
     simnet.callPublicFn(
@@ -789,6 +909,7 @@ describe(`read-only functions: ${contractName}`, () => {
       ft: Cl.principal(mockTokenAddress),
       amount: Cl.uint(500),
       to: Cl.principal(address3),
+      executed: Cl.none(),
       created: Cl.uint(4), // set by contract
     });
     simnet.callPublicFn(
@@ -823,7 +944,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const required = Cl.uint(2);
     const expectedProposal = Cl.tuple({
       required: Cl.uint(2),
-      executed: Cl.bool(false),
+      executed: Cl.none(),
       created: Cl.uint(4), // set by contract
     });
     simnet.callPublicFn(

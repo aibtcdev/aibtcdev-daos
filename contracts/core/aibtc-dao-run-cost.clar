@@ -20,6 +20,7 @@
 ;; error messages
 (define-constant ERR_NOT_OWNER (err u1000))
 (define-constant ERR_ASSET_NOT_ALLOWED (err u1001))
+(define-constant ERR_PROPOSAL_MISMATCH (err u1002))
 
 ;; contract details
 (define-constant DEPLOYED_BURN_BLOCK burn-block-height)
@@ -60,7 +61,7 @@
   {
     who: principal, ;; owner
     status: bool, ;; enabled
-    executed: bool, ;; executed
+    executed: (optional uint), ;; block height if executed
     created: uint, ;; block height
   }
 )
@@ -70,6 +71,7 @@
   {
     token: principal, ;; asset contract
     enabled: bool, ;; enabled
+    executed: (optional uint), ;; block height if executed
     created: uint, ;; block height
   }
 )
@@ -80,6 +82,7 @@
     ft: principal, ;; asset contract
     amount: uint, ;; amount
     to: principal, ;; recipient
+    executed: (optional uint), ;; block height if executed
     created: uint, ;; block height
   }
 )
@@ -88,7 +91,7 @@
   uint ;; nonce
   {
     required: uint, ;; new confirmation threshold
-    executed: bool, ;; executed
+    executed: (optional uint), ;; block height if executed
     created: uint, ;; block height
   }
 )
@@ -125,13 +128,23 @@
   )
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
-    (var-set setOwnerProposalsTotal (+ (var-get setOwnerProposalsTotal) u1))
-    (map-insert SetOwnerProposals nonce {
-      who: who,
-      status: status,
-      executed: false,
-      created: burn-block-height,
-    })
+    (let ((proposal-opt (map-get? SetOwnerProposals nonce)))
+      (if (is-some proposal-opt)
+        (let ((proposal (unwrap-panic proposal-opt)))
+          (asserts! (is-eq (get who proposal) who) ERR_PROPOSAL_MISMATCH)
+          (asserts! (is-eq (get status proposal) status) ERR_PROPOSAL_MISMATCH)
+        )
+        (begin
+          (var-set setOwnerProposalsTotal (+ (var-get setOwnerProposalsTotal) u1))
+          (map-insert SetOwnerProposals nonce {
+            who: who,
+            status: status,
+            executed: none,
+            created: burn-block-height,
+          })
+        )
+      )
+    )
     (print {
       notification: "dao-run-cost/set-owner",
       payload: {
@@ -153,12 +166,23 @@
   )
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
-    (var-set setAssetProposalsTotal (+ (var-get setAssetProposalsTotal) u1))
-    (map-insert SetAssetProposals nonce {
-      token: token,
-      enabled: enabled,
-      created: burn-block-height,
-    })
+    (let ((proposal-opt (map-get? SetAssetProposals nonce)))
+      (if (is-some proposal-opt)
+        (let ((proposal (unwrap-panic proposal-opt)))
+          (asserts! (is-eq (get token proposal) token) ERR_PROPOSAL_MISMATCH)
+          (asserts! (is-eq (get enabled proposal) enabled) ERR_PROPOSAL_MISMATCH)
+        )
+        (begin
+          (var-set setAssetProposalsTotal (+ (var-get setAssetProposalsTotal) u1))
+          (map-insert SetAssetProposals nonce {
+            token: token,
+            enabled: enabled,
+            executed: none,
+            created: burn-block-height,
+          })
+        )
+      )
+    )
     (print {
       notification: "dao-run-cost/set-asset",
       payload: {
@@ -182,13 +206,25 @@
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
     (asserts! (is-allowed-asset (contract-of ft)) ERR_ASSET_NOT_ALLOWED)
-    (var-set transferProposalsTotal (+ (var-get transferProposalsTotal) u1))
-    (map-insert TransferProposals nonce {
-      ft: (contract-of ft),
-      amount: amount,
-      to: to,
-      created: burn-block-height,
-    })
+    (let ((proposal-opt (map-get? TransferProposals nonce)))
+      (if (is-some proposal-opt)
+        (let ((proposal (unwrap-panic proposal-opt)))
+          (asserts! (is-eq (get ft proposal) (contract-of ft)) ERR_PROPOSAL_MISMATCH)
+          (asserts! (is-eq (get amount proposal) amount) ERR_PROPOSAL_MISMATCH)
+          (asserts! (is-eq (get to proposal) to) ERR_PROPOSAL_MISMATCH)
+        )
+        (begin
+          (var-set transferProposalsTotal (+ (var-get transferProposalsTotal) u1))
+          (map-insert TransferProposals nonce {
+            ft: (contract-of ft),
+            amount: amount,
+            to: to,
+            executed: none,
+            created: burn-block-height,
+          })
+        )
+      )
+    )
     (print {
       notification: "dao-run-cost/transfer-dao-token",
       payload: {
@@ -210,14 +246,23 @@
   )
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
-    (var-set setConfirmationsProposalsTotal
-      (+ (var-get setConfirmationsProposalsTotal) u1)
+    (let ((proposal-opt (map-get? SetConfirmationsProposals nonce)))
+      (if (is-some proposal-opt)
+        (let ((proposal (unwrap-panic proposal-opt)))
+          (asserts! (is-eq (get required proposal) required) ERR_PROPOSAL_MISMATCH)
+        )
+        (begin
+          (var-set setConfirmationsProposalsTotal
+            (+ (var-get setConfirmationsProposalsTotal) u1)
+          )
+          (map-insert SetConfirmationsProposals nonce {
+            required: required,
+            executed: none,
+            created: burn-block-height,
+          })
+        )
+      )
     )
-    (map-insert SetConfirmationsProposals nonce {
-      required: required,
-      executed: false,
-      created: burn-block-height,
-    })
     (print {
       notification: "dao-run-cost/set-confirmations",
       payload: {
@@ -355,56 +400,46 @@
 )
 
 (define-private (execute-set-owner (nonce uint))
-  (let (
-      (proposal (map-get? SetOwnerProposals nonce))
-      (proposalDetails (unwrap! proposal false))
-    )
-    (asserts! (can-execute (get created proposalDetails)) false)
-    (asserts! (is-some proposal) false)
-    (asserts! (is-eq (get executed proposalDetails) false) false)
-    (map-set SetOwnerProposals nonce {
-      who: (get who proposalDetails),
-      status: (get status proposalDetails),
-      executed: true,
-      created: burn-block-height,
-    })
+  (let ((proposal (unwrap! (map-get? SetOwnerProposals nonce) false)))
+    (asserts! (can-execute (get created proposal)) false)
+    (asserts! (is-none (get executed proposal)) false)
+    (map-set Owners (get who proposal) (get status proposal))
+    (map-set SetOwnerProposals nonce (merge proposal { executed: (some burn-block-height) }))
     (print {
       notification: "dao-run-cost/execute-set-owner",
       payload: {
         nonce: nonce,
-        who: (get who proposalDetails),
-        status: (get status proposalDetails),
-        executed: true,
-        created: (get created proposalDetails),
+        who: (get who proposal),
+        status: (get status proposal),
+        executed: (some burn-block-height),
+        created: (get created proposal),
         contractCaller: contract-caller,
         txSender: tx-sender,
       },
     })
-    (map-set Owners (get who proposalDetails) (get status proposalDetails))
+    true
   )
 )
 
 (define-private (execute-set-asset (nonce uint))
-  (let (
-      (proposal (map-get? SetAssetProposals nonce))
-      (proposalDetails (unwrap! proposal false))
-    )
-    (asserts! (can-execute (get created proposalDetails)) false)
-    (asserts! (is-some proposal) false)
+  (let ((proposal (unwrap! (map-get? SetAssetProposals nonce) false)))
+    (asserts! (can-execute (get created proposal)) false)
+    (asserts! (is-none (get executed proposal)) false)
+    (map-set AllowedAssets (get token proposal) (get enabled proposal))
+    (map-set SetAssetProposals nonce (merge proposal { executed: (some burn-block-height) }))
     (print {
       notification: "dao-run-cost/execute-set-asset",
       payload: {
         nonce: nonce,
-        token: (get token proposalDetails),
-        enabled: (get enabled proposalDetails),
-        created: (get created proposalDetails),
+        token: (get token proposal),
+        enabled: (get enabled proposal),
+        executed: (some burn-block-height),
+        created: (get created proposal),
         contractCaller: contract-caller,
         txSender: tx-sender,
       },
     })
-    (map-set AllowedAssets (get token proposalDetails)
-      (get enabled proposalDetails)
-    )
+    true
   )
 )
 
@@ -412,27 +447,26 @@
     (nonce uint)
     (ft <sip010-trait>)
   )
-  (let (
-      (proposal (map-get? TransferProposals nonce))
-      (proposalDetails (unwrap! proposal false))
-    )
-    (asserts! (can-execute (get created proposalDetails)) false)
-    (asserts! (is-some proposal) false)
+  (let ((proposal (unwrap! (map-get? TransferProposals nonce) false)))
+    (asserts! (can-execute (get created proposal)) false)
+    (asserts! (is-none (get executed proposal)) false)
+    (map-set TransferProposals nonce (merge proposal { executed: (some burn-block-height) }))
     (print {
       notification: "dao-run-cost/execute-transfer",
       payload: {
         nonce: nonce,
-        amount: (get amount proposalDetails),
-        recipient: (get to proposalDetails),
-        assetContract: (get ft proposalDetails),
-        created: (get created proposalDetails),
+        amount: (get amount proposal),
+        recipient: (get to proposal),
+        assetContract: (get ft proposal),
+        executed: (some burn-block-height),
+        created: (get created proposal),
         contractCaller: contract-caller,
         txSender: tx-sender,
       },
     })
     (unwrap!
-      (as-contract (contract-call? ft transfer (get amount proposalDetails) SELF
-        (get to proposalDetails) none
+      (as-contract (contract-call? ft transfer (get amount proposal) SELF
+        (get to proposal) none
       ))
       false
     )
@@ -440,30 +474,23 @@
 )
 
 (define-private (execute-set-confirmations (nonce uint))
-  (let (
-      (proposal (map-get? SetConfirmationsProposals nonce))
-      (proposalDetails (unwrap! proposal false))
-    )
-    (asserts! (can-execute (get created proposalDetails)) false)
-    (asserts! (is-some proposal) false)
-    (asserts! (is-eq (get executed proposalDetails) false) false)
-    (map-set SetConfirmationsProposals nonce {
-      required: (get required proposalDetails),
-      executed: true,
-      created: burn-block-height,
-    })
+  (let ((proposal (unwrap! (map-get? SetConfirmationsProposals nonce) false)))
+    (asserts! (can-execute (get created proposal)) false)
+    (asserts! (is-none (get executed proposal)) false)
+    (var-set confirmationsRequired (get required proposal))
+    (map-set SetConfirmationsProposals nonce (merge proposal { executed: (some burn-block-height) }))
     (print {
       notification: "dao-run-cost/execute-set-confirmations",
       payload: {
         nonce: nonce,
-        required: (get required proposalDetails),
-        executed: true,
-        created: (get created proposalDetails),
+        required: (get required proposal),
+        executed: (some burn-block-height),
+        created: (get created proposal),
         contractCaller: contract-caller,
         txSender: tx-sender,
       },
     })
-    (var-set confirmationsRequired (get required proposalDetails))
+    true
   )
 )
 
