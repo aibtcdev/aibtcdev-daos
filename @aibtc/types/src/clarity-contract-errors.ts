@@ -1,3 +1,11 @@
+// aibtc-dao-run-cost.clar
+export enum ErrCodeDaoRunCost {
+  ERR_NOT_OWNER = 1000,
+  ERR_ASSET_NOT_ALLOWED,
+  ERR_PROPOSAL_MISMATCH,
+  ERR_SAVING_PROPOSAL,
+}
+
 // protocol-fees-account.clar
 export enum ErrCodeProtocolFeesAccount {
   ERR_NOT_OWNER = 1000,
