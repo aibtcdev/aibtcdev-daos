@@ -21,6 +21,7 @@ const contractName = contractAddress.split(".")[1];
 const ERR_NOT_OWNER = 1000;
 const ERR_ASSET_NOT_ALLOWED = 1001;
 const ERR_PROPOSAL_MISMATCH = 1002;
+const ERR_SAVING_PROPOSAL = 1003;
 
 // Proposal expiration constant from the contract
 const PROPOSAL_EXPIRATION = 48;

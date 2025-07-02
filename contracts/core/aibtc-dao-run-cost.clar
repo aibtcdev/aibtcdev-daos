@@ -21,6 +21,7 @@
 (define-constant ERR_NOT_OWNER (err u1000))
 (define-constant ERR_ASSET_NOT_ALLOWED (err u1001))
 (define-constant ERR_PROPOSAL_MISMATCH (err u1002))
+(define-constant ERR_SAVING_PROPOSAL (err u1003))
 
 ;; contract details
 (define-constant DEPLOYED_BURN_BLOCK burn-block-height)
@@ -136,12 +137,12 @@
         )
         (begin
           (var-set setOwnerProposalsTotal (+ (var-get setOwnerProposalsTotal) u1))
-          (map-insert SetOwnerProposals nonce {
+          (asserts! (map-insert SetOwnerProposals nonce {
             who: who,
             status: status,
             executed: none,
             created: burn-block-height,
-          })
+          }) ERR_SAVING_PROPOSAL)
         )
       )
     )
@@ -174,12 +175,12 @@
         )
         (begin
           (var-set setAssetProposalsTotal (+ (var-get setAssetProposalsTotal) u1))
-          (map-insert SetAssetProposals nonce {
+          (asserts! (map-insert SetAssetProposals nonce {
             token: token,
             enabled: enabled,
             executed: none,
             created: burn-block-height,
-          })
+          }) ERR_SAVING_PROPOSAL)
         )
       )
     )
@@ -215,13 +216,13 @@
         )
         (begin
           (var-set transferProposalsTotal (+ (var-get transferProposalsTotal) u1))
-          (map-insert TransferProposals nonce {
+          (asserts! (map-insert TransferProposals nonce {
             ft: (contract-of ft),
             amount: amount,
             to: to,
             executed: none,
             created: burn-block-height,
-          })
+          }) ERR_SAVING_PROPOSAL)
         )
       )
     )
@@ -255,11 +256,11 @@
           (var-set setConfirmationsProposalsTotal
             (+ (var-get setConfirmationsProposalsTotal) u1)
           )
-          (map-insert SetConfirmationsProposals nonce {
+          (asserts! (map-insert SetConfirmationsProposals nonce {
             required: required,
             executed: none,
             created: burn-block-height,
-          })
+          }) ERR_SAVING_PROPOSAL)
         )
       )
     )
