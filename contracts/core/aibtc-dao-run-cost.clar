@@ -129,21 +129,20 @@
   )
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
-    (let ((proposalOpt (map-get? SetOwnerProposals nonce)))
-      (if (is-some proposalOpt)
-        (let ((proposal (unwrap-panic proposalOpt)))
-          (asserts! (is-eq (get who proposal) who) ERR_PROPOSAL_MISMATCH)
-          (asserts! (is-eq (get status proposal) status) ERR_PROPOSAL_MISMATCH)
-        )
-        (begin
-          (var-set setOwnerProposalsTotal (+ (var-get setOwnerProposalsTotal) u1))
-          (asserts! (map-insert SetOwnerProposals nonce {
-            who: who,
-            status: status,
-            executed: none,
-            created: burn-block-height,
-          }) ERR_SAVING_PROPOSAL)
-        )
+    (match (map-get? SetOwnerProposals nonce)
+      proposal
+      (begin
+        (asserts! (is-eq (get who proposal) who) ERR_PROPOSAL_MISMATCH)
+        (asserts! (is-eq (get status proposal) status) ERR_PROPOSAL_MISMATCH)
+      )
+      (begin
+        (var-set setOwnerProposalsTotal (+ (var-get setOwnerProposalsTotal) u1))
+        (asserts! (map-insert SetOwnerProposals nonce {
+          who: who,
+          status: status,
+          executed: none,
+          created: burn-block-height,
+        }) ERR_SAVING_PROPOSAL)
       )
     )
     (print {
@@ -167,21 +166,20 @@
   )
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
-    (let ((proposalOpt (map-get? SetAssetProposals nonce)))
-      (if (is-some proposalOpt)
-        (let ((proposal (unwrap-panic proposalOpt)))
-          (asserts! (is-eq (get token proposal) token) ERR_PROPOSAL_MISMATCH)
-          (asserts! (is-eq (get enabled proposal) enabled) ERR_PROPOSAL_MISMATCH)
-        )
-        (begin
-          (var-set setAssetProposalsTotal (+ (var-get setAssetProposalsTotal) u1))
-          (asserts! (map-insert SetAssetProposals nonce {
-            token: token,
-            enabled: enabled,
-            executed: none,
-            created: burn-block-height,
-          }) ERR_SAVING_PROPOSAL)
-        )
+    (match (map-get? SetAssetProposals nonce)
+      proposal
+      (begin
+        (asserts! (is-eq (get token proposal) token) ERR_PROPOSAL_MISMATCH)
+        (asserts! (is-eq (get enabled proposal) enabled) ERR_PROPOSAL_MISMATCH)
+      )
+      (begin
+        (var-set setAssetProposalsTotal (+ (var-get setAssetProposalsTotal) u1))
+        (asserts! (map-insert SetAssetProposals nonce {
+          token: token,
+          enabled: enabled,
+          executed: none,
+          created: burn-block-height,
+        }) ERR_SAVING_PROPOSAL)
       )
     )
     (print {
@@ -207,23 +205,22 @@
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
     (asserts! (is-allowed-asset (contract-of ft)) ERR_ASSET_NOT_ALLOWED)
-    (let ((proposalOpt (map-get? TransferProposals nonce)))
-      (if (is-some proposalOpt)
-        (let ((proposal (unwrap-panic proposalOpt)))
-          (asserts! (is-eq (get ft proposal) (contract-of ft)) ERR_PROPOSAL_MISMATCH)
-          (asserts! (is-eq (get amount proposal) amount) ERR_PROPOSAL_MISMATCH)
-          (asserts! (is-eq (get to proposal) to) ERR_PROPOSAL_MISMATCH)
-        )
-        (begin
-          (var-set transferProposalsTotal (+ (var-get transferProposalsTotal) u1))
-          (asserts! (map-insert TransferProposals nonce {
-            ft: (contract-of ft),
-            amount: amount,
-            to: to,
-            executed: none,
-            created: burn-block-height,
-          }) ERR_SAVING_PROPOSAL)
-        )
+    (match (map-get? TransferProposals nonce)
+      proposal
+      (begin
+        (asserts! (is-eq (get ft proposal) (contract-of ft)) ERR_PROPOSAL_MISMATCH)
+        (asserts! (is-eq (get amount proposal) amount) ERR_PROPOSAL_MISMATCH)
+        (asserts! (is-eq (get to proposal) to) ERR_PROPOSAL_MISMATCH)
+      )
+      (begin
+        (var-set transferProposalsTotal (+ (var-get transferProposalsTotal) u1))
+        (asserts! (map-insert TransferProposals nonce {
+          ft: (contract-of ft),
+          amount: amount,
+          to: to,
+          executed: none,
+          created: burn-block-height,
+        }) ERR_SAVING_PROPOSAL)
       )
     )
     (print {
@@ -247,21 +244,18 @@
   )
   (begin
     (asserts! (is-owner contract-caller) ERR_NOT_OWNER)
-    (let ((proposalOpt (map-get? SetConfirmationsProposals nonce)))
-      (if (is-some proposalOpt)
-        (let ((proposal (unwrap-panic proposalOpt)))
-          (asserts! (is-eq (get required proposal) required) ERR_PROPOSAL_MISMATCH)
+    (match (map-get? SetConfirmationsProposals nonce)
+      proposal
+      (asserts! (is-eq (get required proposal) required) ERR_PROPOSAL_MISMATCH)
+      (begin
+        (var-set setConfirmationsProposalsTotal
+          (+ (var-get setConfirmationsProposalsTotal) u1)
         )
-        (begin
-          (var-set setConfirmationsProposalsTotal
-            (+ (var-get setConfirmationsProposalsTotal) u1)
-          )
-          (asserts! (map-insert SetConfirmationsProposals nonce {
-            required: required,
-            executed: none,
-            created: burn-block-height,
-          }) ERR_SAVING_PROPOSAL)
-        )
+        (asserts! (map-insert SetConfirmationsProposals nonce {
+          required: required,
+          executed: none,
+          created: burn-block-height,
+        }) ERR_SAVING_PROPOSAL)
       )
     )
     (print {
