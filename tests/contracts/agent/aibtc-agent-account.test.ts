@@ -172,6 +172,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "deposit-stx() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -255,6 +256,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "deposit-ft() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -337,6 +339,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "withdraw-stx() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -455,6 +458,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "withdraw-ft() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -528,6 +532,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "approve-contract() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -619,6 +624,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "revoke-contract() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -724,6 +730,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "create-action-proposal() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -864,6 +871,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "vote-on-action-proposal() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -981,6 +989,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "veto-action-proposal() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -1225,6 +1234,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "conclude-action-proposal() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -1288,6 +1298,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "set-agent-can-use-proposals() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -1352,6 +1363,9 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, {
+      titleBefore: "set-agent-can-approve-revoke-contracts() event",
+    });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -1415,6 +1429,9 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, {
+      titleBefore: "set-agent-can-buy-sell-assets() event",
+    });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -1545,6 +1562,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "faktory-buy-asset() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -1694,6 +1712,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "faktory-sell-asset() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 });
