@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { ErrCodeAgentAccount } from "../../../utilities/contract-error-codes";
 import { setupFullContractRegistry } from "../../../utilities/contract-registry";
 import {
+  convertClarityTuple,
   convertSIP019PrintEvent,
   SBTC_CONTRACT,
 } from "../../../utilities/contract-helpers";
@@ -24,6 +25,21 @@ const contractName = contractAddress.split(".")[1];
 
 // import error codes
 const ErrCode = ErrCodeAgentAccount;
+
+// types
+type AgentAccountConfiguration = {
+  account: string;
+  agent: string;
+  owner: string;
+  sbtc: string;
+};
+
+type AgentAccountPermissions = {
+  canDeposit: boolean;
+  canUseProposals: boolean;
+  canApproveRevokeContracts: boolean;
+  canBuySell: boolean;
+};
 
 describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
@@ -519,7 +535,7 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-configuration() returns the correct configuration", () => {
     // arrange
-    const expectedConfig = {
+    const expectedConfig: AgentAccountConfiguration = {
       account: contractAddress,
       agent: address2,
       owner: deployer,
@@ -534,21 +550,10 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
 
-    // Convert the Clarity value to a JavaScript object
-    const config = configCV.result;
-    if (config.type !== ClarityType.Tuple) {
-      throw new Error("returned object is not a tuple");
-    }
-
-    // Convert the TupleCV to a plain object
-    const configTuple = config.value;
-    const configData = Object.fromEntries(
-      Object.entries(configTuple).map(
-        ([key, value]: [string, ClarityValue]) => [key, cvToValue(value, true)]
-      )
-    );
-
     // assert
+    const configData = convertClarityTuple<AgentAccountConfiguration>(
+      configCV.result
+    );
     expect(configData).toEqual(expectedConfig);
   });
 
@@ -557,7 +562,7 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-agent-permissions() returns the correct agent permissions", () => {
     // arrange
-    const expectedInitialPermissions = {
+    const expectedInitialPermissions: AgentAccountPermissions = {
       canDeposit: true,
       canUseProposals: true,
       canApproveRevokeContracts: true,
@@ -573,7 +578,9 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert initial state
-    const permissionsData = cvToValue(permissionsCV.result, true);
+    const permissionsData = convertClarityTuple<AgentAccountPermissions>(
+      permissionsCV.result
+    );
     expect(permissionsData).toEqual(expectedInitialPermissions);
 
     // arrange - change a permission
@@ -584,7 +591,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
 
-    const expectedUpdatedPermissions = {
+    const expectedUpdatedPermissions: AgentAccountPermissions = {
       ...expectedInitialPermissions,
       canBuySell: true,
     };
@@ -598,7 +605,8 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert updated state
-    const updatedPermissionsData = cvToValue(updatedPermissionsCV.result, true);
+    const updatedPermissionsData =
+      convertClarityTuple<AgentAccountPermissions>(updatedPermissionsCV.result);
     expect(updatedPermissionsData).toEqual(expectedUpdatedPermissions);
   });
 
