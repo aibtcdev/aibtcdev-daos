@@ -552,6 +552,56 @@ describe(`read-only functions: ${contractName}`, () => {
     expect(configData).toEqual(expectedConfig);
   });
 
+  ////////////////////////////////////////
+  // get-agent-permissions() tests
+  ////////////////////////////////////////
+  it("get-agent-permissions() returns the correct agent permissions", () => {
+    // arrange
+    const expectedInitialPermissions = {
+      canDeposit: true,
+      canUseProposals: true,
+      canApproveRevokeContracts: true,
+      canBuySell: false,
+    };
+
+    // act
+    const permissionsCV = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-agent-permissions",
+      [],
+      deployer
+    );
+
+    // assert initial state
+    const permissionsData = cvToValue(permissionsCV.result, true);
+    expect(permissionsData).toEqual(expectedInitialPermissions);
+
+    // arrange - change a permission
+    simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-buy-sell-assets",
+      [Cl.bool(true)],
+      deployer
+    );
+
+    const expectedUpdatedPermissions = {
+      ...expectedInitialPermissions,
+      canBuySell: true,
+    };
+
+    // act again
+    const updatedPermissionsCV = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-agent-permissions",
+      [],
+      deployer
+    );
+
+    // assert updated state
+    const updatedPermissionsData = cvToValue(updatedPermissionsCV.result, true);
+    expect(updatedPermissionsData).toEqual(expectedUpdatedPermissions);
+  });
+
   it("agent can approve/revoke contracts when authorized and fails when revoked", () => {
     // arrange
     const newContract = `${deployer}.some-new-contract`;

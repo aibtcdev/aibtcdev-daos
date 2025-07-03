@@ -408,6 +408,15 @@
   }
 )
 
+(define-read-only (get-agent-permissions)
+  {
+    canDeposit: (var-get agentCanDepositAssets),
+    canUseProposals: (var-get agentCanUseProposals),
+    canApproveRevokeContracts: (var-get agentCanApproveRevokeContracts),
+    canBuySell: (var-get agentCanBuySellAssets)
+  }
+)
+
 ;; private functions
 
 (define-private (is-owner)
