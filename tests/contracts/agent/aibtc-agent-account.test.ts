@@ -106,7 +106,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // deposit-stx() tests
   ////////////////////////////////////////
-  it("deposit-stx() fails if caller is not the owner or agent", () => {
+  it("deposit-stx() fails if caller is not authorized", () => {
     // arrange
     const amount = 1000000; // 1 STX
 
@@ -116,6 +116,31 @@ describe(`public functions: ${contractName}`, () => {
       "deposit-stx",
       [Cl.uint(amount)],
       address3
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
+  });
+
+  it("deposit-stx() fails for agent if permission is revoked", () => {
+    // arrange
+    const amount = 1000000; // 1 STX
+
+    // act
+    // revoke permission
+    const revokeReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-deposit-assets",
+      [Cl.bool(false)],
+      deployer
+    );
+    expect(revokeReceipt.result).toBeOk(Cl.bool(true));
+
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "deposit-stx",
+      [Cl.uint(amount)],
+      address2 // agent
     );
 
     // assert
@@ -179,7 +204,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // deposit-ft() tests
   ////////////////////////////////////////
-  it("deposit-ft() fails if caller is not the owner or agent", () => {
+  it("deposit-ft() fails if caller is not authorized", () => {
     // arrange
     const amount = 10000000;
 
@@ -189,6 +214,31 @@ describe(`public functions: ${contractName}`, () => {
       "deposit-ft",
       [Cl.principal(SBTC_CONTRACT), Cl.uint(amount)],
       address3
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
+  });
+
+  it("deposit-ft() fails for agent if permission is revoked", () => {
+    // arrange
+    const amount = 10000000;
+
+    // act
+    // revoke permission
+    const revokeReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-deposit-assets",
+      [Cl.bool(false)],
+      deployer
+    );
+    expect(revokeReceipt.result).toBeOk(Cl.bool(true));
+
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "deposit-ft",
+      [Cl.principal(SBTC_CONTRACT), Cl.uint(amount)],
+      address2 // agent
     );
 
     // assert
@@ -218,6 +268,15 @@ describe(`public functions: ${contractName}`, () => {
 
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
+
+    // verify the contract is now approved
+    const isApproved = simnet.callReadOnlyFn(
+      contractAddress,
+      "is-approved-contract",
+      [Cl.principal(SBTC_CONTRACT)],
+      deployer
+    );
+    expect(isApproved.result).toStrictEqual(Cl.bool(true));
   });
 
   it("deposit-ft() emits the correct notification event", () => {
@@ -1235,6 +1294,70 @@ describe(`public functions: ${contractName}`, () => {
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
     dbgLog(printEvent, { titleBefore: "conclude-action-proposal() event" });
+    expect(printEvent).toStrictEqual(expectedEvent);
+  });
+
+  ////////////////////////////////////////
+  // set-agent-can-deposit-assets() tests
+  ////////////////////////////////////////
+  it("set-agent-can-deposit-assets() fails if caller is not the owner", () => {
+    // arrange
+    const canDeposit = false;
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-deposit-assets",
+      [Cl.bool(canDeposit)],
+      address3
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_CALLER_NOT_OWNER));
+  });
+
+  it("set-agent-can-deposit-assets() succeeds and sets agent permission", () => {
+    // arrange
+    const canDeposit = false;
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-deposit-assets",
+      [Cl.bool(canDeposit)],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+  });
+
+  it("set-agent-can-deposit-assets() emits the correct notification event", () => {
+    // arrange
+    const canDeposit = false;
+    const expectedEvent = {
+      notification: "aibtc-agent-account/set-agent-can-deposit-assets",
+      payload: {
+        canDeposit: canDeposit,
+        sender: deployer,
+        caller: deployer,
+      },
+    };
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-deposit-assets",
+      [Cl.bool(canDeposit)],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+    const event = receipt.events[0];
+    expect(event).toBeDefined();
+    const printEvent = convertSIP019PrintEvent(receipt.events[0]);
+    dbgLog(printEvent, { titleBefore: "set-agent-can-deposit-assets() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 

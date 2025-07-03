@@ -53,6 +53,7 @@
 (map-set ApprovedContracts SBTC_TOKEN true)
 
 ;; data vars
+(define-data-var agentCanDepositAssets bool true)
 (define-data-var agentCanUseProposals bool true)
 (define-data-var agentCanApproveRevokeContracts bool true)
 (define-data-var agentCanBuySellAssets bool false)
@@ -62,7 +63,7 @@
 ;; the owner or agent can deposit STX to this contract
 (define-public (deposit-stx (amount uint))
   (begin
-    (asserts! (is-owner-or-agent-sender) ERR_OPERATION_NOT_ALLOWED)
+    (asserts! (deposit-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/deposit-stx",
       payload: {
@@ -82,7 +83,7 @@
     (amount uint)
   )
   (begin
-    (asserts! (is-owner-or-agent-sender) ERR_OPERATION_NOT_ALLOWED)
+    (asserts! (deposit-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/deposit-ft",
       payload: {
@@ -294,6 +295,22 @@
 
 ;; Agent Account Configuration Functions
 
+;; the owner can set whether the agent can deposit assets
+(define-public (set-agent-can-deposit-assets (canDeposit bool))
+  (begin
+    (asserts! (is-owner) ERR_CALLER_NOT_OWNER)
+    (print {
+      notification: "aibtc-agent-account/set-agent-can-deposit-assets",
+      payload: {
+        canDeposit: canDeposit,
+        sender: tx-sender,
+        caller: contract-caller,
+      },
+    })
+    (ok (var-set agentCanDepositAssets canDeposit))
+  )
+)
+
 ;; the owner can set whether the agent can use proposals
 (define-public (set-agent-can-use-proposals (canUseProposals bool))
   (begin
@@ -401,11 +418,8 @@
   (is-eq contract-caller ACCOUNT_AGENT)
 )
 
-(define-private (is-owner-or-agent-sender)
-  (or
-    (is-eq tx-sender ACCOUNT_OWNER)
-    (is-eq tx-sender ACCOUNT_AGENT)
-  )
+(define-private (deposit-allowed)
+  (or (is-owner) (and (is-agent) (var-get agentCanDepositAssets)))
 )
 
 (define-private (use-proposals-allowed)
