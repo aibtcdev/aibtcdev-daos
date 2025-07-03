@@ -53,6 +53,7 @@
 (map-set ApprovedContracts SBTC_TOKEN true)
 
 ;; data vars
+(define-data-var agentCanDepositAssets bool true)
 (define-data-var agentCanUseProposals bool true)
 (define-data-var agentCanApproveRevokeContracts bool true)
 (define-data-var agentCanBuySellAssets bool false)
@@ -62,7 +63,7 @@
 ;; the owner or agent can deposit STX to this contract
 (define-public (deposit-stx (amount uint))
   (begin
-    (asserts! (is-owner-or-agent-sender) ERR_OPERATION_NOT_ALLOWED)
+    (asserts! (deposit-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/deposit-stx",
       payload: {
@@ -76,14 +77,13 @@
   )
 )
 
-;; the owner or agent can deposit FT to this contract if the asset contract is approved
+;; the owner or agent can deposit FT to this contract which will approve the asset contract
 (define-public (deposit-ft
     (ft <ft-trait>)
     (amount uint)
   )
   (begin
-    (asserts! (is-owner-or-agent-sender) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of ft)) ERR_CONTRACT_NOT_APPROVED)
+    (asserts! (deposit-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/deposit-ft",
       payload: {
@@ -94,6 +94,7 @@
         recipient: SELF,
       },
     })
+    (map-set ApprovedContracts (contract-of ft) true)
     (contract-call? ft transfer amount contract-caller SELF none)
   )
 )
@@ -294,6 +295,22 @@
 
 ;; Agent Account Configuration Functions
 
+;; the owner can set whether the agent can deposit assets
+(define-public (set-agent-can-deposit-assets (canDeposit bool))
+  (begin
+    (asserts! (is-owner) ERR_CALLER_NOT_OWNER)
+    (print {
+      notification: "aibtc-agent-account/set-agent-can-deposit-assets",
+      payload: {
+        canDeposit: canDeposit,
+        sender: tx-sender,
+        caller: contract-caller,
+      },
+    })
+    (ok (var-set agentCanDepositAssets canDeposit))
+  )
+)
+
 ;; the owner can set whether the agent can use proposals
 (define-public (set-agent-can-use-proposals (canUseProposals bool))
   (begin
@@ -391,6 +408,15 @@
   }
 )
 
+(define-read-only (get-agent-permissions)
+  {
+    canDeposit: (var-get agentCanDepositAssets),
+    canUseProposals: (var-get agentCanUseProposals),
+    canApproveRevokeContracts: (var-get agentCanApproveRevokeContracts),
+    canBuySell: (var-get agentCanBuySellAssets),
+  }
+)
+
 ;; private functions
 
 (define-private (is-owner)
@@ -401,11 +427,8 @@
   (is-eq contract-caller ACCOUNT_AGENT)
 )
 
-(define-private (is-owner-or-agent-sender)
-  (or
-    (is-eq tx-sender ACCOUNT_OWNER)
-    (is-eq tx-sender ACCOUNT_AGENT)
-  )
+(define-private (deposit-allowed)
+  (or (is-owner) (and (is-agent) (var-get agentCanDepositAssets)))
 )
 
 (define-private (use-proposals-allowed)
@@ -424,6 +447,9 @@
   ;; print creation event
   (print {
     notification: "aibtc-agent-account/user-agent-account-created",
-    payload: (get-configuration),
+    payload: {
+      config: (get-configuration),
+      agentPermissions: (get-agent-permissions),
+    },
   })
 )

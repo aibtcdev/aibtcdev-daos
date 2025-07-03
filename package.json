@@ -1,6 +1,6 @@
 {
   "name": "aibtcdev-daos",
-  "version": "0.25.0",
+  "version": "0.29.0",
   "description": "AI-powered Bitcoin DAOs",
   "type": "module",
   "private": true,
@@ -22,18 +22,18 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.13.1",
-    "agents": "^0.0.98",
+    "@modelcontextprotocol/sdk": "^1.13.3",
+    "agents": "^0.0.101",
     "hono": "^4.8.3"
   },
   "devDependencies": {
-    "@aibtc/types": "^0.6.0",
-    "@cloudflare/vite-plugin": "^1.7.5",
-    "@cloudflare/workers-types": "^4.20250620.0",
-    "@hirosystems/clarinet-sdk": "^3.1.0",
+    "@aibtc/types": "^0.7.0",
+    "@cloudflare/vite-plugin": "^1.8.0",
+    "@cloudflare/workers-types": "^4.20250702.0",
+    "@hirosystems/clarinet-sdk": "^3.2.0",
     "@hono/vite-build": "^1.6.2",
     "@stacks/transactions": "^7.1.0",
-    "@types/node": "^22.15.33",
+    "@types/node": "^22.16.0",
     "chokidar-cli": "^3.0.0",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
@@ -42,7 +42,7 @@
     "vitest": "^3.2.4",
     "vitest-environment-clarinet": "^2.3.0",
     "workers-mcp": "^0.0.13",
-    "wrangler": "^4.21.2",
-    "zod": "^3.25.67"
+    "wrangler": "^4.22.0",
+    "zod": "^3.25.68"
   }
 }

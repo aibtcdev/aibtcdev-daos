@@ -235,6 +235,14 @@ describe(`public functions: ${contractName}`, () => {
     );
     expect(voteReceipt.result).toBeOk(Cl.bool(true));
 
+    const voteReceipt2 = simnet.callPublicFn(
+      actionProposalContractAddress,
+      "vote-on-action-proposal",
+      [Cl.uint(proposalId), Cl.bool(true)],
+      address1
+    );
+    expect(voteReceipt2.result).toBeOk(Cl.bool(true));
+
     simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY + 1);
 
     const concludeProposalReceipt = simnet.callPublicFn(

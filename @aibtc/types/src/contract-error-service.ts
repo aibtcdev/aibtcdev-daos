@@ -25,6 +25,19 @@ const errorDefinitions: {
     [S in ContractSubtype<T>]?: ContractSpecificErrorDefinition;
   };
 } = {
+  CORE: {
+    DAO_RUN_COST: {
+      enumObject: ClarityErrors.ErrCodeDaoRunCost,
+      descriptions: {
+        ERR_NOT_OWNER: "Caller is not an authorized owner.",
+        ERR_ASSET_NOT_ALLOWED:
+          "The specified asset is not allowed for this operation.",
+        ERR_PROPOSAL_MISMATCH:
+          "The provided proposal parameters do not match the existing proposal.",
+        ERR_SAVING_PROPOSAL: "Failed to save the proposal details.",
+      },
+    },
+  },
   AGENT: {
     AGENT_ACCOUNT: {
       enumObject: ClarityErrors.ErrCodeAgentAccount,

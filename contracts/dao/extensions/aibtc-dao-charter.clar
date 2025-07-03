@@ -54,10 +54,13 @@
 )
 
 (define-public (set-dao-charter (charter (string-utf8 4096)))
-  (let ((newVersion (+ (var-get currentVersion) u1))
-        (previousCharter (match (map-get? CharterVersions (var-get currentVersion))
-          cv (get charter cv)
-          u"")))
+  (let (
+      (newVersion (+ (var-get currentVersion) u1))
+      (previousCharter (match (map-get? CharterVersions (var-get currentVersion))
+        cv (get charter cv)
+        u""
+      ))
+    )
     ;; check if sender is dao or extension
     (try! (is-dao-or-extension))
     ;; check length of charter
