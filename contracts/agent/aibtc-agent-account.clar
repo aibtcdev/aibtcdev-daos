@@ -413,7 +413,7 @@
     canDeposit: (var-get agentCanDepositAssets),
     canUseProposals: (var-get agentCanUseProposals),
     canApproveRevokeContracts: (var-get agentCanApproveRevokeContracts),
-    canBuySell: (var-get agentCanBuySellAssets)
+    canBuySell: (var-get agentCanBuySellAssets),
   }
 )
 
@@ -447,6 +447,9 @@
   ;; print creation event
   (print {
     notification: "aibtc-agent-account/user-agent-account-created",
-    payload: (get-configuration),
+    payload: {
+      config: (get-configuration),
+      agentPermissions: (get-agent-permissions),
+    },
   })
 )
