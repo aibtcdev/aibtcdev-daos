@@ -25,16 +25,29 @@ const errorDefinitions: {
     [S in ContractSubtype<T>]?: ContractSpecificErrorDefinition;
   };
 } = {
+  CORE: {
+    DAO_RUN_COST: {
+      enumObject: ClarityErrors.ErrCodeDaoRunCost,
+      descriptions: {
+        ERR_NOT_OWNER: "Caller is not an authorized owner.",
+        ERR_ASSET_NOT_ALLOWED:
+          "The specified asset is not allowed for this operation.",
+        ERR_PROPOSAL_MISMATCH:
+          "The provided proposal parameters do not match the existing proposal.",
+        ERR_SAVING_PROPOSAL: "Failed to save the proposal details.",
+      },
+    },
+  },
   AGENT: {
     AGENT_ACCOUNT: {
       enumObject: ClarityErrors.ErrCodeAgentAccount,
       descriptions: {
-        ERR_UNAUTHORIZED: "Sender is not authorized to perform this action.",
-        ERR_UNKNOWN_ASSET:
-          "The specified asset is not recognized or supported.",
-        ERR_OPERATION_FAILED: "The requested operation failed to complete.",
-        ERR_BUY_SELL_NOT_ALLOWED:
-          "Buying or selling is not currently allowed by the agent.",
+        ERR_CALLER_NOT_OWNER:
+          "The caller is not the owner of the agent account.",
+        ERR_CONTRACT_NOT_APPROVED:
+          "The specified contract is not approved for interaction.",
+        ERR_OPERATION_NOT_ALLOWED:
+          "The requested operation is not allowed for the caller.",
       },
     },
   },

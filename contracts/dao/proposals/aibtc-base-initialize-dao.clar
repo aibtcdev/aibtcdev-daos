@@ -9,6 +9,8 @@
 (define-constant CFG_DAO_MANIFEST_TEXT u"aibtc mission goes here")
 ;; /g/.aibtc-faktory/dao_contract_token
 (define-constant CFG_DAO_TOKEN .aibtc-faktory)
+;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_token_contract
+(define-constant CFG_SBTC_TOKEN 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token)
 
 (define-public (execute (sender principal))
   (begin
@@ -59,19 +61,21 @@
           enabled: true,
         }
       )))
-    ;; allow asset in treasury
+    ;; allow default assets in treasury
     ;; /g/.aibtc-treasury/dao_contract_treasury
     (try! (contract-call? .aibtc-treasury allow-asset CFG_DAO_TOKEN true))
+    ;; /g/.aibtc-treasury/dao_contract_treasury
+    (try! (contract-call? .aibtc-treasury allow-asset CFG_SBTC_TOKEN true))
     ;; set DAO manifest in dao-charter extension
     ;; /g/.aibtc-dao-charter/dao_contract_charter
     (try! (contract-call? .aibtc-dao-charter set-dao-charter CFG_DAO_MANIFEST_TEXT))
     ;; send DAO manifest as onchain message
     ;; /g/.aibtc-onchain-messaging/dao_contract_messaging
     (try! (contract-call? .aibtc-onchain-messaging send CFG_DAO_MANIFEST_TEXT))
-    ;; print manifest data
+    ;; print initialization data
     (print {
       ;; /g/aibtc/dao_token_symbol
-      notification: "aibtc-base-dao/execute",
+      notification: "aibtc-base-initialize-dao/execute",
       payload: {
         manifest: CFG_DAO_MANIFEST_TEXT,
         sender: sender,

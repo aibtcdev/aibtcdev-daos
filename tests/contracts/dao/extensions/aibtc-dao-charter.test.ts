@@ -60,17 +60,19 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // set-dao-charter() tests
   ////////////////////////////////////////
-  it("set-dao-charter() fails if called directly", () => {
-    // arrange
-    // act
-    const receipt = simnet.callPublicFn(
-      contractAddress,
-      "set-dao-charter",
-      [Cl.stringUtf8("Test Charter")],
-      address1
-    );
-    // assert
-    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+  describe("set-dao-charter()", () => {
+    it("fails if called directly by a user", () => {
+      // arrange
+      // act
+      const receipt = simnet.callPublicFn(
+        contractAddress,
+        "set-dao-charter",
+        [Cl.stringUtf8("Test Charter")],
+        address1
+      );
+      // assert
+      expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+    });
   });
 });
 
@@ -130,7 +132,7 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     ).result;
     // assert
-    expect(result).toBeSome(expectedDaoCharterString);
+    expect(result).toBeSome(expectedDaoCharter);
   });
 
   ////////////////////////////////////////

@@ -10,12 +10,12 @@ echo "======================================================="
 total_contracts=0
 untested_contracts=0
 
-# Function to convert contract path to expected test path
-get_test_path() {
+# Function to convert contract path to expected test path base
+get_test_path_base() {
     local contract_path=$1
     # Remove 'contracts/' prefix and replace with 'tests/contracts/'
-    # Replace .clar with .test.ts
-    echo "${contract_path/contracts\//tests/contracts\/}" | sed 's/\.clar$/.test.ts/'
+    # Remove .clar suffix
+    echo "${contract_path/contracts\//tests/contracts\/}" | sed 's/\.clar$//'
 }
 
 # Debug: Print current directory
@@ -50,14 +50,19 @@ for contract in "${contracts[@]}"; do
     fi
 
     let "total_contracts=total_contracts+1"
-    test_file=$(get_test_path "$contract")
+    test_file_base=$(get_test_path_base "$contract")
     
-    if [ ! -f "$test_file" ]; then
+    # Find any test files that start with the base name
+    shopt -s nullglob
+    matching_tests=(${test_file_base}*.test.ts)
+    shopt -u nullglob
+    
+    if [ ${#matching_tests[@]} -eq 0 ]; then
         echo "❌ Missing test file for: $contract"
-        echo "   Expected test file at: $test_file"
+        echo "   Expected a test file like: ${test_file_base}.test.ts"
         let "untested_contracts=untested_contracts+1"
     else
-        echo "✅ Found test file for: $contract"
+        echo "✅ Found test file(s) for: $contract"
     fi
 done
 

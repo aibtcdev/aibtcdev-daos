@@ -1,15 +1,16 @@
-// protocol-fees-account.clar
-export enum ErrCodeProtocolFeesAccount {
+// aibtc-dao-run-cost.clar
+export enum ErrCodeDaoRunCost {
   ERR_NOT_OWNER = 1000,
   ERR_ASSET_NOT_ALLOWED,
+  ERR_PROPOSAL_MISMATCH,
+  ERR_SAVING_PROPOSAL,
 }
 
 // aibtc-agent-account.clar
 export enum ErrCodeAgentAccount {
-  ERR_UNAUTHORIZED = 1100,
-  ERR_UNKNOWN_ASSET,
-  ERR_OPERATION_FAILED,
-  ERR_BUY_SELL_NOT_ALLOWED,
+  ERR_CALLER_NOT_OWNER = 1100,
+  ERR_CONTRACT_NOT_APPROVED,
+  ERR_OPERATION_NOT_ALLOWED = 1103,
 }
 
 // aibtc-base-dao.clar

@@ -209,6 +209,7 @@ export function defineProposalContractDependencies(
           .addTraitDependency("DAO_PROPOSAL", "dao_trait_proposal")
           .addContractDependency("dao_contract_base", "BASE", "DAO")
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
+          .addAddressDependency("SBTC", "sbtc_token_contract")
           .addContractDependency(
             "dao_contract_action_proposal_voting",
             "EXTENSIONS",
@@ -369,8 +370,8 @@ export function defineAgentContractDependencies(
             "agent_account_trait_proposals"
           )
           .addTraitDependency(
-            "AGENT_FAKTORY_DEX_APPROVAL",
-            "agent_account_trait_faktory_dex_approval"
+            "AGENT_ACCOUNT_CONFIG",
+            "agent_account_trait_account_config"
           )
           .addTraitDependency(
             "AGENT_FAKTORY_BUY_SELL",

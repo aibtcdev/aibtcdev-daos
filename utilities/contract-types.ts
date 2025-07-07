@@ -5,6 +5,7 @@ export const CONTRACT_TYPES = [
   "EXTENSIONS", // extensions
   "PROPOSALS", // core proposals
   "TOKEN", // token, dex, pool
+  "CORE", // core contracts like run-cost
 ] as const;
 
 // derive a type from the array
@@ -31,6 +32,7 @@ export const CONTRACT_SUBTYPES = {
   ] as const,
   PROPOSALS: ["INITIALIZE_DAO"] as const,
   TOKEN: ["DAO", "DEX", "POOL", "PRELAUNCH"] as const,
+  CORE: ["DAO_RUN_COST"] as const,
 } as const;
 
 // helper type that infers subcategory keys per category
@@ -69,5 +71,8 @@ export const CONTRACT_NAMES: {
     DEX: "aibtc-faktory-dex",
     POOL: "xyk-pool-sbtc-aibtc-v-1-1",
     PRELAUNCH: "aibtc-pre-faktory",
+  },
+  CORE: {
+    DAO_RUN_COST: "aibtc-dao-run-cost",
   },
 };
