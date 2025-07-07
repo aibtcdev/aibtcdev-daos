@@ -52,9 +52,9 @@
 
 ;; set voting delay
 ;; mainnet: 144 blocks (24 hours)
-;; testnet: 1 blocks (10 minutes)
+;; testnet: 3 blocks (30 minutes)
 ;; devnet: 144 blocks (24 hours)
-(define-constant VOTING_DELAY u1)
+(define-constant VOTING_DELAY u3)
 ;; set voting period
 ;; mainnet: 288 blocks (48 hours)
 ;; testnet: 3 blocks (30 minutes) 
