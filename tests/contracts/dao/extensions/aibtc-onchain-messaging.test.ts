@@ -2,6 +2,7 @@ import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeOnchainMessaging } from "../../../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
+import { constructDao, getDaoTokens } from "../../../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -55,7 +56,10 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   it("send() succeeds with valid message", () => {
-    // arrange
+    // arrange: construct the dao and fund the user
+    constructDao(deployer);
+    getDaoTokens(address1, 1000000);
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
