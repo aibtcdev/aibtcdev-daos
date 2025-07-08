@@ -1,6 +1,8 @@
 ;; Implement XYK pool trait and use SIP 010 trait
-(impl-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-pool-trait-v-1-2.xyk-pool-trait)
-(use-trait sip-010-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.sip-010-trait-ft-standard.sip-010-trait)
+;; /g/'ST3VXT52QEQPZ5246A16RFNMR1PRJ96JK6YYX37N8.xyk-pool-trait-v-1-2.xyk-pool-trait/bitflow_pool_trait
+(impl-trait 'ST3VXT52QEQPZ5246A16RFNMR1PRJ96JK6YYX37N8.xyk-pool-trait-v-1-2.xyk-pool-trait)
+;; /g/'ST3VXT52QEQPZ5246A16RFNMR1PRJ96JK6YYX37N8.sip-010-trait-ft-standard.sip-010-trait/bitflow_sip010_trait
+(use-trait sip-010-trait 'ST3VXT52QEQPZ5246A16RFNMR1PRJ96JK6YYX37N8.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; implement aibtcdev trait
 (impl-trait .aibtc-dao-traits.bitflow-pool)
@@ -19,8 +21,8 @@
 (define-constant ERR_NOT_POOL_CONTRACT_DEPLOYER (err u3006))
 
 ;; XYK Core address and contract deployer address
-;; /g/'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2/bitflow_core_contract
-(define-constant CORE_ADDRESS 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2)
+;; /g/'ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1.xyk-core-v-1-2/bitflow_core_contract
+(define-constant CORE_ADDRESS 'ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1.xyk-core-v-1-2)
 ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
 (define-constant CONTRACT_DEPLOYER .aibtc-faktory-dex)
 

@@ -24,9 +24,15 @@
   )
   (begin
     (asserts! (is-eq tx-sender sender) (err ERR-NOT-AUTHORIZED))
-    (and (is-some memo) (is-some (print memo)))
     ;; /g/SYMBOL/dao_token_symbol
-    (ft-transfer? SYMBOL-AIBTC-DAO amount sender recipient)
+    (match (ft-transfer? SYMBOL-AIBTC-DAO amount sender recipient)
+      response
+      (begin
+        (print memo)
+        (ok response)
+      )
+      error (err error)
+    )
   )
 )
 
@@ -147,7 +153,7 @@
     targetStx: u5000000,
     tokenToDex: (/ (* MAX u16) u100),
     tokenToDeployer: (/ (* MAX u4) u100),
-    stxToDex: u0,
-    stxBuyFirstFee: u0,
+    stxToDex: u250000,
+    stxBuyFirstFee: u150000,
   })
 )
