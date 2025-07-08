@@ -201,10 +201,7 @@
         creator: contract-caller,
         creatorUserId: userId,
         liquidTokens: liquidTokens,
-        memo: (if (is-some memo)
-          memo
-          none
-        ),
+        memo: memo,
         createdBtc: createdBtc,
         createdStx: createdStx,
         voteStart: voteStart,
@@ -229,10 +226,7 @@
         creator: contract-caller,
         creatorUserId: userId,
         liquidTokens: liquidTokens,
-        memo: (if (is-some memo)
-          memo
-          none
-        ),
+        memo: memo,
       })
       ERR_SAVING_PROPOSAL
     )
