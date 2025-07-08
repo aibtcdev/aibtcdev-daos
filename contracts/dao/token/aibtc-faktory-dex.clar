@@ -13,8 +13,10 @@
 (define-constant ERR-STX-NON-POSITIVE (err u1002))
 (define-constant ERR-STX-BALANCE-TOO-LOW (err u1003))
 (define-constant ERR-FT-NON-POSITIVE (err u1004))
-(define-constant ERR-FETCHING-BUY-INFO (err u1005)) ;; new, should be unreachable
-(define-constant ERR-FETCHING-SELL-INFO (err u1006)) ;; new, should be unreachable
+(define-constant ERR-FETCHING-BUY-INFO (err u1005))
+(define-constant ERR-FETCHING-SELL-INFO (err u1006))
+(define-constant ERR-AMOUNT-TOO-HIGH (err u1007))
+(define-constant ERR-AMOUNT-TOO-LOW (err u1008))
 (define-constant ERR-TOKEN-NOT-AUTH (err u401))
 
 (define-constant FEE-RECEIVER 'ST3S2565C4DP2MGR3CMANMGYDCDA314Q25AQGR26R) ;; 'SMHAVPYZ8BVD0BHBBQGY5AQVVGNQY4TNHAKGPYP)
@@ -34,6 +36,7 @@
 
 ;; data vars
 (define-data-var open bool false)
+(define-data-var bonded bool false)
 (define-data-var fak-ustx uint u0)
 (define-data-var ft-balance uint u0)
 (define-data-var stx-balance uint u0)
@@ -44,9 +47,10 @@
     (ubtc uint)
   )
   (begin
+    (and (not (var-get open)) (try! (open-market)))
     (asserts! (is-eq DEX-TOKEN (contract-of ft)) ERR-TOKEN-NOT-AUTH)
     (asserts! (var-get open) ERR-MARKET-CLOSED)
-    (asserts! (> ubtc u0) ERR-STX-NON-POSITIVE)
+    (asserts! (>= ubtc u4) ERR-STX-NON-POSITIVE)
     (let (
         (in-info (unwrap! (get-in ubtc) ERR-FETCHING-BUY-INFO))
         (total-stx (get total-stx in-info))
@@ -61,7 +65,9 @@
         (tokens-out (get tokens-out in-info))
         (new-stx (get new-stx in-info))
         (ft-receiver tx-sender)
+        (stx-max (/ (* (get stx-to-grad in-info) u115) u100))
       )
+      (asserts! (<= ubtc stx-max) ERR-AMOUNT-TOO-HIGH)
       ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
       (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
         transfer (- fee pre-fee) tx-sender FEE-RECEIVER none
@@ -85,7 +91,7 @@
             (agent-amount (/ (* premium-amount u60) u100))
             (originator-amount (- premium-amount agent-amount))
             (amm-ustx (- new-stx GRAD-FEE))
-            (xyk-pool-uri (default-to u"https://bitflow.finance"
+            (xyk-pool-uri (default-to u"https://faktory.fun/"
               (try! (contract-call? ft get-token-uri))
             ))
             (xyk-burn-amount (- (sqrti (* amm-ustx amm-amount)) u1))
@@ -94,8 +100,8 @@
           (try! (as-contract (contract-call? ft transfer originator-amount tx-sender ORIGINATOR none)))
           ;; Call XYK Core v-1-2 pool by Bitflow
           (try! (as-contract (contract-call?
-            ;; /g/'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2/external_bitflow_core
-            'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2
+            ;; /g/'ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1.xyk-core-v-1-2/external_bitflow_core
+            'ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1.xyk-core-v-1-2
             ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_token_pool
             create-pool .xyk-pool-sbtc-aibtc-v-1-1
             ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
@@ -103,12 +109,12 @@
             amm-amount xyk-burn-amount u10 u40 u10 u40
             'ST27Q7Z7P5MTJN2B3M9Q406XPCDB1VFZJ3KWX3CES xyk-pool-uri true
           )))
-          ;; here 'ST27Q7Z7P5MTJN2B3M9Q406XPCDB1VFZJ3KWX3CES replaced of ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1
           ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
           (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
             transfer GRAD-FEE tx-sender G-RECEIVER none
           )))
           (var-set open false)
+          (var-set bonded true)
           (var-set stx-balance u0)
           (var-set ft-balance u0)
           ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
@@ -157,8 +163,15 @@
       (total-stk (+ total-stx (var-get fak-ustx)))
       (total-ft (var-get ft-balance))
       (k (* total-ft total-stk))
-      (fee (/ (* ubtc u2) u100))
-      (stx-in (- ubtc fee))
+      (feek (/ (* ubtc u2) u100))
+      (fee (if (>= feek u3)
+        feek
+        u3
+      ))
+      (stx-in (if (> ubtc fee)
+        (- ubtc fee)
+        u0
+      ))
       (new-stk (+ total-stk stx-in))
       (new-ft (/ k new-stk))
       (tokens-out (- total-ft new-ft))
@@ -204,6 +217,7 @@
         (new-stx (get new-stx out-info))
         (stx-receiver tx-sender)
       )
+      (asserts! (>= stx-out u4) ERR-AMOUNT-TOO-LOW)
       (asserts! (>= total-stx stx-out) ERR-STX-BALANCE-TOO-LOW)
       (try! (contract-call? ft transfer amount tx-sender (as-contract tx-sender) none))
       ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
@@ -247,9 +261,19 @@
       (k (* total-ft total-stk))
       (new-ft (+ total-ft amount))
       (new-stk (/ k new-ft))
-      (stx-out (- (- total-stk new-stk) u1))
-      (fee (/ (* stx-out u2) u100))
-      (stx-to-receiver (- stx-out fee))
+      (stx-out (if (>= total-stk (+ new-stk u5))
+        (- (- total-stk new-stk) u1)
+        u0
+      ))
+      (feek (/ (* stx-out u2) u100))
+      (fee (if (>= feek u3)
+        feek
+        u3
+      ))
+      (stx-to-receiver (if (> stx-out fee)
+        (- stx-out fee)
+        u0
+      ))
     )
     (ok {
       total-stx: total-stx,
@@ -274,8 +298,8 @@
 (define-public (open-market)
   ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
   (let ((is-prelaunch-allowing (unwrap-panic (contract-call? .aibtc-pre-faktory is-market-open))))
+    (asserts! (not (var-get bonded)) ERR-MARKET-CLOSED)
     (asserts! is-prelaunch-allowing ERR-MARKET-CLOSED)
-    (var-set stx-balance DEX-AMOUNT)
     (var-set open true)
     (ok true)
   )
@@ -283,16 +307,16 @@
 
 ;; boot dex
 (begin
-  (var-set open true)
   (var-set fak-ustx FAK_STX)
+  (var-set stx-balance DEX-AMOUNT)
   (var-set ft-balance u16000000000000000)
   (print {
     type: "faktory-dex-trait-v1-1",
     dexContract: (as-contract tx-sender),
-    ;; /g/'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2/external_bitflow_core
-    ammReceiver: 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2, ;; 'SM1793C4R5PZ4NS4VQ4WMP7SKKYVH8JZEWSZ9HCCR.xyk-core-v-1-2
+    ;; /g/'ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1.xyk-core-v-1-2/external_bitflow_core
+    ammReceiver: 'ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1.xyk-core-v-1-2,
     ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_token_pool
-    poolName: .xyk-pool-sbtc-aibtc-v-1-1, ;; 'SPV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RCJDC22.xyk-pool-stx-NAME-v1-1
+    poolName: .xyk-pool-sbtc-aibtc-v-1-1,
   })
   (ok true)
 )
