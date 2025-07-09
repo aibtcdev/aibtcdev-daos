@@ -316,7 +316,6 @@ describe(`public functions: ${contractName}`, () => {
     // assert
     expect(receipt.result.type).toBe(ClarityType.ResponseOk);
     const claimedAmount = cvToValue(receipt.result).value;
-    console.log(`Claimed amount for address2: ${claimedAmount}`);
     expect(BigInt(claimedAmount)).toBeGreaterThan(0n);
 
     // Check that claimed amount was updated for address2

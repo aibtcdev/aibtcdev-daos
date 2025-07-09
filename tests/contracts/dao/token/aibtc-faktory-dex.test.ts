@@ -271,9 +271,6 @@ describe(`public functions: ${contractName}`, () => {
       .getAssetsMap()
       .get(SBTC_ASSETS_MAP)
       ?.get(address2)!;
-    console.log(
-      `sbtcBalanceBefore: ${sbtcBalanceBefore}, sbtcBalanceAfter: ${sbtcBalanceAfter}`
-    );
     expect(sbtcBalanceAfter).toBeGreaterThan(sbtcBalanceBefore);
   });
 });
