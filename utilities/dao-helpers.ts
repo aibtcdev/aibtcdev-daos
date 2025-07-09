@@ -1,10 +1,5 @@
 import { expect } from "vitest";
-import {
-  Cl,
-  ClarityType,
-  ClarityValue,
-  cvToValue,
-} from "@stacks/transactions";
+import { Cl, ClarityType, ClarityValue, cvToValue } from "@stacks/transactions";
 import {
   DEVNET_DEPLOYER,
   SBTC_CONTRACT,
@@ -296,15 +291,27 @@ export function completePrelaunch(deployer: string) {
     return; // Already complete
   }
 
-  // Use 5 wallets to buy all 20 seats
-  const users = Array.from({ length: 5 }, (_, i) => `wallet_${i + 1}`);
+  const users = [
+    "deployer",
+    "wallet_1",
+    "wallet_2",
+    "wallet_3",
+    "wallet_4",
+    "wallet_5",
+    "wallet_6",
+    "wallet_7",
+    "wallet_8",
+    "faucet",
+  ];
+
+  // Use 10 wallets to buy all 20 seats
   for (const wallet of users) {
     const userAddress = simnet.getAccounts().get(wallet)!;
     getSbtcFromFaucet(userAddress);
     const buyReceipt = simnet.callPublicFn(
       preFaktoryAddress,
       "buy-up-to",
-      [Cl.uint(4)], // Each user buys 4 seats
+      [Cl.uint(2)], // Each user buys 2 seats
       userAddress
     );
     expect(buyReceipt.result).toBeOk(Cl.bool(true));
@@ -323,8 +330,15 @@ export function completePrelaunch(deployer: string) {
   ) {
     throw new Error("Failed to get final pre-faktory contract status");
   }
-  const finalStatus = convertClarityTuple<{ "market-open": boolean }>(
-    finalStatusResult.value
+  const finalStatus = convertClarityTuple<{
+    "market-open": boolean;
+    "seat-holders": { owner: string; seats: bigint }[];
+  }>(finalStatusResult.value);
+  console.log("Final pre-faktory status:", finalStatus);
+  console.log(
+    "Seat holders:",
+    JSON.stringify(finalStatus["seat-holders"], null, 2)
   );
+  // Check if the market is open
   expect(finalStatus["market-open"]).toBe(true);
 }

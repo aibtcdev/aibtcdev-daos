@@ -1,12 +1,14 @@
-import { Cl, ClarityType, cvToValue, UIntCV } from "@stacks/transactions";
+import { Cl, ClarityType, cvToValue } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 import {
   completePrelaunch,
   getSbtcFromFaucet,
 } from "../../../../utilities/dao-helpers";
-import { dbgLog } from "../../../../utilities/debug-logging";
-import { convertClarityTuple } from "../../../../utilities/contract-helpers";
+import {
+  convertClarityTuple,
+  decodeClarityValues,
+} from "../../../../utilities/contract-helpers";
 
 // Types for contract data structures
 type ContractStatus = {
@@ -179,7 +181,9 @@ describe(`public functions: ${contractName}`, () => {
       throw new Error("get-contract-status() failed when it shouldn't");
     }
 
-    const newStatus = convertClarityTuple<ContractStatus>(newStatusResult.value);
+    const newStatus = convertClarityTuple<ContractStatus>(
+      newStatusResult.value
+    );
     expect(newStatus["total-users"]).toStrictEqual(initialUsers + 1n);
     expect(newStatus["total-seats-taken"]).toStrictEqual(initialSeats + 3n);
   });
@@ -531,7 +535,7 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-vesting-schedule() failed when it shouldn't");
     }
 
-    const data = convertClarityTuple<VestingSchedule>(result.value);
+    const data = decodeClarityValues(result.value);
     const vestingSchedule = data["vesting-schedule"];
 
     // Verify the vesting-schedule exists and is a list
