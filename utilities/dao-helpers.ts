@@ -1,6 +1,15 @@
 import { expect } from "vitest";
-import { Cl, ClarityValue, cvToValue } from "@stacks/transactions";
-import { DEVNET_DEPLOYER, SBTC_CONTRACT } from "./contract-helpers";
+import {
+  Cl,
+  ClarityType,
+  ClarityValue,
+  cvToValue,
+} from "@stacks/transactions";
+import {
+  DEVNET_DEPLOYER,
+  SBTC_CONTRACT,
+  convertClarityTuple,
+} from "./contract-helpers";
 import { setupDaoContractRegistry } from "./contract-registry";
 import { dbgLog } from "./debug-logging";
 
@@ -15,6 +24,17 @@ function getRandomAmount(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// helper to get sBTC from the faucet
+export function getSbtcFromFaucet(address: string) {
+  const faucetReceipt = simnet.callPublicFn(
+    SBTC_CONTRACT,
+    "faucet",
+    [],
+    address
+  );
+  expect(faucetReceipt.result).toBeOk(Cl.bool(true));
+}
+
 // helper to get sBTC from faucet and buy DAO tokens from the token dex
 export function getDaoTokens(address: string, satsAmount: number) {
   // Get contract references from registry
@@ -26,14 +46,7 @@ export function getDaoTokens(address: string, satsAmount: number) {
   }
 
   // get sbtc from the faucet
-  const faucetReceipt = simnet.callPublicFn(
-    SBTC_CONTRACT,
-    "faucet",
-    [],
-    address
-  );
-  dbgLog(`faucetReceipt: ${JSON.stringify(faucetReceipt)}`);
-  expect(faucetReceipt.result).toBeOk(Cl.bool(true));
+  getSbtcFromFaucet(address);
 
   // get dao tokens from the token dex
   const getDaoTokensReceipt = simnet.callPublicFn(
@@ -250,4 +263,68 @@ export function formatSerializedBuffer(value: ClarityValue): ClarityValue {
   const serialized = Cl.serialize(value);
   const buffer = Cl.bufferFromHex(serialized);
   return buffer;
+}
+
+// helper to complete the pre-launch by buying all seats
+export function completePrelaunch(deployer: string) {
+  const preFaktoryAddress = registry.getContractAddressByTypeAndSubtype(
+    "TOKEN",
+    "PRELAUNCH"
+  );
+  if (!preFaktoryAddress) {
+    throw new Error("Pre-faktory contract not found in registry");
+  }
+
+  // Check if prelaunch is already complete using the safe tuple converter
+  const statusResult = simnet.callReadOnlyFn(
+    preFaktoryAddress,
+    "get-contract-status",
+    [],
+    deployer
+  ).result;
+  if (
+    statusResult.type !== ClarityType.ResponseOk ||
+    statusResult.value.type !== ClarityType.Tuple
+  ) {
+    throw new Error("Failed to get pre-faktory contract status");
+  }
+  const status = convertClarityTuple<{ "distribution-height": bigint }>(
+    statusResult.value
+  );
+
+  if (status["distribution-height"] > 0n) {
+    return; // Already complete
+  }
+
+  // Use 10 wallets to buy all 20 seats
+  const users = Array.from({ length: 10 }, (_, i) => `wallet_${i + 1}`);
+  for (const wallet of users) {
+    const userAddress = simnet.getAccounts().get(wallet)!;
+    getSbtcFromFaucet(userAddress);
+    const buyReceipt = simnet.callPublicFn(
+      preFaktoryAddress,
+      "buy-up-to",
+      [Cl.uint(2)], // Each user buys 2 seats
+      userAddress
+    );
+    expect(buyReceipt.result).toBeOk(Cl.bool(true));
+  }
+
+  // Verify distribution was initialized and market is open in pre-faktory
+  const finalStatusResult = simnet.callReadOnlyFn(
+    preFaktoryAddress,
+    "get-contract-status",
+    [],
+    deployer
+  ).result;
+  if (
+    finalStatusResult.type !== ClarityType.ResponseOk ||
+    finalStatusResult.value.type !== ClarityType.Tuple
+  ) {
+    throw new Error("Failed to get final pre-faktory contract status");
+  }
+  const finalStatus = convertClarityTuple<{ "market-open": boolean }>(
+    finalStatusResult.value
+  );
+  expect(finalStatus["market-open"]).toBe(true);
 }
