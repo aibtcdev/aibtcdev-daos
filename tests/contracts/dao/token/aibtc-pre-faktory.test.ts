@@ -8,6 +8,43 @@ import {
 import { dbgLog } from "../../../../utilities/debug-logging";
 import { convertClarityTuple } from "../../../../utilities/contract-helpers";
 
+// Types for contract data structures
+type ContractStatus = {
+  "is-distribution-period": boolean;
+  "total-users": bigint;
+  "total-seats-taken": bigint;
+  "deployment-height": bigint;
+  "distribution-height": bigint;
+  "accelerated-vesting": boolean;
+  "market-open": boolean;
+  "governance-active": boolean;
+  "seat-holders": { owner: string; seats: bigint }[];
+};
+
+type UserInfo = {
+  "seats-owned": bigint;
+  "amount-claimed": bigint;
+  "claimable-amount": bigint;
+};
+
+type VestingEntry = {
+  height: bigint;
+  percent: bigint;
+  id: bigint;
+};
+
+type VestingSchedule = {
+  "vesting-schedule": VestingEntry[];
+};
+
+type UserExpectedShare = {
+  user: string;
+  "user-seats": bigint;
+  "total-seats": bigint;
+  "total-accumulated-fees": bigint;
+  "expected-share": bigint;
+};
+
 // setup accounts
 const accounts = simnet.getAccounts();
 const deployer = accounts.get("deployer")!;
@@ -77,7 +114,7 @@ describe(`public functions: ${contractName}`, () => {
       throw new Error("get-user-info() failed when it shouldn't");
     }
 
-    const userInfo = convertClarityTuple(userInfoResult.value);
+    const userInfo = convertClarityTuple<UserInfo>(userInfoResult.value);
     expect(userInfo["seats-owned"]).toStrictEqual(2n);
   });
 
@@ -113,9 +150,11 @@ describe(`public functions: ${contractName}`, () => {
       throw new Error("get-contract-status() failed when it shouldn't");
     }
 
-    const initialStatus = convertClarityTuple(initialStatusResult.value);
-    const initialUsers = initialStatus["total-users"] as bigint;
-    const initialSeats = initialStatus["total-seats-taken"] as bigint;
+    const initialStatus = convertClarityTuple<ContractStatus>(
+      initialStatusResult.value
+    );
+    const initialUsers = initialStatus["total-users"];
+    const initialSeats = initialStatus["total-seats-taken"];
 
     // act
     const receipt = simnet.callPublicFn(
@@ -140,7 +179,7 @@ describe(`public functions: ${contractName}`, () => {
       throw new Error("get-contract-status() failed when it shouldn't");
     }
 
-    const newStatus = convertClarityTuple(newStatusResult.value);
+    const newStatus = convertClarityTuple<ContractStatus>(newStatusResult.value);
     expect(newStatus["total-users"]).toStrictEqual(initialUsers + 1n);
     expect(newStatus["total-seats-taken"]).toStrictEqual(initialSeats + 3n);
   });
@@ -166,7 +205,9 @@ describe(`public functions: ${contractName}`, () => {
     if (userInfoBeforeResult.type !== ClarityType.ResponseOk) {
       throw new Error("get-user-info() failed when it shouldn't");
     }
-    const userInfoBefore = convertClarityTuple(userInfoBeforeResult.value);
+    const userInfoBefore = convertClarityTuple<UserInfo>(
+      userInfoBeforeResult.value
+    );
     expect(userInfoBefore["seats-owned"]).toStrictEqual(2n);
 
     // act
@@ -190,7 +231,9 @@ describe(`public functions: ${contractName}`, () => {
     if (userInfoAfterResult.type !== ClarityType.ResponseOk) {
       throw new Error("get-user-info() failed when it shouldn't");
     }
-    const userInfoAfter = convertClarityTuple(userInfoAfterResult.value);
+    const userInfoAfter = convertClarityTuple<UserInfo>(
+      userInfoAfterResult.value
+    );
     expect(userInfoAfter["seats-owned"]).toStrictEqual(0n);
   });
 
@@ -262,7 +305,7 @@ describe(`public functions: ${contractName}`, () => {
     ).result;
 
     expect(userInfoResult.type).toBe(ClarityType.ResponseOk);
-    const userInfoData = convertClarityTuple(userInfoResult.value);
+    const userInfoData = convertClarityTuple<UserInfo>(userInfoResult.value);
     expect(userInfoData["amount-claimed"]).toBeGreaterThan(0n);
   });
 
@@ -298,7 +341,7 @@ describe(`public functions: ${contractName}`, () => {
     ).result;
 
     expect(userInfoResult.type).toBe(ClarityType.ResponseOk);
-    const userInfoData = convertClarityTuple(userInfoResult.value);
+    const userInfoData = convertClarityTuple<UserInfo>(userInfoResult.value);
     expect(userInfoData["amount-claimed"]).toBeGreaterThan(0n);
   });
 
@@ -346,7 +389,7 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-contract-status() did not return a tuple");
     }
 
-    const status = convertClarityTuple(result.value);
+    const status = convertClarityTuple<ContractStatus>(result.value);
 
     // Verify the structure matches what we expect
     expect(status).toHaveProperty("is-distribution-period");
@@ -382,7 +425,7 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-user-info() failed when it shouldn't");
     }
 
-    const userInfo = convertClarityTuple(result.value);
+    const userInfo = convertClarityTuple<UserInfo>(result.value);
 
     // Verify the structure matches what we expect
     expect(userInfo["seats-owned"]).toEqual(1n);
@@ -408,10 +451,12 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-remaining-seats() failed when it shouldn't");
     }
 
-    const data = convertClarityTuple(result.value);
+    const data = convertClarityTuple<{ "remaining-seats": bigint }>(
+      result.value
+    );
 
     // Verify the structure matches what we expect
-    expect(data).toHaveProperty("remainin-seats");
+    expect(data).toHaveProperty("remaining-seats");
   });
 
   ////////////////////////////////////////
@@ -436,7 +481,7 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-seats-owned() failed when it shouldn't");
     }
 
-    const data = convertClarityTuple(result.value);
+    const data = convertClarityTuple<{ "seats-owned": bigint }>(result.value);
 
     // Verify the structure matches what we expect
     expect(data["seats-owned"]).toEqual(1n);
@@ -460,7 +505,9 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-claimed-amount() failed when it shouldn't");
     }
 
-    const data = convertClarityTuple(result.value);
+    const data = convertClarityTuple<{ "claimed-amount": bigint }>(
+      result.value
+    );
 
     // Verify the structure matches what we expect
     expect(data["claimed-amount"]).toBeDefined();
@@ -484,8 +531,8 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-vesting-schedule() failed when it shouldn't");
     }
 
-    const data = convertClarityTuple(result.value);
-    const vestingSchedule = data["vesting-schedule"] as any[];
+    const data = convertClarityTuple<VestingSchedule>(result.value);
+    const vestingSchedule = data["vesting-schedule"];
 
     // Verify the vesting-schedule exists and is a list
     expect(vestingSchedule).toBeDefined();
@@ -517,7 +564,9 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-seat-holders() failed when it shouldn't");
     }
 
-    const data = convertClarityTuple(result.value);
+    const data = convertClarityTuple<{
+      "seat-holders": { owner: string; seats: bigint }[];
+    }>(result.value);
 
     // Verify the structure matches what we expect
     expect(data).toHaveProperty("seat-holders");
@@ -642,7 +691,7 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-user-expected-share() failed when it shouldn't");
     }
 
-    const data = convertClarityTuple(result.value);
+    const data = convertClarityTuple<UserExpectedShare>(result.value);
 
     // Verify the structure matches what we expect
     expect(data.user).toEqual(address1);

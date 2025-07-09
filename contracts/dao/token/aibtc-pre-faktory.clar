@@ -566,7 +566,7 @@
 )
 
 (define-read-only (get-remaining-seats)
-  (ok { remainin-seats: (- SEATS (var-get total-seats-taken)) })
+  (ok { remaining-seats: (- SEATS (var-get total-seats-taken)) })
 )
 
 (define-read-only (get-seats-owned (address principal))

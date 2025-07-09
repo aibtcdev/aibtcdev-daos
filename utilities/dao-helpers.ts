@@ -296,15 +296,15 @@ export function completePrelaunch(deployer: string) {
     return; // Already complete
   }
 
-  // Use 10 wallets to buy all 20 seats
-  const users = Array.from({ length: 10 }, (_, i) => `wallet_${i + 1}`);
+  // Use 5 wallets to buy all 20 seats
+  const users = Array.from({ length: 5 }, (_, i) => `wallet_${i + 1}`);
   for (const wallet of users) {
     const userAddress = simnet.getAccounts().get(wallet)!;
     getSbtcFromFaucet(userAddress);
     const buyReceipt = simnet.callPublicFn(
       preFaktoryAddress,
       "buy-up-to",
-      [Cl.uint(2)], // Each user buys 2 seats
+      [Cl.uint(4)], // Each user buys 4 seats
       userAddress
     );
     expect(buyReceipt.result).toBeOk(Cl.bool(true));
