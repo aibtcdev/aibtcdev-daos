@@ -6,46 +6,14 @@ import {
   getSbtcFromFaucet,
 } from "../../../../utilities/dao-helpers";
 import {
+  FaktoryContractStatus,
+  FaktoryUserExpectedShare,
+  FaktoryUserInfo,
+} from "../../../../utilities/dao-types";
+import {
   convertClarityTuple,
   decodeClarityValues,
 } from "../../../../utilities/contract-helpers";
-
-// Types for contract data structures
-type ContractStatus = {
-  "is-distribution-period": boolean;
-  "total-users": bigint;
-  "total-seats-taken": bigint;
-  "deployment-height": bigint;
-  "distribution-height": bigint;
-  "accelerated-vesting": boolean;
-  "market-open": boolean;
-  "governance-active": boolean;
-  "seat-holders": { owner: string; seats: bigint }[];
-};
-
-type UserInfo = {
-  "seats-owned": bigint;
-  "amount-claimed": bigint;
-  "claimable-amount": bigint;
-};
-
-type VestingEntry = {
-  height: bigint;
-  percent: bigint;
-  id: bigint;
-};
-
-type VestingSchedule = {
-  "vesting-schedule": VestingEntry[];
-};
-
-type UserExpectedShare = {
-  user: string;
-  "user-seats": bigint;
-  "total-seats": bigint;
-  "total-accumulated-fees": bigint;
-  "expected-share": bigint;
-};
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -116,7 +84,7 @@ describe(`public functions: ${contractName}`, () => {
       throw new Error("get-user-info() failed when it shouldn't");
     }
 
-    const userInfo = convertClarityTuple<UserInfo>(userInfoResult.value);
+    const userInfo = convertClarityTuple<FaktoryUserInfo>(userInfoResult.value);
     expect(userInfo["seats-owned"]).toStrictEqual(2n);
   });
 
@@ -152,7 +120,7 @@ describe(`public functions: ${contractName}`, () => {
       throw new Error("get-contract-status() failed when it shouldn't");
     }
 
-    const initialStatus = convertClarityTuple<ContractStatus>(
+    const initialStatus = convertClarityTuple<FaktoryContractStatus>(
       initialStatusResult.value
     );
     const initialUsers = initialStatus["total-users"];
@@ -181,7 +149,7 @@ describe(`public functions: ${contractName}`, () => {
       throw new Error("get-contract-status() failed when it shouldn't");
     }
 
-    const newStatus = convertClarityTuple<ContractStatus>(
+    const newStatus = convertClarityTuple<FaktoryContractStatus>(
       newStatusResult.value
     );
     expect(newStatus["total-users"]).toStrictEqual(initialUsers + 1n);
@@ -209,7 +177,7 @@ describe(`public functions: ${contractName}`, () => {
     if (userInfoBeforeResult.type !== ClarityType.ResponseOk) {
       throw new Error("get-user-info() failed when it shouldn't");
     }
-    const userInfoBefore = convertClarityTuple<UserInfo>(
+    const userInfoBefore = convertClarityTuple<FaktoryUserInfo>(
       userInfoBeforeResult.value
     );
     expect(userInfoBefore["seats-owned"]).toStrictEqual(2n);
@@ -235,7 +203,7 @@ describe(`public functions: ${contractName}`, () => {
     if (userInfoAfterResult.type !== ClarityType.ResponseOk) {
       throw new Error("get-user-info() failed when it shouldn't");
     }
-    const userInfoAfter = convertClarityTuple<UserInfo>(
+    const userInfoAfter = convertClarityTuple<FaktoryUserInfo>(
       userInfoAfterResult.value
     );
     expect(userInfoAfter["seats-owned"]).toStrictEqual(0n);
@@ -321,7 +289,9 @@ describe(`public functions: ${contractName}`, () => {
         "get-user-info() did not return a tuple inside the ok response"
       );
     }
-    const userInfoData = convertClarityTuple<UserInfo>(userInfoResult.value);
+    const userInfoData = convertClarityTuple<FaktoryUserInfo>(
+      userInfoResult.value
+    );
     expect(userInfoData["amount-claimed"]).toBeGreaterThan(0n);
   });
 
@@ -367,7 +337,9 @@ describe(`public functions: ${contractName}`, () => {
         "get-user-info() did not return a tuple inside the ok response"
       );
     }
-    const userInfoData = convertClarityTuple<UserInfo>(userInfoResult.value);
+    const userInfoData = convertClarityTuple<FaktoryUserInfo>(
+      userInfoResult.value
+    );
     expect(BigInt(userInfoData["amount-claimed"])).toBeGreaterThan(0n);
   });
 
@@ -415,7 +387,7 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-contract-status() did not return a tuple");
     }
 
-    const status = convertClarityTuple<ContractStatus>(result.value);
+    const status = convertClarityTuple<FaktoryContractStatus>(result.value);
 
     // Verify the structure matches what we expect
     expect(status).toHaveProperty("is-distribution-period");
@@ -451,7 +423,7 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-user-info() failed when it shouldn't");
     }
 
-    const userInfo = convertClarityTuple<UserInfo>(result.value);
+    const userInfo = convertClarityTuple<FaktoryUserInfo>(result.value);
 
     // Verify the structure matches what we expect
     expect(userInfo["seats-owned"]).toEqual(1n);
@@ -717,7 +689,7 @@ describe(`read-only functions: ${contractName}`, () => {
       throw new Error("get-user-expected-share() failed when it shouldn't");
     }
 
-    const data = convertClarityTuple<UserExpectedShare>(result.value);
+    const data = convertClarityTuple<FaktoryUserExpectedShare>(result.value);
 
     // Verify the structure matches what we expect
     expect(data.user).toEqual(address1);
