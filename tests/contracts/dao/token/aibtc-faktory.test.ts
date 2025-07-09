@@ -1,7 +1,11 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
-import { fundVoters, getDaoTokens } from "../../../../utilities/dao-helpers";
+import {
+  completePrelaunch,
+  fundVoters,
+  getDaoTokens,
+} from "../../../../utilities/dao-helpers";
 import { getBalancesForPrincipal } from "../../../../utilities/asset-helpers";
 import { DAO_TOKEN_ASSETS_MAP } from "../../../../utilities/contract-helpers";
 
@@ -67,6 +71,7 @@ describe(`public functions: ${contractName}`, () => {
     expect(initialBalanceResult.result).toBeOk(Cl.uint(0));
 
     // Get some tokens for address1
+    completePrelaunch(deployer);
     getDaoTokens(address1, 1000000);
 
     // act
@@ -99,6 +104,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("transfer() handles memo correctly", () => {
     // arrange
+    completePrelaunch(deployer);
     getDaoTokens(address1, 1000000);
 
     // act
@@ -127,6 +133,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("send-many() succeeds with multiple recipients", () => {
     // arrange
+    completePrelaunch(deployer);
     getDaoTokens(address1, 1000000);
 
     const initialBalance2Result = simnet.callReadOnlyFn(
@@ -322,6 +329,7 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-balance() returns expected value for accounts", () => {
     // arrange
+    completePrelaunch(deployer);
     fundVoters([address1]);
     const address1Balances = getBalancesForPrincipal(address1);
     const address1DaoBalance = address1Balances.get(DAO_TOKEN_ASSETS_MAP);

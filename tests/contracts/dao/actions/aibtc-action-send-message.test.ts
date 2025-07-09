@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Cl } from "@stacks/transactions";
 import { ErrCodeActionSendMessage } from "../../../../utilities/contract-error-codes";
 import {
+  completePrelaunch,
   constructDao,
   formatSerializedBuffer,
   passActionProposal,
@@ -62,6 +63,7 @@ describe(`public functions: ${contractName}`, () => {
     // fund accounts for creating and voting on proposals
     const voters = [deployer, address1, address2, address3];
     // construct the DAO
+    completePrelaunch(deployer);
     constructDao(deployer);
     // pass the action proposal
     passActionProposal(

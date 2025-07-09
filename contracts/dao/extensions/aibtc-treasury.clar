@@ -25,14 +25,6 @@
 (define-constant DEPLOYED_STACKS_BLOCK stacks-block-height)
 (define-constant SELF (as-contract tx-sender))
 
-;; template variables
-;;
-
-;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_token_contract
-(define-constant CFG_SBTC_TOKEN 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token)
-;; /g/.aibtc-faktory/dao_contract_token
-(define-constant CFG_DAO_TOKEN .aibtc-faktory)
-
 ;; data maps
 ;;
 
@@ -41,8 +33,6 @@
   principal
   bool
 )
-(map-set AllowedAssets CFG_SBTC_TOKEN true)
-(map-set AllowedAssets CFG_DAO_TOKEN true)
 
 ;; public functions
 (define-public (callback

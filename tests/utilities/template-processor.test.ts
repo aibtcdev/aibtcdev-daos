@@ -87,14 +87,18 @@ describe("Template Processor", () => {
     // Create a simplified agent account template for testing
     const testAgentTemplate = `
 ;; title: aibtc-agent-account
-;; version: 1.0.0
+;; version: 2.0.0
 ;; summary: A special account contract between a user and an agent for managing assets and DAO interactions.
 
 ;; traits
 ;; /g/.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account
 (impl-trait .aibtc-agent-account-traits.aibtc-account)
-;; /g/.aibtc-agent-account-traits.aibtc-faktory-dex/agent_account_trait_faktory_dex_approval
-(impl-trait .aibtc-agent-account-traits.aibtc-faktory-dex)
+;; /g/.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals
+(impl-trait .aibtc-agent-account-traits.aibtc-proposals)
+;; /g/.aibtc-agent-account-traits.aibtc-account-config/agent_account_trait_account_config
+(impl-trait .aibtc-agent-account-traits.aibtc-account-config)
+;; /g/.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell
+(impl-trait .aibtc-agent-account-traits.faktory-buy-sell)
 ;; /g/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
@@ -126,8 +130,9 @@ describe("Template Processor", () => {
       dao_contract_token_dex: ".test-dex-contract",
       sbtc_contract: "ST000000000000000000002AMW42H.sbtc-token",
       agent_account_trait_account: ".test-traits.agent-account",
-      agent_account_trait_faktory_dex_approval:
-        ".test-traits.faktory-dex-approval",
+      agent_account_trait_proposals: ".test-traits.agent-proposals",
+      agent_account_trait_account_config: ".test-traits.agent-account-config",
+      agent_account_trait_faktory_buy_sell: ".test-traits.faktory-buy-sell",
       base_trait_sip010: ".test-traits.sip010",
       dao_trait_proposal: ".test-traits.proposal",
       dao_trait_faktory_dex: ".test-traits.faktory-dex",
@@ -169,15 +174,17 @@ describe("Template Processor", () => {
     const replacements = createReplacementsMap({
       dao_manifest: "The mission of this DAO is to test template processing",
       dao_contract_token: ".test-token-contract",
+      sbtc_token_contract: "'ST000000000000000000002AMW42H.sbtc-token'",
+      dao_trait_proposal: ".test-traits.proposal",
       dao_contract_base: ".test-base-dao",
       dao_contract_action_proposal_voting: ".test-proposal-voting",
       dao_contract_charter: ".test-dao-charter",
       dao_contract_epoch: ".test-dao-epoch",
       dao_contract_users: ".test-dao-users",
       dao_contract_messaging: ".test-messaging",
-      dao_token_owner_contract: ".test-token-owner",
+      dao_contract_token_owner: ".test-token-owner",
       dao_contract_treasury: ".test-treasury",
-      dao_action_send_message_contract: ".test-send-message",
+      dao_action_send_message: ".test-send-message",
       dao_token_symbol: "TEST",
     });
 
@@ -197,7 +204,9 @@ describe("Template Processor", () => {
     expect(processed).toContain("enabled: true");
     expect(processed).toContain("extension: .test-dao-charter");
     expect(processed).toContain("enabled: true");
-    expect(processed).toContain('notification: "TEST-base-dao/execute"');
+    expect(processed).toContain(
+      'notification: "TEST-base-initialize-dao/execute"'
+    );
   });
 
   it("should process token owner template", async () => {
@@ -307,29 +316,26 @@ describe("Contract Generator", () => {
 
     // DAO Trait references
     dao_trait_extension: ".test-traits.extension",
-    dao_trait_action_proposal_voting: ".test-traits.action-proposals-voting", // Note: value was .test-traits.action-proposals-voting, key was different
+    dao_trait_action_proposal_voting: ".test-traits.action-proposals-voting",
     dao_trait_action: ".test-traits.action",
-    dao_trait_proposal: ".test-traits.proposal", // Note: value was .test-traits.proposal, key was different
+    dao_trait_proposal: ".test-traits.proposal",
     dao_trait_token_owner: ".test-traits.token-owner",
-    dao_trait_faktory_dex: ".test-traits.faktory-dex", // Note: value was .test-traits.faktory-dex, key was different
+    dao_trait_faktory_dex: ".test-traits.faktory-dex",
     dao_trait_base: ".test-traits.base-dao",
 
     // Agent Trait references
     agent_account_trait_account:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account",
-    // Note: key was different
-    agent_account_trait_faktory_dex_approval:
-      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-faktory-dex",
-    // Note: key was different
+    agent_account_trait_account_config:
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-config",
     agent_account_trait_proposals:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-proposals",
-    // Note: key was different
     agent_account_trait_faktory_buy_sell:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.faktory-buy-sell",
 
     // SIP Trait references
-    base_trait_sip010: ".test-traits.sip010", // Note: key was different
-    faktory_trait: ".test-traits.faktory-token", // Note: key was different, assuming 'faktory_trait' is the keyName
+    base_trait_sip010: ".test-traits.sip010",
+    faktory_trait: ".test-traits.faktory-token",
 
     // DAO contracts
     dao_contract_users: ".test-dao-users",
@@ -341,13 +347,14 @@ describe("Contract Generator", () => {
     dao_contract_charter: ".test-dao-charter",
     dao_contract_epoch: ".test-dao-epoch",
     dao_contract_messaging: ".test-messaging",
-    dao_token_owner_contract: ".test-token-owner", // Consider standardizing to dao_contract_token_owner if possible
-    dao_action_send_message_contract: ".test-send-message", // Consider standardizing
+    dao_contract_token_owner: ".test-token-owner",
+    dao_action_send_message: ".test-send-message",
     base_contract_dao_run_cost: ".test-dao-run-cost",
     dao_contract_rewards_account: ".test-rewards-account",
 
     // External contracts
-    sbtc_contract: "ST000000000000000000002AMW42H.sbtc-token", // Note: key was different
+    sbtc_contract: "ST000000000000000000002AMW42H.sbtc-token",
+    sbtc_token_contract: "'ST000000000000000000002AMW42H.sbtc-token'",
 
     // Configuration values
     dao_manifest: "The mission of this DAO is to test template processing",

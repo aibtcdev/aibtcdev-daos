@@ -2,7 +2,11 @@ import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeTreasury } from "../../../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
-import { getDaoTokens } from "../../../../utilities/dao-helpers";
+import {
+  completePrelaunch,
+  constructDao,
+  getDaoTokens,
+} from "../../../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -83,6 +87,8 @@ describe(`public functions: ${contractName}`, () => {
 
   it("deposit-ft() succeeds if asset allowed", () => {
     // arrange
+    completePrelaunch(deployer);
+    constructDao(deployer);
     getDaoTokens(address1, 100_000);
     // act
     const receipt = simnet.callPublicFn(

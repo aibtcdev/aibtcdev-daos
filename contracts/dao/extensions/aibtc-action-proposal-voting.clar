@@ -45,7 +45,7 @@
 ;; voting configuration
 (define-constant VOTING_QUORUM u15) ;; 15% of liquid supply must participate
 (define-constant VOTING_THRESHOLD u66) ;; 66% of votes must be in favor
-(define-constant VOTING_BOND u500000000000) ;; action proposal bond, 5,000 DAO tokens w/ 8 decimals
+(define-constant VOTING_BOND u100000000000) ;; action proposal bond, 1,000 DAO tokens w/ 8 decimals
 (define-constant VOTING_REWARD u100000000000) ;; action proposal reward, 1,000 DAO tokens w/ 8 decimals
 ;; /g/.aibtc-treasury/dao_contract_treasury
 (define-constant VOTING_TREASURY .aibtc-treasury) ;; used to calculate liquid supply
@@ -186,9 +186,7 @@
       ERR_PROPOSAL_RATE_LIMIT
     )
     ;; caller has the required balance
-    (asserts! (> senderBalance (+ VOTING_BOND AIBTC_DAO_RUN_COST_AMOUNT))
-      ERR_INSUFFICIENT_BALANCE
-    )
+    (asserts! (> senderBalance VOTING_BOND) ERR_INSUFFICIENT_BALANCE)
     ;; print proposal creation event
     (print {
       ;; /g/aibtc/dao_token_symbol
@@ -203,10 +201,7 @@
         creator: contract-caller,
         creatorUserId: userId,
         liquidTokens: liquidTokens,
-        memo: (if (is-some memo)
-          memo
-          none
-        ),
+        memo: memo,
         createdBtc: createdBtc,
         createdStx: createdStx,
         voteStart: voteStart,
@@ -231,10 +226,7 @@
         creator: contract-caller,
         creatorUserId: userId,
         liquidTokens: liquidTokens,
-        memo: (if (is-some memo)
-          memo
-          none
-        ),
+        memo: memo,
       })
       ERR_SAVING_PROPOSAL
     )
