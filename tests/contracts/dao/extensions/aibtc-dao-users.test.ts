@@ -15,6 +15,7 @@ import {
   formatSerializedBuffer,
   VOTING_DELAY,
   VOTING_PERIOD,
+  completePrelaunch,
 } from "../../../../utilities/dao-helpers";
 import { convertClarityTuple } from "../../../../utilities/contract-helpers";
 
@@ -81,6 +82,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("get-or-create-user-index() creates a user when a proposal is made", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([address1]); // fund the user to create a proposal
     const userIndex = simnet.callReadOnlyFn(
@@ -169,6 +171,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("increase-user-reputation() is called when a proposal passes", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer, address1]);
     const actionProposalsContract = registry.getContractByTypeAndSubtype(
@@ -288,6 +291,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("decrease-user-reputation() is called when a proposal fails", () => {
     // arrange: create user and give them some reputation first
+    completePrelaunch(deployer);
     constructDao(deployer);
     passActionProposal(
       "SEND_MESSAGE",

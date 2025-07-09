@@ -98,6 +98,16 @@ export function defineExtensionContractDependencies(
           .addTraitDependency("DAO_MESSAGING", "dao_trait_messaging")
           .addContractDependency("dao_contract_base", "BASE", "DAO")
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
+          .addContractDependency(
+            "dao_contract_treasury",
+            "EXTENSIONS",
+            "TREASURY"
+          )
+          .addContractDependency(
+            "dao_contract_action_proposal_voting",
+            "EXTENSIONS",
+            "ACTION_PROPOSAL_VOTING"
+          )
           .addRuntimeValue("dao_token_symbol");
         break;
 
@@ -327,6 +337,8 @@ export function defineTokenContractDependencies(
         contract
           .addAddressDependency("BITFLOW_CORE", "bitflow_core_contract")
           .addContractDependency("dao_contract_token_dex", "TOKEN", "DEX")
+          .addTraitDependency("BITFLOW_POOL", "bitflow_pool_trait")
+          .addTraitDependency("BITFLOW_SIP010", "bitflow_sip010_trait")
           // Add other specific dependencies for xyk-pool if any are discovered later
           .addRuntimeValue("dao_token_symbol"); // Assuming it also uses dao_token_symbol
         break;

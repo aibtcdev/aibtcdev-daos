@@ -6,6 +6,7 @@ import {
 } from "../../../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 import {
+  completePrelaunch,
   constructDao,
   formatSerializedBuffer,
   fundVoters,
@@ -104,6 +105,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("create-action-proposal() fails if called twice in the same btc block", () => {
     // arrange
+    completePrelaunch(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
     // create first proposal
@@ -151,6 +153,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("create-action-proposal() fails if caller has an insufficient balance", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     // act
     const receipt = simnet.callPublicFn(
@@ -169,6 +172,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("create-action-proposal() succeeds if called with sufficient balance", () => {
     // arrange
+    completePrelaunch(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
     // act
@@ -205,6 +209,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("vote-on-action-proposal() fails if voter has an insufficient balance", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -231,6 +236,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("vote-on-action-proposal() fails if proposal is already concluded", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     passActionProposal(
@@ -255,6 +261,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("vote-on-action-proposal() fails if proposal vote is too early", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -281,6 +288,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("vote-on-action-proposal() fails if proposal vote is too late", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -309,6 +317,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("vote-on-action-proposal() fails if updated vote matches existing vote", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -344,6 +353,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("vote-on-action-proposal() succeeds and records vote info", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -371,6 +381,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("vote-on-action-proposal() succeeds if vote is cast then changed during vote window", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -431,6 +442,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("veto-action-proposal() fails if proposal is already concluded", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     passActionProposal(
@@ -455,6 +467,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("veto-action-proposal() fails if veto vote is too early", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -481,6 +494,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("veto-action-proposal() fails if veto vote is too late", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -509,6 +523,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("veto-action-proposal() fails if veto vote already recorded", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -544,6 +559,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("veto-action-proposal() succeeds and records veto vote info", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -589,6 +605,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("conclude-action-proposal() fails if action is not an extension in the dao", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -626,6 +643,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("conclude-action-proposal() fails if proposal is already concluded", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     passActionProposal(
@@ -650,6 +668,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("conclude-action-proposal() fails if proposal is in voting period", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -685,6 +704,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("conclude-action-proposal() fails if proposal is in veto period", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -722,6 +742,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("conclude-action-proposal() fails if provided action does not match proposal action", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer]);
     const setupReceipt = simnet.callPublicFn(
@@ -759,6 +780,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("conclude-action-proposal() succeeds and executes the action if all criteria are met", () => {
     // arrange
+    completePrelaunch(deployer);
     constructDao(deployer);
     fundVoters([deployer, address1, address2, address3]);
     const setupReceipt = simnet.callPublicFn(
@@ -961,6 +983,7 @@ describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("get-liquid-supply() returns expected value", () => {
     // arrange
+    completePrelaunch(deployer);
     const expectedLiquidSupply = 20000000000000000n;
     fundVoters([deployer]);
     constructDao(deployer);

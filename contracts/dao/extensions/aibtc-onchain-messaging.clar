@@ -16,6 +16,9 @@
 (define-constant ERR_INVALID_INPUT (err u1601))
 (define-constant ERR_FETCHING_TOKEN_DATA (err u1602))
 
+;; data-vars
+(define-data-var messageCost uint u0)
+
 ;; public functions
 
 (define-public (callback
@@ -25,6 +28,8 @@
   (ok true)
 )
 
+;; DAO itself can send messages via proposals
+;; DAO token holders can send messages by paying a fee
 (define-public (send (msg (string-utf8 10000)))
   (let (
       (isFromDao (is-ok (is-dao-or-extension)))
@@ -50,7 +55,16 @@
         message: msg,
       },
     })
-    (ok true)
+    ;; check if sender is not dao via proposal
+    (ok (and
+      (not isFromDao)
+      ;; transfer the message cost to the dao
+      ;; /g/.aibtc-treasury/dao_contract_treasury
+      ;; /g/.aibtc-faktory/dao_contract_token
+      (try! (contract-call? .aibtc-treasury deposit-ft .aibtc-faktory
+        (var-get messageCost)
+      ))
+    ))
   )
 )
 
@@ -67,4 +81,23 @@
     )
     ERR_NOT_DAO_OR_EXTENSION
   ))
+)
+
+;; initialization
+;;
+
+(let (
+    ;; /g/.aibtc-action-proposal-voting/dao_contract_action_proposal_voting
+    (proposalConfig (contract-call? .aibtc-action-proposal-voting get-voting-configuration))
+    (bondAmount (get proposalBond proposalConfig))
+  )
+  (print {
+    notification: "aibtc-onchain-messaging/initialize",
+    payload: {
+      contractCaller: contract-caller,
+      txSender: tx-sender,
+      messageCost: bondAmount,
+    },
+  })
+  (ok (var-set messageCost bondAmount))
 )

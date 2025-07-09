@@ -98,7 +98,7 @@
 ;; used to guide decision-making and proposals
 (define-trait dao-charter (
   (set-dao-charter
-    ((string-utf8 4096))
+    ((string-utf8 16384))
     (response bool uint)
   )
 ))

@@ -39,7 +39,7 @@
     createdAt: uint, ;; block height
     caller: principal, ;; contract caller
     sender: principal, ;; tx-sender
-    charter: (string-utf8 4096), ;; charter text
+    charter: (string-utf8 16384), ;; charter text
   }
 )
 
@@ -53,7 +53,7 @@
   (ok true)
 )
 
-(define-public (set-dao-charter (charter (string-utf8 4096)))
+(define-public (set-dao-charter (charter (string-utf8 16384)))
   (let (
       (newVersion (+ (var-get currentVersion) u1))
       (previousCharter (match (map-get? CharterVersions (var-get currentVersion))
@@ -65,7 +65,7 @@
     (try! (is-dao-or-extension))
     ;; check length of charter
     (asserts! (>= (len charter) u1) ERR_CHARTER_TOO_SHORT)
-    (asserts! (<= (len charter) u4096) ERR_CHARTER_TOO_LONG)
+    (asserts! (<= (len charter) u16384) ERR_CHARTER_TOO_LONG)
     ;; insert new charter version
     (asserts!
       (map-insert CharterVersions newVersion {

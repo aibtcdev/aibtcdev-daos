@@ -163,6 +163,16 @@ export function generateTemplateReplacements(
       knownTraitKey: "FAKTORY_SIP010",
       templateToReplacePattern: traits["FAKTORY_SIP010"],
     }, // Uses the actual trait string as the toReplace key part
+    {
+      templateKeyName: "bitflow_pool_trait",
+      knownTraitKey: "BITFLOW_POOL",
+      templateToReplacePattern: traits["BITFLOW_POOL"],
+    },
+    {
+      templateKeyName: "bitflow_sip010_trait",
+      knownTraitKey: "BITFLOW_SIP010",
+      templateToReplacePattern: traits["BITFLOW_SIP010"],
+    },
   ];
 
   traitMappings.forEach((mapping) => {

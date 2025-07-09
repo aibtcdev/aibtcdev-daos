@@ -10,6 +10,7 @@ import {
 } from "../../../utilities/contract-helpers";
 import { getBalancesForPrincipal } from "../../../utilities/asset-helpers";
 import { dbgLog } from "../../../utilities/debug-logging";
+import { completePrelaunch } from "../../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -93,6 +94,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("faktory-buy-asset() fails if caller is not authorized", () => {
     // arrange
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     const amount = 10000000;
     const dex = tokenDexContractAddress;
@@ -112,6 +114,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("faktory-buy-asset() fails if agent can't buy/sell", () => {
     // arrange
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     const amount = 10000000;
     const dex = tokenDexContractAddress;
@@ -131,6 +134,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("faktory-buy-asset() fails if dex contract is not approved", () => {
     // arrange
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     const amount = 10000000;
     const dex = `${deployer}.unknown-dex`;
@@ -150,6 +154,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("faktory-buy-asset() succeeds when called by owner with approved contract", () => {
     // arrange
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     const amount = 1000000;
     const dex = tokenDexContractAddress;
@@ -178,6 +183,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("faktory-buy-asset() emits the correct notification event", () => {
     // arrange
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     const amount = "1000000";
     const dex = tokenDexContractAddress;
@@ -224,6 +230,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("faktory-sell-asset() fails if caller is not authorized", () => {
     // arrange
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     const amount = 10000000;
     const dex = tokenDexContractAddress;
@@ -243,6 +250,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("faktory-sell-asset() fails if agent can't buy/sell", () => {
     // arrange
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     const amount = 10000000;
     const dex = tokenDexContractAddress;
@@ -271,6 +279,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("faktory-sell-asset() fails if dex contract is not approved", () => {
     // arrange
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     const amount = 10000000;
     const dex = `${deployer}.unknown-dex`;
@@ -290,6 +299,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("faktory-sell-asset() succeeds when called by owner with approved contract", () => {
     // arrange
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
 
     // Get the actual balance of the agent account
@@ -324,6 +334,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("faktory-sell-asset() emits the correct notification event", () => {
     // arrange
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
 
     const agentBalances = getBalancesForPrincipal(contractAddress);
@@ -373,6 +384,7 @@ describe(`public functions: ${contractName}`, () => {
 describe(`read-only functions: ${contractName}`, () => {
   it("agent can buy/sell assets when authorized and fails when revoked", () => {
     // arrange
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     const amount = 1000000;
     const dex = tokenDexContractAddress;

@@ -186,9 +186,7 @@
       ERR_PROPOSAL_RATE_LIMIT
     )
     ;; caller has the required balance
-    (asserts! (> senderBalance (+ VOTING_BOND AIBTC_DAO_RUN_COST_AMOUNT))
-      ERR_INSUFFICIENT_BALANCE
-    )
+    (asserts! (> senderBalance VOTING_BOND) ERR_INSUFFICIENT_BALANCE)
     ;; print proposal creation event
     (print {
       ;; /g/aibtc/dao_token_symbol
@@ -203,10 +201,7 @@
         creator: contract-caller,
         creatorUserId: userId,
         liquidTokens: liquidTokens,
-        memo: (if (is-some memo)
-          memo
-          none
-        ),
+        memo: memo,
         createdBtc: createdBtc,
         createdStx: createdStx,
         voteStart: voteStart,
@@ -231,10 +226,7 @@
         creator: contract-caller,
         creatorUserId: userId,
         liquidTokens: liquidTokens,
-        memo: (if (is-some memo)
-          memo
-          none
-        ),
+        memo: memo,
       })
       ERR_SAVING_PROPOSAL
     )

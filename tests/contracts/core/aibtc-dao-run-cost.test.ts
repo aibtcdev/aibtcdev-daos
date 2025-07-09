@@ -2,7 +2,10 @@ import { Cl, ClarityType } from "@stacks/transactions";
 import { describe, expect, it, beforeEach } from "vitest";
 import { getSpecificAssetBalance } from "../../../utilities/asset-helpers";
 import { DAO_TOKEN_ASSETS_MAP } from "../../../utilities/contract-helpers";
-import { getDaoTokens } from "../../../utilities/dao-helpers";
+import {
+  completePrelaunch,
+  getDaoTokens,
+} from "../../../utilities/dao-helpers";
 import { getKnownAddress } from "../../../utilities/known-addresses";
 
 // setup accounts
@@ -578,6 +581,7 @@ describe(`transfer functionality: ${contractName}`, () => {
       DAO_TOKEN_ASSETS_MAP
     );
 
+    completePrelaunch(deployer);
     getDaoTokens(deployer, satsAmount);
 
     // transfer dao tokens to the contract

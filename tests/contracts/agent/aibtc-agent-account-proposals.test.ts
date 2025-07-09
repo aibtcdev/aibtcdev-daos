@@ -10,6 +10,7 @@ import {
 } from "../../../utilities/contract-helpers";
 import { getBalancesForPrincipal } from "../../../utilities/asset-helpers";
 import {
+  completePrelaunch,
   constructDao,
   formatSerializedBuffer,
   fundVoters,
@@ -108,6 +109,7 @@ describe(`public functions: ${contractName}`, () => {
   it("create-action-proposal() fails if caller is not authorized (user or agent)", () => {
     // arrange
     const message = Cl.stringUtf8("hello world");
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
 
     // act
@@ -130,7 +132,9 @@ describe(`public functions: ${contractName}`, () => {
   it("create-action-proposal() succeeds when called by owner", () => {
     // arrange
     const message = Cl.stringUtf8("hello world");
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
+    completePrelaunch(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
 
@@ -173,6 +177,7 @@ describe(`public functions: ${contractName}`, () => {
         caller: deployer,
       },
     };
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
@@ -236,6 +241,7 @@ describe(`public functions: ${contractName}`, () => {
     // arrange
     const proposalId = 1;
     const vote = true;
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
@@ -297,6 +303,7 @@ describe(`public functions: ${contractName}`, () => {
         caller: deployer,
       },
     };
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
@@ -371,6 +378,7 @@ describe(`public functions: ${contractName}`, () => {
   it("veto-action-proposal() succeeds when called by owner", () => {
     // arrange
     const proposalId = 1;
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
@@ -422,6 +430,7 @@ describe(`public functions: ${contractName}`, () => {
         caller: deployer,
       },
     };
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
@@ -493,6 +502,7 @@ describe(`public functions: ${contractName}`, () => {
   it("conclude-action-proposal() fails if contract is not approved", () => {
     // arrange
     const proposalId = 1;
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
@@ -568,6 +578,7 @@ describe(`public functions: ${contractName}`, () => {
   it("conclude-action-proposal() succeeds when called by owner", () => {
     // arrange
     const proposalId = 1;
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
@@ -644,6 +655,7 @@ describe(`public functions: ${contractName}`, () => {
         caller: deployer,
       },
     };
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
@@ -718,6 +730,7 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     let proposalId = 1;
     const vote = true;
+    completePrelaunch(deployer);
     setupAgentAccount(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
