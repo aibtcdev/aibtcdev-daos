@@ -5,7 +5,10 @@ import {
   completePrelaunch,
   getSbtcFromFaucet,
 } from "../../../../utilities/dao-helpers";
-import { SBTC_CONTRACT } from "../../../../utilities/contract-helpers";
+import {
+  SBTC_ASSETS_MAP,
+  SBTC_CONTRACT,
+} from "../../../../utilities/contract-helpers";
 import { dbgLog } from "../../../../utilities/debug-logging";
 
 // setup accounts
@@ -249,7 +252,9 @@ describe(`public functions: ${contractName}`, () => {
       address2
     );
 
-    const sbtcBalanceBefore = simnet.getAssetsMap().get(".sbtc-token.sbtc")
+    const sbtcBalanceBefore = simnet
+      .getAssetsMap()
+      .get(SBTC_ASSETS_MAP)
       ?.get(address2)!;
 
     // act
@@ -262,8 +267,13 @@ describe(`public functions: ${contractName}`, () => {
 
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
-    const sbtcBalanceAfter = simnet.getAssetsMap().get(".sbtc-token.sbtc")
+    const sbtcBalanceAfter = simnet
+      .getAssetsMap()
+      .get(SBTC_ASSETS_MAP)
       ?.get(address2)!;
+    console.log(
+      `sbtcBalanceBefore: ${sbtcBalanceBefore}, sbtcBalanceAfter: ${sbtcBalanceAfter}`
+    );
     expect(sbtcBalanceAfter).toBeGreaterThan(sbtcBalanceBefore);
   });
 });
