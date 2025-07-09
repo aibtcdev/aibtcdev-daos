@@ -22,36 +22,139 @@
 (define-constant FT-INITIALIZED-BALANCE u4000000000000000) ;; max_supply times 4%
 
 ;; Vesting schedule (percentages add up to 100)
-(define-constant VESTING-SCHEDULE
-    (list 
-        ;; Initial release - 10% at once
-        {height: u100, percent: u10, id: u0}    ;; 10% at initial unlock
-        
-        ;; Second phase - 20% total across 6 drips
-        {height: u250, percent: u3, id: u1}     ;; 3%
-        {height: u400, percent: u3, id: u2}     ;; 3%
-        {height: u550, percent: u3, id: u3}     ;; 3%
-        {height: u700, percent: u3, id: u4}     ;; 3%
-        {height: u850, percent: u4, id: u5}     ;; 4%
-        {height: u1000, percent: u4, id: u6}    ;; 4% - hitting 30% total at original second milestone
-        
-        ;; Third phase - 30% total across 7 drips
-        {height: u1200, percent: u4, id: u7}    ;; 4%
-        {height: u1400, percent: u4, id: u8}    ;; 4%
-        {height: u1600, percent: u4, id: u9}    ;; 4%
-        {height: u1750, percent: u4, id: u10}   ;; 4%
-        {height: u1900, percent: u4, id: u11}   ;; 4%
-        {height: u2000, percent: u5, id: u12}   ;; 5%
-        {height: u2100, percent: u5, id: u13}   ;; 5% - hitting 60% total at original third milestone
-        
-        ;; Final phase - 40% total across 7 drips
-        {height: u2500, percent: u5, id: u14}   ;; 5%
-        {height: u2900, percent: u5, id: u15}   ;; 5%
-        {height: u3300, percent: u6, id: u16}   ;; 6%
-        {height: u3600, percent: u6, id: u17}   ;; 6%
-        {height: u3900, percent: u6, id: u18}   ;; 6%
-        {height: u4100, percent: u6, id: u19}   ;; 6%
-        {height: u4200, percent: u6, id: u20})) ;; 6% - hitting 100% total at original final milestone
+(define-constant VESTING-SCHEDULE (list
+  ;; Initial release - 10% at once
+  {
+    height: u100,
+    percent: u10,
+    id: u0,
+  }
+  ;; 10% at initial unlock
+  ;; Second phase - 20% total across 6 drips
+  {
+    height: u250,
+    percent: u3,
+    id: u1,
+  }
+  ;; 3%
+  {
+    height: u400,
+    percent: u3,
+    id: u2,
+  }
+  ;; 3%
+  {
+    height: u550,
+    percent: u3,
+    id: u3,
+  }
+  ;; 3%
+  {
+    height: u700,
+    percent: u3,
+    id: u4,
+  }
+  ;; 3%
+  {
+    height: u850,
+    percent: u4,
+    id: u5,
+  }
+  ;; 4%
+  {
+    height: u1000,
+    percent: u4,
+    id: u6,
+  }
+  ;; 4% - hitting 30% total at original second milestone
+  ;; Third phase - 30% total across 7 drips
+  {
+    height: u1200,
+    percent: u4,
+    id: u7,
+  }
+  ;; 4%
+  {
+    height: u1400,
+    percent: u4,
+    id: u8,
+  }
+  ;; 4%
+  {
+    height: u1600,
+    percent: u4,
+    id: u9,
+  }
+  ;; 4%
+  {
+    height: u1750,
+    percent: u4,
+    id: u10,
+  }
+  ;; 4%
+  {
+    height: u1900,
+    percent: u4,
+    id: u11,
+  }
+  ;; 4%
+  {
+    height: u2000,
+    percent: u5,
+    id: u12,
+  }
+  ;; 5%
+  {
+    height: u2100,
+    percent: u5,
+    id: u13,
+  }
+  ;; 5% - hitting 60% total at original third milestone
+  ;; Final phase - 40% total across 7 drips
+  {
+    height: u2500,
+    percent: u5,
+    id: u14,
+  }
+  ;; 5%
+  {
+    height: u2900,
+    percent: u5,
+    id: u15,
+  }
+  ;; 5%
+  {
+    height: u3300,
+    percent: u6,
+    id: u16,
+  }
+  ;; 6%
+  {
+    height: u3600,
+    percent: u6,
+    id: u17,
+  }
+  ;; 6%
+  {
+    height: u3900,
+    percent: u6,
+    id: u18,
+  }
+  ;; 6%
+  {
+    height: u4100,
+    percent: u6,
+    id: u19,
+  }
+  ;; 6%
+  {
+    height: u4200,
+    percent: u6,
+    id: u20,
+  }
+))
+
+;; 6% - hitting 100% total at original final milestone
 
 (define-constant FAKTORY1 tx-sender) ;; if a multi-sig can create a multi-sig then this is a multi-sig 2 of 5
 (define-constant FAKTORY2 tx-sender)
@@ -221,9 +324,13 @@
         seat-count
       ))
     )
-    (asserts! (is-eq (var-get distribution-height) u0) ERR-DISTRIBUTION-ALREADY-SET)
+    (asserts! (is-eq (var-get distribution-height) u0)
+      ERR-DISTRIBUTION-ALREADY-SET
+    )
     (asserts! (> actual-seats u0) ERR-INVALID-SEAT-COUNT)
-    (asserts! (<= (+ user-seats actual-seats) MAX-SEATS-PER-USER) ERR-INVALID-SEAT-COUNT)
+    (asserts! (<= (+ user-seats actual-seats) MAX-SEATS-PER-USER)
+      ERR-INVALID-SEAT-COUNT
+    )
     (asserts! (< current-seats SEATS) ERR-NO-SEATS-LEFT)
     ;; Process payment
     ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
@@ -271,7 +378,9 @@
       (user-seats (default-to u0 (map-get? seats-owned tx-sender)))
       (seat-owner tx-sender)
     )
-    (asserts! (is-eq (var-get distribution-height) u0) ERR-DISTRIBUTION-ALREADY-SET)
+    (asserts! (is-eq (var-get distribution-height) u0)
+      ERR-DISTRIBUTION-ALREADY-SET
+    )
     (asserts! (> user-seats u0) ERR-NOT-SEAT-OWNER)
     ;; Process refund
     ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
@@ -348,9 +457,13 @@
       (claimable (get-claimable-amount tx-sender))
       (seat-owner tx-sender)
     )
-    (asserts! (> (var-get distribution-height) u0) ERR-DISTRIBUTION-NOT-INITIALIZED)
+    (asserts! (> (var-get distribution-height) u0)
+      ERR-DISTRIBUTION-NOT-INITIALIZED
+    )
     (asserts! (is-eq (contract-of ft) TOKEN-DAO) ERR-WRONG-TOKEN)
-    (asserts! (> (default-to u0 (map-get? seats-owned tx-sender)) u0) ERR-NOT-SEAT-OWNER)
+    (asserts! (> (default-to u0 (map-get? seats-owned tx-sender)) u0)
+      ERR-NOT-SEAT-OWNER
+    )
     (asserts! (> claimable u0) ERR-NOTHING-TO-CLAIM)
     (asserts! (>= (var-get ft-balance) claimable) ERR-CONTRACT-INSUFFICIENT-FUNDS)
     (match (as-contract (contract-call? ft transfer claimable tx-sender seat-owner none))
@@ -379,9 +492,13 @@
     (holder principal)
   )
   (let ((claimable (get-claimable-amount holder)))
-    (asserts! (> (var-get distribution-height) u0) ERR-DISTRIBUTION-NOT-INITIALIZED)
+    (asserts! (> (var-get distribution-height) u0)
+      ERR-DISTRIBUTION-NOT-INITIALIZED
+    )
     (asserts! (is-eq (contract-of ft) TOKEN-DAO) ERR-WRONG-TOKEN)
-    (asserts! (> (default-to u0 (map-get? seats-owned holder)) u0) ERR-NOT-SEAT-OWNER)
+    (asserts! (> (default-to u0 (map-get? seats-owned holder)) u0)
+      ERR-NOT-SEAT-OWNER
+    )
     (asserts! (> claimable u0) ERR-NOTHING-TO-CLAIM)
     (asserts! (>= (var-get ft-balance) claimable) ERR-CONTRACT-INSUFFICIENT-FUNDS)
     (match (as-contract (contract-call? ft transfer claimable tx-sender holder none))
@@ -594,7 +711,8 @@
       (if (> (- acc-fees (var-get acc-distributed)) u0)
         ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
         (match (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
-          transfer (- acc-fees (var-get acc-distributed)) tx-sender FAKTORY1 none
+          transfer (- acc-fees (var-get acc-distributed)) tx-sender FAKTORY1
+          none
         ))
           success (begin
             (print {
@@ -604,7 +722,8 @@
             })
             true
           )
-          error false
+          error
+          false
         )
         true
       )
@@ -650,7 +769,8 @@
             amount: user-share,
           }
         )
-        error {
+        error
+        {
           recipient: holder,
           amount: u0,
         }

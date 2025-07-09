@@ -26,8 +26,7 @@
     (asserts! (is-eq tx-sender sender) (err ERR-NOT-AUTHORIZED))
     ;; /g/SYMBOL/dao_token_symbol
     (match (ft-transfer? SYMBOL-AIBTC-DAO amount sender recipient)
-      response
-      (begin
+      response (begin
         (print memo)
         (ok response)
       )
