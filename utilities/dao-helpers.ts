@@ -332,13 +332,7 @@ export function completePrelaunch(deployer: string) {
   }
   const finalStatus = convertClarityTuple<{
     "market-open": boolean;
-    "seat-holders": { owner: string; seats: bigint }[];
   }>(finalStatusResult.value);
-  console.log("Final pre-faktory status:", finalStatus);
-  console.log(
-    "Seat holders:",
-    JSON.stringify(finalStatus["seat-holders"], null, 2)
-  );
   // Check if the market is open
   expect(finalStatus["market-open"]).toBe(true);
 }

@@ -297,8 +297,11 @@ describe(`public functions: ${contractName}`, () => {
 
     // assert
     expect(receipt.result.type).toBe(ClarityType.ResponseOk);
+    if (receipt.result.type !== ClarityType.ResponseOk) {
+      throw new Error("claim() did not return an ok response");
+    }
     const claimedAmount = cvToValue(receipt.result).value;
-    expect(claimedAmount).toBeGreaterThan(0n);
+    expect(BigInt(claimedAmount)).toBeGreaterThan(0n);
 
     // Check that claimed amount was updated
     const userInfoResult = simnet.callReadOnlyFn(
@@ -309,6 +312,15 @@ describe(`public functions: ${contractName}`, () => {
     ).result;
 
     expect(userInfoResult.type).toBe(ClarityType.ResponseOk);
+    if (userInfoResult.type !== ClarityType.ResponseOk) {
+      throw new Error("get-user-info() did not return an ok response");
+    }
+    expect(userInfoResult.value.type).toBe(ClarityType.Tuple);
+    if (userInfoResult.value.type !== ClarityType.Tuple) {
+      throw new Error(
+        "get-user-info() did not return a tuple inside the ok response"
+      );
+    }
     const userInfoData = convertClarityTuple<UserInfo>(userInfoResult.value);
     expect(userInfoData["amount-claimed"]).toBeGreaterThan(0n);
   });
@@ -334,7 +346,8 @@ describe(`public functions: ${contractName}`, () => {
     // assert
     expect(receipt.result.type).toBe(ClarityType.ResponseOk);
     const claimedAmount = cvToValue(receipt.result).value;
-    expect(claimedAmount).toBeGreaterThan(0n);
+    console.log(`Claimed amount for address2: ${claimedAmount}`);
+    expect(BigInt(claimedAmount)).toBeGreaterThan(0n);
 
     // Check that claimed amount was updated for address2
     const userInfoResult = simnet.callReadOnlyFn(
@@ -345,8 +358,17 @@ describe(`public functions: ${contractName}`, () => {
     ).result;
 
     expect(userInfoResult.type).toBe(ClarityType.ResponseOk);
+    if (userInfoResult.type !== ClarityType.ResponseOk) {
+      throw new Error("get-user-info() did not return an ok response");
+    }
+    expect(userInfoResult.value.type).toBe(ClarityType.Tuple);
+    if (userInfoResult.value.type !== ClarityType.Tuple) {
+      throw new Error(
+        "get-user-info() did not return a tuple inside the ok response"
+      );
+    }
     const userInfoData = convertClarityTuple<UserInfo>(userInfoResult.value);
-    expect(userInfoData["amount-claimed"]).toBeGreaterThan(0n);
+    expect(BigInt(userInfoData["amount-claimed"])).toBeGreaterThan(0n);
   });
 
   ////////////////////////////////////////
