@@ -972,7 +972,7 @@ describe(`read-only functions: ${contractName}`, () => {
         quorum: Cl.uint(15),
         threshold: Cl.uint(66),
         treasury: Cl.principal(treasuryContractAddress),
-        proposalBond: Cl.uint(100000000000),
+        proposalBond: Cl.uint(50000000000),
         proposalReward: Cl.uint(100000000000),
       })
     );

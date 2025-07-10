@@ -318,7 +318,7 @@ describe(`public functions: ${contractName}`, () => {
       Cl.tuple({
         address: Cl.principal(address1),
         createdAt: Cl.uint(createdAt),
-        reputation: Cl.int(1), // REP_SUCCESS is u1
+        reputation: Cl.int(1), // REPUTATION_CHANGE is u1
       })
     );
     expect(originalUserDataResult).toStrictEqual(expectedOriginalUserData);
@@ -405,9 +405,9 @@ describe(`public functions: ${contractName}`, () => {
       Cl.tuple({
         address: Cl.principal(address1),
         createdAt: Cl.uint(createdAt),
-        // REP_SUCCESS is u1, REP_FAILURE is u2. Reputation is int.
-        // Start at 1. After failure: 1 - 2 = -1.
-        reputation: Cl.int(-1),
+        // REPUTATION_CHANGE is u1. Reputation is int.
+        // Start at 1. After failure: 1 - 1 = 0.
+        reputation: Cl.int(0),
       })
     );
     expect(updatedUserDataResult).toStrictEqual(expectedUpdatedUserData);
