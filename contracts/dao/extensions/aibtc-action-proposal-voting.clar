@@ -35,7 +35,7 @@
 (define-constant ERR_ALREADY_VOTED (err u1312))
 (define-constant ERR_INVALID_ACTION (err u1313))
 
-(define-constant AIBTC_DAO_RUN_COST_AMOUNT u10000000000) ;; 100 DAO tokens w/ 8 decimals
+(define-constant AIBTC_DAO_RUN_COST_AMOUNT u20000000000) ;; 200 DAO tokens w/ 8 decimals
 
 ;; /g/.aibtc-dao-run-cost/base_contract_dao_run_cost
 (define-constant AIBTC_DAO_RUN_COST_CONTRACT .aibtc-dao-run-cost) ;; AIBTC dao run cost contract
@@ -45,7 +45,7 @@
 ;; voting configuration
 (define-constant VOTING_QUORUM u15) ;; 15% of liquid supply must participate
 (define-constant VOTING_THRESHOLD u66) ;; 66% of votes must be in favor
-(define-constant VOTING_BOND u100000000000) ;; action proposal bond, 1,000 DAO tokens w/ 8 decimals
+(define-constant VOTING_BOND u50000000000) ;; action proposal bond, 500 DAO tokens w/ 8 decimals
 (define-constant VOTING_REWARD u100000000000) ;; action proposal reward, 1,000 DAO tokens w/ 8 decimals
 ;; /g/.aibtc-treasury/dao_contract_treasury
 (define-constant VOTING_TREASURY .aibtc-treasury) ;; used to calculate liquid supply
