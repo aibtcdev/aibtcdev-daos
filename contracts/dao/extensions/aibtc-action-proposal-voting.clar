@@ -61,8 +61,7 @@
 ;; devnet: 288 blocks (48 hours)
 (define-constant VOTING_PERIOD u288)
 
-(define-constant REP_SUCCESS u1) ;; reputation increase on proposal success
-(define-constant REP_FAILURE u2) ;; reputation decrease on proposal failure
+(define-constant REPUTATION_CHANGE u1) ;; reputation increase/decrease
 
 ;; data vars
 ;;
@@ -553,11 +552,11 @@
     (if votePassed
       ;; /g/.aibtc-dao-users/dao_contract_users
       (try! (contract-call? .aibtc-dao-users increase-user-reputation creator
-        REP_SUCCESS
+        REPUTATION_CHANGE
       ))
       ;; /g/.aibtc-dao-users/dao_contract_users
       (try! (contract-call? .aibtc-dao-users decrease-user-reputation creator
-        REP_FAILURE
+        REPUTATION_CHANGE
       ))
     )
     ;; increment the concluded proposal count
