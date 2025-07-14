@@ -13,7 +13,7 @@
 (impl-trait .aibtc-agent-account-traits.aibtc-account-swaps)
 ;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
-;; TODO: /g/.agent-account-traits.aibtc-account-swaps/agent_account_trait_account_swaps
+;; /g/.aibtc-agent-account-traits.aibtc-account-swap-adapter/agent_account_trait_account_swap_adapter
 (use-trait agent-account-swap-adapter .aibtc-agent-account-traits.aibtc-account-swap-adapter)
 ;; /g/.aibtc-agent-account-traits.aibtc-account
 ;; /g/.aibtc-dao-traits.action/dao_trait_action
@@ -261,7 +261,7 @@
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
-      notification: "aibtc-agent-account/buy-dao-token-with-sbtc",
+      notification: "aibtc-agent-account/buy-dao-token",
       payload: {
         swapAdapter: (contract-of swapAdapter),
         daoToken: (contract-of daoToken),
@@ -292,7 +292,7 @@
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
-      notification: "aibtc-agent-account/sell-dao-token-for-sbtc",
+      notification: "aibtc-agent-account/sell-dao-token",
       payload: {
         swapAdapter: (contract-of swapAdapter),
         daoToken: (contract-of daoToken),
