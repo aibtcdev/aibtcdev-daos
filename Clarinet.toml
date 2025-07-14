@@ -63,6 +63,18 @@ path = "contracts/core/aibtc-dao-run-cost.clar"
 clarity_version = 3
 epoch = 3.1
 
+# dao core swap adapters
+
+[contracts.aibtc-acct-swap-bitflow-aibtc-sbtc]
+path = "contracts/core/aibtc-acct-swap-bitflow-aibtc-sbtc.clar"
+clarity_version = 3
+epoch = 3.1
+
+[contracts.aibtc-acct-swap-faktory-aibtc-sbtc]
+path = "contracts/core/aibtc-acct-swap-faktory-aibtc-sbtc.clar"
+clarity_version = 3
+epoch = 3.1
+
 # dao traits
 
 [contracts.aibtc-dao-traits]
