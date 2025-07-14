@@ -32,6 +32,8 @@ type AgentTraits = {
   AGENT_ACCOUNT: string;
   AGENT_ACCOUNT_PROPOSALS: string;
   AGENT_ACCOUNT_CONFIG: string;
+  AGENT_ACCOUNT_SWAPS: string;
+  AGENT_DAO_SWAP_ADAPTER: string;
   AGENT_FAKTORY_BUY_SELL: string;
 };
 
@@ -86,6 +88,10 @@ const mainnetTraits: KnownTraits = {
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-proposals",
   AGENT_ACCOUNT_CONFIG:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-account-config",
+  AGENT_ACCOUNT_SWAPS:
+    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-account-swaps",
+  AGENT_DAO_SWAP_ADAPTER:
+    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
   AGENT_FAKTORY_BUY_SELL:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.faktory-buy-sell",
 };
@@ -138,6 +144,10 @@ const testnetTraits: KnownTraits = {
     "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-proposals",
   AGENT_ACCOUNT_CONFIG:
     "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-account-config",
+  AGENT_ACCOUNT_SWAPS:
+    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-account-swaps",
+  AGENT_DAO_SWAP_ADAPTER:
+    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
   AGENT_FAKTORY_BUY_SELL:
     "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.faktory-buy-sell",
 };
@@ -188,6 +198,10 @@ const devnetTraits: KnownTraits = {
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-proposals",
   AGENT_ACCOUNT_CONFIG:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-config",
+  AGENT_ACCOUNT_SWAPS:
+    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-swaps",
+  AGENT_DAO_SWAP_ADAPTER:
+    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
   AGENT_FAKTORY_BUY_SELL:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.faktory-buy-sell",
 };

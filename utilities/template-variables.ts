@@ -312,6 +312,15 @@ export function generateTemplateReplacements(
     `.${CONTRACT_NAMES["TOKEN"]["PRELAUNCH"]}/dao_contract_pre_faktory`
   ] = `.${preFaktoryContractName}`;
 
+  const bitflowPoolContractName = CONTRACT_NAMES["TOKEN"]["POOL"].replace(
+    templateKeySymbol,
+    symbol
+  );
+  replacements["dao_contract_bitflow_pool"] = `.${bitflowPoolContractName}`;
+  replacements[
+    `.${CONTRACT_NAMES["TOKEN"]["POOL"]}/dao_contract_bitflow_pool`
+  ] = `.${bitflowPoolContractName}`;
+
   // Add faktory_dex_trait (Note: This trait is not in KnownTraits.ts, using literal value from error for devnet/testnet)
   // Ideally, this should be added to KnownTraits for proper multi-network support.
   const faktoryDexTraitValue =
@@ -333,6 +342,8 @@ export function generateTemplateReplacements(
     "AGENT_ACCOUNT",
     "AGENT_ACCOUNT_CONFIG",
     "AGENT_ACCOUNT_PROPOSALS",
+    "AGENT_ACCOUNT_SWAPS",
+    "AGENT_DAO_SWAP_ADAPTER",
     "AGENT_FAKTORY_BUY_SELL",
   ];
 
@@ -340,28 +351,19 @@ export function generateTemplateReplacements(
     const traitValue = traits[key];
     if (traitValue) {
       const lowerKey = (key as string).toLowerCase();
-      let templateKeyName: string;
-
-      // Ensure correct keyName generation for agent traits
-      if (key === "AGENT_ACCOUNT_PROPOSALS") {
-        templateKeyName = "agent_account_trait_proposals";
-      } else {
-        // General case for other agent traits like AGENT_ACCOUNT, AGENT_FAKTORY_DEX_APPROVAL, etc.
-        const formattedKey = lowerKey.replace(/^agent_/, ""); // e.g. "account", "faktory_dex_approval"
-        templateKeyName = `agent_account_trait_${formattedKey}`;
-      }
+      // General case for other agent traits like AGENT_ACCOUNT, AGENT_FAKTORY_DEX_APPROVAL, etc.
+      const formattedKey = lowerKey.replace(/^agent_/, ""); // e.g. "account", "faktory_dex_approval"
+      const templateKeyName = `agent_account_trait_${formattedKey}`;
 
       replacements[templateKeyName] = traitValue;
 
       // Construct the toReplace pattern based on templateKeySymbol and the specific parts of the agent trait name
       // e.g., for AGENT_ACCOUNT_PROPOSALS -> .aibtc-agent-account-traits.aibtc-proposals
       const traitNameParts = traitValue.split(".");
-      if (traitNameParts.length > 0) {
+      if (traitNameParts.length > 1) {
         const lastPart = traitNameParts[traitNameParts.length - 1]; // e.g., aibtc-proposals
-        // Assuming agent traits follow a pattern like '.<templateKeySymbol>-agent-account-traits.<specific-part>'
-        // The specific part (e.g. "aibtc-proposals") is derived from the known trait string.
-        // The "agent-account-traits" part is assumed based on the error messages.
-        const toReplacePattern = `.${templateKeySymbol}-agent-account-traits.${lastPart}`;
+        const secondToLastPart = traitNameParts[traitNameParts.length - 2]; // e.g., aibtc-agent-account-traits
+        const toReplacePattern = `.${secondToLastPart}.${lastPart}`;
         replacements[`${toReplacePattern}/${templateKeyName}`] = traitValue; // Key not formatted
       }
     }
