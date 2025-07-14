@@ -2,10 +2,11 @@ export const CONTRACT_TYPES = [
   "AGENT", // agent account
   "BASE", // base-dao
   "ACTIONS", // action proposal extensions
-  "EXTENSIONS", // extensions
-  "PROPOSALS", // core proposals
-  "TOKEN", // token, dex, pool
-  "CORE", // core contracts like run-cost
+  "EXTENSIONS", // dao extensions
+  "PROPOSALS", // dao proposals
+  "TOKEN", // token, dex, pool, prelaunch
+  "TRADING", // adapters for agent accounts
+  "CORE", // core contracts like dao-run-cost
 ] as const;
 
 // derive a type from the array
@@ -32,6 +33,7 @@ export const CONTRACT_SUBTYPES = {
   ] as const,
   PROPOSALS: ["INITIALIZE_DAO"] as const,
   TOKEN: ["DAO", "DEX", "POOL", "PRELAUNCH"] as const,
+  TRADING: ["FAKTORY_SBTC", "BITFLOW_SBTC"] as const,
   CORE: ["DAO_RUN_COST"] as const,
 } as const;
 
@@ -71,6 +73,10 @@ export const CONTRACT_NAMES: {
     DEX: "aibtc-faktory-dex",
     POOL: "xyk-pool-sbtc-aibtc-v-1-1",
     PRELAUNCH: "aibtc-pre-faktory",
+  },
+  TRADING: {
+    FAKTORY_SBTC: "aibtc-acct-swap-faktory-aibtc-sbtc",
+    BITFLOW_SBTC: "aibtc-acct-swap-bitflow-aibtc-sbtc",
   },
   CORE: {
     DAO_RUN_COST: "aibtc-dao-run-cost",

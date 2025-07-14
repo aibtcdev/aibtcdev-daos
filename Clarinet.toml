@@ -63,18 +63,6 @@ path = "contracts/core/aibtc-dao-run-cost.clar"
 clarity_version = 3
 epoch = 3.1
 
-# dao core swap adapters
-
-[contracts.aibtc-acct-swap-bitflow-aibtc-sbtc]
-path = "contracts/core/aibtc-acct-swap-bitflow-aibtc-sbtc.clar"
-clarity_version = 3
-epoch = 3.1
-
-[contracts.aibtc-acct-swap-faktory-aibtc-sbtc]
-path = "contracts/core/aibtc-acct-swap-faktory-aibtc-sbtc.clar"
-clarity_version = 3
-epoch = 3.1
-
 # dao traits
 
 [contracts.aibtc-dao-traits]
@@ -147,6 +135,18 @@ epoch = 3.1
 
 [contracts.aibtc-base-initialize-dao]
 path = 'contracts/dao/proposals/aibtc-base-initialize-dao.clar'
+clarity_version = 3
+epoch = 3.1
+
+# dao trading adapters
+
+[contracts.aibtc-acct-swap-bitflow-aibtc-sbtc]
+path = "contracts/dao/trading/aibtc-acct-swap-bitflow-aibtc-sbtc.clar"
+clarity_version = 3
+epoch = 3.1
+
+[contracts.aibtc-acct-swap-faktory-aibtc-sbtc]
+path = "contracts/dao/trading/aibtc-acct-swap-faktory-aibtc-sbtc.clar"
 clarity_version = 3
 epoch = 3.1
 
