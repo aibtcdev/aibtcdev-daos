@@ -23,3 +23,18 @@ export type FaktoryUserExpectedShare = {
   "total-accumulated-fees": bigint;
   "expected-share": bigint;
 };
+
+export type AgentAccountSwapAdapterContractInfo = {
+  self: string;
+  deployedBurnBlock: bigint;
+  deployedStacksBlock: bigint;
+  swapContract: string;
+  daoToken: string;
+  bitflowCore?: string; // core calls pool in Bitflow adapter
+};
+
+export type AgentAccountSwapAdapterSwapInfo = {
+  totalBuys: bigint;
+  totalSells: bigint;
+  totalSwaps: bigint;
+};

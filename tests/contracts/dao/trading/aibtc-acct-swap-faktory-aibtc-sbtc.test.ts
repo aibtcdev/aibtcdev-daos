@@ -2,11 +2,13 @@ import { Cl, cvToValue } from "@stacks/transactions";
 import { describe, expect, it, test } from "vitest";
 import { setupFullContractRegistry } from "../../../../utilities/contract-registry";
 import { ErrCodeFaktorySwapAdapter } from "../../../../utilities/contract-error-codes";
-import {
-  getSbtcFromFaucet,
-  getDaoTokens,
-} from "../../../../utilities/dao-helpers";
+import { getDaoTokens } from "../../../../utilities/dao-helpers";
 import { completePrelaunch } from "../../../../utilities/dao-helpers";
+import { convertClarityTuple } from "../../../../utilities/contract-helpers";
+import {
+  AgentAccountSwapAdapterContractInfo,
+  AgentAccountSwapAdapterSwapInfo,
+} from "../../../../utilities/dao-types";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -62,7 +64,7 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(daoTokenAddress),
         Cl.uint(1000),
-        Cl.some(Cl.uint(1_000_000_000)),
+        Cl.some(Cl.uint(1_000_000_000_000)),
       ],
       deployer
     );
@@ -164,10 +166,12 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // Assert
-    const result = cvToValue(info.result);
-    expect(result.self.value).toBe(contractAddress);
-    expect(result.faktoryDex.value).toBe(tokenDexContractAddress);
-    expect(result.daoToken.value).toBe(daoTokenAddress);
+    const result = convertClarityTuple<AgentAccountSwapAdapterContractInfo>(
+      info.result
+    );
+    expect(result.self).toBe(contractAddress);
+    expect(result.swapContract).toBe(tokenDexContractAddress);
+    expect(result.daoToken).toBe(daoTokenAddress);
   });
 
   test("get-swap-info() returns correct swap info", () => {
@@ -179,9 +183,11 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
     // Assert
-    const result = cvToValue(info.result);
-    expect(result.totalBuys.value).toBe(0n);
-    expect(result.totalSells.value).toBe(0n);
-    expect(result.totalSwaps.value).toBe(0n);
+    const result = convertClarityTuple<AgentAccountSwapAdapterSwapInfo>(
+      info.result
+    );
+    expect(result.totalBuys).toBe(0n);
+    expect(result.totalSells).toBe(0n);
+    expect(result.totalSwaps).toBe(0n);
   });
 });

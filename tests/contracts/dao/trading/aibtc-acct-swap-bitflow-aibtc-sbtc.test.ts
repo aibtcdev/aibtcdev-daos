@@ -2,12 +2,14 @@ import { Cl, cvToValue } from "@stacks/transactions";
 import { describe, expect, it, test } from "vitest";
 import { setupFullContractRegistry } from "../../../../utilities/contract-registry";
 import { ErrCodeBitflowSwapAdapter } from "../../../../utilities/contract-error-codes";
-import {
-  getKnownAddress,
-  getSbtcFromFaucet,
-  getDaoTokens,
-} from "../../../../utilities/dao-helpers";
+import { getDaoTokens } from "../../../../utilities/dao-helpers";
 import { completePrelaunch } from "../../../../utilities/dao-helpers";
+import { getKnownAddress } from "../../../../utilities/known-addresses";
+import { convertClarityTuple } from "../../../../utilities/contract-helpers";
+import {
+  AgentAccountSwapAdapterContractInfo,
+  AgentAccountSwapAdapterSwapInfo,
+} from "../../../../utilities/dao-types";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -81,6 +83,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(daoTokenAddress), Cl.uint(100000), Cl.some(Cl.uint(1))],
       deployer
     );
+    console.log("Buy DAO Token Receipt with minReceive:", receipt);
     expect(receipt.result).toBeOk(Cl.bool(true));
   });
 
@@ -145,7 +148,7 @@ describe(`read-only functions: ${contractName}`, () => {
       "TOKEN",
       "POOL"
     );
-    const bitflowCoreAddress = getKnownAddress("simnet", "BITFLOW_CORE");
+    const bitflowCoreAddress = getKnownAddress("testnet", "BITFLOW_CORE");
 
     // Act
     const info = simnet.callReadOnlyFn(
@@ -156,11 +159,13 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // Assert
-    const result = cvToValue(info.result);
-    expect(result.self.value).toBe(contractAddress);
-    expect(result.bitflowCore.value).toBe(bitflowCoreAddress);
-    expect(result.bitflowPool.value).toBe(bitflowPoolAddress);
-    expect(result.daoToken.value).toBe(daoTokenAddress);
+    const result = convertClarityTuple<AgentAccountSwapAdapterContractInfo>(
+      info.result
+    );
+    expect(result.self).toBe(contractAddress);
+    expect(result.swapContract).toBe(bitflowPoolAddress);
+    expect(result.daoToken).toBe(daoTokenAddress);
+    expect(result.bitflowCore).toBe(bitflowCoreAddress);
   });
 
   test("get-swap-info() returns correct swap info", () => {
@@ -172,9 +177,11 @@ describe(`read-only functions: ${contractName}`, () => {
       deployer
     );
     // Assert
-    const result = cvToValue(info.result);
-    expect(result.totalBuys.value).toBe(0n);
-    expect(result.totalSells.value).toBe(0n);
-    expect(result.totalSwaps.value).toBe(0n);
+    const result = convertClarityTuple<AgentAccountSwapAdapterSwapInfo>(
+      info.result
+    );
+    expect(result.totalBuys).toBe(0n);
+    expect(result.totalSells).toBe(0n);
+    expect(result.totalSwaps).toBe(0n);
   });
 });

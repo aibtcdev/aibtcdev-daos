@@ -100,7 +100,7 @@
     deployedBurnBlock: DEPLOYED_BURN_BLOCK,
     deployedStacksBlock: DEPLOYED_STACKS_BLOCK,
     ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
-    faktoryDex: .aibtc-faktory-dex,
+    swapContract: .aibtc-faktory-dex,
     daoToken: DAO_TOKEN,
   }
 )

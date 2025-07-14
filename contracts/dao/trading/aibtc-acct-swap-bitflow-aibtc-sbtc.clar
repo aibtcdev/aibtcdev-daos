@@ -85,7 +85,7 @@
     ;; /g/'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2/external_bitflow_core
     bitflowCore: 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2,
     ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
-    bitflowPool: .xyk-pool-sbtc-aibtc-v-1-1,
+    swapContract: .xyk-pool-sbtc-aibtc-v-1-1,
     daoToken: DAO_TOKEN,
   }
 )
