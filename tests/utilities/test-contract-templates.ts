@@ -11,7 +11,7 @@ export const agentAccountTemplate = `
 
 ;; traits
 (impl-trait .aibtc-agent-account-traits.aibtc-account)
-(impl-trait .aibtc-agent-account-traits.aibtc-proposals)
+(impl-trait .aibtc-agent-account-traits.aibtc-account-proposals)
 (impl-trait .aibtc-agent-account-traits.faktory-dex-approval)
 (impl-trait .aibtc-agent-account-traits.faktory-buy-sell)
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)

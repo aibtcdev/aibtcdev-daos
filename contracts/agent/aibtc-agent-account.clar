@@ -5,8 +5,8 @@
 ;; traits
 ;; /g/.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account
 (impl-trait .aibtc-agent-account-traits.aibtc-account)
-;; /g/.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals
-(impl-trait .aibtc-agent-account-traits.aibtc-proposals)
+;; /g/.aibtc-agent-account-traits.aibtc-account-proposals/agent_account_trait_proposals
+(impl-trait .aibtc-agent-account-traits.aibtc-account-proposals)
 ;; /g/.aibtc-agent-account-traits.aibtc-account-config/agent_account_trait_account_config
 (impl-trait .aibtc-agent-account-traits.aibtc-account-config)
 ;; /g/.aibtc-agent-account-traits.aibtc-account-swaps/agent_account_trait_account_swaps

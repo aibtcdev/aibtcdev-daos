@@ -85,7 +85,7 @@ const mainnetTraits: KnownTraits = {
   AGENT_ACCOUNT:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-account",
   AGENT_ACCOUNT_PROPOSALS:
-    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-proposals",
+    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-account-proposals",
   AGENT_ACCOUNT_CONFIG:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-account-config",
   AGENT_ACCOUNT_SWAPS:
@@ -141,7 +141,7 @@ const testnetTraits: KnownTraits = {
   AGENT_ACCOUNT:
     "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-account",
   AGENT_ACCOUNT_PROPOSALS:
-    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-proposals",
+    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-account-proposals",
   AGENT_ACCOUNT_CONFIG:
     "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-account-config",
   AGENT_ACCOUNT_SWAPS:
@@ -195,7 +195,7 @@ const devnetTraits: KnownTraits = {
   AGENT_ACCOUNT:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account",
   AGENT_ACCOUNT_PROPOSALS:
-    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-proposals",
+    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-proposals",
   AGENT_ACCOUNT_CONFIG:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-config",
   AGENT_ACCOUNT_SWAPS:

@@ -16,7 +16,7 @@ import {
  * @returns The formatted string with a leading apostrophe if it's a principal, otherwise the original string.
  */
 function formatIfPrincipal(value: string): string {
-  if (typeof value !== 'string') {
+  if (typeof value !== "string") {
     return value;
   }
   const parts = value.split(".");
@@ -358,7 +358,7 @@ export function generateTemplateReplacements(
       replacements[templateKeyName] = traitValue;
 
       // Construct the toReplace pattern based on templateKeySymbol and the specific parts of the agent trait name
-      // e.g., for AGENT_ACCOUNT_PROPOSALS -> .aibtc-agent-account-traits.aibtc-proposals
+      // e.g., for AGENT_ACCOUNT_PROPOSALS -> .aibtc-agent-account-traits.aibtc-account-proposals
       const traitNameParts = traitValue.split(".");
       if (traitNameParts.length > 1) {
         const lastPart = traitNameParts[traitNameParts.length - 1]; // e.g., aibtc-proposals
