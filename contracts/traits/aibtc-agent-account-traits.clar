@@ -52,17 +52,18 @@
 ;; used by agent account to call swap adapter
 (define-trait aibtc-account-swaps (
   (buy-dao-token
-    (<aibtc-account-swap-adapter> <sip010-trait> uint (optional uint))
+    (<aibtc-dao-swap-adapter> <sip010-trait> uint (optional uint))
     (response bool uint)
   )
   (sell-dao-token
-    (<aibtc-account-swap-adapter> <sip010-trait> uint (optional uint))
+    (<aibtc-dao-swap-adapter> <sip010-trait> uint (optional uint))
     (response bool uint)
   )
 ))
 
 ;; used by swap adapter to call 1:1 configured trading contract
-(define-trait aibtc-account-swap-adapter (
+;; one adapter deployed per dao and trading contract pair
+(define-trait aibtc-dao-swap-adapter (
   (buy-dao-token
     (<sip010-trait> uint (optional uint))
     (response bool uint)

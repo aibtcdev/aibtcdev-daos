@@ -14,7 +14,7 @@
 ;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 ;; /g/.aibtc-agent-account-traits.aibtc-account-swap-adapter/agent_account_trait_account_swap_adapter
-(use-trait agent-account-swap-adapter .aibtc-agent-account-traits.aibtc-account-swap-adapter)
+(use-trait dao-swap-adapter .aibtc-agent-account-traits.aibtc-dao-swap-adapter)
 ;; /g/.aibtc-agent-account-traits.aibtc-account
 ;; /g/.aibtc-dao-traits.action/dao_trait_action
 (use-trait action-trait .aibtc-dao-traits.action)
@@ -246,7 +246,7 @@
 
 ;; the owner or the agent (if enabled) can buy DAO tokens
 (define-public (buy-dao-token
-    (swapAdapter <agent-account-swap-adapter>)
+    (swapAdapter <dao-swap-adapter>)
     (daoToken <ft-trait>)
     (amount uint)
     (minReceive (optional uint))
@@ -277,7 +277,7 @@
 
 ;; the owner or the agent (if enabled) can sell DAO tokens
 (define-public (sell-dao-token
-    (swapAdapter <agent-account-swap-adapter>)
+    (swapAdapter <dao-swap-adapter>)
     (daoToken <ft-trait>)
     (amount uint)
     (minReceive (optional uint))
