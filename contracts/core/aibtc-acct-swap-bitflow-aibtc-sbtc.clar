@@ -1,4 +1,4 @@
-;; title: aibtc-acct-swap-bitflow-aibtc-sbtc
+;; title: aibtc-acct-swap-bitflow-sbtc
 ;; version: 1.0.0
 ;; summary: Adapter to trade on a Bitflow XYK pool with an agent account.
 

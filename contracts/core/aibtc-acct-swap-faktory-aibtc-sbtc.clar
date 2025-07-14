@@ -1,4 +1,4 @@
-;; title: aibtc-acct-swap-faktory-aibtc-sbtc
+;; title: aibtc-acct-swap-faktory-sbtc
 ;; version: 1.0.0
 ;; summary: Adapter to trade on a faktory DEX with an agent account.
 
