@@ -5,7 +5,7 @@
 ;; traits
 ;; /g/.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account
 (impl-trait .aibtc-agent-account-traits.aibtc-account)
-;; /g/.aibtc-agent-account-traits.aibtc-account-proposals/agent_account_trait_proposals
+;; /g/.aibtc-agent-account-traits.aibtc-account-proposals/agent_account_trait_account_proposals
 (impl-trait .aibtc-agent-account-traits.aibtc-account-proposals)
 ;; /g/.aibtc-agent-account-traits.aibtc-account-config/agent_account_trait_account_config
 (impl-trait .aibtc-agent-account-traits.aibtc-account-config)
@@ -15,7 +15,6 @@
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 ;; /g/.aibtc-agent-account-traits.aibtc-dao-swap-adapter/agent_account_trait_dao_swap_adapter
 (use-trait dao-swap-adapter .aibtc-agent-account-traits.aibtc-dao-swap-adapter)
-;; /g/.aibtc-agent-account
 ;; /g/.aibtc-dao-traits.action/dao_trait_action
 (use-trait action-trait .aibtc-dao-traits.action)
 ;; /g/.aibtc-dao-traits.proposal/dao_trait_proposal

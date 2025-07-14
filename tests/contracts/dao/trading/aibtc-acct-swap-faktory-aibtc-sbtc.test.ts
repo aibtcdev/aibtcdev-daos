@@ -1,5 +1,5 @@
-import { Cl } from "@stacks/transactions";
-import { describe, expect, it, beforeEach } from "vitest";
+import { Cl, cvToValue } from "@stacks/transactions";
+import { describe, expect, it, test } from "vitest";
 import { setupFullContractRegistry } from "../../../../utilities/contract-registry";
 import { ErrCodeFaktorySwapAdapter } from "../../../../utilities/contract-error-codes";
 import {
@@ -34,17 +34,14 @@ const tokenDexContractAddress = registry.getContractAddressByTypeAndSubtype(
 const ErrCode = ErrCodeFaktorySwapAdapter;
 
 describe(`public functions: ${contractName}`, () => {
-  beforeEach(() => {
-    // get sBTC and DAO tokens for the deployer
-    completePrelaunch(deployer);
-    getSbtcFromFaucet(deployer);
-    getDaoTokens(deployer, 100000000); // 1 BTC worth
-  });
-
   ////////////////////////////////////////
   // buy-dao-token() tests
   ////////////////////////////////////////
   it("buy-dao-token() fails if token contract does not match", () => {
+    // Arrange
+    completePrelaunch(deployer);
+    getDaoTokens(deployer, 10000);
+    // Act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-dao-token",
@@ -55,6 +52,10 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   it("buy-dao-token() fails if minReceive is provided and slippage is too high", () => {
+    // Arrange
+    completePrelaunch(deployer);
+    getDaoTokens(deployer, 10000);
+    // Act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-dao-token",
@@ -69,6 +70,10 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   it("buy-dao-token() succeeds and swaps for tx-sender without minReceive", () => {
+    // Arrange
+    completePrelaunch(deployer);
+    getDaoTokens(deployer, 10000);
+    // Act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-dao-token",
@@ -79,6 +84,10 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   it("buy-dao-token() succeeds and swaps for tx-sender with minReceive", () => {
+    // Arrange
+    completePrelaunch(deployer);
+    getDaoTokens(deployer, 10000);
+    // Act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-dao-token",
@@ -92,6 +101,10 @@ describe(`public functions: ${contractName}`, () => {
   // sell-dao-token() tests
   ////////////////////////////////////////
   it("sell-dao-token() fails if token contract does not match", () => {
+    // Arrange
+    completePrelaunch(deployer);
+    getDaoTokens(deployer, 10000);
+    // Act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "sell-dao-token",
@@ -102,6 +115,10 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   it("sell-dao-token() succeeds and swaps for tx-sender without minReceive", () => {
+    // Arrange
+    completePrelaunch(deployer);
+    getDaoTokens(deployer, 10000);
+    // Act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "sell-dao-token",
@@ -112,6 +129,10 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   it("sell-dao-token() succeeds and swaps for tx-sender with minReceive", () => {
+    // Arrange
+    completePrelaunch(deployer);
+    getDaoTokens(deployer, 10000);
+    // Act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "sell-dao-token",
@@ -123,6 +144,44 @@ describe(`public functions: ${contractName}`, () => {
 });
 
 describe(`read-only functions: ${contractName}`, () => {
-  // get-contract-info() returns correct contract info
-  // get-swap-info() returns correct swap info
+  test("get-contract-info() returns correct contract info", () => {
+    // Arrange
+    const daoTokenAddress = registry.getContractAddressByTypeAndSubtype(
+      "TOKEN",
+      "DAO"
+    );
+    const tokenDexContractAddress = registry.getContractAddressByTypeAndSubtype(
+      "TOKEN",
+      "DEX"
+    );
+
+    // Act
+    const info = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-contract-info",
+      [],
+      deployer
+    );
+
+    // Assert
+    const result = cvToValue(info.result);
+    expect(result.self.value).toBe(contractAddress);
+    expect(result.faktoryDex.value).toBe(tokenDexContractAddress);
+    expect(result.daoToken.value).toBe(daoTokenAddress);
+  });
+
+  test("get-swap-info() returns correct swap info", () => {
+    // Act
+    const info = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-swap-info",
+      [],
+      deployer
+    );
+    // Assert
+    const result = cvToValue(info.result);
+    expect(result.totalBuys.value).toBe(0n);
+    expect(result.totalSells.value).toBe(0n);
+    expect(result.totalSwaps.value).toBe(0n);
+  });
 });
