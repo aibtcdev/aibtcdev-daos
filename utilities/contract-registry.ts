@@ -166,7 +166,14 @@ export class ContractRegistry {
   getAllDaoContractNames(): string[] {
     const daoContractNames: string[] = [];
 
-    const daoTypes = ["BASE", "ACTIONS", "EXTENSIONS", "PROPOSALS", "TOKEN"];
+    const daoTypes = [
+      "BASE",
+      "ACTIONS",
+      "EXTENSIONS",
+      "PROPOSALS",
+      "TOKEN",
+      "TRADING",
+    ];
 
     CONTRACT_TYPES.forEach((type) => {
       const subtypes = CONTRACT_SUBTYPES[type];

@@ -45,4 +45,8 @@ export const DEPLOYMENT_ORDER: Record<string, number> = {
 
   // initialize dao (always last)
   [useContract("PROPOSALS", "INITIALIZE_DAO")]: 50,
+
+  // dao trading adapters
+  [useContract("TRADING", "FAKTORY_SBTC")]: 60,
+  [useContract("TRADING", "BITFLOW_SBTC")]: 61,
 };

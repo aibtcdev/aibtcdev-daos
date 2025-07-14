@@ -20,6 +20,12 @@ const address3 = accounts.get("wallet_3")!;
 
 // setup contract info for tests
 const registry = setupFullContractRegistry();
+
+console.log(
+  "full contract registry:",
+  JSON.stringify(registry.getAllContracts(), null, 2)
+);
+
 const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "AGENT",
   "AGENT_ACCOUNT"
