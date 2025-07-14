@@ -2,7 +2,10 @@ import { Cl } from "@stacks/transactions";
 import { describe, expect, it, beforeEach } from "vitest";
 import { setupFullContractRegistry } from "../../../../utilities/contract-registry";
 import { ErrCodeFaktorySwapAdapter } from "../../../../utilities/contract-error-codes";
-import { getSbtcFromFaucet, getDaoTokens } from "../../../../utilities/dao-helpers";
+import {
+  getSbtcFromFaucet,
+  getDaoTokens,
+} from "../../../../utilities/dao-helpers";
 import { completePrelaunch } from "../../../../utilities/dao-helpers";
 
 // setup accounts
@@ -55,7 +58,11 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-dao-token",
-      [Cl.principal(daoTokenAddress), Cl.uint(1000), Cl.some(Cl.uint(1_000_000_000))],
+      [
+        Cl.principal(daoTokenAddress),
+        Cl.uint(1000),
+        Cl.some(Cl.uint(1_000_000_000)),
+      ],
       deployer
     );
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_SLIPPAGE_TOO_HIGH));

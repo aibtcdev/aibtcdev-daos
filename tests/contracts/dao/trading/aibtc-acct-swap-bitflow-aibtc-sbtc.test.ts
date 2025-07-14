@@ -2,7 +2,10 @@ import { Cl } from "@stacks/transactions";
 import { describe, expect, it, beforeEach } from "vitest";
 import { setupFullContractRegistry } from "../../../../utilities/contract-registry";
 import { ErrCodeBitflowSwapAdapter } from "../../../../utilities/contract-error-codes";
-import { getSbtcFromFaucet, getDaoTokens } from "../../../../utilities/dao-helpers";
+import {
+  getSbtcFromFaucet,
+  getDaoTokens,
+} from "../../../../utilities/dao-helpers";
 import { completePrelaunch } from "../../../../utilities/dao-helpers";
 
 // setup accounts
@@ -45,7 +48,11 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-dao-token",
-      [Cl.principal(tokenDexContractAddress), Cl.uint(1000), Cl.some(Cl.uint(1))],
+      [
+        Cl.principal(tokenDexContractAddress),
+        Cl.uint(1000),
+        Cl.some(Cl.uint(1)),
+      ],
       deployer
     );
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INVALID_DAO_TOKEN));
@@ -78,7 +85,11 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "sell-dao-token",
-      [Cl.principal(tokenDexContractAddress), Cl.uint(1000), Cl.some(Cl.uint(1))],
+      [
+        Cl.principal(tokenDexContractAddress),
+        Cl.uint(1000),
+        Cl.some(Cl.uint(1)),
+      ],
       deployer
     );
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INVALID_DAO_TOKEN));
