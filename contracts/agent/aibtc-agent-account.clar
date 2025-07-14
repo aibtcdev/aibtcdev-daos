@@ -1,18 +1,21 @@
 ;; title: aibtc-agent-account
-;; version: 2.0.0
+;; version: 3.0.0
 ;; summary: A special account contract between a user and an agent for managing assets and DAO interactions. Only the user can withdraw funds.
 
 ;; traits
 ;; /g/.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account
 (impl-trait .aibtc-agent-account-traits.aibtc-account)
-;; /g/.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals
-(impl-trait .aibtc-agent-account-traits.aibtc-proposals)
+;; /g/.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_account_proposals
+(impl-trait .aibtc-agent-account-traits.aibtc-account-proposals)
 ;; /g/.aibtc-agent-account-traits.aibtc-account-config/agent_account_trait_account_config
 (impl-trait .aibtc-agent-account-traits.aibtc-account-config)
-;; /g/.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell
-(impl-trait .aibtc-agent-account-traits.faktory-buy-sell)
+;; /g/.aibtc-agent-account-traits.aibtc-account-swaps/agent_account_trait_account_swaps
+(impl-trait .aibtc-agent-account-traits.aibtc-account-swaps)
 ;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+;; TODO: /g/.agent-account-traits.aibtc-account-swaps/agent_account_trait_account_swaps
+(use-trait agent-account-swap-adapter .aibtc-agent-account-traits.aibtc-account-swap-adapter)
+;; /g/.aibtc-agent-account-traits.aibtc-account
 ;; /g/.aibtc-dao-traits.action/dao_trait_action
 (use-trait action-trait .aibtc-dao-traits.action)
 ;; /g/.aibtc-dao-traits.proposal/dao_trait_proposal
@@ -239,57 +242,67 @@
   )
 )
 
-;; Faktory DEX Trading Functions
+;; Generalized trading functions, requires adapter for specific routes
 
-;; the owner or the agent (if enabled) can buy assets on the Faktory DEX if the DEX contract is approved
-;; requires sBTC to be deposited in the agent account
-(define-public (faktory-buy-asset
-    (faktory-dex <dao-faktory-dex>)
-    (asset <faktory-token>)
+;; the owner or the agent (if enabled) can buy DAO tokens
+(define-public (buy-dao-token
+    (swapAdapter <agent-account-swap-adapter>)
+    (daoToken <ft-trait>)
     (amount uint)
+    (minReceive (optional uint))
   )
   (begin
     (asserts! (buy-sell-assets-allowed) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of faktory-dex))
+    (asserts!
+      (and
+        (is-approved-contract (contract-of swapAdapter))
+        (is-approved-contract (contract-of daoToken))
+      )
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
-      notification: "aibtc-agent-account/faktory-buy-asset",
+      notification: "aibtc-agent-account/buy-dao-token-with-sbtc",
       payload: {
-        dexContract: (contract-of faktory-dex),
-        asset: (contract-of asset),
+        swapAdapter: (contract-of swapAdapter),
+        daoToken: (contract-of daoToken),
         amount: amount,
+        minReceive: minReceive,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (as-contract (contract-call? faktory-dex buy asset amount))
+    (as-contract (contract-call? swapAdapter buy-dao-token daoToken amount minReceive))
   )
 )
 
-;; the owner or the agent (if enabled) can sell assets on the Faktory DEX if the DEX contract is approved
-;; requires the asset to be deposited in the agent account
-(define-public (faktory-sell-asset
-    (faktory-dex <dao-faktory-dex>)
-    (asset <faktory-token>)
+;; the owner or the agent (if enabled) can sell DAO tokens
+(define-public (sell-dao-token
+    (swapAdapter <agent-account-swap-adapter>)
+    (daoToken <ft-trait>)
     (amount uint)
+    (minReceive (optional uint))
   )
   (begin
     (asserts! (buy-sell-assets-allowed) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of faktory-dex))
+    (asserts!
+      (and
+        (is-approved-contract (contract-of swapAdapter))
+        (is-approved-contract (contract-of daoToken))
+      )
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
-      notification: "aibtc-agent-account/faktory-sell-asset",
+      notification: "aibtc-agent-account/sell-dao-token-for-sbtc",
       payload: {
-        dexContract: (contract-of faktory-dex),
-        asset: (contract-of asset),
+        swapAdapter: (contract-of swapAdapter),
+        daoToken: (contract-of daoToken),
         amount: amount,
+        minReceive: minReceive,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (as-contract (contract-call? faktory-dex sell asset amount))
+    (as-contract (contract-call? swapAdapter sell-dao-token daoToken amount minReceive))
   )
 )
 

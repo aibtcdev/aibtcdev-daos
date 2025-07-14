@@ -8,7 +8,6 @@
 (use-trait dao-proposal-trait .aibtc-dao-traits.proposal)
 (use-trait dao-action-proposal-trait .aibtc-dao-traits.action-proposal-voting)
 (use-trait dao-faktory-dex .aibtc-dao-traits.faktory-dex)
-(use-trait faktory-token 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1.sip-010-trait)
 
 ;; ACCOUNT TRAITS
 
@@ -31,7 +30,7 @@
   )
 ))
 
-(define-trait aibtc-proposals (
+(define-trait aibtc-account-proposals (
   (create-action-proposal
     (<dao-action-proposal-trait> <dao-action-trait> (buff 2048) (optional (string-ascii 1024)))
     (response bool uint)
@@ -50,13 +49,26 @@
   )
 ))
 
-(define-trait faktory-buy-sell (
-  (faktory-buy-asset
-    (<dao-faktory-dex> <faktory-token> uint)
+;; used by agent account to call swap adapter
+(define-trait aibtc-account-swaps (
+  (buy-dao-token
+    (<aibtc-account-swap-adapter> <sip010-trait> uint (optional uint))
     (response bool uint)
   )
-  (faktory-sell-asset
-    (<dao-faktory-dex> <faktory-token> uint)
+  (sell-dao-token
+    (<aibtc-account-swap-adapter> <sip010-trait> uint (optional uint))
+    (response bool uint)
+  )
+))
+
+;; used by swap adapter to call 1:1 configured trading contract
+(define-trait aibtc-account-swap-adapter (
+  (buy-dao-token
+    (<sip010-trait> uint (optional uint))
+    (response bool uint)
+  )
+  (sell-dao-token
+    (<sip010-trait> uint (optional uint))
     (response bool uint)
   )
 ))
