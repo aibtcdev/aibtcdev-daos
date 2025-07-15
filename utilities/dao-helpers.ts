@@ -3,6 +3,7 @@ import { Cl, ClarityType, ClarityValue, cvToValue } from "@stacks/transactions";
 import {
   DAO_TOKEN_ASSETS_MAP,
   DEVNET_DEPLOYER,
+  SBTC_ASSETS_MAP,
   SBTC_CONTRACT,
   convertClarityTuple,
 } from "./contract-helpers";
@@ -130,10 +131,12 @@ export function fundAgentAccount(agentAccountContract: string, sender: string) {
   );
   expect(dexReceipt.result).toBeOk(Cl.bool(true));
   // deposit sbtc to the agent account
+  const sbtcBalance =
+    getBalancesForPrincipal(sender).get(SBTC_ASSETS_MAP) || 0n;
   const depositSbtcReceipt = simnet.callPublicFn(
     agentAccountContract,
     "deposit-ft",
-    [Cl.principal(SBTC_CONTRACT), Cl.uint(btcAmount)],
+    [Cl.principal(SBTC_CONTRACT), Cl.uint(sbtcBalance)],
     sender
   );
   dbgLog(`depositSbtcReceipt: ${JSON.stringify(depositSbtcReceipt)}`);
