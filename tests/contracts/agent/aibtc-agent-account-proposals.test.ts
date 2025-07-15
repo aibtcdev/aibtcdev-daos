@@ -13,6 +13,7 @@ import {
   completePrelaunch,
   constructDao,
   formatSerializedBuffer,
+  fundAgentAccount,
   fundVoters,
   VOTING_DELAY,
   VOTING_PERIOD,
@@ -27,6 +28,7 @@ const address3 = accounts.get("wallet_3")!;
 
 // setup contract info for tests
 const registry = setupFullContractRegistry();
+
 const contractAddress = registry.getContractAddressByTypeAndSubtype(
   "AGENT",
   "AGENT_ACCOUNT"
@@ -53,55 +55,6 @@ const sendMessageActionContractAddress =
 // import error codes
 const ErrCode = ErrCodeAgentAccount;
 
-// Helper function to set up the account for testing
-function setupAgentAccount(sender: string, satsAmount: number = 1000000) {
-  // get sBTC from the faucet
-  const faucetReceipt = simnet.callPublicFn(
-    SBTC_CONTRACT,
-    "faucet",
-    [],
-    sender
-  );
-  dbgLog(faucetReceipt, { titleBefore: "faucetReceipt" });
-  expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-
-  // get dao tokens from the dex
-  const dexReceipt = simnet.callPublicFn(
-    tokenDexContractAddress,
-    "buy",
-    [Cl.principal(daoTokenAddress), Cl.uint(satsAmount)],
-    sender
-  );
-  dbgLog(dexReceipt, { titleBefore: "dexReceipt" });
-  expect(dexReceipt.result).toBeOk(Cl.bool(true));
-
-  // get balances for dao token and sbtc
-  const senderBalances = getBalancesForPrincipal(sender);
-  const senderSbtcBalance = senderBalances.get(SBTC_ASSETS_MAP)!;
-  const senderDaoTokenBalance = senderBalances.get(DAO_TOKEN_ASSETS_MAP)!;
-
-  // deposit sBTC to the agent account
-  const depositReceiptSbtc = simnet.callPublicFn(
-    contractAddress,
-    "deposit-ft",
-    [Cl.principal(SBTC_CONTRACT), Cl.uint(senderSbtcBalance)],
-    sender
-  );
-  expect(depositReceiptSbtc.result).toBeOk(Cl.bool(true));
-
-  // deposit DAO tokens to the agent account
-  const depositReceiptDao = simnet.callPublicFn(
-    contractAddress,
-    "deposit-ft",
-    [Cl.principal(daoTokenAddress), Cl.uint(senderDaoTokenBalance)],
-    sender
-  );
-  dbgLog(depositReceiptDao, {
-    titleBefore: "depositReceiptDao",
-  });
-  expect(depositReceiptDao.result).toBeOk(Cl.bool(true));
-}
-
 describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // create-action-proposal() tests
@@ -110,7 +63,7 @@ describe(`public functions: ${contractName}`, () => {
     // arrange
     const message = Cl.stringUtf8("hello world");
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
 
     // act
     const receipt = simnet.callPublicFn(
@@ -133,7 +86,7 @@ describe(`public functions: ${contractName}`, () => {
     // arrange
     const message = Cl.stringUtf8("hello world");
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     completePrelaunch(deployer);
     fundVoters([deployer]);
     constructDao(deployer);
@@ -178,7 +131,7 @@ describe(`public functions: ${contractName}`, () => {
       },
     };
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     fundVoters([deployer]);
     constructDao(deployer);
 
@@ -242,7 +195,7 @@ describe(`public functions: ${contractName}`, () => {
     const proposalId = 1;
     const vote = true;
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     fundVoters([deployer]);
     constructDao(deployer);
 
@@ -304,7 +257,7 @@ describe(`public functions: ${contractName}`, () => {
       },
     };
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     fundVoters([deployer]);
     constructDao(deployer);
 
@@ -379,7 +332,7 @@ describe(`public functions: ${contractName}`, () => {
     // arrange
     const proposalId = 1;
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     fundVoters([deployer]);
     constructDao(deployer);
 
@@ -431,7 +384,7 @@ describe(`public functions: ${contractName}`, () => {
       },
     };
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     fundVoters([deployer]);
     constructDao(deployer);
 
@@ -503,7 +456,7 @@ describe(`public functions: ${contractName}`, () => {
     // arrange
     const proposalId = 1;
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     fundVoters([deployer]);
     constructDao(deployer);
 
@@ -579,8 +532,7 @@ describe(`public functions: ${contractName}`, () => {
     // arrange
     const proposalId = 1;
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
-    fundVoters([deployer]);
+    fundAgentAccount(contractAddress, deployer);
     constructDao(deployer);
 
     // approve the proposal contract
@@ -637,7 +589,6 @@ describe(`public functions: ${contractName}`, () => {
       ],
       deployer
     );
-
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
   });
@@ -656,8 +607,7 @@ describe(`public functions: ${contractName}`, () => {
       },
     };
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
-    fundVoters([deployer]);
+    fundAgentAccount(contractAddress, deployer);
     constructDao(deployer);
 
     // approve the proposal contract
@@ -731,7 +681,7 @@ describe(`read-only functions: ${contractName}`, () => {
     let proposalId = 1;
     const vote = true;
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     fundVoters([deployer]);
     constructDao(deployer);
 

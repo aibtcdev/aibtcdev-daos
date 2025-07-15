@@ -10,7 +10,10 @@ import {
 } from "../../../utilities/contract-helpers";
 import { getBalancesForPrincipal } from "../../../utilities/asset-helpers";
 import { dbgLog } from "../../../utilities/debug-logging";
-import { completePrelaunch } from "../../../utilities/dao-helpers";
+import {
+  completePrelaunch,
+  fundAgentAccount,
+} from "../../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -40,55 +43,6 @@ const faktoryAdapterAddress = registry.getContractAddressByTypeAndSubtype(
 // import error codes
 const ErrCode = ErrCodeAgentAccount;
 
-// Helper function to set up the account for testing
-function setupAgentAccount(sender: string, satsAmount: number = 1000000) {
-  // get sBTC from the faucet
-  const faucetReceipt = simnet.callPublicFn(
-    SBTC_CONTRACT,
-    "faucet",
-    [],
-    sender
-  );
-  dbgLog(faucetReceipt, { titleBefore: "faucetReceipt" });
-  expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-
-  // get dao tokens from the dex
-  const dexReceipt = simnet.callPublicFn(
-    faktoryAdapterAddress,
-    "buy-dao-token",
-    [Cl.principal(daoTokenAddress), Cl.uint(satsAmount), Cl.none()],
-    sender
-  );
-  dbgLog(dexReceipt, { titleBefore: "dexReceipt" });
-  expect(dexReceipt.result).toBeOk(Cl.bool(true));
-
-  // get balances for dao token and sbtc
-  const senderBalances = getBalancesForPrincipal(sender);
-  const senderSbtcBalance = senderBalances.get(SBTC_ASSETS_MAP)!;
-  const senderDaoTokenBalance = senderBalances.get(DAO_TOKEN_ASSETS_MAP)!;
-
-  // deposit sBTC to the agent account
-  const depositReceiptSbtc = simnet.callPublicFn(
-    contractAddress,
-    "deposit-ft",
-    [Cl.principal(SBTC_CONTRACT), Cl.uint(senderSbtcBalance)],
-    sender
-  );
-  expect(depositReceiptSbtc.result).toBeOk(Cl.bool(true));
-
-  // deposit DAO tokens to the agent account
-  const depositReceiptDao = simnet.callPublicFn(
-    contractAddress,
-    "deposit-ft",
-    [Cl.principal(daoTokenAddress), Cl.uint(senderDaoTokenBalance)],
-    sender
-  );
-  dbgLog(depositReceiptDao, {
-    titleBefore: "depositReceiptDao",
-  });
-  expect(depositReceiptDao.result).toBeOk(Cl.bool(true));
-}
-
 describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // buy-dao-token() tests
@@ -96,7 +50,7 @@ describe(`public functions: ${contractName}`, () => {
   it("buy-dao-token() fails if caller is not authorized", () => {
     // arrange
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     const amount = 10000000;
     const adapter = faktoryAdapterAddress;
     const asset = daoTokenAddress;
@@ -116,7 +70,7 @@ describe(`public functions: ${contractName}`, () => {
   it("buy-dao-token() fails if agent can't buy/sell", () => {
     // arrange
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     const amount = 10000000;
     const adapter = faktoryAdapterAddress;
     const asset = daoTokenAddress;
@@ -136,7 +90,7 @@ describe(`public functions: ${contractName}`, () => {
   it("buy-dao-token() fails if swap adapter contract is not approved", () => {
     // arrange
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     const amount = 10000000;
     const adapter = `${deployer}.unknown-adapter`;
     const asset = daoTokenAddress;
@@ -156,7 +110,7 @@ describe(`public functions: ${contractName}`, () => {
   it("buy-dao-token() succeeds when called by owner with approved contract", () => {
     // arrange
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     const amount = 1000000;
     const adapter = faktoryAdapterAddress;
     const asset = daoTokenAddress;
@@ -185,7 +139,7 @@ describe(`public functions: ${contractName}`, () => {
   it("buy-dao-token() emits the correct notification event", () => {
     // arrange
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     const amount = "1000000";
     const adapter = faktoryAdapterAddress;
     const asset = daoTokenAddress;
@@ -233,7 +187,7 @@ describe(`public functions: ${contractName}`, () => {
   it("sell-dao-token() fails if caller is not authorized", () => {
     // arrange
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     const amount = 10000000;
     const adapter = faktoryAdapterAddress;
     const asset = daoTokenAddress;
@@ -253,7 +207,7 @@ describe(`public functions: ${contractName}`, () => {
   it("sell-dao-token() fails if agent can't buy/sell", () => {
     // arrange
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     const amount = 10000000;
     const adapter = faktoryAdapterAddress;
     const asset = daoTokenAddress;
@@ -282,7 +236,7 @@ describe(`public functions: ${contractName}`, () => {
   it("sell-dao-token() fails if swap adapter contract is not approved", () => {
     // arrange
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     const amount = 10000000;
     const adapter = `${deployer}.unknown-adapter`;
     const asset = daoTokenAddress;
@@ -302,7 +256,7 @@ describe(`public functions: ${contractName}`, () => {
   it("sell-dao-token() succeeds when called by owner with approved contract", () => {
     // arrange
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
 
     // Get the actual balance of the agent account
     const agentBalances = getBalancesForPrincipal(contractAddress);
@@ -338,7 +292,7 @@ describe(`public functions: ${contractName}`, () => {
   it("sell-dao-token() emits the correct notification event", () => {
     // arrange
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
 
     const agentBalances = getBalancesForPrincipal(contractAddress);
     const agentDaoTokenBalance = agentBalances.get(DAO_TOKEN_ASSETS_MAP)!;
@@ -394,7 +348,7 @@ describe(`read-only functions: ${contractName}`, () => {
   it("agent can buy/sell assets when authorized and fails when revoked", () => {
     // arrange
     completePrelaunch(deployer);
-    setupAgentAccount(deployer);
+    fundAgentAccount(contractAddress, deployer);
     const amount = 1000000;
     const adapter = faktoryAdapterAddress;
     const asset = daoTokenAddress;
