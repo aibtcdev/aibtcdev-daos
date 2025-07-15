@@ -380,7 +380,7 @@ export function defineAgentContractDependencies(
           .addTraitDependency("AGENT_ACCOUNT", "agent_account_trait_account")
           .addTraitDependency(
             "AGENT_ACCOUNT_PROPOSALS",
-            "agent_account_trait_proposals"
+            "agent_account_trait_account_proposals"
           )
           .addTraitDependency(
             "AGENT_ACCOUNT_CONFIG",

@@ -93,7 +93,7 @@ describe("Template Processor", () => {
 ;; traits
 ;; /g/.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account
 (impl-trait .aibtc-agent-account-traits.aibtc-account)
-;; /g/.aibtc-agent-account-traits.aibtc-account-proposals/agent_account_trait_proposals
+;; /g/.aibtc-agent-account-traits.aibtc-account-proposals/agent_account_trait_account_proposals
 (impl-trait .aibtc-agent-account-traits.aibtc-account-proposals)
 ;; /g/.aibtc-agent-account-traits.aibtc-account-config/agent_account_trait_account_config
 (impl-trait .aibtc-agent-account-traits.aibtc-account-config)
@@ -130,7 +130,7 @@ describe("Template Processor", () => {
       dao_contract_token_dex: ".test-dex-contract",
       sbtc_contract: "ST000000000000000000002AMW42H.sbtc-token",
       agent_account_trait_account: ".test-traits.agent-account",
-      agent_account_trait_proposals: ".test-traits.agent-proposals",
+      agent_account_trait_account_proposals: ".test-traits.agent-proposals",
       agent_account_trait_account_config: ".test-traits.agent-account-config",
       agent_account_trait_faktory_buy_sell: ".test-traits.faktory-buy-sell",
       base_trait_sip010: ".test-traits.sip010",
@@ -328,14 +328,14 @@ describe("Contract Generator", () => {
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account",
     agent_account_trait_account_config:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-config",
-    agent_account_trait_proposals:
+    agent_account_trait_account_proposals:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-proposals",
     agent_account_trait_faktory_buy_sell:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.faktory-buy-sell",
 
     // SIP Trait references
     base_trait_sip010: ".test-traits.sip010",
-    faktory_trait: ".test-traits.faktory-token",
+    dao_trait_faktory_token: ".test-traits.faktory-token",
 
     // DAO contracts
     dao_contract_users: ".test-dao-users",
