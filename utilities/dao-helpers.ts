@@ -118,10 +118,8 @@ export function fundAgentAccount(agentAccountContract: string, sender: string) {
     sender
   );
   expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-  // progress chain
-  simnet.mineEmptyBlocks(10);
-  // generate an amount between 10k and 500k satoshis
-  const btcAmount = getRandomAmount(10_000, 500_000);
+  // generate an amount between 500k and 1M satoshis
+  const btcAmount = getRandomAmount(500_000, 1_000_000);
   dbgLog(`btcAmount: ${btcAmount} satoshis`);
   // get dao tokens from the token dex
   const dexReceipt = simnet.callPublicFn(
@@ -131,8 +129,6 @@ export function fundAgentAccount(agentAccountContract: string, sender: string) {
     sender
   );
   expect(dexReceipt.result).toBeOk(Cl.bool(true));
-  // progress chain
-  simnet.mineEmptyBlocks(10);
   // deposit sbtc to the agent account
   const depositSbtcReceipt = simnet.callPublicFn(
     agentAccountContract,

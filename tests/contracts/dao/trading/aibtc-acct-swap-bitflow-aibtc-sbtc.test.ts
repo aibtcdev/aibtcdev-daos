@@ -83,7 +83,6 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(daoTokenAddress), Cl.uint(100000), Cl.some(Cl.uint(1))],
       deployer
     );
-    console.log("Buy DAO Token Receipt with minReceive:", receipt);
     expect(receipt.result).toBeOk(Cl.bool(true));
   });
 

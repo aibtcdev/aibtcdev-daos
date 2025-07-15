@@ -2,19 +2,12 @@ import { Cl, cvToValue } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeAgentAccount } from "../../../utilities/contract-error-codes";
 import { setupFullContractRegistry } from "../../../utilities/contract-registry";
-import {
-  convertSIP019PrintEvent,
-  DAO_TOKEN_ASSETS_MAP,
-  SBTC_ASSETS_MAP,
-  SBTC_CONTRACT,
-} from "../../../utilities/contract-helpers";
-import { getBalancesForPrincipal } from "../../../utilities/asset-helpers";
+import { convertSIP019PrintEvent } from "../../../utilities/contract-helpers";
 import {
   completePrelaunch,
   constructDao,
   formatSerializedBuffer,
   fundAgentAccount,
-  fundVoters,
   VOTING_DELAY,
   VOTING_PERIOD,
 } from "../../../utilities/dao-helpers";
@@ -35,15 +28,6 @@ const contractAddress = registry.getContractAddressByTypeAndSubtype(
 );
 const contractName = contractAddress.split(".")[1];
 
-// DAO contract references
-const daoTokenAddress = registry.getContractAddressByTypeAndSubtype(
-  "TOKEN",
-  "DAO"
-);
-const tokenDexContractAddress = registry.getContractAddressByTypeAndSubtype(
-  "TOKEN",
-  "DEX"
-);
 const actionProposalsContractAddress =
   registry.getContractAddressByTypeAndSubtype(
     "EXTENSIONS",
@@ -88,7 +72,6 @@ describe(`public functions: ${contractName}`, () => {
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
     completePrelaunch(deployer);
-    fundVoters([deployer]);
     constructDao(deployer);
 
     // approve the proposal contract
@@ -132,7 +115,6 @@ describe(`public functions: ${contractName}`, () => {
     };
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
-    fundVoters([deployer]);
     constructDao(deployer);
 
     // approve the proposal contract
@@ -196,7 +178,6 @@ describe(`public functions: ${contractName}`, () => {
     const vote = true;
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
-    fundVoters([deployer]);
     constructDao(deployer);
 
     // approve the proposal contract
@@ -258,7 +239,6 @@ describe(`public functions: ${contractName}`, () => {
     };
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
-    fundVoters([deployer]);
     constructDao(deployer);
 
     // approve the proposal contract
@@ -333,7 +313,6 @@ describe(`public functions: ${contractName}`, () => {
     const proposalId = 1;
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
-    fundVoters([deployer]);
     constructDao(deployer);
 
     // approve the proposal contract
@@ -385,7 +364,6 @@ describe(`public functions: ${contractName}`, () => {
     };
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
-    fundVoters([deployer]);
     constructDao(deployer);
 
     // approve the proposal contract
@@ -457,7 +435,6 @@ describe(`public functions: ${contractName}`, () => {
     const proposalId = 1;
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
-    fundVoters([deployer]);
     constructDao(deployer);
 
     // approve the proposal contract to create the proposal
@@ -664,7 +641,6 @@ describe(`public functions: ${contractName}`, () => {
       ],
       deployer
     );
-
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
     const event = receipt.events[0];
@@ -682,7 +658,6 @@ describe(`read-only functions: ${contractName}`, () => {
     const vote = true;
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
-    fundVoters([deployer]);
     constructDao(deployer);
 
     // Owner approves the proposal contract
