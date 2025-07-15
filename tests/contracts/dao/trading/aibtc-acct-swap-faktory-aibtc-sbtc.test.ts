@@ -2,13 +2,20 @@ import { Cl, cvToValue } from "@stacks/transactions";
 import { describe, expect, it, test } from "vitest";
 import { setupFullContractRegistry } from "../../../../utilities/contract-registry";
 import { ErrCodeFaktorySwapAdapter } from "../../../../utilities/contract-error-codes";
-import { getDaoTokens } from "../../../../utilities/dao-helpers";
+import {
+  fundAgentAccount,
+  getDaoTokens,
+} from "../../../../utilities/dao-helpers";
 import { completePrelaunch } from "../../../../utilities/dao-helpers";
-import { convertClarityTuple } from "../../../../utilities/contract-helpers";
+import {
+  convertClarityTuple,
+  DAO_TOKEN_ASSETS_MAP,
+} from "../../../../utilities/contract-helpers";
 import {
   AgentAccountSwapAdapterContractInfo,
   AgentAccountSwapAdapterSwapInfo,
 } from "../../../../utilities/dao-types";
+import { getBalancesForPrincipal } from "../../../../utilities/asset-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -30,6 +37,11 @@ const daoTokenAddress = registry.getContractAddressByTypeAndSubtype(
 const tokenDexContractAddress = registry.getContractAddressByTypeAndSubtype(
   "TOKEN",
   "DEX"
+);
+
+const agentAccountContractAddress = registry.getContractAddressByTypeAndSubtype(
+  "AGENT",
+  "AGENT_ACCOUNT"
 );
 
 // import error codes
@@ -64,7 +76,7 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(daoTokenAddress),
         Cl.uint(1000),
-        Cl.some(Cl.uint(1_000_000_000_000)),
+        Cl.some(Cl.uint(1_000_000_000_000_000_000n)), // unrealistic minReceive to trigger slippage error
       ],
       deployer
     );
@@ -120,11 +132,14 @@ describe(`public functions: ${contractName}`, () => {
     // Arrange
     completePrelaunch(deployer);
     getDaoTokens(deployer, 10000);
+    const deployerBalance =
+      getBalancesForPrincipal(deployer).get(DAO_TOKEN_ASSETS_MAP) || 0n;
+
     // Act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "sell-dao-token",
-      [Cl.principal(daoTokenAddress), Cl.uint(100000), Cl.none()],
+      [Cl.principal(daoTokenAddress), Cl.uint(deployerBalance), Cl.none()],
       deployer
     );
     expect(receipt.result).toBeOk(Cl.bool(true));
@@ -134,11 +149,17 @@ describe(`public functions: ${contractName}`, () => {
     // Arrange
     completePrelaunch(deployer);
     getDaoTokens(deployer, 10000);
+    const deployerBalance =
+      getBalancesForPrincipal(deployer).get(DAO_TOKEN_ASSETS_MAP) || 0n;
     // Act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "sell-dao-token",
-      [Cl.principal(daoTokenAddress), Cl.uint(100000), Cl.some(Cl.uint(1))],
+      [
+        Cl.principal(daoTokenAddress),
+        Cl.uint(deployerBalance),
+        Cl.some(Cl.uint(1)),
+      ],
       deployer
     );
     expect(receipt.result).toBeOk(Cl.bool(true));

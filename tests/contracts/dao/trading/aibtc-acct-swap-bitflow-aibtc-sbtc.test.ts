@@ -5,11 +5,15 @@ import { ErrCodeBitflowSwapAdapter } from "../../../../utilities/contract-error-
 import { getDaoTokens } from "../../../../utilities/dao-helpers";
 import { completePrelaunch } from "../../../../utilities/dao-helpers";
 import { getKnownAddress } from "../../../../utilities/known-addresses";
-import { convertClarityTuple } from "../../../../utilities/contract-helpers";
+import {
+  convertClarityTuple,
+  DAO_TOKEN_ASSETS_MAP,
+} from "../../../../utilities/contract-helpers";
 import {
   AgentAccountSwapAdapterContractInfo,
   AgentAccountSwapAdapterSwapInfo,
 } from "../../../../utilities/dao-types";
+import { getBalancesForPrincipal } from "../../../../utilities/asset-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -76,11 +80,17 @@ describe(`public functions: ${contractName}`, () => {
     // Arrange
     completePrelaunch(deployer);
     getDaoTokens(deployer, 10000);
+    const deployerBalance =
+      getBalancesForPrincipal(deployer).get(DAO_TOKEN_ASSETS_MAP) || 0n;
     // Act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-dao-token",
-      [Cl.principal(daoTokenAddress), Cl.uint(100000), Cl.some(Cl.uint(1))],
+      [
+        Cl.principal(daoTokenAddress),
+        Cl.uint(deployerBalance),
+        Cl.some(Cl.uint(1)),
+      ],
       deployer
     );
     expect(receipt.result).toBeOk(Cl.bool(true));
@@ -125,11 +135,17 @@ describe(`public functions: ${contractName}`, () => {
     // Arrange
     completePrelaunch(deployer);
     getDaoTokens(deployer, 10000);
+    const deployerBalance =
+      getBalancesForPrincipal(deployer).get(DAO_TOKEN_ASSETS_MAP) || 0n;
     // Act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "sell-dao-token",
-      [Cl.principal(daoTokenAddress), Cl.uint(100000), Cl.some(Cl.uint(1))],
+      [
+        Cl.principal(daoTokenAddress),
+        Cl.uint(deployerBalance),
+        Cl.some(Cl.uint(1)),
+      ],
       deployer
     );
     expect(receipt.result).toBeOk(Cl.bool(true));
