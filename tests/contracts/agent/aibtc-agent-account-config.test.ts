@@ -35,6 +35,12 @@ type AgentAccountConfiguration = {
   sbtc: string;
 };
 
+type AgentAccountApprovalTypes = {
+  proposalVoting: bigint;
+  swap: bigint;
+  token: bigint;
+};
+
 type AgentAccountPermissions = {
   canDeposit: boolean;
   canUseProposals: boolean;
@@ -209,6 +215,73 @@ describe(`public functions: ${contractName}`, () => {
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
     dbgLog(printEvent, { titleBefore: "revoke-contract() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
+  });
+
+  it("revoke-contract() succeeds for agent if permission is granted", () => {
+    // arrange
+    const contract = `${deployer}.contract-to-revoke-by-agent`;
+    // approve the contract first by owner
+    simnet.callPublicFn(
+      contractAddress,
+      "approve-contract",
+      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      deployer
+    );
+    // enable agent to revoke
+    simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-approve-revoke-contracts",
+      [Cl.bool(true)],
+      deployer
+    );
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "revoke-contract",
+      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      address2 // agent
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+    const isApproved = simnet.callReadOnlyFn(
+      contractAddress,
+      "is-approved-contract",
+      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      deployer
+    );
+    expect(isApproved.result).toStrictEqual(Cl.bool(false));
+  });
+
+  it("revoke-contract() fails for agent if permission is not granted", () => {
+    // arrange
+    const contract = `${deployer}.another-contract-to-revoke-by-agent`;
+    // approve the contract first by owner
+    simnet.callPublicFn(
+      contractAddress,
+      "approve-contract",
+      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      deployer
+    );
+    // disable agent to revoke
+    simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-approve-revoke-contracts",
+      [Cl.bool(false)],
+      deployer
+    );
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "revoke-contract",
+      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      address2 // agent
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
   });
 
   ////////////////////////////////////////
@@ -471,6 +544,34 @@ describe(`public functions: ${contractName}`, () => {
     });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
+
+  ////////////////////////////////////////
+  // get-config() tests
+  ////////////////////////////////////////
+  it("get-config() returns the correct configuration", () => {
+    // arrange
+    const expectedConfig: AgentAccountConfiguration = {
+      account: contractAddress,
+      agent: address2,
+      owner: deployer,
+      sbtc: SBTC_CONTRACT,
+    };
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "get-config",
+      [],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result.type).toBe(ClarityType.ResponseOk);
+    const configData = convertClarityTuple<AgentAccountConfiguration>(
+      (receipt.result as any).value
+    );
+    expect(configData).toEqual(expectedConfig);
+  });
 });
 
 describe(`read-only functions: ${contractName}`, () => {
@@ -558,6 +659,32 @@ describe(`read-only functions: ${contractName}`, () => {
       configCV.result
     );
     expect(configData).toEqual(expectedConfig);
+  });
+
+  ////////////////////////////////////////
+  // get-approval-types() tests
+  ////////////////////////////////////////
+  it("get-approval-types() returns the correct approval types", () => {
+    // arrange
+    const expectedTypes: AgentAccountApprovalTypes = {
+      proposalVoting: BigInt(AgentAccountApprovalType.VOTING),
+      swap: BigInt(AgentAccountApprovalType.SWAP),
+      token: BigInt(AgentAccountApprovalType.TOKEN),
+    };
+
+    // act
+    const typesCV = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-approval-types",
+      [],
+      deployer
+    );
+
+    // assert
+    const typesData = convertClarityTuple<AgentAccountApprovalTypes>(
+      typesCV.result
+    );
+    expect(typesData).toEqual(expectedTypes);
   });
 
   ////////////////////////////////////////
