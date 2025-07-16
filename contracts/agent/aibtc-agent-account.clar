@@ -442,6 +442,13 @@
   )
 )
 
+;; helper to get config as response via trait
+(define-public (get-config)
+  (let ((wrappedConfig (some (get-configuration))))
+    (ok (unwrap! wrappedConfig ERR_OPERATION_NOT_ALLOWED))
+  )
+)
+
 ;; read only functions
 
 (define-read-only (is-approved-contract

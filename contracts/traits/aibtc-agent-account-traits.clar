@@ -95,4 +95,16 @@
     (principal uint)
     (response bool uint)
   )
+  (get-config
+    ()
+    (
+      response       {
+      account: principal,
+      agent: principal,
+      owner: principal,
+      sbtc: principal,
+    }
+      uint
+    )
+  )
 ))
