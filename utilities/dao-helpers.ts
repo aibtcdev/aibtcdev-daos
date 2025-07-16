@@ -397,7 +397,8 @@ export function graduateDex(caller: string) {
   dbgLog(
     `DEX state before buy: open=${cvToValue(open)}, bonded=${cvToValue(
       bonded
-    )}`
+    )}`,
+    { forceLog: true }
   );
 
   const preFaktoryAddress = registry.getContractAddressByTypeAndSubtype(
@@ -414,7 +415,8 @@ export function graduateDex(caller: string) {
     caller
   );
   dbgLog(
-    `Pre-faktory market open status: ${JSON.stringify(marketOpenResult.result)}`
+    `Pre-faktory market open status: ${JSON.stringify(marketOpenResult.result)}`,
+    { forceLog: true }
   );
 
   const graduateReceipt = simnet.callPublicFn(
@@ -423,6 +425,8 @@ export function graduateDex(caller: string) {
     [Cl.principal(tokenContract), Cl.uint(amountToGraduate)],
     caller
   );
-  dbgLog(`Graduate receipt: ${JSON.stringify(graduateReceipt, null, 2)}`);
+  dbgLog(`Graduate receipt: ${JSON.stringify(graduateReceipt, null, 2)}`, {
+    forceLog: true,
+  });
   expect(graduateReceipt.result).toBeOk(Cl.bool(true));
 }

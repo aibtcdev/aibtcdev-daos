@@ -85,18 +85,11 @@ describe(`public functions: ${contractName}`, () => {
     completePrelaunch(deployer);
     getSbtcFromFaucet(deployer);
     graduateDex(deployer);
-    getDaoTokens(deployer, 10000);
-    const deployerBalance =
-      getBalancesForPrincipal(deployer).get(DAO_TOKEN_ASSETS_MAP) || 0n;
     // Act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-dao-token",
-      [
-        Cl.principal(daoTokenAddress),
-        Cl.uint(deployerBalance),
-        Cl.some(Cl.uint(1)),
-      ],
+      [Cl.principal(daoTokenAddress), Cl.uint(10000), Cl.some(Cl.uint(1))],
       deployer
     );
     expect(receipt.result).toBeOk(Cl.bool(true));
@@ -141,8 +134,8 @@ describe(`public functions: ${contractName}`, () => {
     // Arrange
     completePrelaunch(deployer);
     getSbtcFromFaucet(deployer);
-    graduateDex(deployer);
     getDaoTokens(deployer, 10000);
+    graduateDex(deployer);
     const deployerBalance =
       getBalancesForPrincipal(deployer).get(DAO_TOKEN_ASSETS_MAP) || 0n;
     // Act
