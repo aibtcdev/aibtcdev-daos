@@ -86,3 +86,18 @@ export enum ErrCodeActionSendMessage {
   ERR_NOT_DAO_OR_EXTENSION = 2000,
   ERR_INVALID_PARAMETERS,
 }
+
+// aibtc-acct-swap-faktory-aibtc-sbtc.clar
+export enum ErrCodeFaktorySwapAdapter {
+  ERR_INVALID_DAO_TOKEN = 2200,
+  ERR_SWAP_FAILED,
+  ERR_QUOTE_FAILED,
+  ERR_SLIPPAGE_TOO_HIGH,
+}
+
+// aibtc-acct-swap-bitflow-aibtc-sbtc.clar
+export enum ErrCodeBitflowSwapAdapter {
+  ERR_INVALID_DAO_TOKEN = 2300,
+  ERR_SWAP_FAILED,
+  ERR_MIN_RECEIVE_REQUIRED,
+}

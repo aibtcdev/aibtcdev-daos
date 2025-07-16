@@ -11,6 +11,7 @@ import { TokenContract } from "../models/dao-token-contract";
 import { ExtensionContract } from "../models/dao-extension-contract";
 import { ActionContract } from "../models/dao-action-contract";
 import { ProposalContract } from "../models/dao-proposal-contract";
+import { TradingContract } from "../models/dao-trading-contract";
 import { AgentContract } from "../models/agent-contract";
 import { DEVNET_DEPLOYER } from "./contract-helpers";
 import {
@@ -166,7 +167,14 @@ export class ContractRegistry {
   getAllDaoContractNames(): string[] {
     const daoContractNames: string[] = [];
 
-    const daoTypes = ["BASE", "ACTIONS", "EXTENSIONS", "PROPOSALS", "TOKEN"];
+    const daoTypes = [
+      "BASE",
+      "ACTIONS",
+      "EXTENSIONS",
+      "PROPOSALS",
+      "TOKEN",
+      "TRADING",
+    ];
 
     CONTRACT_TYPES.forEach((type) => {
       const subtypes = CONTRACT_SUBTYPES[type];
@@ -326,6 +334,12 @@ export class ContractRegistry {
         contract = new ProposalContract(
           name as any, // Type assertion to handle the string literal constraint
           subtype as ContractSubtype<"PROPOSALS">
+        );
+        break;
+      case "TRADING":
+        contract = new TradingContract(
+          name as any, // Type assertion to handle the string literal constraint
+          subtype as ContractSubtype<"TRADING">
         );
         break;
       case "AGENT":

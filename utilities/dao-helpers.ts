@@ -1,12 +1,20 @@
 import { expect } from "vitest";
 import { Cl, ClarityType, ClarityValue, cvToValue } from "@stacks/transactions";
+import { getKnownAddress } from "./known-addresses";
 import {
+  DAO_TOKEN_ASSETS_MAP,
   DEVNET_DEPLOYER,
+  SBTC_ASSETS_MAP,
   SBTC_CONTRACT,
   convertClarityTuple,
 } from "./contract-helpers";
-import { setupDaoContractRegistry } from "./contract-registry";
+import {
+  setupDaoContractRegistry,
+  setupFullContractRegistry,
+} from "./contract-registry";
+import { FaktoryContractStatus, FaktoryDexInInfo } from "./dao-types";
 import { dbgLog } from "./debug-logging";
+import { getBalancesForPrincipal } from "./asset-helpers";
 
 export const VOTING_DELAY = 144;
 export const VOTING_PERIOD = 288;
@@ -96,52 +104,57 @@ export function fundVoters(voters: string[]) {
 }
 
 // helper to fund an agent account with random amounts of sBTC and DAO tokens
-export function fundAgentAccount() {
-  const agentAccountAddress = registry.getContractAddressByTypeAndSubtype(
-    "AGENT",
-    "AGENT_ACCOUNT"
-  );
-  const tokenContractAddress = registry.getContractAddressByTypeAndSubtype(
+export function fundAgentAccount(agentAccountContract: string, sender: string) {
+  const daoTokenContract = registry.getContractAddressByTypeAndSubtype(
     "TOKEN",
     "DAO"
   );
-  if (!agentAccountAddress) {
-    throw new Error("Required agent account not found in registry");
-  }
+  const daoTokenDexContract = registry.getContractAddressByTypeAndSubtype(
+    "TOKEN",
+    "DEX"
+  );
   // get sbtc from the faucet
   const faucetReceipt = simnet.callPublicFn(
     SBTC_CONTRACT,
     "faucet",
     [],
-    agentAccountAddress
+    sender
   );
   expect(faucetReceipt.result).toBeOk(Cl.bool(true));
-  // progress chain
-  simnet.mineEmptyBlocks(10);
-  // generate an amount between 100k and 1M satoshis
-  const btcAmount = getRandomAmount(100_000, 1_000_000);
+  // generate an amount between 500k and 1M satoshis
+  const btcAmount = getRandomAmount(500_000, 1_000_000);
   dbgLog(`btcAmount: ${btcAmount} satoshis`);
   // get dao tokens from the token dex
-  getDaoTokens(agentAccountAddress, btcAmount);
-  // progress chain
-  simnet.mineEmptyBlocks(10);
+  const dexReceipt = simnet.callPublicFn(
+    daoTokenDexContract,
+    "buy",
+    [Cl.principal(daoTokenContract), Cl.uint(btcAmount)],
+    sender
+  );
+  expect(dexReceipt.result).toBeOk(Cl.bool(true));
   // deposit sbtc to the agent account
+  const sbtcBalance =
+    getBalancesForPrincipal(sender).get(SBTC_ASSETS_MAP) || 0n;
   const depositSbtcReceipt = simnet.callPublicFn(
-    SBTC_CONTRACT,
+    agentAccountContract,
     "deposit-ft",
-    [Cl.principal(SBTC_CONTRACT), Cl.uint(btcAmount)],
-    agentAccountAddress
+    [Cl.principal(SBTC_CONTRACT), Cl.uint(sbtcBalance)],
+    sender
   );
   dbgLog(`depositSbtcReceipt: ${JSON.stringify(depositSbtcReceipt)}`);
   expect(depositSbtcReceipt.result).toBeOk(Cl.bool(true));
   // deposit dao tokens to the agent account
+  const daoTokenBalance =
+    getBalancesForPrincipal(sender).get(DAO_TOKEN_ASSETS_MAP)!;
   const depositTokensReceipt = simnet.callPublicFn(
-    tokenContractAddress,
+    agentAccountContract,
     "deposit-ft",
-    [Cl.uint(btcAmount)],
-    agentAccountAddress
+    [Cl.principal(daoTokenContract), Cl.uint(daoTokenBalance)],
+    sender
   );
-  dbgLog(`depositTokensReceipt: ${JSON.stringify(depositTokensReceipt)}`);
+  dbgLog(
+    `depositTokensReceipt: ${JSON.stringify(depositTokensReceipt, null, 2)}`
+  );
   expect(depositTokensReceipt.result).toBeOk(Cl.bool(true));
 }
 
@@ -335,4 +348,144 @@ export function completePrelaunch(deployer: string) {
   }>(finalStatusResult.value);
   // Check if the market is open
   expect(finalStatus["market-open"]).toBe(true);
+}
+
+// helper to graduate the faktory dex and create the bitflow pool
+export function graduateDex(caller: string) {
+  // Get contract references from registry
+  const tokenContract = registry.getContractAddressByTypeAndSubtype(
+    "TOKEN",
+    "DAO"
+  );
+  const tokenDexContract = registry.getContractAddressByTypeAndSubtype(
+    "TOKEN",
+    "DEX"
+  );
+
+  // 1. Calculate amount needed to graduate
+  const getInResult = simnet.callReadOnlyFn(
+    tokenDexContract,
+    "get-in",
+    [Cl.uint(0)],
+    caller
+  );
+  if (
+    getInResult.result.type !== ClarityType.ResponseOk ||
+    getInResult.result.value.type !== ClarityType.Tuple
+  ) {
+    throw new Error("Failed to get dex-in info");
+  }
+  const dexInfo = convertClarityTuple<FaktoryDexInInfo>(
+    getInResult.result.value
+  );
+
+  // If total-stx is 0, the contract has been graduated and its balances zeroed out.
+  if (dexInfo["total-stx"] === 0n) {
+    return;
+  }
+
+  const amountToGraduate = dexInfo["stx-to-grad"];
+
+  // 2. Check caller balance
+  const sbtcBalance =
+    getBalancesForPrincipal(caller).get(SBTC_ASSETS_MAP) || 0n;
+  if (sbtcBalance < amountToGraduate) {
+    throw new Error(
+      `Caller ${caller} has insufficient sBTC to graduate DEX. Needs ${amountToGraduate}, has ${sbtcBalance}`
+    );
+  }
+
+  // 3. Call buy to graduate the dex
+  const preFaktoryAddress = registry.getContractAddressByTypeAndSubtype(
+    "TOKEN",
+    "PRELAUNCH"
+  );
+  if (!preFaktoryAddress) {
+    throw new Error("Pre-faktory contract not found in registry");
+  }
+
+  // --- BEFORE LOGGING ---
+  dbgLog("--- State Snapshot BEFORE graduateDex buy call ---");
+  const dexOpenBefore = simnet.callReadOnlyFn(
+    tokenDexContract,
+    "get-open",
+    [],
+    caller
+  );
+  const preFaktoryStatusBeforeResult = simnet.callReadOnlyFn(
+    preFaktoryAddress,
+    "get-contract-status",
+    [],
+    caller
+  );
+  if (preFaktoryStatusBeforeResult.result.type === ClarityType.ResponseOk) {
+    const status = convertClarityTuple<FaktoryContractStatus>(
+      preFaktoryStatusBeforeResult.result.value
+    );
+    dbgLog(
+      `DEX state BEFORE: open=${JSON.stringify(
+        dexOpenBefore.result
+      )}, bonded (inferred)=${status["accelerated-vesting"]}`
+    );
+    dbgLog(`Pre-faktory status BEFORE: ${status["market-open"]}}`);
+  }
+
+  dbgLog(`--- Calling 'buy' to graduate DEX ---`);
+  dbgLog(` > DEX Contract: ${tokenDexContract}`);
+  dbgLog(` > Token Contract (ft): ${tokenContract}`);
+  dbgLog(` > Amount to Graduate (ubtc): ${amountToGraduate}`);
+  dbgLog(` > Caller: ${caller}`);
+  dbgLog(` > Caller sBTC Balance: ${sbtcBalance}`);
+
+  const graduateReceipt = simnet.callPublicFn(
+    tokenDexContract,
+    "buy",
+    [Cl.principal(tokenContract), Cl.uint(amountToGraduate)],
+    caller
+  );
+  dbgLog(`Graduate receipt: ${JSON.stringify(graduateReceipt, null, 2)}`);
+
+  // --- AFTER LOGGING ---
+  dbgLog("--- State Snapshot AFTER graduateDex buy call ---");
+  const dexOpenAfter = simnet.callReadOnlyFn(
+    tokenDexContract,
+    "get-open",
+    [],
+    caller
+  );
+  const preFaktoryStatusAfterResult = simnet.callReadOnlyFn(
+    preFaktoryAddress,
+    "get-contract-status",
+    [],
+    caller
+  );
+  if (preFaktoryStatusAfterResult.result.type === ClarityType.ResponseOk) {
+    const status = convertClarityTuple<FaktoryContractStatus>(
+      preFaktoryStatusAfterResult.result.value
+    );
+    dbgLog(
+      `DEX state AFTER: open=${JSON.stringify(
+        dexOpenAfter.result
+      )}, bonded (inferred)=${status["accelerated-vesting"]}`
+    );
+    dbgLog(`Pre-faktory status AFTER: ${status["market-open"]}`);
+  }
+
+  expect(graduateReceipt.result).toBeOk(Cl.bool(true));
+}
+
+// helper to enable public pool creation in the bitflow core contract
+export function enablePublicPoolCreation(caller: string) {
+  const coreContractAddress = getKnownAddress("devnet", "BITFLOW_CORE");
+
+  const receipt = simnet.callPublicFn(
+    coreContractAddress,
+    "set-public-pool-creation",
+    [Cl.bool(true)],
+    caller
+  );
+  dbgLog(
+    `enablePublicPoolCreation receipt: ${JSON.stringify(receipt, null, 2)}`
+  );
+  expect(receipt.result).toBeOk(Cl.bool(true));
 }

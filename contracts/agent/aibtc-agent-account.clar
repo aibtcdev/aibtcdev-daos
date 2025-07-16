@@ -1,18 +1,20 @@
 ;; title: aibtc-agent-account
-;; version: 2.0.0
+;; version: 3.0.0
 ;; summary: A special account contract between a user and an agent for managing assets and DAO interactions. Only the user can withdraw funds.
 
 ;; traits
 ;; /g/.aibtc-agent-account-traits.aibtc-account/agent_account_trait_account
 (impl-trait .aibtc-agent-account-traits.aibtc-account)
-;; /g/.aibtc-agent-account-traits.aibtc-proposals/agent_account_trait_proposals
-(impl-trait .aibtc-agent-account-traits.aibtc-proposals)
+;; /g/.aibtc-agent-account-traits.aibtc-account-proposals/agent_account_trait_account_proposals
+(impl-trait .aibtc-agent-account-traits.aibtc-account-proposals)
 ;; /g/.aibtc-agent-account-traits.aibtc-account-config/agent_account_trait_account_config
 (impl-trait .aibtc-agent-account-traits.aibtc-account-config)
-;; /g/.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell
-(impl-trait .aibtc-agent-account-traits.faktory-buy-sell)
+;; /g/.aibtc-agent-account-traits.aibtc-account-swaps/agent_account_trait_account_swaps
+(impl-trait .aibtc-agent-account-traits.aibtc-account-swaps)
 ;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+;; /g/.aibtc-agent-account-traits.aibtc-dao-swap-adapter/agent_account_trait_dao_swap_adapter
+(use-trait dao-swap-adapter .aibtc-agent-account-traits.aibtc-dao-swap-adapter)
 ;; /g/.aibtc-dao-traits.action/dao_trait_action
 (use-trait action-trait .aibtc-dao-traits.action)
 ;; /g/.aibtc-dao-traits.proposal/dao_trait_proposal
@@ -42,15 +44,29 @@
 (define-constant ERR_CALLER_NOT_OWNER (err u1100))
 (define-constant ERR_CONTRACT_NOT_APPROVED (err u1101))
 (define-constant ERR_OPERATION_NOT_ALLOWED (err u1103))
+(define-constant ERR_INVALID_APPROVAL_TYPE (err u1104))
+
+;; contract approval types
+(define-constant APPROVED_CONTRACT_VOTING u1)
+(define-constant APPROVED_CONTRACT_SWAP u2)
+(define-constant APPROVED_CONTRACT_TOKEN u3)
 
 ;; data maps
 (define-map ApprovedContracts
-  principal
+  {
+    contract: principal,
+    type: uint, ;; matches defined constants
+  }
   bool
 )
 
 ;; insert sBTC token into approved contracts
-(map-set ApprovedContracts SBTC_TOKEN true)
+(map-set ApprovedContracts {
+  contract: SBTC_TOKEN,
+  type: APPROVED_CONTRACT_TOKEN,
+}
+  true
+)
 
 ;; data vars
 (define-data-var agentCanDepositAssets bool true)
@@ -77,7 +93,7 @@
   )
 )
 
-;; the owner or agent can deposit FT to this contract which will approve the asset contract
+;; the owner or agent can deposit FT to this contract
 (define-public (deposit-ft
     (ft <ft-trait>)
     (amount uint)
@@ -94,7 +110,6 @@
         recipient: SELF,
       },
     })
-    (map-set ApprovedContracts (contract-of ft) true)
     (contract-call? ft transfer amount contract-caller SELF none)
   )
 )
@@ -123,7 +138,9 @@
   )
   (begin
     (asserts! (is-owner) ERR_CALLER_NOT_OWNER)
-    (asserts! (is-approved-contract (contract-of ft)) ERR_CONTRACT_NOT_APPROVED)
+    (asserts! (is-approved-contract (contract-of ft) APPROVED_CONTRACT_TOKEN)
+      ERR_CONTRACT_NOT_APPROVED
+    )
     (print {
       notification: "aibtc-agent-account/withdraw-ft",
       payload: {
@@ -149,7 +166,8 @@
   )
   (begin
     (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of votingContract))
+    (asserts!
+      (is-approved-contract (contract-of votingContract) APPROVED_CONTRACT_VOTING)
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
@@ -174,7 +192,8 @@
   )
   (begin
     (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of votingContract))
+    (asserts!
+      (is-approved-contract (contract-of votingContract) APPROVED_CONTRACT_VOTING)
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
@@ -198,7 +217,8 @@
   )
   (begin
     (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of votingContract))
+    (asserts!
+      (is-approved-contract (contract-of votingContract) APPROVED_CONTRACT_VOTING)
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
@@ -222,7 +242,8 @@
   )
   (begin
     (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of votingContract))
+    (asserts!
+      (is-approved-contract (contract-of votingContract) APPROVED_CONTRACT_VOTING)
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
@@ -239,57 +260,67 @@
   )
 )
 
-;; Faktory DEX Trading Functions
+;; Generalized trading functions, requires adapter for specific routes
 
-;; the owner or the agent (if enabled) can buy assets on the Faktory DEX if the DEX contract is approved
-;; requires sBTC to be deposited in the agent account
-(define-public (faktory-buy-asset
-    (faktory-dex <dao-faktory-dex>)
-    (asset <faktory-token>)
+;; the owner or the agent (if enabled) can buy DAO tokens
+(define-public (buy-dao-token
+    (swapAdapter <dao-swap-adapter>)
+    (daoToken <ft-trait>)
     (amount uint)
+    (minReceive (optional uint))
   )
   (begin
     (asserts! (buy-sell-assets-allowed) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of faktory-dex))
+    (asserts!
+      (and
+        (is-approved-contract (contract-of swapAdapter) APPROVED_CONTRACT_SWAP)
+        (is-approved-contract (contract-of daoToken) APPROVED_CONTRACT_TOKEN)
+      )
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
-      notification: "aibtc-agent-account/faktory-buy-asset",
+      notification: "aibtc-agent-account/buy-dao-token",
       payload: {
-        dexContract: (contract-of faktory-dex),
-        asset: (contract-of asset),
+        swapAdapter: (contract-of swapAdapter),
+        daoToken: (contract-of daoToken),
         amount: amount,
+        minReceive: minReceive,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (as-contract (contract-call? faktory-dex buy asset amount))
+    (as-contract (contract-call? swapAdapter buy-dao-token daoToken amount minReceive))
   )
 )
 
-;; the owner or the agent (if enabled) can sell assets on the Faktory DEX if the DEX contract is approved
-;; requires the asset to be deposited in the agent account
-(define-public (faktory-sell-asset
-    (faktory-dex <dao-faktory-dex>)
-    (asset <faktory-token>)
+;; the owner or the agent (if enabled) can sell DAO tokens
+(define-public (sell-dao-token
+    (swapAdapter <dao-swap-adapter>)
+    (daoToken <ft-trait>)
     (amount uint)
+    (minReceive (optional uint))
   )
   (begin
     (asserts! (buy-sell-assets-allowed) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of faktory-dex))
+    (asserts!
+      (and
+        (is-approved-contract (contract-of swapAdapter) APPROVED_CONTRACT_SWAP)
+        (is-approved-contract (contract-of daoToken) APPROVED_CONTRACT_TOKEN)
+      )
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
-      notification: "aibtc-agent-account/faktory-sell-asset",
+      notification: "aibtc-agent-account/sell-dao-token",
       payload: {
-        dexContract: (contract-of faktory-dex),
-        asset: (contract-of asset),
+        swapAdapter: (contract-of swapAdapter),
+        daoToken: (contract-of daoToken),
         amount: amount,
+        minReceive: minReceive,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (as-contract (contract-call? faktory-dex sell asset amount))
+    (as-contract (contract-call? swapAdapter sell-dao-token daoToken amount minReceive))
   )
 )
 
@@ -360,43 +391,76 @@
 )
 
 ;; the owner or the agent (if enabled) can approve a contract for use with the agent account
-(define-public (approve-contract (contract principal))
+(define-public (approve-contract
+    (contract principal)
+    (type uint)
+  )
   (begin
     (asserts! (approve-revoke-contract-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/approve-contract",
       payload: {
         contract: contract,
+        type: type,
         approved: true,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (ok (map-set ApprovedContracts contract true))
+    (ok (map-set ApprovedContracts {
+      contract: contract,
+      type: type,
+    }
+      true
+    ))
   )
 )
 
 ;; the owner or the agent (if enabled) can revoke a contract from use with the agent account
-(define-public (revoke-contract (contract principal))
+(define-public (revoke-contract
+    (contract principal)
+    (type uint)
+  )
   (begin
     (asserts! (approve-revoke-contract-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/revoke-contract",
       payload: {
         contract: contract,
+        type: type,
         approved: false,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (ok (map-set ApprovedContracts contract false))
+    (ok (map-set ApprovedContracts {
+      contract: contract,
+      type: type,
+    }
+      false
+    ))
+  )
+)
+
+;; helper to get config as response via trait
+(define-public (get-config)
+  (let ((wrappedConfig (some (get-configuration))))
+    (ok (unwrap! wrappedConfig ERR_OPERATION_NOT_ALLOWED))
   )
 )
 
 ;; read only functions
 
-(define-read-only (is-approved-contract (contract principal))
-  (default-to false (map-get? ApprovedContracts contract))
+(define-read-only (is-approved-contract
+    (contract principal)
+    (type uint)
+  )
+  (default-to false
+    (map-get? ApprovedContracts {
+      contract: contract,
+      type: type,
+    })
+  )
 )
 
 (define-read-only (get-configuration)
@@ -405,6 +469,14 @@
     agent: ACCOUNT_AGENT,
     owner: ACCOUNT_OWNER,
     sbtc: SBTC_TOKEN,
+  }
+)
+
+(define-read-only (get-approval-types)
+  {
+    proposalVoting: APPROVED_CONTRACT_VOTING,
+    swap: APPROVED_CONTRACT_SWAP,
+    token: APPROVED_CONTRACT_TOKEN,
   }
 )
 
@@ -425,6 +497,14 @@
 
 (define-private (is-agent)
   (is-eq contract-caller ACCOUNT_AGENT)
+)
+
+(define-private (is-valid-type (type uint))
+  (or
+    (is-eq type APPROVED_CONTRACT_VOTING)
+    (is-eq type APPROVED_CONTRACT_SWAP)
+    (is-eq type APPROVED_CONTRACT_TOKEN)
+  )
 )
 
 (define-private (deposit-allowed)
@@ -449,6 +529,7 @@
     notification: "aibtc-agent-account/user-agent-account-created",
     payload: {
       config: (get-configuration),
+      approvalTypes: (get-approval-types),
       agentPermissions: (get-agent-permissions),
     },
   })

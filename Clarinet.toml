@@ -138,6 +138,24 @@ path = 'contracts/dao/proposals/aibtc-base-initialize-dao.clar'
 clarity_version = 3
 epoch = 3.1
 
+# dao trading adapters
+
+[contracts.aibtc-acct-swap-bitflow-aibtc-sbtc]
+path = "contracts/dao/trading/aibtc-acct-swap-bitflow-aibtc-sbtc.clar"
+clarity_version = 3
+epoch = 3.1
+
+[contracts.aibtc-acct-swap-faktory-aibtc-sbtc]
+path = "contracts/dao/trading/aibtc-acct-swap-faktory-aibtc-sbtc.clar"
+clarity_version = 3
+epoch = 3.1
+
+# helper to simulate xyk-core from bitflow
+[contracts.xyk-core-v-1-2]
+path = "contracts/dao/trading/xyk-core-v-1-2.clar"
+clarity_version = 3
+epoch = 3.1
+
 # faktory contracts
 
 [contracts.aibtc-faktory]
@@ -161,6 +179,11 @@ clarity_version = 2
 epoch = 3.1
 
 # used for testing
+
+[contracts.unknown-adapter]
+path = 'contracts/dao/trading/aibtc-acct-swap-faktory-aibtc-sbtc.clar'
+clarity_version = 3
+epoch = 3.1
 
 [contracts.unknown-token]
 path = 'contracts/dao/token/aibtc-faktory.clar'

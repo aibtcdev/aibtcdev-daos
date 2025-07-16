@@ -13,6 +13,7 @@ export function defineAllDaoContractDependencies(
   defineProposalContractDependencies(registry);
   defineTokenContractDependencies(registry);
   defineAgentContractDependencies(registry);
+  defineTradingContractDependencies(registry);
 }
 
 /**
@@ -379,11 +380,19 @@ export function defineAgentContractDependencies(
           .addTraitDependency("AGENT_ACCOUNT", "agent_account_trait_account")
           .addTraitDependency(
             "AGENT_ACCOUNT_PROPOSALS",
-            "agent_account_trait_proposals"
+            "agent_account_trait_account_proposals"
           )
           .addTraitDependency(
             "AGENT_ACCOUNT_CONFIG",
             "agent_account_trait_account_config"
+          )
+          .addTraitDependency(
+            "AGENT_ACCOUNT_SWAPS",
+            "agent_account_trait_account_swaps"
+          )
+          .addTraitDependency(
+            "AGENT_DAO_SWAP_ADAPTER",
+            "agent_account_trait_dao_swap_adapter"
           )
           .addTraitDependency(
             "AGENT_FAKTORY_BUY_SELL",
@@ -408,6 +417,57 @@ export function defineAgentContractDependencies(
 
       default:
         // Default dependencies for all agent contracts
+        contract.addRuntimeValue("dao_token_symbol");
+        break;
+    }
+  });
+}
+
+/**
+ * Define dependencies for Trading contracts
+ * @param registry The contract registry instance
+ */
+export function defineTradingContractDependencies(
+  registry: ContractRegistry
+): void {
+  // Get all trading contracts
+  const tradingContracts = registry.getContractsByType("TRADING");
+
+  // Define dependencies for each trading contract
+  tradingContracts.forEach((contract) => {
+    switch (contract.name) {
+      case "aibtc-acct-swap-faktory-aibtc-sbtc":
+        contract
+          .addTraitDependency(
+            "AGENT_DAO_SWAP_ADAPTER",
+            "agent_account_trait_dao_swap_adapter"
+          )
+          .addTraitDependency("BASE_SIP010", "base_trait_sip010")
+          .addContractDependency("dao_contract_token", "TOKEN", "DAO")
+          .addContractDependency("dao_contract_token_dex", "TOKEN", "DEX")
+          .addRuntimeValue("dao_token_symbol");
+        break;
+
+      case "aibtc-acct-swap-bitflow-aibtc-sbtc":
+        contract
+          .addTraitDependency(
+            "AGENT_DAO_SWAP_ADAPTER",
+            "agent_account_trait_dao_swap_adapter"
+          )
+          .addTraitDependency("BASE_SIP010", "base_trait_sip010")
+          .addAddressDependency("SBTC", "base_contract_sbtc")
+          .addContractDependency("dao_contract_token", "TOKEN", "DAO")
+          .addAddressDependency("BITFLOW_CORE", "external_bitflow_core")
+          .addContractDependency(
+            "dao_contract_bitflow_pool",
+            "TOKEN",
+            "POOL"
+          )
+          .addRuntimeValue("dao_token_symbol");
+        break;
+
+      default:
+        // Default dependencies for all trading contracts
         contract.addRuntimeValue("dao_token_symbol");
         break;
     }

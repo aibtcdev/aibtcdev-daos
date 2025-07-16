@@ -21,8 +21,8 @@
 (define-constant ERR_NOT_POOL_CONTRACT_DEPLOYER (err u3006))
 
 ;; XYK Core address and contract deployer address
-;; /g/'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2/bitflow_core_contract
-(define-constant CORE_ADDRESS 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2)
+;; /g/.xyk-core-v-1-2/bitflow_core_contract
+(define-constant CORE_ADDRESS .xyk-core-v-1-2)
 ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
 (define-constant CONTRACT_DEPLOYER .aibtc-faktory-dex)
 
