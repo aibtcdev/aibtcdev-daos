@@ -72,6 +72,31 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
   });
 
+  it("deposit-stx() succeeds for agent if permission is granted", () => {
+    // arrange
+    const amount = 1000000; // 1 STX
+
+    // act
+    // ensure permission is granted
+    const grantReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-deposit-assets",
+      [Cl.bool(true)],
+      deployer
+    );
+    expect(grantReceipt.result).toBeOk(Cl.bool(true));
+
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "deposit-stx",
+      [Cl.uint(amount)],
+      address2 // agent
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
+  });
+
   it("deposit-stx() succeeds and deposits STX to the agent account", () => {
     // arrange
     const agentAccountBalances = getBalancesForPrincipal(contractAddress);
@@ -168,6 +193,40 @@ describe(`public functions: ${contractName}`, () => {
 
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
+  });
+
+  it("deposit-ft() succeeds for agent if permission is granted", () => {
+    // arrange
+    const amount = 10000000;
+
+    // act
+    // ensure permission is granted
+    const grantReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-deposit-assets",
+      [Cl.bool(true)],
+      deployer
+    );
+    expect(grantReceipt.result).toBeOk(Cl.bool(true));
+
+    // get sBTC from the faucet for the agent
+    const faucetReceipt = simnet.callPublicFn(
+      SBTC_CONTRACT,
+      "faucet",
+      [],
+      address2 // agent
+    );
+    expect(faucetReceipt.result).toBeOk(Cl.bool(true));
+
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "deposit-ft",
+      [Cl.principal(SBTC_CONTRACT), Cl.uint(amount)],
+      address2 // agent
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
   });
 
   it("deposit-ft() succeeds and transfers sBTC to the account", () => {
