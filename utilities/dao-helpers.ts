@@ -392,15 +392,6 @@ export function graduateDex(caller: string) {
   }
 
   // 3. Call buy to graduate the dex
-  const open = simnet.getDataVar(tokenDexContract, "open");
-  const bonded = simnet.getDataVar(tokenDexContract, "bonded");
-  dbgLog(
-    `DEX state before buy: open=${cvToValue(open)}, bonded=${cvToValue(
-      bonded
-    )}`,
-    { forceLog: true }
-  );
-
   const preFaktoryAddress = registry.getContractAddressByTypeAndSubtype(
     "TOKEN",
     "PRELAUNCH"
@@ -408,16 +399,35 @@ export function graduateDex(caller: string) {
   if (!preFaktoryAddress) {
     throw new Error("Pre-faktory contract not found in registry");
   }
-  const marketOpenResult = simnet.callReadOnlyFn(
-    preFaktoryAddress,
-    "is-market-open",
+
+  // --- BEFORE LOGGING ---
+  dbgLog("--- State Snapshot BEFORE graduateDex buy call ---", {
+    forceLog: true,
+  });
+  const dexOpenBefore = simnet.callReadOnlyFn(
+    tokenDexContract,
+    "get-open",
     [],
     caller
   );
-  dbgLog(
-    `Pre-faktory market open status: ${JSON.stringify(marketOpenResult.result)}`,
-    { forceLog: true }
+  const preFaktoryStatusBeforeResult = simnet.callReadOnlyFn(
+    preFaktoryAddress,
+    "get-contract-status",
+    [],
+    caller
   );
+  if (preFaktoryStatusBeforeResult.result.type === ClarityType.ResponseOk) {
+    const status = convertClarityTuple(preFaktoryStatusBeforeResult.result.value);
+    dbgLog(
+      `DEX state BEFORE: open=${JSON.stringify(
+        dexOpenBefore.result
+      )}, bonded (inferred)=${status["accelerated-vesting"]}`,
+      { forceLog: true }
+    );
+    dbgLog(`Pre-faktory status BEFORE: ${JSON.stringify(status, null, 2)}`, {
+      forceLog: true,
+    });
+  }
 
   const graduateReceipt = simnet.callPublicFn(
     tokenDexContract,
@@ -428,5 +438,35 @@ export function graduateDex(caller: string) {
   dbgLog(`Graduate receipt: ${JSON.stringify(graduateReceipt, null, 2)}`, {
     forceLog: true,
   });
+
+  // --- AFTER LOGGING ---
+  dbgLog("--- State Snapshot AFTER graduateDex buy call ---", {
+    forceLog: true,
+  });
+  const dexOpenAfter = simnet.callReadOnlyFn(
+    tokenDexContract,
+    "get-open",
+    [],
+    caller
+  );
+  const preFaktoryStatusAfterResult = simnet.callReadOnlyFn(
+    preFaktoryAddress,
+    "get-contract-status",
+    [],
+    caller
+  );
+  if (preFaktoryStatusAfterResult.result.type === ClarityType.ResponseOk) {
+    const status = convertClarityTuple(preFaktoryStatusAfterResult.result.value);
+    dbgLog(
+      `DEX state AFTER: open=${JSON.stringify(
+        dexOpenAfter.result
+      )}, bonded (inferred)=${status["accelerated-vesting"]}`,
+      { forceLog: true }
+    );
+    dbgLog(`Pre-faktory status AFTER: ${JSON.stringify(status, null, 2)}`, {
+      forceLog: true,
+    });
+  }
+
   expect(graduateReceipt.result).toBeOk(Cl.bool(true));
 }
