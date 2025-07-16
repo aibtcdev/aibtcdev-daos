@@ -48,6 +48,11 @@ for contract in "${contracts[@]}"; do
         echo "⏩ Skipping trait file: $contract"
         continue
     fi
+    # band-aid to skip xyk-core-v-1-2 local copy
+    if [[ "$contract" == *"xyk-core-v-1-2"* ]]; then
+        echo "⏩ Skipping local copy of xyk-core-v-1-2: $contract"
+        continue
+    fi
 
     let "total_contracts=total_contracts+1"
     test_file_base=$(get_test_path_base "$contract")

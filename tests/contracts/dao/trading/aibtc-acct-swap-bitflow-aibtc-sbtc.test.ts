@@ -167,7 +167,7 @@ describe(`read-only functions: ${contractName}`, () => {
       "TOKEN",
       "POOL"
     );
-    const bitflowCoreAddress = getKnownAddress("testnet", "BITFLOW_CORE");
+    const bitflowCoreAddress = getKnownAddress("devnet", "BITFLOW_CORE");
 
     // Act
     const info = simnet.callReadOnlyFn(

@@ -405,9 +405,7 @@ export function graduateDex(caller: string) {
   }
 
   // --- BEFORE LOGGING ---
-  dbgLog("--- State Snapshot BEFORE graduateDex buy call ---", {
-    forceLog: true,
-  });
+  dbgLog("--- State Snapshot BEFORE graduateDex buy call ---");
   const dexOpenBefore = simnet.callReadOnlyFn(
     tokenDexContract,
     "get-open",
@@ -427,22 +425,17 @@ export function graduateDex(caller: string) {
     dbgLog(
       `DEX state BEFORE: open=${JSON.stringify(
         dexOpenBefore.result
-      )}, bonded (inferred)=${status["accelerated-vesting"]}`,
-      { forceLog: true }
+      )}, bonded (inferred)=${status["accelerated-vesting"]}`
     );
-    dbgLog(`Pre-faktory status BEFORE: ${JSON.stringify(status, null, 2)}`, {
-      forceLog: true,
-    });
+    dbgLog(`Pre-faktory status BEFORE: ${status["market-open"]}}`);
   }
 
-  dbgLog(`--- Calling 'buy' to graduate DEX ---`, { forceLog: true });
-  dbgLog(` > DEX Contract: ${tokenDexContract}`, { forceLog: true });
-  dbgLog(` > Token Contract (ft): ${tokenContract}`, { forceLog: true });
-  dbgLog(` > Amount to Graduate (ubtc): ${amountToGraduate}`, {
-    forceLog: true,
-  });
-  dbgLog(` > Caller: ${caller}`, { forceLog: true });
-  dbgLog(` > Caller sBTC Balance: ${sbtcBalance}`, { forceLog: true });
+  dbgLog(`--- Calling 'buy' to graduate DEX ---`);
+  dbgLog(` > DEX Contract: ${tokenDexContract}`);
+  dbgLog(` > Token Contract (ft): ${tokenContract}`);
+  dbgLog(` > Amount to Graduate (ubtc): ${amountToGraduate}`);
+  dbgLog(` > Caller: ${caller}`);
+  dbgLog(` > Caller sBTC Balance: ${sbtcBalance}`);
 
   const graduateReceipt = simnet.callPublicFn(
     tokenDexContract,
@@ -450,14 +443,10 @@ export function graduateDex(caller: string) {
     [Cl.principal(tokenContract), Cl.uint(amountToGraduate)],
     caller
   );
-  dbgLog(`Graduate receipt: ${JSON.stringify(graduateReceipt, null, 2)}`, {
-    forceLog: true,
-  });
+  dbgLog(`Graduate receipt: ${JSON.stringify(graduateReceipt, null, 2)}`);
 
   // --- AFTER LOGGING ---
-  dbgLog("--- State Snapshot AFTER graduateDex buy call ---", {
-    forceLog: true,
-  });
+  dbgLog("--- State Snapshot AFTER graduateDex buy call ---");
   const dexOpenAfter = simnet.callReadOnlyFn(
     tokenDexContract,
     "get-open",
@@ -477,12 +466,9 @@ export function graduateDex(caller: string) {
     dbgLog(
       `DEX state AFTER: open=${JSON.stringify(
         dexOpenAfter.result
-      )}, bonded (inferred)=${status["accelerated-vesting"]}`,
-      { forceLog: true }
+      )}, bonded (inferred)=${status["accelerated-vesting"]}`
     );
-    dbgLog(`Pre-faktory status AFTER: ${JSON.stringify(status, null, 2)}`, {
-      forceLog: true,
-    });
+    dbgLog(`Pre-faktory status AFTER: ${status["market-open"]}`);
   }
 
   expect(graduateReceipt.result).toBeOk(Cl.bool(true));
@@ -499,10 +485,7 @@ export function enablePublicPoolCreation(caller: string) {
     caller
   );
   dbgLog(
-    `enablePublicPoolCreation receipt: ${JSON.stringify(receipt, null, 2)}`,
-    {
-      forceLog: true,
-    }
+    `enablePublicPoolCreation receipt: ${JSON.stringify(receipt, null, 2)}`
   );
   expect(receipt.result).toBeOk(Cl.bool(true));
 }

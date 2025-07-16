@@ -49,7 +49,18 @@
     )
       success (ok (var-set totalBuys (+ (var-get totalBuys) u1)))
       error
-      ERR_SWAP_FAILED
+      ;; ERR_SWAP_FAILED
+      (begin 
+      (print {
+        notification: "Swap failed",
+        payload: {
+          daoToken: daoTokenContract,
+          amount: amount,
+          minReceive: (unwrap-panic minReceive),
+          error: error,
+        },
+      })
+      (ok true))
     )
   )
 )
@@ -70,7 +81,18 @@
     )
       success (ok (var-set totalSells (+ (var-get totalSells) u1)))
       error
-      ERR_SWAP_FAILED
+      ;; ERR_SWAP_FAILED
+      (begin 
+      (print {
+        notification: "Swap failed",
+        payload: {
+          daoToken: daoToken,
+          amount: amount,
+          minReceive: (unwrap-panic minReceive),
+          error: error,
+        },
+      })
+      (ok true))
     )
   )
 )
