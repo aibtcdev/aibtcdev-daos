@@ -24,6 +24,20 @@ export type FaktoryUserExpectedShare = {
   "expected-share": bigint;
 };
 
+export type FaktoryDexInInfo = {
+  "total-stx": bigint;
+  "total-stk": bigint;
+  "ft-balance": bigint;
+  k: bigint;
+  fee: bigint;
+  "stx-in": bigint;
+  "new-stk": bigint;
+  "new-ft": bigint;
+  "tokens-out": bigint;
+  "new-stx": bigint;
+  "stx-to-grad": bigint;
+};
+
 export type AgentAccountSwapAdapterContractInfo = {
   self: string;
   deployedBurnBlock: bigint;

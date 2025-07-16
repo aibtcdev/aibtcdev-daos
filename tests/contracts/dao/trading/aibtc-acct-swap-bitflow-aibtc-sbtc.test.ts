@@ -2,8 +2,12 @@ import { Cl, cvToValue } from "@stacks/transactions";
 import { describe, expect, it, test } from "vitest";
 import { setupFullContractRegistry } from "../../../../utilities/contract-registry";
 import { ErrCodeBitflowSwapAdapter } from "../../../../utilities/contract-error-codes";
-import { getDaoTokens } from "../../../../utilities/dao-helpers";
-import { completePrelaunch } from "../../../../utilities/dao-helpers";
+import {
+  completePrelaunch,
+  getDaoTokens,
+  getSbtcFromFaucet,
+  graduateDex,
+} from "../../../../utilities/dao-helpers";
 import { getKnownAddress } from "../../../../utilities/known-addresses";
 import {
   convertClarityTuple,
@@ -79,6 +83,8 @@ describe(`public functions: ${contractName}`, () => {
   it("buy-dao-token() succeeds and swaps for tx-sender", () => {
     // Arrange
     completePrelaunch(deployer);
+    getSbtcFromFaucet(deployer);
+    graduateDex(deployer);
     getDaoTokens(deployer, 10000);
     const deployerBalance =
       getBalancesForPrincipal(deployer).get(DAO_TOKEN_ASSETS_MAP) || 0n;
@@ -134,6 +140,8 @@ describe(`public functions: ${contractName}`, () => {
   it("sell-dao-token() succeeds and swaps for tx-sender", () => {
     // Arrange
     completePrelaunch(deployer);
+    getSbtcFromFaucet(deployer);
+    graduateDex(deployer);
     getDaoTokens(deployer, 10000);
     const deployerBalance =
       getBalancesForPrincipal(deployer).get(DAO_TOKEN_ASSETS_MAP) || 0n;

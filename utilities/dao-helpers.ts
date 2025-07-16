@@ -11,6 +11,7 @@ import {
   setupDaoContractRegistry,
   setupFullContractRegistry,
 } from "./contract-registry";
+import { FaktoryDexInInfo } from "./dao-types";
 import { dbgLog } from "./debug-logging";
 import { getBalancesForPrincipal } from "./asset-helpers";
 
@@ -346,4 +347,50 @@ export function completePrelaunch(deployer: string) {
   }>(finalStatusResult.value);
   // Check if the market is open
   expect(finalStatus["market-open"]).toBe(true);
+}
+
+// helper to graduate the faktory dex and create the bitflow pool
+export function graduateDex(caller: string) {
+  // Get contract references from registry
+  const tokenContract = registry.getContractAddressByTypeAndSubtype("TOKEN", "DAO");
+  const tokenDexContract = registry.getContractAddressByTypeAndSubtype(
+    "TOKEN",
+    "DEX"
+  );
+
+  // 1. Calculate amount needed to graduate
+  const getInResult = simnet.callReadOnlyFn(
+    tokenDexContract,
+    "get-in",
+    [Cl.uint(0)],
+    caller
+  );
+  if (
+    getInResult.result.type !== ClarityType.ResponseOk ||
+    getInResult.result.value.type !== ClarityType.Tuple
+  ) {
+    throw new Error("Failed to get dex-in info");
+  }
+  const dexInfo = convertClarityTuple<FaktoryDexInInfo>(
+    getInResult.result.value
+  );
+  const amountToGraduate = dexInfo["stx-to-grad"];
+
+  // 2. Check caller balance
+  const sbtcBalance =
+    getBalancesForPrincipal(caller).get(SBTC_ASSETS_MAP) || 0n;
+  if (sbtcBalance < amountToGraduate) {
+    throw new Error(
+      `Caller ${caller} has insufficient sBTC to graduate DEX. Needs ${amountToGraduate}, has ${sbtcBalance}`
+    );
+  }
+
+  // 3. Call buy to graduate the dex
+  const graduateReceipt = simnet.callPublicFn(
+    tokenDexContract,
+    "buy",
+    [Cl.principal(tokenContract), Cl.uint(amountToGraduate)],
+    caller
+  );
+  expect(graduateReceipt.result).toBeOk(Cl.bool(true));
 }
