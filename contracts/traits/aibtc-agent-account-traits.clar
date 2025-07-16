@@ -88,11 +88,11 @@
     (response bool uint)
   )
   (approve-contract
-    (principal)
+    (principal uint)
     (response bool uint)
   )
   (revoke-contract
-    (principal)
+    (principal uint)
     (response bool uint)
   )
 ))

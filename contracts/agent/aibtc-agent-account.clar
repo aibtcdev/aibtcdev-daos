@@ -44,15 +44,29 @@
 (define-constant ERR_CALLER_NOT_OWNER (err u1100))
 (define-constant ERR_CONTRACT_NOT_APPROVED (err u1101))
 (define-constant ERR_OPERATION_NOT_ALLOWED (err u1103))
+(define-constant ERR_INVALID_APPROVAL_TYPE (err u1104))
+
+;; contract approval types
+(define-constant APPROVED_CONTRACT_VOTING u1)
+(define-constant APPROVED_CONTRACT_SWAP u2)
+(define-constant APPROVED_CONTRACT_TOKEN u3)
 
 ;; data maps
 (define-map ApprovedContracts
-  principal
+  {
+    contract: principal,
+    type: uint, ;; matches defined constants
+  }
   bool
 )
 
 ;; insert sBTC token into approved contracts
-(map-set ApprovedContracts SBTC_TOKEN true)
+(map-set ApprovedContracts {
+  contract: SBTC_TOKEN,
+  type: APPROVED_CONTRACT_TOKEN,
+}
+  true
+)
 
 ;; data vars
 (define-data-var agentCanDepositAssets bool true)
@@ -124,7 +138,9 @@
   )
   (begin
     (asserts! (is-owner) ERR_CALLER_NOT_OWNER)
-    (asserts! (is-approved-contract (contract-of ft)) ERR_CONTRACT_NOT_APPROVED)
+    (asserts! (is-approved-contract (contract-of ft) APPROVED_CONTRACT_TOKEN)
+      ERR_CONTRACT_NOT_APPROVED
+    )
     (print {
       notification: "aibtc-agent-account/withdraw-ft",
       payload: {
@@ -150,7 +166,8 @@
   )
   (begin
     (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of votingContract))
+    (asserts!
+      (is-approved-contract (contract-of votingContract) APPROVED_CONTRACT_VOTING)
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
@@ -175,7 +192,8 @@
   )
   (begin
     (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of votingContract))
+    (asserts!
+      (is-approved-contract (contract-of votingContract) APPROVED_CONTRACT_VOTING)
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
@@ -199,7 +217,8 @@
   )
   (begin
     (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of votingContract))
+    (asserts!
+      (is-approved-contract (contract-of votingContract) APPROVED_CONTRACT_VOTING)
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
@@ -223,7 +242,8 @@
   )
   (begin
     (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)
-    (asserts! (is-approved-contract (contract-of votingContract))
+    (asserts!
+      (is-approved-contract (contract-of votingContract) APPROVED_CONTRACT_VOTING)
       ERR_CONTRACT_NOT_APPROVED
     )
     (print {
@@ -253,8 +273,8 @@
     (asserts! (buy-sell-assets-allowed) ERR_OPERATION_NOT_ALLOWED)
     (asserts!
       (and
-        (is-approved-contract (contract-of swapAdapter))
-        (is-approved-contract (contract-of daoToken))
+        (is-approved-contract (contract-of swapAdapter) APPROVED_CONTRACT_SWAP)
+        (is-approved-contract (contract-of daoToken) APPROVED_CONTRACT_TOKEN)
       )
       ERR_CONTRACT_NOT_APPROVED
     )
@@ -284,8 +304,8 @@
     (asserts! (buy-sell-assets-allowed) ERR_OPERATION_NOT_ALLOWED)
     (asserts!
       (and
-        (is-approved-contract (contract-of swapAdapter))
-        (is-approved-contract (contract-of daoToken))
+        (is-approved-contract (contract-of swapAdapter) APPROVED_CONTRACT_SWAP)
+        (is-approved-contract (contract-of daoToken) APPROVED_CONTRACT_TOKEN)
       )
       ERR_CONTRACT_NOT_APPROVED
     )
@@ -371,43 +391,69 @@
 )
 
 ;; the owner or the agent (if enabled) can approve a contract for use with the agent account
-(define-public (approve-contract (contract principal))
+(define-public (approve-contract
+    (contract principal)
+    (type uint)
+  )
   (begin
     (asserts! (approve-revoke-contract-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/approve-contract",
       payload: {
         contract: contract,
+        type: type,
         approved: true,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (ok (map-set ApprovedContracts contract true))
+    (ok (map-set ApprovedContracts {
+      contract: contract,
+      type: type,
+    }
+      true
+    ))
   )
 )
 
 ;; the owner or the agent (if enabled) can revoke a contract from use with the agent account
-(define-public (revoke-contract (contract principal))
+(define-public (revoke-contract
+    (contract principal)
+    (type uint)
+  )
   (begin
     (asserts! (approve-revoke-contract-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/revoke-contract",
       payload: {
         contract: contract,
+        type: type,
         approved: false,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (ok (map-set ApprovedContracts contract false))
+    (ok (map-set ApprovedContracts {
+      contract: contract,
+      type: type,
+    }
+      false
+    ))
   )
 )
 
 ;; read only functions
 
-(define-read-only (is-approved-contract (contract principal))
-  (default-to false (map-get? ApprovedContracts contract))
+(define-read-only (is-approved-contract
+    (contract principal)
+    (type uint)
+  )
+  (default-to false
+    (map-get? ApprovedContracts {
+      contract: contract,
+      type: type,
+    })
+  )
 )
 
 (define-read-only (get-configuration)
@@ -416,6 +462,14 @@
     agent: ACCOUNT_AGENT,
     owner: ACCOUNT_OWNER,
     sbtc: SBTC_TOKEN,
+  }
+)
+
+(define-read-only (get-approval-types)
+  {
+    proposalVoting: APPROVED_CONTRACT_VOTING,
+    swap: APPROVED_CONTRACT_SWAP,
+    token: APPROVED_CONTRACT_TOKEN,
   }
 )
 
@@ -436,6 +490,14 @@
 
 (define-private (is-agent)
   (is-eq contract-caller ACCOUNT_AGENT)
+)
+
+(define-private (is-valid-type (type uint))
+  (or
+    (is-eq type APPROVED_CONTRACT_VOTING)
+    (is-eq type APPROVED_CONTRACT_SWAP)
+    (is-eq type APPROVED_CONTRACT_TOKEN)
+  )
 )
 
 (define-private (deposit-allowed)
@@ -460,6 +522,7 @@
     notification: "aibtc-agent-account/user-agent-account-created",
     payload: {
       config: (get-configuration),
+      approvalTypes: (get-approval-types),
       agentPermissions: (get-agent-permissions),
     },
   })
