@@ -374,6 +374,12 @@ export function graduateDex(caller: string) {
   const dexInfo = convertClarityTuple<FaktoryDexInInfo>(
     getInResult.result.value
   );
+
+  // If total-stx is 0, the contract has been graduated and its balances zeroed out.
+  if (dexInfo["total-stx"] === 0n) {
+    return;
+  }
+
   const amountToGraduate = dexInfo["stx-to-grad"];
 
   // 2. Check caller balance
