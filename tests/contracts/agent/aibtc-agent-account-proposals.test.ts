@@ -1,6 +1,7 @@
 import { Cl, cvToValue } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeAgentAccount } from "../../../utilities/contract-error-codes";
+import { AgentAccountApprovalType } from "../../../utilities/dao-types";
 import { setupFullContractRegistry } from "../../../utilities/contract-registry";
 import { convertSIP019PrintEvent } from "../../../utilities/contract-helpers";
 import {
@@ -78,7 +79,10 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(actionProposalsContractAddress)],
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(AgentAccountApprovalType.VOTING),
+      ],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
@@ -121,7 +125,10 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(actionProposalsContractAddress)],
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(AgentAccountApprovalType.VOTING),
+      ],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
@@ -184,7 +191,10 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(actionProposalsContractAddress)],
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(AgentAccountApprovalType.VOTING),
+      ],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
@@ -245,7 +255,10 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(actionProposalsContractAddress)],
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(AgentAccountApprovalType.VOTING),
+      ],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
@@ -319,7 +332,10 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(actionProposalsContractAddress)],
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(AgentAccountApprovalType.VOTING),
+      ],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
@@ -370,7 +386,10 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(actionProposalsContractAddress)],
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(AgentAccountApprovalType.VOTING),
+      ],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
@@ -441,7 +460,10 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(actionProposalsContractAddress)],
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(AgentAccountApprovalType.VOTING),
+      ],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
@@ -484,7 +506,10 @@ describe(`public functions: ${contractName}`, () => {
     const revokeReceipt = simnet.callPublicFn(
       contractAddress,
       "revoke-contract",
-      [Cl.principal(actionProposalsContractAddress)],
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(AgentAccountApprovalType.VOTING),
+      ],
       deployer
     );
     expect(revokeReceipt.result).toBeOk(Cl.bool(true));
@@ -516,7 +541,10 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(actionProposalsContractAddress)],
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(AgentAccountApprovalType.VOTING),
+      ],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
@@ -591,7 +619,10 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(actionProposalsContractAddress)],
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(AgentAccountApprovalType.VOTING),
+      ],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
@@ -664,7 +695,10 @@ describe(`read-only functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(actionProposalsContractAddress)],
+      [
+        Cl.principal(actionProposalsContractAddress),
+        Cl.uint(AgentAccountApprovalType.VOTING),
+      ],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));

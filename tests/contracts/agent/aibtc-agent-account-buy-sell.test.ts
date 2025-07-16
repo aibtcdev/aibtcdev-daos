@@ -1,6 +1,7 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeAgentAccount } from "../../../utilities/contract-error-codes";
+import { AgentAccountApprovalType } from "../../../utilities/dao-types";
 import { setupFullContractRegistry } from "../../../utilities/contract-registry";
 import {
   convertSIP019PrintEvent,
@@ -119,10 +120,19 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(adapter)],
+      [Cl.principal(adapter), Cl.uint(AgentAccountApprovalType.SWAP)],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
+
+    // Approve the token contract
+    const approveTokenReceipt = simnet.callPublicFn(
+      contractAddress,
+      "approve-contract",
+      [Cl.principal(asset), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      deployer
+    );
+    expect(approveTokenReceipt.result).toBeOk(Cl.bool(true));
 
     // act
     const receipt = simnet.callPublicFn(
@@ -159,10 +169,19 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(adapter)],
+      [Cl.principal(adapter), Cl.uint(AgentAccountApprovalType.SWAP)],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
+
+    // Approve the token contract
+    const approveTokenReceipt = simnet.callPublicFn(
+      contractAddress,
+      "approve-contract",
+      [Cl.principal(asset), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      deployer
+    );
+    expect(approveTokenReceipt.result).toBeOk(Cl.bool(true));
 
     // act
     const receipt = simnet.callPublicFn(
@@ -267,10 +286,22 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(faktoryAdapterAddress)],
+      [
+        Cl.principal(faktoryAdapterAddress),
+        Cl.uint(AgentAccountApprovalType.SWAP),
+      ],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
+
+    // Approve the token contract
+    const approveTokenReceipt = simnet.callPublicFn(
+      contractAddress,
+      "approve-contract",
+      [Cl.principal(daoTokenAddress), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      deployer
+    );
+    expect(approveTokenReceipt.result).toBeOk(Cl.bool(true));
 
     // act
     const receipt = simnet.callPublicFn(
@@ -316,10 +347,19 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(adapter)],
+      [Cl.principal(adapter), Cl.uint(AgentAccountApprovalType.SWAP)],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
+
+    // Approve the token contract
+    const approveTokenReceipt = simnet.callPublicFn(
+      contractAddress,
+      "approve-contract",
+      [Cl.principal(asset), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      deployer
+    );
+    expect(approveTokenReceipt.result).toBeOk(Cl.bool(true));
 
     // act
     const receipt = simnet.callPublicFn(
@@ -357,10 +397,19 @@ describe(`read-only functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(adapter)],
+      [Cl.principal(adapter), Cl.uint(AgentAccountApprovalType.SWAP)],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
+
+    // Approve the token contract
+    const approveTokenReceipt = simnet.callPublicFn(
+      contractAddress,
+      "approve-contract",
+      [Cl.principal(asset), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      deployer
+    );
+    expect(approveTokenReceipt.result).toBeOk(Cl.bool(true));
 
     // Enable agent buy/sell
     let permissionReceipt = simnet.callPublicFn(
