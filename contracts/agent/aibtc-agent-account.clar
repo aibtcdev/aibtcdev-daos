@@ -93,7 +93,7 @@
   )
 )
 
-;; the owner or agent can deposit FT to this contract which will approve the asset contract
+;; the owner or agent can deposit FT to this contract
 (define-public (deposit-ft
     (ft <ft-trait>)
     (amount uint)
