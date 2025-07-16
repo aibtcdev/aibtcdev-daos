@@ -84,6 +84,24 @@ describe(`public functions: ${contractName}`, () => {
     // Arrange
     completePrelaunch(deployer);
     getSbtcFromFaucet(deployer);
+    const bitflowCoreAddress = getKnownAddress("testnet", "BITFLOW_CORE");
+    const publicPoolCreation = simnet.callReadOnlyFn(
+      bitflowCoreAddress,
+      "get-public-pool-creation",
+      [],
+      deployer
+    );
+    console.log(
+      "get-public-pool-creation:",
+      cvToValue(publicPoolCreation.result)
+    );
+    const admins = simnet.callReadOnlyFn(
+      bitflowCoreAddress,
+      "get-admins",
+      [],
+      deployer
+    );
+    console.log("get-admins:", cvToValue(admins.result));
     graduateDex(deployer);
     // Act
     const receipt = simnet.callPublicFn(
@@ -135,6 +153,24 @@ describe(`public functions: ${contractName}`, () => {
     completePrelaunch(deployer);
     getSbtcFromFaucet(deployer);
     getDaoTokens(deployer, 10000);
+    const bitflowCoreAddress = getKnownAddress("testnet", "BITFLOW_CORE");
+    const publicPoolCreation = simnet.callReadOnlyFn(
+      bitflowCoreAddress,
+      "get-public-pool-creation",
+      [],
+      deployer
+    );
+    console.log(
+      "get-public-pool-creation:",
+      cvToValue(publicPoolCreation.result)
+    );
+    const admins = simnet.callReadOnlyFn(
+      bitflowCoreAddress,
+      "get-admins",
+      [],
+      deployer
+    );
+    console.log("get-admins:", cvToValue(admins.result));
     graduateDex(deployer);
     const deployerBalance =
       getBalancesForPrincipal(deployer).get(DAO_TOKEN_ASSETS_MAP) || 0n;
