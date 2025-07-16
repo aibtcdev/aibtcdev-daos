@@ -392,11 +392,37 @@ export function graduateDex(caller: string) {
   }
 
   // 3. Call buy to graduate the dex
+  const open = simnet.getDataVar(tokenDexContract, "open");
+  const bonded = simnet.getDataVar(tokenDexContract, "bonded");
+  dbgLog(
+    `DEX state before buy: open=${cvToValue(open)}, bonded=${cvToValue(
+      bonded
+    )}`
+  );
+
+  const preFaktoryAddress = registry.getContractAddressByTypeAndSubtype(
+    "TOKEN",
+    "PRELAUNCH"
+  );
+  if (!preFaktoryAddress) {
+    throw new Error("Pre-faktory contract not found in registry");
+  }
+  const marketOpenResult = simnet.callReadOnlyFn(
+    preFaktoryAddress,
+    "is-market-open",
+    [],
+    caller
+  );
+  dbgLog(
+    `Pre-faktory market open status: ${JSON.stringify(marketOpenResult.result)}`
+  );
+
   const graduateReceipt = simnet.callPublicFn(
     tokenDexContract,
     "buy",
     [Cl.principal(tokenContract), Cl.uint(amountToGraduate)],
     caller
   );
+  dbgLog(`Graduate receipt: ${JSON.stringify(graduateReceipt, null, 2)}`);
   expect(graduateReceipt.result).toBeOk(Cl.bool(true));
 }
