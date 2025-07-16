@@ -108,6 +108,35 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_CONTRACT_NOT_APPROVED));
   });
 
+  it("buy-dao-token() fails if dao token contract is not approved", () => {
+    // arrange
+    completePrelaunch(deployer);
+    fundAgentAccount(contractAddress, deployer);
+    const amount = 10000000;
+    const adapter = faktoryAdapterAddress;
+    const asset = `${deployer}.unknown-token`;
+
+    // Approve the adapter contract
+    const approveReceipt = simnet.callPublicFn(
+      contractAddress,
+      "approve-contract",
+      [Cl.principal(adapter), Cl.uint(AgentAccountApprovalType.SWAP)],
+      deployer
+    );
+    expect(approveReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "buy-dao-token",
+      [Cl.principal(adapter), Cl.principal(asset), Cl.uint(amount), Cl.none()],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_CONTRACT_NOT_APPROVED));
+  });
+
   it("buy-dao-token() succeeds when called by owner with approved contract", () => {
     // arrange
     completePrelaunch(deployer);
@@ -259,6 +288,35 @@ describe(`public functions: ${contractName}`, () => {
     const amount = 10000000;
     const adapter = `${deployer}.unknown-adapter`;
     const asset = daoTokenAddress;
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "sell-dao-token",
+      [Cl.principal(adapter), Cl.principal(asset), Cl.uint(amount), Cl.none()],
+      deployer
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_CONTRACT_NOT_APPROVED));
+  });
+
+  it("sell-dao-token() fails if dao token contract is not approved", () => {
+    // arrange
+    completePrelaunch(deployer);
+    fundAgentAccount(contractAddress, deployer);
+    const amount = 10000000;
+    const adapter = faktoryAdapterAddress;
+    const asset = `${deployer}.unknown-token`;
+
+    // Approve the adapter contract
+    const approveReceipt = simnet.callPublicFn(
+      contractAddress,
+      "approve-contract",
+      [Cl.principal(adapter), Cl.uint(AgentAccountApprovalType.SWAP)],
+      deployer
+    );
+    expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // act
     const receipt = simnet.callPublicFn(
