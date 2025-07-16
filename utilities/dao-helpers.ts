@@ -1,5 +1,6 @@
 import { expect } from "vitest";
 import { Cl, ClarityType, ClarityValue, cvToValue } from "@stacks/transactions";
+import { getKnownAddress } from "./known-addresses";
 import {
   DAO_TOKEN_ASSETS_MAP,
   DEVNET_DEPLOYER,
@@ -480,4 +481,17 @@ export function graduateDex(caller: string) {
   }
 
   expect(graduateReceipt.result).toBeOk(Cl.bool(true));
+}
+
+// helper to enable public pool creation in the bitflow core contract
+export function enablePublicPoolCreation(caller: string) {
+  const coreContractAddress = getKnownAddress("devnet", "BITFLOW_CORE");
+
+  const receipt = simnet.callPublicFn(
+    coreContractAddress,
+    "set-public-pool-creation",
+    [Cl.bool(true)],
+    caller
+  );
+  expect(receipt.result).toBeOk(Cl.bool(true));
 }
