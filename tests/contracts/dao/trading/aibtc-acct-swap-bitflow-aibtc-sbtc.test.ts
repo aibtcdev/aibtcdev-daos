@@ -1,4 +1,4 @@
-import { Cl, cvToValue } from "@stacks/transactions";
+import { Cl } from "@stacks/transactions";
 import { describe, expect, it, test } from "vitest";
 import { setupFullContractRegistry } from "../../../../utilities/contract-registry";
 import { ErrCodeBitflowSwapAdapter } from "../../../../utilities/contract-error-codes";

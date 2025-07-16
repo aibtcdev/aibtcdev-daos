@@ -1,11 +1,8 @@
-import { Cl, cvToValue } from "@stacks/transactions";
+import { Cl } from "@stacks/transactions";
 import { describe, expect, it, test } from "vitest";
 import { setupFullContractRegistry } from "../../../../utilities/contract-registry";
 import { ErrCodeFaktorySwapAdapter } from "../../../../utilities/contract-error-codes";
-import {
-  fundAgentAccount,
-  getDaoTokens,
-} from "../../../../utilities/dao-helpers";
+import { getDaoTokens } from "../../../../utilities/dao-helpers";
 import { completePrelaunch } from "../../../../utilities/dao-helpers";
 import {
   convertClarityTuple,
@@ -37,11 +34,6 @@ const daoTokenAddress = registry.getContractAddressByTypeAndSubtype(
 const tokenDexContractAddress = registry.getContractAddressByTypeAndSubtype(
   "TOKEN",
   "DEX"
-);
-
-const agentAccountContractAddress = registry.getContractAddressByTypeAndSubtype(
-  "AGENT",
-  "AGENT_ACCOUNT"
 );
 
 // import error codes
