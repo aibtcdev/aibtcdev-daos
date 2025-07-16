@@ -431,6 +431,13 @@ export function graduateDex(caller: string) {
     });
   }
 
+  dbgLog(`--- Calling 'buy' to graduate DEX ---`, { forceLog: true });
+  dbgLog(` > DEX Contract: ${tokenDexContract}`, { forceLog: true });
+  dbgLog(` > Token Contract (ft): ${tokenContract}`, { forceLog: true });
+  dbgLog(` > Amount to Graduate (ubtc): ${amountToGraduate}`, { forceLog: true });
+  dbgLog(` > Caller: ${caller}`, { forceLog: true });
+  dbgLog(` > Caller sBTC Balance: ${sbtcBalance}`, { forceLog: true });
+
   const graduateReceipt = simnet.callPublicFn(
     tokenDexContract,
     "buy",
