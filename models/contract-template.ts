@@ -41,7 +41,7 @@ export abstract class ContractBase {
   readonly deploymentOrder: number;
   readonly templatePath: string;
   readonly clarityVersion: ClarityVersion | undefined;
-  
+
   protected _displayName?: string;
   protected _source?: string;
   protected _hash?: string;
@@ -59,6 +59,8 @@ export abstract class ContractBase {
         return `dao/proposals/${name}.clar`;
       case "TOKEN":
         return `dao/token/${name}.clar`;
+      case "TRADING":
+        return `dao/trading/${name}.clar`;
       case "AGENT":
         return `agent/${name}.clar`;
       default:

@@ -100,8 +100,8 @@
           (try! (as-contract (contract-call? ft transfer originator-amount tx-sender ORIGINATOR none)))
           ;; Call XYK Core v-1-2 pool by Bitflow
           (try! (as-contract (contract-call?
-            ;; /g/'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2/external_bitflow_core
-            'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2
+            ;; /g/.xyk-core-v-1-2/external_bitflow_core
+            .xyk-core-v-1-2
             ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_token_pool
             create-pool .xyk-pool-sbtc-aibtc-v-1-1
             ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
@@ -313,8 +313,8 @@
   (print {
     type: "faktory-dex-trait-v1-1",
     dexContract: (as-contract tx-sender),
-    ;; /g/'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2/external_bitflow_core
-    ammReceiver: 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2,
+    ;; /g/.xyk-core-v-1-2/external_bitflow_core
+    ammReceiver: .xyk-core-v-1-2,
     ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_token_pool
     poolName: .xyk-pool-sbtc-aibtc-v-1-1,
   })
