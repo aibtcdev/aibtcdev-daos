@@ -11,7 +11,7 @@ import {
   setupDaoContractRegistry,
   setupFullContractRegistry,
 } from "./contract-registry";
-import { FaktoryDexInInfo } from "./dao-types";
+import { FaktoryContractStatus, FaktoryDexInInfo } from "./dao-types";
 import { dbgLog } from "./debug-logging";
 import { getBalancesForPrincipal } from "./asset-helpers";
 
@@ -417,7 +417,9 @@ export function graduateDex(caller: string) {
     caller
   );
   if (preFaktoryStatusBeforeResult.result.type === ClarityType.ResponseOk) {
-    const status = convertClarityTuple(preFaktoryStatusBeforeResult.result.value);
+    const status = convertClarityTuple<FaktoryContractStatus>(
+      preFaktoryStatusBeforeResult.result.value
+    );
     dbgLog(
       `DEX state BEFORE: open=${JSON.stringify(
         dexOpenBefore.result
@@ -456,7 +458,9 @@ export function graduateDex(caller: string) {
     caller
   );
   if (preFaktoryStatusAfterResult.result.type === ClarityType.ResponseOk) {
-    const status = convertClarityTuple(preFaktoryStatusAfterResult.result.value);
+    const status = convertClarityTuple<FaktoryContractStatus>(
+      preFaktoryStatusAfterResult.result.value
+    );
     dbgLog(
       `DEX state AFTER: open=${JSON.stringify(
         dexOpenAfter.result
