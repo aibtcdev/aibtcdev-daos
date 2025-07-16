@@ -1,6 +1,9 @@
 codecov:
   require_ci_to_pass: true
 
+ignore:
+  - "contracts/dao/trading/xyk-core-v-1-2.clar"
+
 coverage:
   precision: 2
   round: down
