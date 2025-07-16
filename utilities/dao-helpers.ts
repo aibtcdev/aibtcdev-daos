@@ -353,7 +353,10 @@ export function completePrelaunch(deployer: string) {
 // helper to graduate the faktory dex and create the bitflow pool
 export function graduateDex(caller: string) {
   // Get contract references from registry
-  const tokenContract = registry.getContractAddressByTypeAndSubtype("TOKEN", "DAO");
+  const tokenContract = registry.getContractAddressByTypeAndSubtype(
+    "TOKEN",
+    "DAO"
+  );
   const tokenDexContract = registry.getContractAddressByTypeAndSubtype(
     "TOKEN",
     "DEX"
@@ -435,7 +438,9 @@ export function graduateDex(caller: string) {
   dbgLog(`--- Calling 'buy' to graduate DEX ---`, { forceLog: true });
   dbgLog(` > DEX Contract: ${tokenDexContract}`, { forceLog: true });
   dbgLog(` > Token Contract (ft): ${tokenContract}`, { forceLog: true });
-  dbgLog(` > Amount to Graduate (ubtc): ${amountToGraduate}`, { forceLog: true });
+  dbgLog(` > Amount to Graduate (ubtc): ${amountToGraduate}`, {
+    forceLog: true,
+  });
   dbgLog(` > Caller: ${caller}`, { forceLog: true });
   dbgLog(` > Caller sBTC Balance: ${sbtcBalance}`, { forceLog: true });
 
@@ -492,6 +497,12 @@ export function enablePublicPoolCreation(caller: string) {
     "set-public-pool-creation",
     [Cl.bool(true)],
     caller
+  );
+  dbgLog(
+    `enablePublicPoolCreation receipt: ${JSON.stringify(receipt, null, 2)}`,
+    {
+      forceLog: true,
+    }
   );
   expect(receipt.result).toBeOk(Cl.bool(true));
 }

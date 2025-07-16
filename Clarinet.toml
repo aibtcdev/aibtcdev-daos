@@ -150,6 +150,12 @@ path = "contracts/dao/trading/aibtc-acct-swap-faktory-aibtc-sbtc.clar"
 clarity_version = 3
 epoch = 3.1
 
+# helper to simulate xyk-core from bitflow
+[contracts.xyk-core-v-1-2]
+path = "contracts/dao/trading/xyk-core-v-1-2.clar"
+clarity_version = 3
+epoch = 3.1
+
 # faktory contracts
 
 [contracts.aibtc-faktory]

@@ -41,8 +41,8 @@
   (let ((daoTokenContract (contract-of daoToken)))
     (asserts! (is-eq daoTokenContract DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
     (asserts! (is-some minReceive) ERR_MIN_RECEIVE_REQUIRED)
-    ;; /g/'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2/external_bitflow_core
-    (match (contract-call? 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2
+    ;; /g/.xyk-core-v-1-2/external_bitflow_core
+    (match (contract-call? .xyk-core-v-1-2
       ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
       swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1 daoToken SBTC_TOKEN amount
       (unwrap-panic minReceive)
@@ -62,8 +62,8 @@
   (begin
     (asserts! (is-eq (contract-of daoToken) DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
     (asserts! (is-some minReceive) ERR_MIN_RECEIVE_REQUIRED)
-    ;; /g/'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2/external_bitflow_core
-    (match (contract-call? 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2
+    ;; /g/.xyk-core-v-1-2/external_bitflow_core
+    (match (contract-call? .xyk-core-v-1-2
       ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
       swap-y-for-x .xyk-pool-sbtc-aibtc-v-1-1 daoToken SBTC_TOKEN amount
       (unwrap-panic minReceive)
@@ -82,8 +82,8 @@
     self: SELF,
     deployedBurnBlock: DEPLOYED_BURN_BLOCK,
     deployedStacksBlock: DEPLOYED_STACKS_BLOCK,
-    ;; /g/'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2/external_bitflow_core
-    bitflowCore: 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2,
+    ;; /g/.xyk-core-v-1-2/external_bitflow_core
+    bitflowCore: .xyk-core-v-1-2,
     ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
     swapContract: .xyk-pool-sbtc-aibtc-v-1-1,
     daoToken: DAO_TOKEN,
