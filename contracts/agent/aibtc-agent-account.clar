@@ -96,7 +96,6 @@
         recipient: SELF,
       },
     })
-    (map-set ApprovedContracts (contract-of ft) true)
     (contract-call? ft transfer amount contract-caller SELF none)
   )
 )
