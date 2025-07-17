@@ -43,8 +43,8 @@
     (asserts! (is-some minReceive) ERR_MIN_RECEIVE_REQUIRED)
     ;; /g/.xyk-core-v-1-2/external_bitflow_core
     (match (contract-call? .xyk-core-v-1-2
-      ;; /g/.aibtc-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
-      swap-x-for-y .aibtc-pool-sbtc-aibtc-v-1-1 daoToken SBTC_TOKEN amount
+      ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
+      swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1 daoToken SBTC_TOKEN amount
       (unwrap-panic minReceive)
     )
       success (ok (var-set totalBuys (+ (var-get totalBuys) u1)))
@@ -75,8 +75,8 @@
     (asserts! (is-some minReceive) ERR_MIN_RECEIVE_REQUIRED)
     ;; /g/.xyk-core-v-1-2/external_bitflow_core
     (match (contract-call? .xyk-core-v-1-2
-      ;; /g/.aibtc-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
-      swap-y-for-x .aibtc-pool-sbtc-aibtc-v-1-1 daoToken SBTC_TOKEN amount
+      ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
+      swap-y-for-x .xyk-pool-sbtc-aibtc-v-1-1 daoToken SBTC_TOKEN amount
       (unwrap-panic minReceive)
     )
       success (ok (var-set totalSells (+ (var-get totalSells) u1)))
@@ -106,8 +106,8 @@
     deployedStacksBlock: DEPLOYED_STACKS_BLOCK,
     ;; /g/.xyk-core-v-1-2/external_bitflow_core
     bitflowCore: .xyk-core-v-1-2,
-    ;; /g/.aibtc-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
-    swapContract: .aibtc-pool-sbtc-aibtc-v-1-1,
+    ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
+    swapContract: .xyk-pool-sbtc-aibtc-v-1-1,
     daoToken: DAO_TOKEN,
   }
 )
