@@ -206,8 +206,15 @@ export function generateTemplateReplacements(
     },
   ];
 
-
-  // ... (keep traitMappings definition) ...
+  traitMappings.forEach((mapping) => {
+    const traitValue = traits[mapping.knownTraitKey];
+    if (traitValue) {
+      const fullKey = `${mapping.templateToReplacePattern}/${mapping.templateKeyName}`;
+      // The key itself should not be formatted, only the value
+      replacements[fullKey] = traitValue;
+      replacements[mapping.templateKeyName] = traitValue;
+    }
+  });
 
   // 3. Add all contract names in both formats
   for (const type of CONTRACT_TYPES) {
