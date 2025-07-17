@@ -378,6 +378,7 @@ describe("Contract Generator", () => {
     // External contracts
     sbtc_contract: "ST000000000000000000002AMW42H.sbtc-token",
     sbtc_token_contract: "'ST000000000000000000002AMW42H.sbtc-token'",
+    base_contract_sbtc: "ST000000000000000000002AMW42H.sbtc-token",
 
     // Configuration values
     dao_manifest: "The mission of this DAO is to test template processing",
