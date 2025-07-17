@@ -94,11 +94,11 @@ describe("Template Processor", () => {
   it("should throw an error if the replacement key is not in the target line", () => {
     const template = `
 ;; /g/KEY/value
-(define-constant FOO 'DIFFERENT_KEY')
+(define-constant FOO 'DIFFERENT_STRING')
 `;
     const replacements = createReplacementsMap({ value: "BAR" });
     expect(() => processContractTemplate(template, replacements)).toThrow(
-      `Replacement key 'KEY' from comment at line 2 not found in target line 3: "(define-constant FOO 'DIFFERENT_KEY')"`
+      `Replacement key 'KEY' from comment at line 2 not found in target line 3: "(define-constant FOO 'DIFFERENT_STRING')"`
     );
   });
 
@@ -349,6 +349,8 @@ describe("Contract Generator", () => {
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-config",
     agent_account_trait_account_proposals:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-proposals",
+    agent_account_trait_account_swaps:
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-swaps",
     agent_account_trait_faktory_buy_sell:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.faktory-buy-sell",
 
