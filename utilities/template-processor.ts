@@ -52,8 +52,7 @@ export function processContractTemplate(
         while (
           targetLineIndex < lines.length &&
           (lines[targetLineIndex].trim() === "" ||
-            lines[targetLineIndex].trim().match(/^;;\s*\/g\//) ||
-            lines[targetLineIndex].trim().startsWith(";;"))
+            lines[targetLineIndex].trim().match(/^;;\s*\/g\//))
         ) {
           targetLineIndex++;
         }
