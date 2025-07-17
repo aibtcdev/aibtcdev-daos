@@ -63,7 +63,7 @@ describe("Template Processor", () => {
     expect(processed).toBe(template);
   });
 
-  it("should handle templates with unknown replacement keys", () => {
+  it("should throw an error for unknown replacement keys", () => {
     const template = `
 ;; This is a test template
 ;; /g/UNKNOWN_KEY/unknown_value
@@ -74,13 +74,32 @@ describe("Template Processor", () => {
       "DIFFERENT_KEY/different_value": "replacement",
     });
 
-    const processed = processContractTemplate(template, replacements);
+    expect(() => processContractTemplate(template, replacements)).toThrow(
+      "Template variable 'unknown_value' not found in replacements map for comment at line 3"
+    );
+  });
 
-    // The unknown key comment should remain
-    expect(processed).toContain(";; /g/UNKNOWN_KEY/unknown_value");
+  it("should throw an error if a blank line separates a directive from its target", () => {
+    const template = `
+;; /g/KEY/value
 
-    // The value should not be replaced
-    expect(processed).toContain("(define-constant SOME_CONSTANT 'UNKNOWN_KEY)");
+(define-constant FOO 'KEY')
+`;
+    const replacements = createReplacementsMap({ value: "BAR" });
+    expect(() => processContractTemplate(template, replacements)).toThrow(
+      "Could not find a valid target line for replacement key 'KEY' from comment at line 2."
+    );
+  });
+
+  it("should throw an error if the replacement key is not in the target line", () => {
+    const template = `
+;; /g/KEY/value
+(define-constant FOO 'DIFFERENT_KEY')
+`;
+    const replacements = createReplacementsMap({ value: "BAR" });
+    expect(() => processContractTemplate(template, replacements)).toThrow(
+      `Replacement key 'KEY' from comment at line 2 not found in target line 3: "(define-constant FOO 'DIFFERENT_KEY')"`
+    );
   });
 
   it("should process agent account contract template", () => {
