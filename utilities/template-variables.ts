@@ -173,17 +173,41 @@ export function generateTemplateReplacements(
       knownTraitKey: "BITFLOW_SIP010",
       templateToReplacePattern: traits["BITFLOW_SIP010"],
     },
+    // Agent traits
+    {
+      templateKeyName: "agent_account_trait_account",
+      knownTraitKey: "AGENT_ACCOUNT",
+      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-account`,
+    },
+    {
+      templateKeyName: "agent_account_trait_account_config",
+      knownTraitKey: "AGENT_ACCOUNT_CONFIG",
+      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-account-config`,
+    },
+    {
+      templateKeyName: "agent_account_trait_account_proposals",
+      knownTraitKey: "AGENT_ACCOUNT_PROPOSALS",
+      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-account-proposals`,
+    },
+    {
+      templateKeyName: "agent_account_trait_account_swaps",
+      knownTraitKey: "AGENT_ACCOUNT_SWAPS",
+      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-account-swaps`,
+    },
+    {
+      templateKeyName: "agent_account_trait_dao_swap_adapter",
+      knownTraitKey: "AGENT_DAO_SWAP_ADAPTER",
+      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-dao-swap-adapter`,
+    },
+    {
+      templateKeyName: "agent_account_trait_faktory_buy_sell",
+      knownTraitKey: "AGENT_FAKTORY_BUY_SELL",
+      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.faktory-buy-sell`,
+    },
   ];
 
-  traitMappings.forEach((mapping) => {
-    const traitValue = traits[mapping.knownTraitKey];
-    if (traitValue) {
-      const fullKey = `${mapping.templateToReplacePattern}/${mapping.templateKeyName}`;
-      // The key itself should not be formatted, only the value
-      replacements[fullKey] = traitValue;
-      replacements[mapping.templateKeyName] = traitValue;
-    }
-  });
+
+  // ... (keep traitMappings definition) ...
 
   // 3. Add all contract names in both formats
   for (const type of CONTRACT_TYPES) {
@@ -338,52 +362,7 @@ export function generateTemplateReplacements(
   replacements["dao_manifest"] = `The mission of the ${symbol} is to...`;
 
   // 7. Add agent account specific replacements
-  const agentTraitMappings: {
-    templateKeyName: string;
-    knownTraitKey: keyof KnownTraits;
-    templateToReplacePattern: string;
-  }[] = [
-    {
-      templateKeyName: "agent_account_trait_account",
-      knownTraitKey: "AGENT_ACCOUNT",
-      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-account`,
-    },
-    {
-      templateKeyName: "agent_account_trait_account_config",
-      knownTraitKey: "AGENT_ACCOUNT_CONFIG",
-      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-account-config`,
-    },
-    {
-      templateKeyName: "agent_account_trait_account_proposals",
-      knownTraitKey: "AGENT_ACCOUNT_PROPOSALS",
-      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-account-proposals`,
-    },
-    {
-      templateKeyName: "agent_account_trait_account_swaps",
-      knownTraitKey: "AGENT_ACCOUNT_SWAPS",
-      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-account-swaps`,
-    },
-    {
-      templateKeyName: "agent_account_trait_dao_swap_adapter",
-      knownTraitKey: "AGENT_DAO_SWAP_ADAPTER",
-      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-dao-swap-adapter`,
-    },
-    {
-      templateKeyName: "agent_account_trait_faktory_buy_sell",
-      knownTraitKey: "AGENT_FAKTORY_BUY_SELL",
-      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.faktory-buy-sell`,
-    },
-  ];
-
-  agentTraitMappings.forEach((mapping) => {
-    const traitValue = traits[mapping.knownTraitKey];
-    if (traitValue) {
-      const fullKey = `${mapping.templateToReplacePattern}/${mapping.templateKeyName}`;
-      // The key itself should not be formatted, only the value
-      replacements[fullKey] = traitValue;
-      replacements[mapping.templateKeyName] = traitValue;
-    }
-  });
+  // (These are now merged into the main traitMappings array)
 
   replacements[`${addresses.DEPLOYER.split(".")[0]}/account_owner`] = // Key not formatted
     addresses.DEPLOYER; // Adjusted for dynamic deployer prefix
