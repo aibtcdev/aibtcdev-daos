@@ -109,47 +109,47 @@ const testnetTraits: KnownTraits = {
     "STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.sip-010-trait-ft-standard.sip-010-trait",
   // DAO traits
   DAO_BASE:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-base-dao-trait.aibtc-base-dao",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-base-dao-trait.aibtc-base-dao",
   DAO_PROPOSAL:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.proposal",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.proposal",
   DAO_EXTENSION:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.extension",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.extension",
   DAO_ACTION:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.action",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.action",
   DAO_ACTION_PROPOSAL_VOTING:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.action-proposal-voting",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.action-proposal-voting",
   DAO_CHARTER:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.dao-charter",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.dao-charter",
   DAO_EPOCH:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.dao-epoch",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.dao-epoch",
   DAO_MESSAGING:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.messaging",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.messaging",
   DAO_REWARDS_ACCOUNT:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.rewards-account",
-  DAO_TOKEN: "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.token",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.rewards-account",
+  DAO_TOKEN: "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.token",
   DAO_TOKEN_DEX:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.faktory-dex",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.faktory-dex",
   DAO_TOKEN_OWNER:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.token-owner",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.token-owner",
   DAO_TOKEN_POOL:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.bitflow-pool",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.bitflow-pool",
   DAO_TREASURY:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.treasury",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.treasury",
   DAO_USERS:
-    "ST3C2P23SJT12N045QAKK7NC1QQZ8B2CQYEHY8X0S.aibtc-dao-traits.dao-users",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.dao-users",
   // Agent traits
   AGENT_ACCOUNT:
-    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-account",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.aibtc-account",
   AGENT_ACCOUNT_PROPOSALS:
-    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-account-proposals",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.aibtc-account-proposals",
   AGENT_ACCOUNT_CONFIG:
-    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-account-config",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.aibtc-account-config",
   AGENT_ACCOUNT_SWAPS:
-    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-account-swaps",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.aibtc-account-swaps",
   AGENT_DAO_SWAP_ADAPTER:
-    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
   AGENT_FAKTORY_BUY_SELL:
-    "ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP.aibtc-agent-account-traits.faktory-buy-sell",
+    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.faktory-buy-sell",
 };
 
 const devnetTraits: KnownTraits = {

@@ -1,5 +1,5 @@
 ;; title: aibtc-dao-traits
-;; version: 3.1.0
+;; version: 3.2.0
 ;; summary: A collection of traits for aibtc cohort 0.
 
 ;; IMPORTS
@@ -37,7 +37,7 @@
 
 ;; the decentralized exchange and initial bonding curve for a token
 ;; can be used to buy and sell tokens until the target is reached
-;; liquidity is provided by the initial minting of tokens (20%)
+;; liquidity is provided by the initial minting of tokens
 ;; reaching the target will trigger migration to the Bitflow pool
 (define-trait faktory-dex (
   (buy
@@ -72,8 +72,7 @@
   )
 ))
 
-;; a voting contract for whitelisted pre-defined actions
-;; has lower voting threshold and quorum than core proposals
+;; a voting contract to vote on whitelisted pre-defined actions
 (define-trait action-proposal-voting (
   (create-action-proposal
     (<action> (buff 2048) (optional (string-ascii 1024)))
@@ -131,9 +130,7 @@
   )
 ))
 
-;; a messaging contract that allows anyone to send public messages on-chain
-;; messages can be up to 1MB in size and are printed as events that can be monitored
-;; messages can verifiably indicate the sender is the dao by using a proposal
+;; a messaging contract used by the dao to send verified messages
 (define-trait messaging (
   (send
     ((string-utf8 10000))
@@ -163,8 +160,8 @@
   )
 ))
 
-;; an extension that manages STX, SIP-009 NFTs, and SIP-010 tokens
-;; also supports stacking STX with Stacks Proof of Transfer
+;; an extension that manages the DAO treasury
+;; restricted to operate with the rewards-account and proposal flows
 (define-trait treasury (
   (allow-asset
     (principal bool)
