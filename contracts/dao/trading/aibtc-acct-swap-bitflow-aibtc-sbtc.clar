@@ -44,23 +44,12 @@
     ;; /g/.xyk-core-v-1-2/external_bitflow_core
     (match (contract-call? .xyk-core-v-1-2
       ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
-      swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1 daoToken SBTC_TOKEN amount
+      swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1 SBTC_TOKEN daoToken amount
       (unwrap-panic minReceive)
     )
       success (ok (var-set totalBuys (+ (var-get totalBuys) u1)))
       error
-      ;; ERR_SWAP_FAILED
-      (begin 
-      (print {
-        notification: "Swap failed",
-        payload: {
-          daoToken: daoTokenContract,
-          amount: amount,
-          minReceive: (unwrap-panic minReceive),
-          error: error,
-        },
-      })
-      (ok true))
+      ERR_SWAP_FAILED
     )
   )
 )
@@ -70,29 +59,18 @@
     (amount uint)
     (minReceive (optional uint))
   )
-  (begin
-    (asserts! (is-eq (contract-of daoToken) DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
+  (let ((daoTokenContract (contract-of daoToken)))
+    (asserts! (is-eq daoTokenContract DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
     (asserts! (is-some minReceive) ERR_MIN_RECEIVE_REQUIRED)
     ;; /g/.xyk-core-v-1-2/external_bitflow_core
     (match (contract-call? .xyk-core-v-1-2
       ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
-      swap-y-for-x .xyk-pool-sbtc-aibtc-v-1-1 daoToken SBTC_TOKEN amount
+      swap-y-for-x .xyk-pool-sbtc-aibtc-v-1-1 SBTC_TOKEN daoToken amount
       (unwrap-panic minReceive)
     )
       success (ok (var-set totalSells (+ (var-get totalSells) u1)))
       error
-      ;; ERR_SWAP_FAILED
-      (begin 
-      (print {
-        notification: "Swap failed",
-        payload: {
-          daoToken: daoToken,
-          amount: amount,
-          minReceive: (unwrap-panic minReceive),
-          error: error,
-        },
-      })
-      (ok true))
+      ERR_SWAP_FAILED
     )
   )
 )
