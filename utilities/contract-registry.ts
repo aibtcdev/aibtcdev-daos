@@ -20,6 +20,15 @@ import {
 } from "./template-processor";
 import { defineAllDaoContractDependencies } from "./contract-dependencies";
 
+const DAO_CONTRACT_TYPES: ContractType[] = [
+  "BASE",
+  "ACTIONS",
+  "EXTENSIONS",
+  "PROPOSALS",
+  "TOKEN",
+  "TRADING",
+];
+
 export function setupDaoContractRegistry(): ContractRegistry {
   const registry = new ContractRegistry();
   registry.registerDaoContracts();
@@ -167,23 +176,10 @@ export class ContractRegistry {
   getAllDaoContractNames(): string[] {
     const daoContractNames: string[] = [];
 
-    const daoTypes = [
-      "BASE",
-      "ACTIONS",
-      "EXTENSIONS",
-      "PROPOSALS",
-      "TOKEN",
-      "TRADING",
-    ];
-
-    CONTRACT_TYPES.forEach((type) => {
+    DAO_CONTRACT_TYPES.forEach((type) => {
       const subtypes = CONTRACT_SUBTYPES[type];
 
       subtypes.forEach((subtype) => {
-        if (!daoTypes.includes(type)) {
-          return;
-        }
-
         const contractName = this.getContractNameByTypeAndSubtype(
           type,
           subtype as ContractSubtype<typeof type>
@@ -246,15 +242,7 @@ export class ContractRegistry {
    * Creates and registers only DAO-related contracts
    */
   registerDaoContracts(): this {
-    const daoTypes: ContractType[] = [
-      "BASE",
-      "ACTIONS",
-      "EXTENSIONS",
-      "PROPOSALS",
-      "TOKEN",
-    ];
-
-    daoTypes.forEach((type) => {
+    DAO_CONTRACT_TYPES.forEach((type) => {
       const subtypes = CONTRACT_SUBTYPES[type];
 
       subtypes.forEach((subtype) => {
