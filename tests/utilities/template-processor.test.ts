@@ -116,8 +116,6 @@ describe("Template Processor", () => {
 (impl-trait .aibtc-agent-account-traits.aibtc-account-proposals)
 ;; /g/.aibtc-agent-account-traits.aibtc-account-config/agent_account_trait_account_config
 (impl-trait .aibtc-agent-account-traits.aibtc-account-config)
-;; /g/.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell
-(impl-trait .aibtc-agent-account-traits.faktory-buy-sell)
 ;; /g/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
@@ -151,7 +149,6 @@ describe("Template Processor", () => {
       agent_account_trait_account: ".test-traits.agent-account",
       agent_account_trait_account_proposals: ".test-traits.agent-proposals",
       agent_account_trait_account_config: ".test-traits.agent-account-config",
-      agent_account_trait_faktory_buy_sell: ".test-traits.faktory-buy-sell",
       base_trait_sip010: ".test-traits.sip010",
       dao_trait_proposal: ".test-traits.proposal",
       dao_trait_faktory_dex: ".test-traits.faktory-dex",
@@ -353,8 +350,6 @@ describe("Contract Generator", () => {
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-swaps",
     agent_account_trait_dao_swap_adapter:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
-    agent_account_trait_faktory_buy_sell:
-      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.faktory-buy-sell",
 
     // SIP Trait references
     base_trait_sip010: ".test-traits.sip010",

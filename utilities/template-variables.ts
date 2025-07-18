@@ -199,11 +199,6 @@ export function generateTemplateReplacements(
       knownTraitKey: "AGENT_DAO_SWAP_ADAPTER",
       templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-dao-swap-adapter`,
     },
-    {
-      templateKeyName: "agent_account_trait_faktory_buy_sell",
-      knownTraitKey: "AGENT_FAKTORY_BUY_SELL",
-      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.faktory-buy-sell`,
-    },
   ];
 
   traitMappings.forEach((mapping) => {
