@@ -447,12 +447,21 @@ export function createApiRouter(registry: ContractRegistry) {
           }
         }
 
+        if (generatedErrors.length > 0) {
+          const errorDetails = generatedErrors
+            .map((e) => `${e.name}: ${e.error}`)
+            .join("\n");
+          throw new ApiError(ErrorCode.TEMPLATE_PROCESSING_ERROR, {
+            reason: `Failed to generate one or more DAO contracts:\n${errorDetails}`,
+          });
+        }
+
         // Make sure we return at least an empty array for contracts
         return {
           network,
           tokenSymbol: tokenSymbolLower,
           contracts: generatedContracts.length > 0 ? generatedContracts : [],
-          errors: generatedErrors.length > 0 ? generatedErrors : undefined,
+          errors: undefined,
         } as GeneratedDaoContractsResponse;
       },
       { path: "/generate-dao-contracts", method: "POST" }

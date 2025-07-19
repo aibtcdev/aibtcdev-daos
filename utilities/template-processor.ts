@@ -43,53 +43,57 @@ export function processContractTemplate(
       // Look up the replacement value directly using the valueKey
       const replacementValue = replacements.get(valueKey);
 
-      if (replacementValue !== undefined) {
-        // Find the target line - the first line after this comment that contains the key
-        let targetLineIndex = i + 1;
-        let foundTarget = false;
-
-        // First, skip any comment lines that might be stacked
-        while (
-          targetLineIndex < lines.length &&
-          (lines[targetLineIndex].trim() === "" ||
-            lines[targetLineIndex].trim().match(/^;;\s*\/g\//) ||
-            lines[targetLineIndex].trim().startsWith(";;"))
-        ) {
-          targetLineIndex++;
-        }
-
-        // Now look for the first line containing the key
-        const searchLimit = Math.min(targetLineIndex + 10, lines.length);
-        for (let j = targetLineIndex; j < searchLimit; j++) {
-          if (lines[j].includes(replacementKey)) {
-            targetLineIndex = j;
-            foundTarget = true;
-            break;
-          }
-        }
-
-        // If we found a valid target line
-        if (foundTarget && targetLineIndex < lines.length) {
-          templateVariables.push({
-            lineIndex: targetLineIndex,
-            commentLineIndex: i,
-            key: replacementKey,
-            value: replacementValue!,
-            replacementKey: valueKey,
-          });
-
-          // Mark this comment line to be skipped
-          skipLines.add(i);
-        } else {
-          // Log a warning if we couldn't find the target line
-          dbgLog(
-            `Could not find target line containing key '${replacementKey}' for comment at line ${
-              i + 1
-            }`,
-            { logType: "error", forceLog: true }
-          );
-        }
+      if (replacementValue === undefined) {
+        throw new Error(
+          `Template variable '${valueKey}' not found in replacements map for comment at line ${
+            i + 1
+          }`
+        );
       }
+
+      // Find the target line by skipping any subsequent stacked directives.
+      let targetLineIndex = i + 1;
+      while (
+        targetLineIndex < lines.length &&
+        lines[targetLineIndex].trim().match(/^;;\s*\/g\//)
+      ) {
+        targetLineIndex++;
+      }
+
+      // Check if the target line exists or if a blank line was found
+      if (
+        targetLineIndex >= lines.length ||
+        lines[targetLineIndex].trim() === ""
+      ) {
+        throw new Error(
+          `Could not find a valid target line for replacement key '${replacementKey}' from comment at line ${
+            i + 1
+          }.`
+        );
+      }
+
+      const targetLine = lines[targetLineIndex];
+
+      // If the key is not found in the target line, it's a template error
+      if (!targetLine.includes(replacementKey)) {
+        throw new Error(
+          `Replacement key '${replacementKey}' from comment at line ${
+            i + 1
+          } not found in target line ${targetLineIndex + 1}: "${targetLine}"`
+        );
+      }
+
+      // If we found a valid target line
+      templateVariables.push({
+        lineIndex: targetLineIndex,
+        commentLineIndex: i,
+        key: replacementKey,
+        value: replacementValue!,
+        replacementKey: valueKey,
+      });
+
+      // Mark this comment line to be skipped
+      skipLines.add(i);
     }
   }
 

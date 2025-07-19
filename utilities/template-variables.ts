@@ -173,6 +173,32 @@ export function generateTemplateReplacements(
       knownTraitKey: "BITFLOW_SIP010",
       templateToReplacePattern: traits["BITFLOW_SIP010"],
     },
+    // Agent traits
+    {
+      templateKeyName: "agent_account_trait_account",
+      knownTraitKey: "AGENT_ACCOUNT",
+      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-account`,
+    },
+    {
+      templateKeyName: "agent_account_trait_account_config",
+      knownTraitKey: "AGENT_ACCOUNT_CONFIG",
+      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-account-config`,
+    },
+    {
+      templateKeyName: "agent_account_trait_account_proposals",
+      knownTraitKey: "AGENT_ACCOUNT_PROPOSALS",
+      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-account-proposals`,
+    },
+    {
+      templateKeyName: "agent_account_trait_account_swaps",
+      knownTraitKey: "AGENT_ACCOUNT_SWAPS",
+      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-account-swaps`,
+    },
+    {
+      templateKeyName: "agent_account_trait_dao_swap_adapter",
+      knownTraitKey: "AGENT_DAO_SWAP_ADAPTER",
+      templateToReplacePattern: `.${templateKeySymbol}-agent-account-traits.${templateKeySymbol}-dao-swap-adapter`,
+    },
   ];
 
   traitMappings.forEach((mapping) => {
@@ -338,36 +364,7 @@ export function generateTemplateReplacements(
   replacements["dao_manifest"] = `The mission of the ${symbol} is to...`;
 
   // 7. Add agent account specific replacements
-  const agentTraitKeys: (keyof KnownTraits)[] = [
-    "AGENT_ACCOUNT",
-    "AGENT_ACCOUNT_CONFIG",
-    "AGENT_ACCOUNT_PROPOSALS",
-    "AGENT_ACCOUNT_SWAPS",
-    "AGENT_DAO_SWAP_ADAPTER",
-    "AGENT_FAKTORY_BUY_SELL",
-  ];
-
-  agentTraitKeys.forEach((key) => {
-    const traitValue = traits[key];
-    if (traitValue) {
-      const lowerKey = (key as string).toLowerCase();
-      // General case for other agent traits like AGENT_ACCOUNT, AGENT_FAKTORY_DEX_APPROVAL, etc.
-      const formattedKey = lowerKey.replace(/^agent_/, ""); // e.g. "account", "faktory_dex_approval"
-      const templateKeyName = `agent_account_trait_${formattedKey}`;
-
-      replacements[templateKeyName] = traitValue;
-
-      // Construct the toReplace pattern based on templateKeySymbol and the specific parts of the agent trait name
-      // e.g., for AGENT_ACCOUNT_PROPOSALS -> .aibtc-agent-account-traits.aibtc-account-proposals
-      const traitNameParts = traitValue.split(".");
-      if (traitNameParts.length > 1) {
-        const lastPart = traitNameParts[traitNameParts.length - 1]; // e.g., aibtc-proposals
-        const secondToLastPart = traitNameParts[traitNameParts.length - 2]; // e.g., aibtc-agent-account-traits
-        const toReplacePattern = `.${secondToLastPart}.${lastPart}`;
-        replacements[`${toReplacePattern}/${templateKeyName}`] = traitValue; // Key not formatted
-      }
-    }
-  });
+  // (These are now merged into the main traitMappings array)
 
   replacements[`${addresses.DEPLOYER.split(".")[0]}/account_owner`] = // Key not formatted
     addresses.DEPLOYER; // Adjusted for dynamic deployer prefix
