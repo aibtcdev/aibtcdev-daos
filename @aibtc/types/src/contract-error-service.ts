@@ -48,6 +48,7 @@ const errorDefinitions: {
           "The specified contract is not approved for interaction.",
         ERR_OPERATION_NOT_ALLOWED:
           "The requested operation is not allowed for the caller.",
+        ERR_INVALID_APPROVAL_TYPE: "The specified approval type is invalid.",
       },
     },
   },

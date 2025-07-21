@@ -152,3 +152,16 @@ export {
   verifyProposalInputParams,
   isProposalStatus,
 };
+
+/**
+ * Agent Account Types
+ * These types are used for interacting with the AIBTC Agent Account contract.
+ */
+import type { AgentAccountApprovalType } from "./agent-account-types";
+import {
+  AGENT_ACCOUNT_APPROVAL_TYPES,
+  getAgentAccountApprovalType,
+} from "./agent-account-types";
+
+export type { AgentAccountApprovalType };
+export { AGENT_ACCOUNT_APPROVAL_TYPES, getAgentAccountApprovalType };
