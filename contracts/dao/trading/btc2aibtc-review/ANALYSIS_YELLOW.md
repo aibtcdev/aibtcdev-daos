@@ -59,3 +59,51 @@ This document contains the detailed analysis of functions categorized as YELLOW,
 
 - **Finding:** The function is implemented securely with all necessary checks for a multi-signature voting system. No vulnerabilities were identified.
 - **Recommendation:** No changes recommended.
+
+---
+
+## Function: `signal-add-liquidity`
+
+- **Category:** 🟡 YELLOW
+- **Purpose:** Allows the operator to signal their intent to add liquidity to the pool. This is the first step in a two-step, time-locked process.
+- **Parameters:** None.
+- **Return Values:** `(ok true)`.
+- **State Changes:**
+    - Modifies the `pool` data variable, setting `add-liq-signaled-at` to the current `burn-block-height`.
+- **External Contract Calls:** None.
+
+### Watchpoint Review
+
+- **Access Control:** Correctly restricted to the `current-operator`.
+- **State Integrity:** The function simply sets a timestamp in the `pool` variable. This is a safe and transparent way to initiate a privileged action. It does not overwrite an existing signal, which is acceptable as re-signaling would just refresh the timer.
+- **External Call Security:** N/A.
+- **Overall Logic:** The function is a secure and necessary part of the time-locked liquidity addition process.
+
+### Findings & Recommendations
+
+- **Finding:** The function is implemented correctly. No vulnerabilities were identified.
+- **Recommendation:** No changes recommended.
+
+---
+
+## Function: `signal-set-params`
+
+- **Category:** 🟡 YELLOW
+- **Purpose:** Allows the operator to signal their intent to change the pool's parameters. This is the first step in a two-step, time-locked process.
+- **Parameters:** None.
+- **Return Values:** `(ok true)`.
+- **State Changes:**
+    - Modifies the `pool` data variable, setting `set-param-signaled-at` to the current `burn-block-height`.
+- **External Contract Calls:** None.
+
+### Watchpoint Review
+
+- **Access Control:** Correctly restricted to the `current-operator`.
+- **State Integrity:** Similar to `signal-add-liquidity`, this function safely records the operator's intent by setting a timestamp, initiating the cooldown period before parameters can be changed.
+- **External Call Security:** N/A.
+- **Overall Logic:** The function is a secure and necessary part of the time-locked parameter update process.
+
+### Findings & Recommendations
+
+- **Finding:** The function is implemented correctly. No vulnerabilities were identified.
+- **Recommendation:** No changes recommended.
