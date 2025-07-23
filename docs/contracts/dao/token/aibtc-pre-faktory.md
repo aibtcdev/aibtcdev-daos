@@ -108,10 +108,15 @@ This contract includes numerous read-only functions to provide transparency into
 ## 7. Variables
 
 - `total-seats-taken`: The number of seats that have been purchased.
+- `total-users`: The number of unique participants who have purchased seats.
+- `ft-balance`: The contract's balance of the DAO token available for vesting claims.
+- `stx-balance`: The contract's balance of sBTC from seat purchases.
 - `distribution-height`: The block height at which the pre-launch was successful and token distribution began.
+- `market-open`: A flag indicating if the pre-launch was successful, allowing the DEX to open.
 - `accelerated-vesting`: A flag that, when true, accelerates the early stages of the vesting schedule.
 - `accumulated-fees`: The amount of sBTC collected from the DEX, waiting to be airdropped.
 - `last-airdrop-height`: The block height of the last fee airdrop.
+- `final-airdrop-mode`: A flag to bypass the cooldown for the final fee airdrop.
 
 ---
 
@@ -119,6 +124,7 @@ This contract includes numerous read-only functions to provide transparency into
 
 - `seats-owned`: Maps a user's principal to the number of seats they own.
 - `claimed-amounts`: Maps a user's principal to the total amount of tokens they have already claimed.
+- `seat-holders`: A list of up to 20 objects, each containing a seat holder's `owner` principal and their `seats` count.
 
 ---
 
@@ -128,9 +134,12 @@ This contract includes numerous read-only functions to provide transparency into
 - `(err u302)`: `ERR-NOT-SEAT-OWNER`.
 - `(err u304)`: `ERR-NOTHING-TO-CLAIM`.
 - `(err u305)`: `ERR-NOT-AUTHORIZED`.
+- `(err u307)`: `ERR-WRONG-TOKEN`. The `claim` function was called with an incorrect token trait.
 - `(err u311)`: `ERR-CONTRACT-INSUFFICIENT-FUNDS`.
 - `(err u313)`: `ERR-INVALID-SEAT-COUNT`.
+- `(err u316)`: `ERR-REMOVING-HOLDER`. An internal error occurred while trying to remove a user during a refund.
 - `(err u320)`: `ERR-DISTRIBUTION-ALREADY-SET`.
 - `(err u321)`: `ERR-DISTRIBUTION-NOT-INITIALIZED`.
 - `(err u323)`: `ERR-NO-FEES-TO-DISTRIBUTE`.
 - `(err u324)`: `ERR-COOLDOWN-ACTIVE`.
+- `(err u325)`: `ERR-TOTAL-SEATS-ZERO`. The fee airdrop was triggered when no seats were owned.

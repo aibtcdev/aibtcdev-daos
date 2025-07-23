@@ -102,6 +102,7 @@ Sets the `open` flag to `true`, allowing `buy` and `sell` transactions. This can
 
 - `open`: A boolean flag indicating if the market is open for trading.
 - `bonded`: A boolean flag indicating if the DEX has graduated and funded the AMM pool.
+- `fak-ustx`: The amount of "fake" or virtual sBTC liquidity used to initialize the bonding curve price.
 - `ft-balance`: The contract's current balance of the DAO token.
 - `stx-balance`: The contract's current balance of sBTC.
 - `premium`: A percentage (`u25`) used to calculate a token bonus for the graduation contributors.

@@ -114,8 +114,11 @@ This contract contains numerous data variables to store its state, including:
 
 ## 8. Errors
 
+- `(err u4)`: `ERR_NOT_AUTHORIZED_SIP_010`. The `tx-sender` is not the `sender` in a `transfer` call.
+- `(err u5)`: `ERR_INVALID_PRINCIPAL_SIP_010`. An address in a `transfer` call is not a standard principal.
 - `(err u3001)`: `ERR_NOT_AUTHORIZED`. The caller is not the `CORE_ADDRESS`.
 - `(err u3002)`: `ERR_INVALID_AMOUNT`. The amount for a transfer, mint, or burn is zero.
+- `(err u3003)`: `ERR_INVALID_PRINCIPAL`. A principal provided to a core-managed function is invalid.
 - `(err u3004)`: `ERR_POOL_NOT_CREATED`.
 - `(err u3005)`: `ERR_POOL_DISABLED`.
 - `(err u3006)`: `ERR_NOT_POOL_CONTRACT_DEPLOYER`. The `create-pool` call was not initiated by the authorized deployer.
