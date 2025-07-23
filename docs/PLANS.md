@@ -26,14 +26,14 @@ This phase involves documenting the remaining contracts, categorized by their lo
     - [x] `aibtc-acct-swap-bitflow-aibtc-sbtc.md`
     - [x] `aibtc-acct-swap-faktory-aibtc-sbtc.md`
   - [x] **Base:** `aibtc-base-dao.md`
-  - [ ] **Actions:** `aibtc-action-send-message.md`
+  - [x] **Actions:** `aibtc-action-send-message.md`
   - [x] **Extensions:**
     - [x] `aibtc-dao-charter.md`
     - [x] `aibtc-dao-epoch.md`
     - [x] `aibtc-dao-users.md`
-    - [ ] `aibtc-onchain-messaging.md`
+    - [x] `aibtc-onchain-messaging.md`
     - [ ] `aibtc-rewards-account.md`
-    - [ ] `aibtc-token-owner.md`
+    - [x] `aibtc-token-owner.md`
     - [ ] `aibtc-treasury.md`
   - [ ] **Proposals:** `aibtc-base-initialize-dao.md`
   - [ ] **Token:**
