@@ -37,7 +37,7 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
         - [x] `signal-allowlist-approval`
         - [x] `signal-add-liquidity`
         - [x] `signal-set-params`
-        - [ ] `signal-withdrawal`
+        - [x] `signal-withdrawal`
       - **🟢 GREEN Functions**
         - [ ] `is-approver`
         - [ ] `are-swaps-paused`

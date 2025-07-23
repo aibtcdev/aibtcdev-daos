@@ -86,6 +86,32 @@ This document contains the detailed analysis of functions categorized as YELLOW,
 
 ---
 
+## Function: `signal-withdrawal`
+
+- **Category:** 🟡 YELLOW
+- **Purpose:** Allows the operator to signal their intent to withdraw available sBTC from the pool. This is the first step in the two-step, time-locked withdrawal process.
+- **Parameters:** None.
+- **Return Values:** `(ok true)`.
+- **State Changes:**
+    - Modifies the `pool` data variable, setting `withdrawal-signaled-at` to the current `burn-block-height`.
+- **External Contract Calls:** None.
+
+### Watchpoint Review
+
+- **Access Control:** Correctly restricted to the `current-operator`.
+- **State Integrity:**
+    - The function includes a check `(asserts! (> (get available-sbtc current-pool) u0) ERR_INSUFFICIENT_POOL_BALANCE)` to ensure there are actually funds to withdraw before allowing a signal. This is a good preventative measure.
+    - It safely records the operator's intent by setting the `withdrawal-signaled-at` timestamp, initiating the `WITHDRAWAL_COOLOFF` period.
+- **External Call Security:** N/A.
+- **Overall Logic:** The function is a secure and necessary part of the time-locked withdrawal process, providing transparency for operator actions.
+
+### Findings & Recommendations
+
+- **Finding:** The function is implemented correctly and securely. No vulnerabilities were identified.
+- **Recommendation:** No changes recommended.
+
+---
+
 ## Function: `signal-set-params`
 
 - **Category:** 🟡 YELLOW
