@@ -10,6 +10,7 @@ The documentation is organized to mirror the contract repository structure.
 - **[Table of Contents](./SUMMARY.md)**: A complete, GitBook-style table of contents for quick navigation.
 - **[Documentation Plan](./PLANS.md)**: See the plan and progress for generating this documentation.
 - **[Review Checklist](./REVIEW_CHECKLIST.md)**: The checklist used to ensure documentation quality and consistency.
+- **[Project Retrospective](./END.md)**: A summary of lessons learned from this documentation effort.
 
 ## Getting Started
 

@@ -69,5 +69,5 @@ This phase involves documenting the remaining contracts, categorized by their lo
   - [x] Create `README.md` files for each subdirectory in `docs/contracts` to explain the contract category.
   - [x] Create `SUMMARY.md` to provide a complete table of contents (GitBook style).
     - [ ] Consider creating a script to auto-generate `SUMMARY.md` from the directory structure.
-- [ ] **Retrospective:**
-  - [ ] Review the process and document lessons learned in `END.md`.
+- [x] **Retrospective:**
+  - [x] Review the process and document lessons learned in `END.md`.
