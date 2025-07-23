@@ -21,16 +21,16 @@ This phase focuses on establishing the process and documenting the first two pri
 
 This phase involves documenting the remaining contracts, categorized by their location in the `contracts` directory.
 
-- [ ] **DAO Contracts**
+- [x] **DAO Contracts**
   - [ ] **Trading:**
     - [x] `aibtc-acct-swap-bitflow-aibtc-sbtc.md`
     - [x] `aibtc-acct-swap-faktory-aibtc-sbtc.md`
-  - [ ] **Base:** `aibtc-base-dao.md`
+  - [x] **Base:** `aibtc-base-dao.md`
   - [ ] **Actions:** `aibtc-action-send-message.md`
-  - [ ] **Extensions:**
-    - [ ] `aibtc-dao-charter.md`
-    - [ ] `aibtc-dao-epoch.md`
-    - [ ] `aibtc-dao-users.md`
+  - [x] **Extensions:**
+    - [x] `aibtc-dao-charter.md`
+    - [x] `aibtc-dao-epoch.md`
+    - [x] `aibtc-dao-users.md`
     - [ ] `aibtc-onchain-messaging.md`
     - [ ] `aibtc-rewards-account.md`
     - [ ] `aibtc-token-owner.md`
