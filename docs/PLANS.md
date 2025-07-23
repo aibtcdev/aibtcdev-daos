@@ -10,6 +10,8 @@ This phase focuses on establishing the process and documenting the first two pri
   - [x] Create a generic `TEMPLATE_CONTRACT.md` file for documenting Clarity contracts.
 - [x] **Setup: Create Test Script**
   - [x] Create a script in `../tests` to identify Clarity contracts in `../contracts` that are missing corresponding documentation files in `docs/contracts`.
+- [x] **Setup: Create Trait Documentation Template**
+  - [x] Create a generic `TEMPLATE_TRAIT.md` file for documenting Clarity traits.
 - [x] **Priority Contract 1: Agent Account**
   - [x] Create `docs/contracts/agent/aibtc-agent-account.md`
   - [x] Document the purpose, public functions, and key interactions of the contract.
@@ -42,7 +44,7 @@ This phase involves documenting the remaining contracts, categorized by their lo
     - [x] `aibtc-pre-faktory.md`
     - [x] `xyk-pool-sbtc-aibtc-v-1-1.md`
 - [ ] **Core Contracts**
-  - [ ] `aibtc-dao-run-cost.md`
+  - [x] `aibtc-dao-run-cost.md`
 - [ ] **Trait Contracts**
   - [ ] `traits/aibtc-agent-account-traits.md`
   - [ ] `traits/aibtc-base-dao-trait.md`

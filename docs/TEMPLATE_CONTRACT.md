@@ -8,21 +8,7 @@
 
 ---
 
-## 2. Traits
-
-[List and describe the traits this contract implements or uses.]
-
-### Implemented Traits
-- `trait-name-1`: [Brief description of the trait and its purpose in this contract.]
-- `trait-name-2`: ...
-
-### Used Traits
-- `trait-name-3`: [Brief description of the trait and its purpose in this contract.]
-- `trait-name-4`: ...
-
----
-
-## 3. Called Contracts
+## 2. Called Contracts
 
 [List and describe other contracts that this contract interacts with via `contract-call?`.]
 
@@ -31,7 +17,7 @@
 
 ---
 
-## 4. Public Functions
+## 3. Public Functions
 
 [List and describe each public function. Use the format below.]
 
@@ -57,7 +43,7 @@
 
 ---
 
-## 5. Read-Only Functions
+## 4. Read-Only Functions
 
 [List and describe each read-only function.]
 
@@ -72,7 +58,7 @@
 
 ---
 
-## 6. Private Functions
+## 5. Private Functions
 
 [List and describe each private function.]
 
@@ -87,7 +73,7 @@
 
 ---
 
-## 7. Constants
+## 6. Constants
 
 [List and describe any important constants.]
 
@@ -95,7 +81,7 @@
 
 ---
 
-## 8. Variables
+## 7. Variables
 
 [List and describe any important state variables.]
 
@@ -103,7 +89,7 @@
 
 ---
 
-## 9. Data Maps
+## 8. Data Maps
 
 [List and describe any data maps.]
 
@@ -111,16 +97,16 @@
 
 ---
 
-## 10. Errors
+## 9. Errors
 
 [List and describe custom error codes.]
 
 - `(err u100)`: Description of error 100.
-- `(err u101)`: Description of error 101.
+- `(err u101)`: Description of a new error.
 
 ---
 
-## 11. Print Events
+## 10. Print Events
 
 [List and describe any SIP-019 style print events emitted by the contract.]
 
