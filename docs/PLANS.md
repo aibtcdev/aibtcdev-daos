@@ -49,9 +49,9 @@ This phase involves documenting the remaining contracts, categorized by their lo
   - [x] `traits/aibtc-agent-account-traits.md`
   - [x] `traits/aibtc-base-dao-trait.md`
   - [x] `traits/aibtc-dao-traits.md`
-- [ ] **External Dependencies (Stub Docs)**
-  - [ ] `sbtc-token.md`
-  - [ ] `xyk-core-v-1-2.md`
+- [x] **External Dependencies (Stub Docs)**
+  - [x] `sbtc-token.md`
+  - [x] `xyk-core-v-1-2.md`
 
 ## Phase 3: Finalization and Review
 
