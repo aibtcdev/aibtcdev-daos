@@ -45,10 +45,10 @@ This phase involves documenting the remaining contracts, categorized by their lo
     - [x] `xyk-pool-sbtc-aibtc-v-1-1.md`
 - [ ] **Core Contracts**
   - [x] `aibtc-dao-run-cost.md`
-- [ ] **Trait Contracts**
-  - [ ] `traits/aibtc-agent-account-traits.md`
-  - [ ] `traits/aibtc-base-dao-trait.md`
-  - [ ] `traits/aibtc-dao-traits.md`
+- [x] **Trait Contracts**
+  - [x] `traits/aibtc-agent-account-traits.md`
+  - [x] `traits/aibtc-base-dao-trait.md`
+  - [x] `traits/aibtc-dao-traits.md`
 - [ ] **External Dependencies (Stub Docs)**
   - [ ] `sbtc-token.md`
   - [ ] `xyk-core-v-1-2.md`
