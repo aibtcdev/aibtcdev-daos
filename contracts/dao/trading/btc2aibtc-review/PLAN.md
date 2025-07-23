@@ -76,7 +76,7 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
         - [x] Refund mechanism (`request-refund`, `process-refund`).
     - [x] **Contract Relationship Diagram:** Create a visual diagram of external contract dependencies.
     - [x] **External Dependencies:** Scrutinize all external calls, especially to the `clarity-bitcoin-lib-v7`, the `sbtc-token`, and the various DEX/pool traits. We need to understand the trust assumptions for each.
-    - [ ] **State Management:** Analyze the lifecycle of key data structures like the `pool` variable and the `processed-btc-txs` map to check for integrity and potential race conditions.
+    - [x] **State Management:** Analyze the lifecycle of key data structures like the `pool` variable and the `processed-btc-txs` map to check for integrity and potential race conditions.
     - [ ] **Emergency Procedures:** Evaluate the `emergency-stop-swaps` function for effectiveness and potential bypasses.
 
 **Phase 4: Final Report and Recommendations**

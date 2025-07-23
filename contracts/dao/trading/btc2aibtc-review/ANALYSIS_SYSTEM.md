@@ -71,3 +71,32 @@ The contract's security is heavily reliant on the correctness and security of se
 ### Conclusion
 
 The contract manages its external dependencies well. Critical, high-trust dependencies like the Bitcoin library are unavoidable. Dependencies with higher operational risk, like DEXs, are managed through a combination of governance (allowlisting) and technical safeguards (fallbacks, slippage protection). The tightest coupling is with the `ai-account` system, making its security integral to the security of the swap user journey.
+
+---
+
+## State Management
+
+The contract's state is managed through a set of data variables and maps. The design appears robust and follows security best practices.
+
+-   **Replay Protection:**
+    -   The `processed-btc-txs` and `processed-refunds` maps are the core of the replay protection mechanism. They work by storing the hash of every processed Bitcoin transaction.
+    -   **Lifecycle:** A transaction ID is written once and never modified or deleted. Every processing function first checks `(is-none (map-get? ...))` before proceeding. This is a secure, write-once pattern that effectively prevents double-spending and replay attacks.
+    -   **Integrity:** There are no functions that can alter or remove entries from these maps, ensuring their integrity as a permanent record of processed transactions.
+
+-   **One-Way State Transitions:**
+    -   The contract makes excellent use of one-way flags to manage critical state transitions, preventing state from moving backward or being reset.
+    -   `is-initialized`: Set to `true` once in `initialize-pool` and never changed.
+    -   `swaps-paused`: Set to `true` by `emergency-stop-swaps` and can never be unset.
+    -   `allowlist-proposals.executed`: A proposal's `executed` flag is flipped to `true` upon successful voting and is never reverted.
+    -   `refund-requests.done`: A refund request's `done` flag is flipped to `true` upon processing and is never reverted.
+
+-   **Time-lock State (`...-signaled-at`):**
+    -   Operator actions (`add-liquidity`, `withdraw`, `set-params`) are controlled by timestamp variables within the `pool` data-var.
+    -   **Lifecycle:** A `signal-*` function sets the timestamp. The corresponding execution function checks that the cooldown period has passed and then resets the timestamp to `none`, correctly consuming the signal. This prevents the signal from being reused.
+
+-   **Race Conditions:**
+    -   No race conditions are apparent. Clarity transactions are atomic. Within a single transaction, the contract consistently performs checks (e.g., `is-none`, `not (var-get ...)` ) *before* performing state-mutating actions. This ensures that the conditions for a state change are valid at the moment of execution.
+
+### Conclusion
+
+The state management of the contract is a key strength. It is designed defensively, using write-once data structures and irreversible state transitions to ensure integrity and prevent common attack vectors like replay attacks.
