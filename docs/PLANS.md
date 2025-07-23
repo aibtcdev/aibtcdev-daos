@@ -10,12 +10,12 @@ This phase focuses on establishing the process and documenting the first two pri
   - [x] Create a generic `TEMPLATE_CONTRACT.md` file for documenting Clarity contracts.
 - [x] **Setup: Create Test Script**
   - [x] Create a script in `../tests` to identify Clarity contracts in `../contracts` that are missing corresponding documentation files in `docs/contracts`.
-- [ ] **Priority Contract 1: Agent Account**
-  - [ ] Create `docs/contracts/agent/aibtc-agent-account.md`
-  - [ ] Document the purpose, public functions, and key interactions of the contract.
-- [ ] **Priority Contract 2: Action Proposal Voting**
-  - [ ] Create `docs/contracts/proposals/aibtc-action-proposal-voting.md`
-  - [ ] Document the purpose, public functions, and key interactions of the contract.
+- [x] **Priority Contract 1: Agent Account**
+  - [x] Create `docs/contracts/agent/aibtc-agent-account.md`
+  - [x] Document the purpose, public functions, and key interactions of the contract.
+- [x] **Priority Contract 2: Action Proposal Voting**
+  - [x] Create `docs/contracts/dao/extensions/aibtc-action-proposal-voting.md`
+  - [x] Document the purpose, public functions, and key interactions of the contract.
 
 ## Phase 2: Full Contract Documentation
 
