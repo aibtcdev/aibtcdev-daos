@@ -17,7 +17,7 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
     - [ ] Analyze functions in descending order of risk: RED -> ORANGE -> YELLOW -> GREEN.
       - **🔴 RED Functions**
         - [x] `initialize-pool`
-        - [ ] `add-liquidity-to-pool`
+        - [x] `add-liquidity-to-pool`
         - [ ] `add-only-liquidity`
         - [ ] `withdraw-from-pool`
         - [ ] `process-btc-deposit`
