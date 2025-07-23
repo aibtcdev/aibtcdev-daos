@@ -21,9 +21,10 @@ This phase focuses on establishing the process and documenting the first two pri
 
 This phase involves documenting the remaining contracts, categorized by their location in the `contracts` directory.
 
-- [ ] **Core Contracts**
-  - [ ] `aibtc-dao-run-cost.md`
 - [ ] **DAO Contracts**
+  - [ ] **Trading:**
+    - [x] `aibtc-acct-swap-bitflow-aibtc-sbtc.md`
+    - [x] `aibtc-acct-swap-faktory-aibtc-sbtc.md`
   - [ ] **Base:** `aibtc-base-dao.md`
   - [ ] **Actions:** `aibtc-action-send-message.md`
   - [ ] **Extensions:**
@@ -40,14 +41,13 @@ This phase involves documenting the remaining contracts, categorized by their lo
     - [ ] `aibtc-faktory-dex.md`
     - [ ] `aibtc-pre-faktory.md`
     - [ ] `xyk-pool-sbtc-aibtc-v-1-1.md`
-  - [ ] **Trading:**
-    - [ ] `aibtc-acct-swap-bitflow-aibtc-sbtc.md`
-    - [ ] `aibtc-acct-swap-faktory-aibtc-sbtc.md`
+- [ ] **Core Contracts**
+  - [ ] `aibtc-dao-run-cost.md`
 - [ ] **Trait Contracts**
   - [ ] `traits/aibtc-agent-account-traits.md`
   - [ ] `traits/aibtc-base-dao-trait.md`
   - [ ] `traits/aibtc-dao-traits.md`
-- [ ] **External Dependencies (Skipping)**
+- [ ] **External Dependencies (Stub Docs)**
   - [ ] `sbtc-token.md`
   - [ ] `xyk-core-v-1-2.md`
 

@@ -17,10 +17,12 @@ Before starting, we clarified the following points:
 
 With these points clarified, we have no further blocking questions and can proceed with the plan.
 
-## Phase 2 Planning
+## Phase 2 Planning (Answered)
 
 As we move into Phase 2, a few more questions have come up based on the initial documentation work:
 
 1.  **External Dependencies:** The plan now includes a section for external contracts that we will skip documenting (e.g., `sbtc-token`, `xyk-core-v-1-2`). Is this the correct approach, or should we create brief stub files for them explaining their role at a high level?
+    -   **Decision:** We will create stub documentation files for external dependencies. This ensures our test script passes and provides context for why these contracts are part of the repository (e.g., `sbtc-token` is a testnet version with a faucet, `xyk-core-v-1-2` is a local copy of Bitflow's core contract). We will add this to the plan.
 
 2.  **Missing Contracts:** The `aibtc-acct-swap-bitflow-aibtc-sbtc` and `aibtc-acct-swap-faktory-aibtc-sbtc` contracts in the plan appear to be specific implementations of a swap adapter. Is there a base `aibtc-agent-account-swap-adapter` contract that should also be added to the documentation plan?
+    -   **Decision:** There is no base contract. These contracts are implementations of the `.aibtc-agent-account-traits.aibtc-dao-swap-adapter` trait. We will proceed with documenting these two implementations first in Phase 2.
