@@ -49,3 +49,49 @@ This is the most fundamental user journey for the bridge, where a user sends BTC
 ### Conclusion
 
 The BTC-to-sBTC deposit journey is well-designed with strong security primitives like replay protection and reliance on a dedicated verification library. The main risks are external (dependency on the Bitcoin library) or operational (pool liquidity and the global cooldown mechanism).
+
+---
+
+## Journey 2: BTC to aiBTC Swap
+
+This is the primary value-add journey of the contract, allowing users to convert BTC directly into a specific aiBTC token.
+
+**Actors:**
+-   **User:** Initiates the process with a BTC transaction.
+-   **Processor:** Any off-chain entity that calls the bridge contract.
+-   **DEX:** An external, allowlisted decentralized exchange that performs the sBTC -> aiBTC swap.
+
+### Step-by-Step Flow
+
+1.  **User Action (Off-chain):** The user constructs a BTC transaction with a specific payload: `{p: principal, a: uint, d: uint}`.
+    -   `p`: Their Stacks principal.
+    -   `a`: The minimum amount of aiBTC they are willing to receive (for slippage protection).
+    -   `d`: The ID of the allowlisted DEX they want to use.
+
+2.  **Processor Action (On-chain):** An off-chain service detects the transaction and calls `swap-btc-to-aibtc` or `swap-btc-to-aibtc-legacy` with the necessary proofs and contract trait arguments.
+
+3.  **Contract Execution (`swap-btc-to-aibtc`):**
+    -   **Emergency Stop Check:** The contract first asserts that swaps are not paused (`(asserts! (not (var-get swaps-paused)) ...)`).
+    -   **BTC Verification & Replay Protection:** Same as the deposit journey (verifies BTC tx, checks `processed-btc-txs`).
+    -   **Payload & Value Parsing:** Parses the BTC amount, user principal (`stx-receiver`), `min-amount-out`, and `dex-id`.
+    -   **DEX & Dependency Validation:** This is a critical security gate.
+        -   It retrieves the approved contract set (`dex-info`) using the `dex-id`.
+        -   It asserts that the `ft`, `ai-dex`, and `ai-pool` contracts passed as arguments match the ones from `dex-info`. This prevents the processor from injecting malicious contracts.
+    -   **`ai-account` Resolution:** It calls `.register-ai-account` to resolve the user's `stx-receiver` principal into a dedicated `ai-account`. All subsequent token transfers are directed to this `ai-account`. This is a key dependency noted in `QUESTIONS.md`.
+    -   **Liquidity & Fee Calculation:** Same as the deposit journey.
+    -   **Swap Execution (Branching Logic):**
+        -   **If Bonded Pool:** It calls `swap-x-for-y` on the Bitflow pool, passing the `min-amount-out`.
+        -   **If Unbonded DEX:** It first calls `get-in` to get a quote (`tokens-out`). It asserts `tokens-out >= min-amount-out` before calling `buy` on the DEX.
+    -   **Failure Handling (Swap Fallback):** If any part of the swap fails (e.g., the DEX call returns an `err`), the `match` statement catches it. The contract then attempts to transfer the original `sbtc-amount-to-user` directly to the user's `ai-account`. This is a robust safety net that prevents loss of funds.
+    -   **Success & Token Transfer:** If the swap succeeds, the contract calls the `ft` (aiBTC token) contract to transfer the resulting tokens to the user's `ai-account`.
+
+### System-Level Observations
+
+-   **Composability & Risk:** This journey highlights the power and risk of DeFi composability. The bridge acts as an orchestrator, relying on multiple external contracts (`clarity-bitcoin-lib`, `sbtc-token`, `ai-account`, and the chosen DEX/pool). A vulnerability in any of these dependencies can impact the bridge.
+-   **Security via Allowlisting:** The entire security model for swaps rests on the governance process for allowlisting DEXs. The `approver`s are trusted to perform due diligence on any DEX before it is added.
+-   **Robust Fallback:** The sBTC refund mechanism on swap failure is a critical feature that significantly de-risks the process for the user. It ensures that even if the DEX interaction fails, the user receives the value of their initial deposit (minus fees).
+-   **Tight Coupling with `ai-account`:** The journey cannot be completed without the user having an `ai-account`. This makes the `ai-account` system a hard dependency for the bridge's core functionality.
+
+### Conclusion
+
+The BTC-to-aiBTC swap journey is a complex but well-architected flow. It uses a defense-in-depth approach by validating all external inputs against an on-chain allowlist and providing a safe fallback path. The primary risks are inherited from its external dependencies, making the governance over those dependencies the most critical security function.
