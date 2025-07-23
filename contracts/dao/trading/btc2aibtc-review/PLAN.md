@@ -18,7 +18,7 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
       - **🔴 RED Functions**
         - [x] `initialize-pool`
         - [x] `add-liquidity-to-pool`
-        - [ ] `add-only-liquidity`
+        - [x] `add-only-liquidity`
         - [ ] `withdraw-from-pool`
         - [ ] `process-btc-deposit`
         - [ ] `process-btc-deposit-legacy`

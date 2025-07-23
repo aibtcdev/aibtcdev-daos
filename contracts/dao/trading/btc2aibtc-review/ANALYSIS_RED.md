@@ -65,3 +65,32 @@ This document contains the detailed analysis of functions categorized as RED, fo
 
 - **Finding:** The function is implemented securely with appropriate access controls and a time-locked execution pattern. No vulnerabilities were identified.
 - **Recommendation:** No changes recommended.
+
+---
+
+## Function: `add-only-liquidity`
+
+- **Category:** 🔴 RED
+- **Purpose:** A "reserved" function for the operator to add sBTC liquidity *without* the standard signaling and cooldown period.
+- **Parameters:**
+    - `sbtc-amount uint`: The amount of sBTC to add.
+- **Return Values:** `(ok true)` on success, `(err ...)` on failure.
+- **State Changes:**
+    - Modifies the `pool` data variable:
+        - Increments `total-sbtc` and `available-sbtc`.
+- **External Contract Calls:**
+    - `(contract-call? 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token transfer ...)`: Transfers `sbtc-amount` from the operator to this contract.
+
+### Watchpoint Review
+
+- **Access Control:** Correctly restricted to the `current-operator`.
+- **State Integrity:**
+    - **Cooldown Bypass:** This function intentionally bypasses the `signal-add-liquidity` and `COOLDOWN` mechanism. This gives the operator the ability to add liquidity instantly, which is a significant centralization of power compared to the time-locked `add-liquidity-to-pool` function.
+    - **Input Validation:** Correctly checks that `sbtc-amount` is greater than zero.
+- **External Call Security:** The `sbtc-token` transfer is handled correctly within a `match` statement.
+- **Overall Logic:** The function is simple, but its power lies in what it omits. The lack of a cooldown period means the operator can change the pool's liquidity state without any advance warning to users. The comment `reserved` suggests it is intended for special circumstances.
+
+### Findings & Recommendations
+
+- **Finding:** The function `add-only-liquidity` centralizes control over the pool's liquidity with the operator by bypassing the standard time-lock pattern. This creates a trust assumption that the operator will not use this power maliciously (e.g., front-running large user transactions by inflating the pool size).
+- **Recommendation:** The purpose and intended use cases for this function should be clearly documented. A question will be added to `QUESTIONS.md` to seek clarification from the development team.
