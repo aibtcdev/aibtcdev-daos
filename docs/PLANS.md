@@ -43,7 +43,7 @@ This phase involves documenting the remaining contracts, categorized by their lo
     - [x] `aibtc-faktory-dex.md`
     - [x] `aibtc-pre-faktory.md`
     - [x] `xyk-pool-sbtc-aibtc-v-1-1.md`
-- [ ] **Core Contracts**
+- [x] **Core Contracts**
   - [x] `aibtc-dao-run-cost.md`
 - [x] **Trait Contracts**
   - [x] `traits/aibtc-agent-account-traits.md`
