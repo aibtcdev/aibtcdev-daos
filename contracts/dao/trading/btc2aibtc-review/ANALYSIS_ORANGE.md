@@ -144,3 +144,58 @@ This document contains the detailed analysis of functions categorized as ORANGE,
 
 - **Finding:** The function is implemented with excellent security controls, particularly the mechanism for linking the refund proof back to the original request. No vulnerabilities were identified.
 - **Recommendation:** No changes recommended.
+
+---
+
+## Function: `request-refund-legacy`
+
+- **Category:** 🟠 ORANGE
+- **Purpose:** The legacy equivalent of `request-refund`. It allows a user to request a refund for a non-SegWit BTC deposit.
+- **Parameters:**
+    - `btc-refund-receiver (buff 40)`: The BTC address for the refund.
+    - Legacy BTC transaction proof parameters (e.g., `height`, `blockheader`, `tx`, `proof`).
+- **Return Values:** `(ok refund-id)` on success.
+- **State Changes:** Identical to `request-refund`.
+- **External Contract Calls:**
+    - `clarity-bitcoin-lib-v7`: For verifying the legacy BTC transaction.
+
+### Watchpoint Review
+
+- **Access Control:** Correctly validates that `tx-sender` matches the principal in the BTC payload.
+- **State Integrity:** Implements the same secure pattern of checking `processed-btc-txs` and then immediately adding the transaction ID to prevent it from being used for a deposit.
+- **External Call Security:** Relies on `clarity-bitcoin-lib-v7` for verification, consistent with the contract's design.
+- **Overall Logic:** The function is a direct parallel to its SegWit counterpart and follows the same secure logic.
+
+### Findings & Recommendations
+
+- **Finding:** The function is well-designed and secure. No vulnerabilities were identified.
+- **Recommendation:** No changes recommended.
+
+---
+
+## Function: `process-refund-legacy`
+
+- **Category:** 🟠 ORANGE
+- **Purpose:** The legacy equivalent of `process-refund`. It finalizes a refund request by verifying a legacy BTC return transaction.
+- **Parameters:**
+    - `refund-id uint`: The ID of the refund request.
+    - Legacy BTC transaction proof parameters for the return transaction.
+- **Return Values:** `(ok true)` on success.
+- **State Changes:** Identical to `process-refund`.
+- **External Contract Calls:**
+    - `clarity-bitcoin-lib-v7`: For verifying the legacy BTC refund transaction.
+
+### Watchpoint Review
+
+- **Access Control:** Public, with authorization derived from the proof.
+- **State Integrity:**
+    - **Request Linking:** Correctly parses the `refund-id` from the legacy transaction payload to link the proof to the request.
+    - **Replay Protection:** Correctly uses the `done` flag and the `processed-refunds` map to prevent replay attacks.
+    - **Input Validation:** Correctly verifies the refund amount.
+- **External Call Security:** Relies on `clarity-bitcoin-lib-v7`.
+- **Overall Logic:** The function securely closes the refund loop for legacy transactions, mirroring the robust design of the SegWit version.
+
+### Findings & Recommendations
+
+- **Finding:** The function is implemented securely. No vulnerabilities were identified.
+- **Recommendation:** No changes recommended.
