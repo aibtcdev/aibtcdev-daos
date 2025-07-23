@@ -19,25 +19,35 @@ This phase focuses on establishing the process and documenting the first two pri
 
 ## Phase 2: Full Contract Documentation
 
-This phase involves documenting the remaining contracts. The list below is an initial assessment based on the codebase and may be adjusted.
+This phase involves documenting the remaining contracts, categorized by their location in the `contracts` directory.
 
-- [ ] **Base Contracts**
-  - [ ] `aibtc-base-dao.md`
-- [ ] **Agent Contracts**
-  - [ ] `aibtc-agent-account-config.md`
-- [ ] **DAO Extension Contracts**
-  - [ ] `aibtc-dao-charter.md`
+- [ ] **Core Contracts**
   - [ ] `aibtc-dao-run-cost.md`
-  - [ ] `aibtc-dao-users.md`
-  - [ ] `aibtc-onchain-messaging.md`
-  - [ ] `aibtc-rewards-account.md`
-  - [ ] `aibtc-token-owner.md`
-  - [ ] `aibtc-treasury.md`
-- [ ] **Action Contracts**
-  - [ ] `aibtc-action-send-message.md`
-- [ ] **Swap Adapter Contracts**
-  - [ ] `aibtc-bitflow-swap-adapter.md`
-  - [ ] `aibtc-faktory-swap-adapter.md`
+- [ ] **DAO Contracts**
+  - [ ] **Base:** `aibtc-base-dao.md`
+  - [ ] **Actions:** `aibtc-action-send-message.md`
+  - [ ] **Extensions:**
+    - [ ] `aibtc-dao-charter.md`
+    - [ ] `aibtc-dao-epoch.md`
+    - [ ] `aibtc-dao-users.md`
+    - [ ] `aibtc-onchain-messaging.md`
+    - [ ] `aibtc-rewards-account.md`
+    - [ ] `aibtc-token-owner.md`
+    - [ ] `aibtc-treasury.md`
+  - [ ] **Proposals:** `aibtc-base-initialize-dao.md`
+  - [ ] **Token:**
+    - [ ] `aibtc-faktory.md`
+    - [ ] `aibtc-faktory-dex.md`
+    - [ ] `aibtc-pre-faktory.md`
+    - [ ] `xyk-pool-sbtc-aibtc-v-1-1.md`
+  - [ ] **Trading:**
+    - [ ] `aibtc-acct-swap-bitflow-aibtc-sbtc.md`
+    - [ ] `aibtc-acct-swap-faktory-aibtc-sbtc.md`
+    - [ ] `xyk-core-v-1-2.md`
+- [ ] **Trait Contracts**
+  - [ ] `aibtc-agent-account-traits.md`
+  - [ ] `aibtc-base-dao-trait.md`
+  - [ ] `aibtc-dao-traits.md`
 
 ## Phase 3: Finalization and Review
 
