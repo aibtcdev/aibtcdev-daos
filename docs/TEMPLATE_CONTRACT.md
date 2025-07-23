@@ -35,6 +35,11 @@
 
 [List and describe each public function. Use the format below.]
 
+- [`function-name`](#function-name): [Brief, one-sentence description of the function.]
+- ...
+
+---
+
 ### `function-name`
 
 `(function-name (arg1 type) (arg2 type) ...)`
@@ -56,6 +61,11 @@
 
 [List and describe each read-only function.]
 
+- [`function-name`](#function-name): [Brief, one-sentence description of the function.]
+- ...
+
+---
+
 ### `function-name`
 
 ... (same format as public functions)
@@ -65,6 +75,11 @@
 ## 6. Private Functions
 
 [List and describe each private function.]
+
+- [`function-name`](#function-name): [Brief, one-sentence description of the function.]
+- ...
+
+---
 
 ### `function-name`
 
