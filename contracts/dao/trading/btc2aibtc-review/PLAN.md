@@ -23,7 +23,7 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
         - [x] `process-btc-deposit`
         - [x] `process-btc-deposit-legacy`
         - [x] `swap-btc-to-aibtc`
-        - [ ] `swap-btc-to-aibtc-legacy`
+        - [x] `swap-btc-to-aibtc-legacy`
       - **🟠 ORANGE Functions**
         - [ ] `emergency-stop-swaps`
         - [ ] `set-new-operator`

@@ -237,3 +237,31 @@ This document contains the detailed analysis of functions categorized as RED, fo
 
 - **Finding:** The function is implemented with strong security controls, including allowlisting, contract verification, slippage protection, and a safe-refund path. The main risk is the complexity and number of external dependencies. The reliance on the `ai-account` contract is a critical design choice that needs to be understood.
 - **Recommendation:** No immediate changes are recommended. The security of the system depends on the thorough vetting of DEXs added to the allowlist and the security of the `ai-account` contract.
+
+---
+
+## Function: `swap-btc-to-aibtc-legacy`
+
+- **Category:** 🔴 RED
+- **Purpose:** The legacy equivalent of `swap-btc-to-aibtc`. It processes a non-SegWit BTC deposit and swaps the resulting sBTC for aiBTC.
+- **Parameters:**
+    - Legacy BTC transaction proof parameters (e.g., `height`, `blockheader`, `tx`, `proof`).
+    - `ft <faktory-token>`, `ai-dex <faktory-dex>`, `ai-pool <bitflow-pool>`, `sbtc-token <faktory-token>`.
+- **Return Values:** `(ok true)` on success, `(err ...)` on failure.
+- **State Changes:** Identical to `swap-btc-to-aibtc`.
+- **External Contract Calls:** Identical to `swap-btc-to-aibtc`, but using legacy BTC verification helpers (`concat-tx`, `was-tx-mined-compact`).
+
+### Watchpoint Review
+
+- **Access Control:** Public and correctly gated by `swaps-paused`.
+- **State Integrity:**
+    - **Replay Protection & Cooldowns:** Correctly implements `processed-btc-txs` check and the global `COOLDOWN`. The questions previously logged in `QUESTIONS.md` regarding the cooldown and `ai-account` dependency apply here as well.
+    - **DEX Allowlisting & Verification:** Follows the same robust validation logic as the SegWit version, checking the `dex-id` and verifying the provided contract principals against the on-chain allowlist.
+- **External Call Security:**
+    - **Slippage Protection & Failure Handling:** Implements the same safe-refund path. If the swap fails, it transfers the sBTC to the user's `ai-account`.
+- **Overall Logic:** This function mirrors the logic of its SegWit counterpart, adapting it for legacy BTC transactions. It shares the same strengths (security through allowlisting, safe failure modes) and the same dependencies and risks.
+
+### Findings & Recommendations
+
+- **Finding:** The function is a well-implemented parallel to `swap-btc-to-aibtc`. It carries the same security assumptions and dependencies. The questions about the global cooldown and the `ai-account` contract are also relevant here.
+- **Recommendation:** No new recommendations.
