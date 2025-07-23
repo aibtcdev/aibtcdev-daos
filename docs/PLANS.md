@@ -36,11 +36,11 @@ This phase involves documenting the remaining contracts, categorized by their lo
     - [x] `aibtc-token-owner.md`
     - [x] `aibtc-treasury.md`
   - [x] **Proposals:** `aibtc-base-initialize-dao.md`
-  - [ ] **Token:**
-    - [ ] `aibtc-faktory.md`
-    - [ ] `aibtc-faktory-dex.md`
-    - [ ] `aibtc-pre-faktory.md`
-    - [ ] `xyk-pool-sbtc-aibtc-v-1-1.md`
+  - [x] **Token:**
+    - [x] `aibtc-faktory.md`
+    - [x] `aibtc-faktory-dex.md`
+    - [x] `aibtc-pre-faktory.md`
+    - [x] `xyk-pool-sbtc-aibtc-v-1-1.md`
 - [ ] **Core Contracts**
   - [ ] `aibtc-dao-run-cost.md`
 - [ ] **Trait Contracts**
