@@ -70,7 +70,7 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
 *   **Actions:**
     - [x] **Access Control Model:** Review the distinct roles of the `current-operator` and the multi-sig `approver`s. Ensure their permissions are correctly scoped and enforced.
     - [ ] **Core User Journeys:** Trace the primary execution paths from end-to-end:
-        - [ ] BTC to sBTC deposit (`process-btc-deposit`).
+        - [x] BTC to sBTC deposit (`process-btc-deposit`).
         - [ ] BTC to aiBTC swap (`swap-btc-to-aibtc`).
         - [ ] Liquidity provider flows (`add-liquidity-to-pool`, `withdraw-from-pool`).
         - [ ] Refund mechanism (`request-refund`, `process-refund`).
