@@ -33,8 +33,8 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
         - [x] `request-refund-legacy`
         - [x] `process-refund-legacy`
       - **🟡 YELLOW Functions**
-        - [ ] `propose-allowlist-dexes`
-        - [ ] `signal-allowlist-approval`
+        - [x] `propose-allowlist-dexes`
+        - [x] `signal-allowlist-approval`
         - [ ] `signal-add-liquidity`
         - [ ] `signal-set-params`
         - [ ] `signal-withdrawal`
