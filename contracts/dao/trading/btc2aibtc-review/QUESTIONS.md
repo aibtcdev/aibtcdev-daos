@@ -20,3 +20,10 @@ This file contains questions that arise during the contract review.
 
 - **File:** `contracts/dao/trading/btc2aibtc-bridge.clar`
 - **Question:** The functions `process-btc-deposit`, `process-btc-deposit-legacy`, `swap-btc-to-aibtc`, and `swap-btc-to-aibtc-legacy` all include the check `(asserts! (> burn-block-height (+ (get last-updated current-pool) COOLDOWN)) ERR_IN_COOLDOWN)`. The `last-updated` variable is only modified by operator actions like `add-liquidity-to-pool` and `set-params`. This seems to create a global cooldown on all user-facing processing functions after any operator action. Is this the intended behavior, and if so, what is the purpose of this mechanism?
+
+---
+
+## Function `swap-btc-to-aibtc` and `swap-btc-to-aibtc-legacy`
+
+- **File:** `contracts/dao/trading/btc2aibtc-bridge.clar`
+- **Question:** These functions resolve the user's principal to an `ai-account` via `(contract-call? .register-ai-account get-ai-account-by-owner ...)`. The resulting tokens (or sBTC refund) are then sent to this `ai-account` rather than the original principal. What is the design rationale for this? Does this imply a user must create an `ai-account` before they can use the swap functionality?

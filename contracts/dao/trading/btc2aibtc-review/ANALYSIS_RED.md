@@ -193,3 +193,47 @@ This document contains the detailed analysis of functions categorized as RED, fo
 
 - **Finding:** The function is a direct parallel to `process-btc-deposit` and shares its robust design and security dependencies. The same concern about the global cooldown applies here.
 - **Recommendation:** No new recommendations beyond the existing question about the global cooldown mechanism.
+
+---
+
+## Function: `swap-btc-to-aibtc`
+
+- **Category:** 🔴 RED
+- **Purpose:** The primary user-facing function for acquiring aiBTC with Bitcoin. It orchestrates the entire process: verifying a SegWit BTC deposit, deducting fees, and swapping the resulting sBTC for aiBTC via an allowlisted third-party DEX.
+- **Parameters:**
+    - BTC transaction proof parameters (e.g., `height`, `wtx`, `wproof`).
+    - `ft <faktory-token>`: The target aiBTC token contract.
+    - `ai-dex <faktory-dex>`: The DEX contract to perform the swap.
+    - `ai-pool <bitflow-pool>`: The liquidity pool contract, used if the DEX is a bonded Bitflow pool.
+    - `sbtc-token <faktory-token>`: The sBTC token contract.
+- **Return Values:** `(ok true)` on success, `(err ...)` on failure.
+- **State Changes:**
+    - `processed-btc-txs`: Map entry created to prevent replays. The `stx-receiver` is stored as the resolved `ai-account`.
+    - `processed-tx-count`: Incremented.
+    - `pool`: `available-sbtc` is decreased.
+- **External Contract Calls:** This function has extensive external dependencies.
+    - `clarity-bitcoin-lib-v7`: For BTC transaction verification.
+    - `.register-ai-account`: To resolve the user's principal to a dedicated `ai-account`.
+    - `ai-dex` trait (`get-bonded`, `get-in`): To get DEX status and quote.
+    - `xyk-core-v-1-2` (`swap-x-for-y`): To execute swaps on bonded pools.
+    - `ai-dex` trait (`buy`): To execute swaps on unbonded DEXs.
+    - `ft` (`transfer`): To send the final aiBTC tokens to the user's `ai-account`.
+    - `sbtc-token` (`transfer`): As a fallback to refund sBTC if the swap fails.
+
+### Watchpoint Review
+
+- **Access Control:** Public, which is correct. It is also correctly gated by the `swaps-paused` flag.
+- **State Integrity:**
+    - **Replay Protection & Cooldowns:** Implements the same `processed-btc-txs` check and global `COOLDOWN` as the deposit functions.
+    - **DEX Allowlisting:** The function correctly validates the `dex-id` from the user payload against the `allowed-dexes` map. This is a critical security control, ensuring that swaps only occur through vetted contracts.
+    - **Contract Verification:** It rigorously checks that the contracts passed as arguments (`ft`, `ai-dex`, `ai-pool`) match the ones associated with the `dex-id` in the allowlist. This prevents users from passing malicious contract addresses.
+    - **`ai-account` Dependency:** The function requires the user's principal (from the BTC payload) to be resolved to an `ai-account` via an external call. The final tokens are sent to this `ai-account`, not the user's principal. This is a significant architectural decision that tightly couples the bridge to the `ai-account` system. A question will be added to `QUESTIONS.md`.
+- **External Call Security:**
+    - **Slippage Protection:** The user-provided `min-amount-out` is respected. The logic explicitly checks the quoted amount or passes the minimum to the underlying pool function, which is expected to enforce it.
+    - **Failure Handling:** The function implements a robust fallback mechanism. If the swap call fails for any reason (e.g., insufficient DEX liquidity, slippage), it catches the error and attempts to transfer the original `sbtc-amount-to-user` to the user's `ai-account`. This prevents the user's funds from getting stuck in the bridge contract.
+- **Overall Logic:** This is a highly complex but well-structured function. The logic correctly prioritizes security by validating all external parameters against an on-chain allowlist and provides a safe failure path for the user. The primary risks are inherited from the external dependencies (`clarity-bitcoin-lib`, the DEX contracts, and the `ai-account` contract).
+
+### Findings & Recommendations
+
+- **Finding:** The function is implemented with strong security controls, including allowlisting, contract verification, slippage protection, and a safe-refund path. The main risk is the complexity and number of external dependencies. The reliance on the `ai-account` contract is a critical design choice that needs to be understood.
+- **Recommendation:** No immediate changes are recommended. The security of the system depends on the thorough vetting of DEXs added to the allowlist and the security of the `ai-account` contract.
