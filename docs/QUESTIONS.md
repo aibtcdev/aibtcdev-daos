@@ -26,3 +26,10 @@ As we move into Phase 2, a few more questions have come up based on the initial 
 
 2.  **Missing Contracts:** The `aibtc-acct-swap-bitflow-aibtc-sbtc` and `aibtc-acct-swap-faktory-aibtc-sbtc` contracts in the plan appear to be specific implementations of a swap adapter. Is there a base `aibtc-agent-account-swap-adapter` contract that should also be added to the documentation plan?
     -   **Decision:** There is no base contract. These contracts are implementations of the `.aibtc-agent-account-traits.aibtc-dao-swap-adapter` trait. We will proceed with documenting these two implementations first in Phase 2.
+
+## Phase 3 Planning (Proposed)
+
+With Phase 1 and 2 complete, we need to refine the plan for Phase 3 to ensure a thorough and efficient review.
+
+1.  **How can we make the review process more systematic?** The "Review and Refine" step is currently broad. A more structured approach would help ensure consistency and completeness.
+    -   **Decision:** We will expand the "Review and Refine" task in `PLANS.md`. The new plan will include creating a `REVIEW_CHECKLIST.md`, performing a structured manual review against it, and considering automated checks for things like broken links. We will also add more detail to the navigation tasks, such as suggesting a script to auto-generate the `SUMMARY.md` file.
