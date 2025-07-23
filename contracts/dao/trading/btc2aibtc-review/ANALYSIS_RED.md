@@ -161,3 +161,35 @@ This document contains the detailed analysis of functions categorized as RED, fo
 
 - **Finding:** The function appears to be robustly designed. Its security relies heavily on the external Bitcoin library. The global cooldown mechanism is a point of concern that requires clarification to ensure it doesn't create denial-of-service vectors or poor user experience.
 - **Recommendation:** Seek clarification from the development team regarding the purpose of the global `COOLDOWN` on deposit processing.
+
+---
+
+## Function: `process-btc-deposit-legacy`
+
+- **Category:** 🔴 RED
+- **Purpose:** The legacy equivalent of `process-btc-deposit`. It processes a user's non-SegWit (legacy) BTC deposit, verifies it, and transfers the corresponding sBTC to the user.
+- **Parameters:** A set of arguments to prove the inclusion of a legacy BTC transaction (`height`, `blockheader`, `tx`, `proof`).
+- **Return Values:** `(ok true)` on success, `(err ...)` on failure.
+- **State Changes:** Identical to `process-btc-deposit`:
+    - `processed-btc-txs`: Map entry created to prevent replays.
+    - `processed-tx-count`: Incremented.
+    - `pool`: `available-sbtc` balance is decreased.
+- **External Contract Calls:**
+    - `(contract-call? 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.bitcoin-helper-v2 concat-tx ...)`: Helper to construct the legacy transaction buffer.
+    - `(contract-call? 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.clarity-bitcoin-lib-v7 was-tx-mined-compact ...)`: Core external call to verify the legacy BTC transaction.
+    - `(as-contract (contract-call? 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token transfer ...))`: Transfers sBTC to the end-user.
+
+### Watchpoint Review
+
+- **Access Control:** Public, which is correct.
+- **State Integrity:**
+    - **Replay Protection:** Correctly implements the `processed-btc-txs` check to prevent double-spends.
+    - **Input Validation:** Correctly validates against `MIN_SATS`, `available-sbtc`, and `max-deposit`.
+    - **Global Cooldown:** This function also contains the `(asserts! (> burn-block-height (+ (get last-updated current-pool) COOLDOWN)) ERR_IN_COOLDOWN)` check. The question previously logged in `QUESTIONS.md` covers this behavior.
+- **External Call Security:** The security model is identical to the SegWit version, relying on the integrity of the `clarity-bitcoin-lib-v7` contract for transaction verification.
+- **Overall Logic:** The function is a parallel implementation for legacy transactions and follows the same secure logic as its SegWit counterpart.
+
+### Findings & Recommendations
+
+- **Finding:** The function is a direct parallel to `process-btc-deposit` and shares its robust design and security dependencies. The same concern about the global cooldown applies here.
+- **Recommendation:** No new recommendations beyond the existing question about the global cooldown mechanism.
