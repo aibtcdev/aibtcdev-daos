@@ -138,3 +138,45 @@ This journey describes the processes for the pool operator to manage the sBTC li
 ### Conclusion
 
 The liquidity provider flows are highly centralized but are managed with strong, transparent safety controls (time-locks). The system correctly protects user funds in-flight by preventing the operator from withdrawing more than the available (idle) liquidity. The main risk is the operator's power, which is a core design choice of the contract.
+
+---
+
+## Journey 4: Refund Mechanism
+
+This journey provides a crucial escape hatch for users whose funds are sent to the bridge but cannot be processed through the primary deposit or swap flows.
+
+**Actors:**
+-   **User:** The original depositor.
+-   **Operator:** The entity responsible for sending the BTC refund off-chain.
+-   **Processor:** Anyone who submits the proof of the refund transaction on-chain.
+
+### Step-by-Step Flow
+
+1.  **Pre-condition:** A user's attempt to have their BTC deposit processed via `process-btc-deposit` or `swap-btc-to-aibtc` has failed (e.g., due to insufficient pool liquidity, deposit exceeding limits, etc.). The user's BTC is now held by the pool's `btc-receiver` address.
+
+2.  **User Action (Request Refund):** The user calls `request-refund` (or its legacy counterpart).
+    -   They provide proof of their original BTC deposit.
+    -   They provide a new `btc-refund-receiver` address where they want the funds returned.
+    -   The contract verifies the user (`tx-sender`) is the owner of the original deposit and that the deposit has not already been processed.
+    -   The contract "burns" the original BTC transaction ID by adding it to `processed-btc-txs` and creates a new `refund-requests` entry with a unique `refund-id`.
+
+3.  **Operator Action (Off-chain):** The operator monitors for new refund requests.
+    -   The operator constructs and sends a new BTC transaction from the pool's wallet to the user's specified `btc-refund-receiver` address.
+    -   **Crucially**, this refund transaction must contain an `OP_RETURN` payload with the corresponding `refund-id`.
+
+4.  **Processor Action (Process Refund):** Anyone (typically the operator) calls `process-refund` (or its legacy counterpart).
+    -   They provide proof of the *refund* BTC transaction sent by the operator.
+    -   The contract verifies this BTC transaction.
+    -   It parses the `refund-id` from the transaction's payload and asserts that it matches the `refund-id` being processed. This is the core security mechanism linking the proof to the request.
+    -   It verifies the BTC amount is sufficient.
+    -   It marks the `refund-requests` entry as `done: true` and records the refund transaction ID in `processed-refunds` to prevent replay.
+
+### System-Level Observations
+
+-   **Trust-Minimized:** While the operator must act off-chain to send the BTC, the process is verified and finalized on-chain in a permissionless way. The user does not need to trust the operator to update the contract state; they only need to trust them to send the BTC, which can be publicly verified.
+-   **Secure Linkage:** The use of the `refund-id` in the `OP_RETURN` of the refund transaction is a brilliant design choice. It creates an undeniable, on-chain link between the refund proof and the original request, preventing any possibility of an operator using one refund transaction to settle multiple requests.
+-   **User-Driven Initiation:** The process is initiated by the user, putting them in control of starting the recovery process for their funds.
+
+### Conclusion
+
+The refund mechanism is a robust and secure process that serves as a vital safety net for users. It is well-designed to be trust-minimized and prevent misuse, ensuring users have a reliable path to recover funds from failed transactions.
