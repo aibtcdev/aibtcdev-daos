@@ -6,9 +6,9 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
 
 *   **Objective:** To get a high-level overview of the contract's surface area and prioritize functions for review.
 *   **Actions:**
-    - [ ] List every function (`define-public`, `define-read-only`, `define-private`) in the contract.
-    - [ ] Perform a preliminary classification of each function into RED, ORANGE, YELLOW, or GREEN categories as defined in `START.md`. This will serve as our initial roadmap.
-    - [ ] Document this classification in a new file, e.g., `FUNCTION_TRIAGE.md`.
+    - [x] List every function (`define-public`, `define-read-only`, `define-private`) in the contract.
+    - [x] Perform a preliminary classification of each function into RED, ORANGE, YELLOW, or GREEN categories as defined in `START.md`. This will serve as our initial roadmap.
+    - [x] Document this classification in a new file, e.g., `FUNCTION_TRIAGE.md`.
 
 **Phase 2: Deep-Dive Function Analysis (Risk-First)**
 
