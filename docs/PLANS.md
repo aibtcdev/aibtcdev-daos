@@ -6,8 +6,8 @@ This plan outlines the steps to create comprehensive functional documentation fo
 
 This phase focuses on establishing the process and documenting the first two priority contracts.
 
-- [ ] **Setup: Create Documentation Template**
-  - [ ] Create a generic `TEMPLATE_CONTRACT.md` file for documenting Clarity contracts.
+- [x] **Setup: Create Documentation Template**
+  - [x] Create a generic `TEMPLATE_CONTRACT.md` file for documenting Clarity contracts.
 - [x] **Setup: Create Test Script**
   - [x] Create a script in `../tests` to identify Clarity contracts in `../contracts` that are missing corresponding documentation files in `docs/contracts`.
 - [ ] **Priority Contract 1: Agent Account**
