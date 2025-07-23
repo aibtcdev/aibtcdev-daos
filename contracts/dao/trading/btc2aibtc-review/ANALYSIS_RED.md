@@ -94,3 +94,35 @@ This document contains the detailed analysis of functions categorized as RED, fo
 
 - **Finding:** The function `add-only-liquidity` centralizes control over the pool's liquidity with the operator by bypassing the standard time-lock pattern. This creates a trust assumption that the operator will not use this power maliciously (e.g., front-running large user transactions by inflating the pool size).
 - **Recommendation:** The purpose and intended use cases for this function should be clearly documented. A question will be added to `QUESTIONS.md` to seek clarification from the development team.
+
+---
+
+## Function: `withdraw-from-pool`
+
+- **Category:** 🔴 RED
+- **Purpose:** Allows the operator to withdraw all *available* sBTC from the contract after a signaling and cool-off period. This is the primary mechanism for the operator to retrieve idle liquidity.
+- **Parameters:** None.
+- **Return Values:** `(ok available-sbtc)` on success, `(err ...)` on failure.
+- **State Changes:**
+    - Modifies the `pool` data variable:
+        - Sets `available-sbtc` to `u0`.
+        - Resets `withdrawal-signaled-at` to `none`.
+- **External Contract Calls:**
+    - `(as-contract (contract-call? 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token transfer ...))`: Transfers the entire `available-sbtc` balance from the contract to the operator.
+
+### Watchpoint Review
+
+- **Access Control:** Correctly restricted to the `current-operator`.
+- **State Integrity:**
+    - **Signal/Cooldown Mechanism:** The function is protected by a robust signal and cool-off mechanism (`withdrawal-signaled-at` and `WITHDRAWAL_COOLOFF`). This prevents the operator from withdrawing funds without warning.
+    - **Input Validation:** The check `(asserts! (> available-sbtc u0) ERR_INSUFFICIENT_POOL_BALANCE)` ensures the function only runs when there are funds to withdraw.
+    - **State Reset:** The function correctly resets `withdrawal-signaled-at` to `none` and `available-sbtc` to `u0`, preventing replay attacks and ensuring the state accurately reflects the withdrawal.
+- **External Call Security:**
+    - The use of `as-contract` is necessary and correct, as the contract is transferring funds it owns.
+    - The `try!` macro correctly handles the result of the token transfer, ensuring the transaction will fail if the transfer does.
+- **Overall Logic:** The logic is sound and follows security best practices. It distinguishes between `total-sbtc` (all liquidity) and `available-sbtc` (idle liquidity), correctly allowing the operator to only withdraw the latter. This ensures that funds backing user deposits cannot be withdrawn.
+
+### Findings & Recommendations
+
+- **Finding:** The function is implemented securely. The time-locked withdrawal process is a critical safety feature that protects the integrity of the pool. No vulnerabilities were identified.
+- **Recommendation:** No changes recommended.

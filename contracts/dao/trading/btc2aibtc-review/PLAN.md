@@ -19,7 +19,7 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
         - [x] `initialize-pool`
         - [x] `add-liquidity-to-pool`
         - [x] `add-only-liquidity`
-        - [ ] `withdraw-from-pool`
+        - [x] `withdraw-from-pool`
         - [ ] `process-btc-deposit`
         - [ ] `process-btc-deposit-legacy`
         - [ ] `swap-btc-to-aibtc`
