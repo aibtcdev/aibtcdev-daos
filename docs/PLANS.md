@@ -56,4 +56,4 @@ This phase involves documenting the remaining contracts, categorized by their lo
   - [ ] Update the root `README.md` and create `SUMMARY.md` to provide a table of contents and navigation guide.
   - [ ] Create `README.md` files for each subdirectory in `docs/contracts`.
 - [ ] **Retrospective:**
-  - [ ] Review the process and document lessons learned.
+  - [ ] Review the process and document lessons learned in `END.md`.
