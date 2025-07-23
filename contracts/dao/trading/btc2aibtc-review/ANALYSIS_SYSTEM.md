@@ -100,3 +100,18 @@ The contract's state is managed through a set of data variables and maps. The de
 ### Conclusion
 
 The state management of the contract is a key strength. It is designed defensively, using write-once data structures and irreversible state transitions to ensure integrity and prevent common attack vectors like replay attacks.
+
+---
+
+## Emergency Procedures
+
+The contract includes a critical safety feature in the `emergency-stop-swaps` function.
+
+-   **Mechanism:** Any single one of the five designated `approver`s can call this function to permanently set the `swaps-paused` flag to `true`.
+-   **Scope:** This immediately halts the two most complex functions in the contract: `swap-btc-to-aibtc` and `swap-btc-to-aibtc-legacy`. It does *not* affect simple deposits (`process-btc-deposit`) or the refund mechanism, allowing for orderly recovery of funds.
+-   **Effectiveness:** The design is simple and effective. It is a one-way "circuit breaker" with no "resume" functionality, ensuring that a halt is a permanent and decisive action that requires a new contract deployment to reverse.
+-   **Bypass Risk:** There are no apparent ways to bypass this check. Both swap functions begin with an `(asserts! (not (var-get swaps-paused)) ...)` check.
+
+### Conclusion
+
+The emergency procedure is well-designed. It is appropriately scoped to halt only the most complex and potentially vulnerable parts of the system while allowing other core functions to continue operating. The ability for a single approver to act swiftly provides a robust defense against unforeseen vulnerabilities in the swap logic or its many external dependencies.
