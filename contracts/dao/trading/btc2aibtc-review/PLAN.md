@@ -28,8 +28,8 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
         - [x] `emergency-stop-swaps`
         - [x] `set-new-operator`
         - [x] `set-params`
-        - [ ] `request-refund`
-        - [ ] `process-refund`
+        - [x] `request-refund`
+        - [x] `process-refund`
         - [ ] `request-refund-legacy`
         - [ ] `process-refund-legacy`
       - **🟡 YELLOW Functions**
