@@ -72,7 +72,7 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
     - [ ] **Core User Journeys:** Trace the primary execution paths from end-to-end:
         - [x] BTC to sBTC deposit (`process-btc-deposit`).
         - [x] BTC to aiBTC swap (`swap-btc-to-aibtc`).
-        - [ ] Liquidity provider flows (`add-liquidity-to-pool`, `withdraw-from-pool`).
+        - [x] Liquidity provider flows (`add-liquidity-to-pool`, `withdraw-from-pool`).
         - [ ] Refund mechanism (`request-refund`, `process-refund`).
     - [ ] **External Dependencies:** Scrutinize all external calls, especially to the `clarity-bitcoin-lib-v7`, the `sbtc-token`, and the various DEX/pool traits. We need to understand the trust assumptions for each.
     - [ ] **State Management:** Analyze the lifecycle of key data structures like the `pool` variable and the `processed-btc-txs` map to check for integrity and potential race conditions.

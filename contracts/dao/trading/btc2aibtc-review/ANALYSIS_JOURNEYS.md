@@ -95,3 +95,46 @@ This is the primary value-add journey of the contract, allowing users to convert
 ### Conclusion
 
 The BTC-to-aiBTC swap journey is a complex but well-architected flow. It uses a defense-in-depth approach by validating all external inputs against an on-chain allowlist and providing a safe fallback path. The primary risks are inherited from its external dependencies, making the governance over those dependencies the most critical security function.
+
+---
+
+## Journey 3: Liquidity Provider Flows
+
+This journey describes the processes for the pool operator to manage the sBTC liquidity, which is essential for the bridge's operation.
+
+**Actor:**
+-   **Operator:** The `current-operator` of the contract.
+
+### Sub-Journey 3a: Adding Liquidity
+
+1.  **Operator Action (Signal):** The operator calls `signal-add-liquidity`. The contract records the current block height in `add-liq-signaled-at`.
+2.  **Cooldown Period:** The operator must wait for the `COOLDOWN` period (6 blocks) to pass.
+3.  **Operator Action (Execute):** The operator calls `add-liquidity-to-pool`, providing the `sbtc-amount` to add.
+4.  **Contract Execution:**
+    -   The contract verifies that it was called by the operator.
+    -   It checks that a signal was made and the cooldown has passed.
+    -   It calls the `sbtc-token` contract to transfer the `sbtc-amount` from the operator's wallet to the bridge contract itself.
+    -   It updates the `total-sbtc` and `available-sbtc` balances and resets the signal.
+
+**Alternative Path:** The operator can use `add-only-liquidity` to bypass the signal/cooldown mechanism entirely. This is a significant centralization point, as noted in `QUESTIONS.md`.
+
+### Sub-Journey 3b: Withdrawing Liquidity
+
+1.  **Operator Action (Signal):** The operator calls `signal-withdrawal`. The contract records the current block height in `withdrawal-signaled-at`.
+2.  **Cool-off Period:** The operator must wait for the `WITHDRAWAL_COOLOFF` period (144 blocks) to pass.
+3.  **Operator Action (Execute):** The operator calls `withdraw-from-pool`.
+4.  **Contract Execution:**
+    -   The contract verifies it was called by the operator.
+    -   It checks that a signal was made and the cool-off has passed.
+    -   It transfers the *entire* `available-sbtc` balance from the bridge contract to the operator.
+    -   It sets `available-sbtc` to `u0` and resets the signal.
+
+### System-Level Observations
+
+-   **Operator-Centric:** Liquidity management is entirely controlled by the single operator principal. This is a major trust assumption.
+-   **Transparency via Time-locks:** The signal-and-wait pattern is a critical security feature. It makes the operator's intentions public before execution, giving users a window to finish in-flight transactions or decide not to use the bridge if they disagree with the operator's actions.
+-   **`available-sbtc` vs. `total-sbtc`:** The distinction is crucial. `total-sbtc` represents all liquidity ever added, while `available-sbtc` is what's idle. User deposits decrease `available-sbtc`. The operator can only withdraw `available-sbtc`, which protects funds that are "owed" to users whose transactions are being processed.
+
+### Conclusion
+
+The liquidity provider flows are highly centralized but are managed with strong, transparent safety controls (time-locks). The system correctly protects user funds in-flight by preventing the operator from withdrawing more than the available (idle) liquidity. The main risk is the operator's power, which is a core design choice of the contract.
