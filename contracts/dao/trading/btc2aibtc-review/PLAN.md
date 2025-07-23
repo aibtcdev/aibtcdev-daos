@@ -68,7 +68,7 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
 
 *   **Objective:** To analyze the contract as an integrated system, focusing on how its parts interact and identifying emergent risks.
 *   **Actions:**
-    - [ ] **Access Control Model:** Review the distinct roles of the `current-operator` and the multi-sig `approver`s. Ensure their permissions are correctly scoped and enforced.
+    - [x] **Access Control Model:** Review the distinct roles of the `current-operator` and the multi-sig `approver`s. Ensure their permissions are correctly scoped and enforced.
     - [ ] **Core User Journeys:** Trace the primary execution paths from end-to-end:
         - [ ] BTC to sBTC deposit (`process-btc-deposit`).
         - [ ] BTC to aiBTC swap (`swap-btc-to-aibtc`).
