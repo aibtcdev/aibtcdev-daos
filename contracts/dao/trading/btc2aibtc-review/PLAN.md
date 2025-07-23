@@ -14,7 +14,7 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
 
 *   **Objective:** To meticulously analyze the logic, security, and potential vulnerabilities within each function, starting with the most critical.
 *   **Actions:**
-    - [ ] Analyze functions in descending order of risk: RED -> ORANGE -> YELLOW -> GREEN.
+    - [x] Analyze functions in descending order of risk: RED -> ORANGE -> YELLOW -> GREEN.
       - **🔴 RED Functions**
         - [x] `initialize-pool`
         - [x] `add-liquidity-to-pool`
@@ -39,28 +39,28 @@ Our review of the `btc2aibtc-bridge.clar` contract will proceed in four phases. 
         - [x] `signal-set-params`
         - [x] `signal-withdrawal`
       - **🟢 GREEN Functions**
-        - [ ] `is-approver`
-        - [ ] `are-swaps-paused`
-        - [ ] `get-dex-allowed`
-        - [ ] `get-allowlist-proposal`
-        - [ ] `has-signaled`
-        - [ ] `read-uint64`
-        - [ ] `find-out`
-        - [ ] `get-out-value`
-        - [ ] `parse-payload-segwit`
-        - [ ] `parse-payload-segwit-refund`
-        - [ ] `get-output-segwit`
-        - [ ] `parse-payload-legacy`
-        - [ ] `parse-payload-legacy-refund`
-        - [ ] `get-output-legacy`
-        - [ ] `get-pool`
-        - [ ] `is-tx-processed`
-        - [ ] `get-processed-tx`
-        - [ ] `get-refund-request`
-        - [ ] `is-refund-processed`
-        - [ ] `get-refund-count`
-        - [ ] `get-current-operator`
-        - [ ] `is-pool-initialized`
+        - [x] `is-approver`
+        - [x] `are-swaps-paused`
+        - [x] `get-dex-allowed`
+        - [x] `get-allowlist-proposal`
+        - [x] `has-signaled`
+        - [x] `read-uint64`
+        - [x] `find-out`
+        - [x] `get-out-value`
+        - [x] `parse-payload-segwit`
+        - [x] `parse-payload-segwit-refund`
+        - [x] `get-output-segwit`
+        - [x] `parse-payload-legacy`
+        - [x] `parse-payload-legacy-refund`
+        - [x] `get-output-legacy`
+        - [x] `get-pool`
+        - [x] `is-tx-processed`
+        - [x] `get-processed-tx`
+        - [x] `get-refund-request`
+        - [x] `is-refund-processed`
+        - [x] `get-refund-count`
+        - [x] `get-current-operator`
+        - [x] `is-pool-initialized`
     - [x] For each function, apply the watchpoints from `START.md`, focusing on access control (`tx-sender`), state changes, external calls, and input validation.
     - [x] Document findings for each function using the template structure mentioned in `START.md` (purpose, parameters, state changes, etc.).
 
