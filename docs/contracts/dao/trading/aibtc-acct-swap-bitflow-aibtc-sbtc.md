@@ -32,21 +32,21 @@ This contract is a swap adapter designed to be used with an `aibtc-agent-account
 ---
 
 ### `buy-dao-token`
-`(buy-dao-token (daoToken <sip010-trait>) (amount uint) (minReceive (optional uint)))`
+`(buy-dao-token (daoToken <sip010-trait>) (amount uint) (minReceive uint))`
 - **Description:** Converts a specified `amount` of `sBTC` into the `aibtc` DAO token by calling the Bitflow core contract. A minimum receive amount is required to protect against slippage.
 - **Parameters:**
   - `daoToken` (`<sip010-trait>`): The DAO token contract, which must match the one configured in the adapter.
   - `amount` (`uint`): The amount of `sBTC` to spend.
-  - `minReceive` (`(optional uint)`): A required value specifying the minimum amount of DAO tokens to be received.
+  - `minReceive` (`uint`): A required value specifying the minimum amount of DAO tokens to be received.
 - **Returns:** `(ok bool)` on success, `(err uint)` on failure.
 
 ### `sell-dao-token`
-`(sell-dao-token (daoToken <sip010-trait>) (amount uint) (minReceive (optional uint)))`
+`(sell-dao-token (daoToken <sip010-trait>) (amount uint) (minReceive uint))`
 - **Description:** Converts a specified `amount` of the `aibtc` DAO token into `sBTC` by calling the Bitflow core contract. A minimum receive amount is required.
 - **Parameters:**
   - `daoToken` (`<sip010-trait>`): The DAO token contract.
   - `amount` (`uint`): The amount of DAO tokens to sell.
-  - `minReceive` (`(optional uint)`): A required value specifying the minimum amount of `sBTC` to be received.
+  - `minReceive` (`uint`): A required value specifying the minimum amount of `sBTC` to be received.
 - **Returns:** `(ok bool)` on success, `(err uint)` on failure.
 
 ---
