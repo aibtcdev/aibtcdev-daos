@@ -27,3 +27,10 @@ This file contains questions that arise during the contract review.
 
 - **File:** `contracts/dao/trading/btc2aibtc-bridge.clar`
 - **Question:** These functions resolve the user's principal to an `ai-account` via `(contract-call? .register-ai-account get-ai-account-by-owner ...)`. The resulting tokens (or sBTC refund) are then sent to this `ai-account` rather than the original principal. What is the design rationale for this? Does this imply a user must create an `ai-account` before they can use the swap functionality?
+
+---
+
+## Function `set-new-operator`
+
+- **File:** `contracts/dao/trading/btc2aibtc-bridge.clar`
+- **Question:** The function allows the current operator to immediately transfer their role to a new principal. Given the sensitivity of the operator role, was a more robust succession mechanism, such as a two-step process involving a time-lock (e.g., `propose-new-operator` and `accept-operator-role`), considered? This would provide a window to react to a compromised key and protect against accidental transfers to an incorrect address.

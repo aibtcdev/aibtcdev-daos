@@ -26,3 +26,28 @@ This document contains the detailed analysis of functions categorized as ORANGE,
 
 - **Finding:** The function is a well-designed security feature. Its simplicity is its strength. No vulnerabilities were identified.
 - **Recommendation:** No changes recommended.
+
+---
+
+## Function: `set-new-operator`
+
+- **Category:** 🟠 ORANGE
+- **Purpose:** Allows the current operator to transfer their administrative role to a new principal.
+- **Parameters:**
+    - `new-operator principal`: The principal to become the new operator.
+- **Return Values:** `(ok true)`.
+- **State Changes:**
+    - Sets the `current-operator` data variable to the `new-operator`.
+- **External Contract Calls:** None.
+
+### Watchpoint Review
+
+- **Access Control:** Correctly restricted to the `current-operator`. Only the current operator can initiate the transfer of power.
+- **State Integrity:** The function executes immediately without a time-lock or confirmation step. This means a compromised operator key could lead to an instant and permanent loss of control over the contract's operational functions. There is no safeguard against typos or errors when specifying the `new-operator` address.
+- **External Call Security:** N/A.
+- **Overall Logic:** The logic is simple and direct. However, given the high privilege of the operator role (adding/withdrawing liquidity, setting fees), this direct transfer mechanism represents a significant point of centralization and trust.
+
+### Findings & Recommendations
+
+- **Finding:** The `set-new-operator` function allows for an immediate, unilateral transfer of a highly privileged role. This lacks the safety features (like time-locks) seen in other sensitive functions within this contract.
+- **Recommendation:** A question will be added to `QUESTIONS.md` to ask the development team about the rationale for this design and whether a more robust succession mechanism (e.g., a two-step process with a time-lock) was considered to mitigate operational risks.
