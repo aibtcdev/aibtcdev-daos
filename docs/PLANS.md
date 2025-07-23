@@ -24,7 +24,7 @@ This phase focuses on establishing the process and documenting the first two pri
 This phase involves documenting the remaining contracts, categorized by their location in the `contracts` directory.
 
 - [x] **DAO Contracts**
-  - [ ] **Trading:**
+  - [x] **Trading:**
     - [x] `aibtc-acct-swap-bitflow-aibtc-sbtc.md`
     - [x] `aibtc-acct-swap-faktory-aibtc-sbtc.md`
   - [x] **Base:** `aibtc-base-dao.md`
