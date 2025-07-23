@@ -43,11 +43,13 @@ This phase involves documenting the remaining contracts, categorized by their lo
   - [ ] **Trading:**
     - [ ] `aibtc-acct-swap-bitflow-aibtc-sbtc.md`
     - [ ] `aibtc-acct-swap-faktory-aibtc-sbtc.md`
-    - [ ] `xyk-core-v-1-2.md` (external, can skip)
 - [ ] **Trait Contracts**
-  - [ ] `aibtc-agent-account-traits.md`
-  - [ ] `aibtc-base-dao-trait.md`
-  - [ ] `aibtc-dao-traits.md`
+  - [ ] `traits/aibtc-agent-account-traits.md`
+  - [ ] `traits/aibtc-base-dao-trait.md`
+  - [ ] `traits/aibtc-dao-traits.md`
+- [ ] **External Dependencies (Skipping)**
+  - [ ] `sbtc-token.md`
+  - [ ] `xyk-core-v-1-2.md`
 
 ## Phase 3: Finalization and Review
 

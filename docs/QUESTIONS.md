@@ -16,3 +16,11 @@ Before starting, we clarified the following points:
     -   **Decision:** We will create a comprehensive plan covering all contracts but will start with two key contracts to establish our process: `agent-account` and `action-proposal-voting`.
 
 With these points clarified, we have no further blocking questions and can proceed with the plan.
+
+## Phase 2 Planning
+
+As we move into Phase 2, a few more questions have come up based on the initial documentation work:
+
+1.  **External Dependencies:** The plan now includes a section for external contracts that we will skip documenting (e.g., `sbtc-token`, `xyk-core-v-1-2`). Is this the correct approach, or should we create brief stub files for them explaining their role at a high level?
+
+2.  **Missing Contracts:** The `aibtc-acct-swap-bitflow-aibtc-sbtc` and `aibtc-acct-swap-faktory-aibtc-sbtc` contracts in the plan appear to be specific implementations of a swap adapter. Is there a base `aibtc-agent-account-swap-adapter` contract that should also be added to the documentation plan?
