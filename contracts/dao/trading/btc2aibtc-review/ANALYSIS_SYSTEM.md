@@ -41,3 +41,33 @@ The access control model employs a sound separation of concerns:
 -   The **approvers** act as a governance body for system-critical changes (adding new integrations) and as a safety council for emergencies.
 
 This layered approach effectively decentralizes power and mitigates risk. The primary areas of trust are placed on the operator's key security (due to `set-new-operator`) and the approvers' diligence. The questions raised in `QUESTIONS.md` regarding these specific functions are central to fully understanding the trust model.
+
+---
+
+## External Dependencies
+
+The contract's security is heavily reliant on the correctness and security of several external contracts and traits. The `ANALYSIS_RELATIONSHIPS.md` diagram provides a visual overview. This section details the trust assumptions for each dependency.
+
+-   **`clarity-bitcoin-lib-v7` & Bitcoin Helpers:**
+    -   **Purpose:** Used to verify the inclusion and validity of BTC transactions on the Bitcoin blockchain.
+    -   **Trust Assumption:** This is the most critical dependency. The entire bridge's solvency rests on the assumption that this library is free of vulnerabilities. A flaw here could allow an attacker to forge BTC transaction proofs, enabling them to mint unbacked sBTC and drain the pool. This dependency must be considered an immutable and fully trusted part of the system.
+
+-   **`sbtc-token` (SIP-010):**
+    -   **Purpose:** The sBTC token contract that this bridge holds and distributes.
+    -   **Trust Assumption:** Assumed to be a compliant and secure SIP-010 fungible token implementation. The bridge trusts it to handle transfers correctly. A vulnerability in the sBTC contract itself (e.g., allowing unauthorized minting) would undermine the bridge's assets.
+
+-   **Allowlisted DEX Ecosystem (`faktory-dex`, `bitflow-pool`, `xyk-core-v-1-2`):**
+    -   **Purpose:** External DEX contracts that perform the sBTC -> aiBTC swap.
+    -   **Trust Assumption:** The contract trusts that any DEX approved by the `approver` governance is secure and will execute swaps correctly. The risk is mitigated by:
+        1.  **Governance:** The 3-of-5 multi-sig must vet any new DEX.
+        2.  **Slippage Protection:** The user provides a `min-amount-out`.
+        3.  **Safe Fallback:** The bridge includes a robust fallback mechanism to refund sBTC to the user if the DEX call fails.
+    -   This is a managed trust: the system is designed to interact with external, potentially risky contracts, but does so with specific safeguards in place.
+
+-   **`register-ai-account`:**
+    -   **Purpose:** Resolves a user's Stacks principal to a dedicated `ai-account` contract.
+    -   **Trust Assumption:** The swap functionality is tightly coupled to this system. It's assumed that this contract correctly and securely maps users to their accounts. The final aiBTC tokens (or sBTC refund) are sent to this `ai-account`. The security of the user's final assets depends on the security of their `ai-account`. This is a key design decision highlighted in `QUESTIONS.md`.
+
+### Conclusion
+
+The contract manages its external dependencies well. Critical, high-trust dependencies like the Bitcoin library are unavoidable. Dependencies with higher operational risk, like DEXs, are managed through a combination of governance (allowlisting) and technical safeguards (fallbacks, slippage protection). The tightest coupling is with the `ai-account` system, making its security integral to the security of the swap user journey.
