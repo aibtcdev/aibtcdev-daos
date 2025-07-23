@@ -32,10 +32,10 @@ This phase involves documenting the remaining contracts, categorized by their lo
     - [x] `aibtc-dao-epoch.md`
     - [x] `aibtc-dao-users.md`
     - [x] `aibtc-onchain-messaging.md`
-    - [ ] `aibtc-rewards-account.md`
+    - [x] `aibtc-rewards-account.md`
     - [x] `aibtc-token-owner.md`
-    - [ ] `aibtc-treasury.md`
-  - [ ] **Proposals:** `aibtc-base-initialize-dao.md`
+    - [x] `aibtc-treasury.md`
+  - [x] **Proposals:** `aibtc-base-initialize-dao.md`
   - [ ] **Token:**
     - [ ] `aibtc-faktory.md`
     - [ ] `aibtc-faktory-dex.md`
