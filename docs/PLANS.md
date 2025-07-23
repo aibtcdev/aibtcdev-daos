@@ -65,9 +65,9 @@ This phase involves documenting the remaining contracts, categorized by their lo
   - [ ] **Automated Checks:**
     - [ ] Consider adding a script to check for broken links within the documentation.
 - [ ] **Improve Navigation:**
-  - [ ] Update the root `README.md` to serve as a clear entry point.
-  - [ ] Create `README.md` files for each subdirectory in `docs/contracts` to explain the contract category.
-  - [ ] Create `SUMMARY.md` to provide a complete table of contents (GitBook style).
+  - [x] Update the root `README.md` to serve as a clear entry point.
+  - [x] Create `README.md` files for each subdirectory in `docs/contracts` to explain the contract category.
+  - [x] Create `SUMMARY.md` to provide a complete table of contents (GitBook style).
     - [ ] Consider creating a script to auto-generate `SUMMARY.md` from the directory structure.
 - [ ] **Retrospective:**
   - [ ] Review the process and document lessons learned in `END.md`.
