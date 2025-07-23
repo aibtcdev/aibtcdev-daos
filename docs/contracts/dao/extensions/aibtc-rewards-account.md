@@ -80,7 +80,7 @@ A private helper function that verifies if the `tx-sender` is the `.aibtc-base-d
 
 **Returns:**
 `(ok true)` if the caller is authorized.
-`(err u1900)` if the caller is not authorized.
+`(err u1700)` if the caller is not authorized.
 
 ---
 
