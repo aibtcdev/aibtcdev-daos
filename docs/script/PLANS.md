@@ -29,29 +29,29 @@ The script's first objective is to understand the current state of the repositor
 
 The script will iterate through the categorized lists and perform the necessary actions.
 
-- [ ] **Prune Orphaned Documentation:**
-  - [ ] For each file in the **To Prune** list, delete the `.md` file.
-  - [ ] Log which files were removed.
+- [x] **Prune Orphaned Documentation:**
+  - [x] For each file in the **To Prune** list, delete the `.md` file using `os.remove()` or `pathlib.Path.unlink()`.
+  - [x] Log which files were removed.
 
-- [ ] **Create New Documentation:**
-  - [ ] For each contract in the **To Create** list:
-    - [ ] **Input:** The path to the `.clar` file and the appropriate template (`TEMPLATE_CONTRACT.md` or `TEMPLATE_TRAIT.md`).
-    - [ ] **Action:**
-        1. Read the content of the `.clar` file and the template file.
-        2. Construct a prompt for the LLM instructing it to generate a complete documentation file by populating the template with information extracted from the Clarity code.
-        3. Execute the LLM tool with the prompt and context.
-        4. Save the generated markdown to the correct path within `docs/contracts/`.
+- [x] **Create New Documentation:**
+  - [x] For each contract in the **To Create** list:
+    - [x] **Setup:**
+        1.  Identify the `.clar` file path.
+        2.  Identify the appropriate template path (`TEMPLATE_CONTRACT.md` or `TEMPLATE_TRAIT.md`).
+        3.  Determine the output path for the new `.md` file.
+    - [x] **LLM Action:**
+        1.  Instantiate an `aider.coders.Coder` object, providing the `.clar` file and the template as read-only context files.
+        2.  Construct a detailed prompt instructing the LLM to create a new documentation file at the target path, using the template and the Clarity code as sources.
+        3.  Use `coder.run()` to execute the request. Aider will create and write to the new documentation file.
 
-- [ ] **Review Existing Documentation:**
-  - [ ] For each contract in the **To Review** list:
-    - [ ] **Input:** The path to the `.clar` file, the existing `.md` file, and the `REVIEW_CHECKLIST.md`.
-    - [ ] **Action:**
-        1. Read the content of all three input files.
-        2. Construct a prompt for the LLM instructing it to act as a technical reviewer.
-        3. The prompt should ask the LLM to compare the `.md` against the `.clar` file for accuracy and verify its structure against the `REVIEW_CHECKLIST.md`.
-        4. Propose minimal, specific changes to fix any discrepancies or omissions.
-        5. Execute the LLM tool with the prompt and context.
-        6. Apply the LLM's proposed changes to the existing `.md` file.
+- [x] **Review Existing Documentation:**
+  - [x] For each contract in the **To Review** list:
+    - [x] **Setup:**
+        1.  Identify the paths for the `.clar` file, the existing `.md` file, and `REVIEW_CHECKLIST.md`.
+    - [x] **LLM Action:**
+        1.  Instantiate an `aider.coders.Coder` object. Add the `.md` file to the chat so it can be edited. Add the `.clar` file and `REVIEW_CHECKLIST.md` as read-only reference files.
+        2.  Construct a prompt instructing the LLM to act as a technical reviewer, comparing the `.md` against the `.clar` file for accuracy and against the checklist for structure.
+        3.  Use `coder.run()` to execute the review. Aider will apply the necessary changes directly to the `.md` file.
 
 ---
 

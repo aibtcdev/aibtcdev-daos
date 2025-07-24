@@ -2,12 +2,16 @@
 
 import argparse
 import os
+import traceback
 from pathlib import Path
 
-# Placeholder for aider imports, to be used in Phase 2
-# from aider.coders import Coder
-# from aider.io import InputOutput
-# from aider.models import Model
+try:
+    from aider.coders import Coder
+    from aider.io import InputOutput
+    from aider.models import Model
+except ImportError:
+    print("Could not import aider. Please install it with 'pip install aider-chat'")
+    exit(1)
 
 # Define constants for paths
 # Assumes the script is in docs/script/
@@ -16,6 +20,8 @@ CONTRACTS_DIR = ROOT_DIR / "contracts"
 DOCS_DIR = ROOT_DIR / "docs" / "contracts"
 TEMPLATES_DIR = ROOT_DIR / "docs" / "templates"
 REVIEW_CHECKLIST_PATH = ROOT_DIR / "docs" / "REVIEW_CHECKLIST.md"
+TEMPLATE_CONTRACT_PATH = TEMPLATES_DIR / "TEMPLATE_CONTRACT.md"
+TEMPLATE_TRAIT_PATH = TEMPLATES_DIR / "TEMPLATE_TRAIT.md"
 
 EXCLUDE_PATHS = [
     "contracts/test",
@@ -94,10 +100,51 @@ def create_documentation(contracts_to_create, model_name, dry_run=False):
     if not contracts_to_create:
         print("No new contracts to document.")
         return
-    
+
     print(f"\nCreating documentation for {len(contracts_to_create)} new contracts...")
-    # Placeholder for Phase 2 implementation
-    pass
+    
+    for contract_path in contracts_to_create:
+        relative_contract_path = contract_path.relative_to(ROOT_DIR)
+        print(f"  - Processing: {relative_contract_path}")
+
+        # Determine which template to use
+        if "trait" in contract_path.name:
+            template_path = TEMPLATE_TRAIT_PATH
+        else:
+            template_path = TEMPLATE_CONTRACT_PATH
+        
+        output_doc_path = get_doc_path_for_contract(contract_path)
+
+        if dry_run:
+            print(f"    (Dry run) Would create {output_doc_path.relative_to(ROOT_DIR)} using {template_path.name}")
+            continue
+
+        try:
+            io = InputOutput(yes=True)
+            model = Model(model_name)
+            
+            # Aider needs string paths
+            read_only_fnames = [str(contract_path), str(template_path)]
+            
+            coder = Coder.create(
+                main_model=model,
+                io=io,
+                read_only_fnames=read_only_fnames,
+                fnames=[], # No files to edit in chat, we are creating one
+                dry_run=dry_run,
+            )
+
+            prompt = (
+                f"Using the provided template and the Clarity contract, create a new"
+                f" documentation file at `{output_doc_path}`. Populate the template"
+                f" with all the relevant information from the contract."
+            )
+            
+            coder.run(prompt)
+
+        except Exception:
+            print(f"    Error processing {relative_contract_path}:")
+            traceback.print_exc()
 
 def review_documentation(contracts_to_review, model_name, dry_run=False):
     """Reviews existing documentation for accuracy against the source code."""
@@ -106,8 +153,43 @@ def review_documentation(contracts_to_review, model_name, dry_run=False):
         return
 
     print(f"\nReviewing {len(contracts_to_review)} existing documents...")
-    # Placeholder for Phase 2 implementation
-    pass
+
+    for contract_path, doc_path in contracts_to_review:
+        relative_contract_path = contract_path.relative_to(ROOT_DIR)
+        print(f"  - Reviewing: {doc_path.relative_to(ROOT_DIR)}")
+
+        if dry_run:
+            print(f"    (Dry run) Would review {doc_path.relative_to(ROOT_DIR)} against {relative_contract_path}")
+            continue
+
+        try:
+            io = InputOutput(yes=True)
+            model = Model(model_name)
+
+            # Aider needs string paths
+            fnames_to_edit = [str(doc_path)]
+            read_only_fnames = [str(contract_path), str(REVIEW_CHECKLIST_PATH)]
+
+            coder = Coder.create(
+                main_model=model,
+                io=io,
+                fnames=fnames_to_edit,
+                read_only_fnames=read_only_fnames,
+                dry_run=dry_run,
+            )
+
+            prompt = (
+                "You are a technical reviewer. Review the documentation file against the"
+                " Clarity contract for technical accuracy and against the review checklist"
+                " for structure and completeness. Apply any necessary changes directly to"
+                " the documentation file to fix discrepancies or omissions."
+            )
+
+            coder.run(prompt)
+
+        except Exception:
+            print(f"    Error reviewing {doc_path.relative_to(ROOT_DIR)}:")
+            traceback.print_exc()
 
 def generate_summary_md(dry_run=False):
     """Generates the SUMMARY.md file for the docs."""
