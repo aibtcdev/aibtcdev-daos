@@ -252,7 +252,7 @@ def main():
     parser = argparse.ArgumentParser(description="Automated Clarity contract documentation generator.")
     parser.add_argument("--dry-run", action="store_true", help="Perform a dry run without making changes.")
     parser.add_argument("--specific-contract", type=str, help="Process only a specific contract file (path from repo root).")
-    parser.add_argument("--model", type=str, default="gpt-4-turbo", help="Specify the LLM model to use.")
+    parser.add_argument("--model", type=str, default="openrouter/google/gemini-2.5-pro-preview-03-25", help="Specify the LLM model to use.")
     
     args = parser.parse_args()
 
