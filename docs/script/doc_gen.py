@@ -146,6 +146,29 @@ def create_documentation(contracts_to_create, model_name, dry_run=False):
             print(f"    Error processing {relative_contract_path}:")
             traceback.print_exc()
 
+def _build_toc_lines(directory: Path, base_path: Path, depth: int) -> list[str]:
+    """Recursively builds table of contents lines."""
+    lines = []
+    indent = "    " * depth
+
+    # Process items in alphabetical order
+    items = sorted(directory.iterdir())
+    
+    subdirs = [p for p in items if p.is_dir()]
+    md_files = [p for p in items if p.is_file() and p.suffix == '.md' and p.name != 'README.md']
+
+    for subdir in subdirs:
+        title = subdir.name.replace('-', ' ').title()
+        lines.append(f"{indent}* {title}")
+        lines.extend(_build_toc_lines(subdir, base_path, depth + 1))
+
+    for md_file in md_files:
+        link = md_file.relative_to(base_path)
+        title = md_file.stem
+        lines.append(f"{indent}* [{title}](./{link})")
+    
+    return lines
+
 def review_documentation(contracts_to_review, model_name, dry_run=False):
     """Reviews existing documentation for accuracy against the source code."""
     if not contracts_to_review:
@@ -194,8 +217,36 @@ def review_documentation(contracts_to_review, model_name, dry_run=False):
 def generate_summary_md(dry_run=False):
     """Generates the SUMMARY.md file for the docs."""
     print("\nGenerating SUMMARY.md...")
-    # Placeholder for Phase 3 implementation
-    pass
+    
+    summary_path = ROOT_DIR / "docs" / "SUMMARY.md"
+    docs_root = ROOT_DIR / "docs"
+    
+    header = [
+        "# Table of Contents",
+        "",
+        "* [Introduction](./README.md)",
+        "* [Documentation Plan](./script/PLANS.md)",
+        "* [Project Retrospective](./script/END.md)",
+        "",
+        "---",
+        "",
+        "* Contract Documentation",
+    ]
+
+    # Start building TOC from docs/contracts directory
+    toc_lines = _build_toc_lines(DOCS_DIR, docs_root, 1)
+
+    content = "\n".join(header + toc_lines) + "\n"
+
+    if dry_run:
+        print("    (Dry run) Would update SUMMARY.md")
+        return
+
+    try:
+        summary_path.write_text(content)
+        print(f"  - Updated {summary_path.relative_to(ROOT_DIR)}")
+    except IOError as e:
+        print(f"    Error writing to SUMMARY.md: {e}")
 
 def main():
     parser = argparse.ArgumentParser(description="Automated Clarity contract documentation generator.")

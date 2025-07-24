@@ -59,8 +59,8 @@ The script will iterate through the categorized lists and perform the necessary 
 
 After all individual files are processed, the script will update the project's navigation to ensure discoverability.
 
-- [ ] **Generate Table of Contents:**
-  - [ ] **Input:** The final directory structure of `docs/contracts/`.
-  - [ ] **Action:**
+- [x] **Generate Table of Contents:**
+  - [x] **Input:** The final directory structure of `docs/contracts/`.
+  - [x] **Action:**
       1. Automatically generate the content for `SUMMARY.md` by traversing the documentation directory.
       2. Overwrite the existing `SUMMARY.md` with the newly generated, always-current table of contents.

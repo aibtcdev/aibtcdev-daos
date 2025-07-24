@@ -1,22 +1,22 @@
 # Table of Contents
 
 * [Introduction](./README.md)
-* [Documentation Plan](./PLANS.md)
-* [Project Retrospective](./END.md)
+* [Documentation Plan](./script/PLANS.md)
+* [Project Retrospective](./script/END.md)
 
 ---
 
-* [Contract Documentation](./contracts/README.md)
-    * [Agent Contracts](./contracts/agent/README.md)
+* Contract Documentation
+    * Agent
         * [aibtc-agent-account](./contracts/agent/aibtc-agent-account.md)
-    * [Core Contracts](./contracts/core/README.md)
+    * Core
         * [aibtc-dao-run-cost](./contracts/core/aibtc-dao-run-cost.md)
-    * [DAO Contracts](./contracts/dao/README.md)
-        * [Actions](./contracts/dao/actions/README.md)
+    * Dao
+        * Actions
             * [aibtc-action-send-message](./contracts/dao/actions/aibtc-action-send-message.md)
-        * [Base](./contracts/dao/base/README.md)
+        * Base
             * [aibtc-base-dao](./contracts/dao/base/aibtc-base-dao.md)
-        * [Extensions](./contracts/dao/extensions/README.md)
+        * Extensions
             * [aibtc-action-proposal-voting](./contracts/dao/extensions/aibtc-action-proposal-voting.md)
             * [aibtc-dao-charter](./contracts/dao/extensions/aibtc-dao-charter.md)
             * [aibtc-dao-epoch](./contracts/dao/extensions/aibtc-dao-epoch.md)
@@ -25,20 +25,17 @@
             * [aibtc-rewards-account](./contracts/dao/extensions/aibtc-rewards-account.md)
             * [aibtc-token-owner](./contracts/dao/extensions/aibtc-token-owner.md)
             * [aibtc-treasury](./contracts/dao/extensions/aibtc-treasury.md)
-        * [Proposals](./contracts/dao/proposals/README.md)
+        * Proposals
             * [aibtc-base-initialize-dao](./contracts/dao/proposals/aibtc-base-initialize-dao.md)
-        * [Token](./contracts/dao/token/README.md)
+        * Token
             * [aibtc-faktory](./contracts/dao/token/aibtc-faktory.md)
             * [aibtc-faktory-dex](./contracts/dao/token/aibtc-faktory-dex.md)
             * [aibtc-pre-faktory](./contracts/dao/token/aibtc-pre-faktory.md)
             * [xyk-pool-sbtc-aibtc-v-1-1](./contracts/dao/token/xyk-pool-sbtc-aibtc-v-1-1.md)
-        * [Trading](./contracts/dao/trading/README.md)
+        * Trading
             * [aibtc-acct-swap-bitflow-aibtc-sbtc](./contracts/dao/trading/aibtc-acct-swap-bitflow-aibtc-sbtc.md)
             * [aibtc-acct-swap-faktory-aibtc-sbtc](./contracts/dao/trading/aibtc-acct-swap-faktory-aibtc-sbtc.md)
-    * [Traits](./contracts/traits/README.md)
+    * Traits
         * [aibtc-agent-account-traits](./contracts/traits/aibtc-agent-account-traits.md)
         * [aibtc-base-dao-trait](./contracts/traits/aibtc-base-dao-trait.md)
         * [aibtc-dao-traits](./contracts/traits/aibtc-dao-traits.md)
-    * External Dependencies
-        * [sbtc-token](./contracts/sbtc-token.md)
-        * [xyk-core-v-1-2](./contracts/xyk-core-v-1-2.md)
