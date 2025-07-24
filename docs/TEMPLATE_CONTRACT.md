@@ -108,7 +108,31 @@
 
 ## 10. Print Events
 
-[List and describe any SIP-019 style print events emitted by the contract.]
+[List and describe any SIP-019 style print events emitted by the contract. Use the format below.]
 
-- `event-name-1`: [Description of when this event is emitted and what its payload contains.]
-- `event-name-2`: ...
+- [`event-name`](#event-name): [Brief, one-sentence description of the event.]
+- ...
+
+---
+
+### `event-name`
+
+**Description:**
+[Description of when this event is emitted and what its payload contains.]
+
+**TypeScript Type:**
+```typescript
+type EventPayload = {
+  key1: string;
+  key2: number;
+};
+```
+
+**Pydantic Model:**
+```python
+from pydantic import BaseModel
+
+class EventPayload(BaseModel):
+    key1: str
+    key2: int
+```
