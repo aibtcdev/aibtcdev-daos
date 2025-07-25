@@ -80,6 +80,11 @@
         </p>
       </div>
 
+      <!-- Key Insights Summary -->
+      <div id="summary-container" class="mb-8">
+        <!-- Summary will be generated here -->
+      </div>
+
       <!-- Controls for sorting and filtering -->
       <div
         class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 flex flex-col md:flex-row gap-4"
@@ -119,14 +124,11 @@
       </div>
 
       <!-- This div will be populated with transaction cost cards by the script -->
-      <main
-        id="report-container"
-        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
-      >
+      <main id="report-container">
         <!-- Loading indicator -->
         <div
           id="loading"
-          class="col-span-full flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border border-gray-200"
+          class="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border border-gray-200"
         >
           <svg
             class="animate-spin h-8 w-8 text-gray-500"
@@ -175,6 +177,7 @@
           }
 
           allProcessedTxs = processCostData(costsData);
+          renderSummary(allProcessedTxs);
           populateContractFilter(allProcessedTxs);
           updateReportView(); // Initial render
 
@@ -254,6 +257,63 @@
       }
 
       /**
+       * Generates and renders a summary table of key insights.
+       */
+      function renderSummary(txs) {
+        if (txs.length === 0) return;
+
+        const container = document.getElementById("summary-container");
+
+        // Find key transactions
+        const overallBottleneck = txs.reduce((prev, curr) =>
+          prev.minTxs < curr.minTxs ? prev : curr
+        );
+        const mostRuntime = txs.reduce((prev, curr) =>
+          prev.cost.runtime > curr.cost.runtime ? prev : curr
+        );
+        const mostReadCount = txs.reduce((prev, curr) =>
+          prev.cost.read_count > curr.cost.read_count ? prev : curr
+        );
+        const mostReadLength = txs.reduce((prev, curr) =>
+          prev.cost.read_length > curr.cost.read_length ? prev : curr
+        );
+        const mostWriteCount = txs.reduce((prev, curr) =>
+          prev.cost.write_count > curr.cost.write_count ? prev : curr
+        );
+        const mostWriteLength = txs.reduce((prev, curr) =>
+          prev.cost.write_length > curr.cost.write_length ? prev : curr
+        );
+
+        const createRow = (label, tx) => {
+          const contractName = tx.contract_id.split(".")[1] || tx.contract_id;
+          return `
+            <tr>
+              <td class="py-3 px-4 border-b border-gray-200 text-sm font-medium text-gray-800">${label}</td>
+              <td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600 font-mono">${contractName}.${tx.method}</td>
+            </tr>
+          `;
+        };
+
+        container.innerHTML = `
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Key Insights</h2>
+            <div class="overflow-x-auto">
+              <table class="min-w-full bg-white">
+                <tbody>
+                  ${createRow("Overall Bottleneck", overallBottleneck)}
+                  ${createRow("Most Runtime-Intensive", mostRuntime)}
+                  ${createRow("Highest Read Count", mostReadCount)}
+                  ${createRow("Highest Read Length", mostReadLength)}
+                  ${createRow("Highest Write Count", mostWriteCount)}
+                  ${createRow("Highest Write Length", mostWriteLength)}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      /**
        * Populates the contract filter dropdown with unique contract names.
        */
       function populateContractFilter(txs) {
@@ -280,37 +340,65 @@
         const sortBy = document.getElementById("sort-select").value;
 
         // 1. Filter
-        let transactionsToDisplay = allProcessedTxs;
+        let filteredTxs = allProcessedTxs;
         if (selectedContract !== "all") {
-          transactionsToDisplay = allProcessedTxs.filter(
+          filteredTxs = allProcessedTxs.filter(
             (tx) => tx.contract_id === selectedContract
           );
         }
 
-        // 2. Sort
+        // 2. Group by contract
+        const groupedByContract = filteredTxs.reduce((acc, tx) => {
+          (acc[tx.contract_id] = acc[tx.contract_id] || []).push(tx);
+          return acc;
+        }, {});
+
+        // 3. Sort and Render
+        container.innerHTML = ""; // Clear previous results
+        if (Object.keys(groupedByContract).length === 0) {
+          container.innerHTML = `<div class="text-center p-12 bg-white rounded-xl shadow-sm border border-gray-200"><p class="text-lg font-medium text-gray-600">No transactions match the current filter.</p></div>`;
+          return;
+        }
+
         const parts = sortBy.split("-");
         const sortDir = parts.pop();
         const sortKey = parts.join("-");
-        transactionsToDisplay.sort((a, b) => {
-          let valA, valB;
-          if (sortKey === "max-txs") {
-            valA = a.minTxs;
-            valB = b.minTxs;
-          } else {
-            valA = a.cost[sortKey];
-            valB = b.cost[sortKey];
-          }
-          return sortDir === "asc" ? valA - valB : valB - valA;
-        });
 
-        // 3. Render
-        container.innerHTML = ""; // Clear previous results
-        if (transactionsToDisplay.length === 0) {
-          container.innerHTML = `<div class="col-span-full text-center p-12 bg-white rounded-xl shadow-sm border border-gray-200"><p class="text-lg font-medium text-gray-600">No transactions match the current filter.</p></div>`;
-        } else {
-          transactionsToDisplay.forEach((tx) =>
-            container.appendChild(createTransactionCard(tx, sortBy))
-          );
+        for (const contractId in groupedByContract) {
+          const contractSection = document.createElement("section");
+          contractSection.className = "mb-12";
+
+          const contractName = contractId.split(".")[1] || contractId;
+          const contractTitle = document.createElement("h2");
+          contractTitle.className =
+            "text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-gray-200";
+          contractTitle.textContent = contractName;
+          contractSection.appendChild(contractTitle);
+
+          const cardContainer = document.createElement("div");
+          cardContainer.className =
+            "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6";
+
+          // Sort transactions within the group
+          const transactions = groupedByContract[contractId];
+          transactions.sort((a, b) => {
+            let valA, valB;
+            if (sortKey === "max-txs") {
+              valA = a.minTxs;
+              valB = b.minTxs;
+            } else {
+              valA = a.cost[sortKey];
+              valB = b.cost[sortKey];
+            }
+            return sortDir === "asc" ? valA - valB : valB - valA;
+          });
+
+          transactions.forEach((tx) => {
+            cardContainer.appendChild(createTransactionCard(tx, sortBy));
+          });
+
+          contractSection.appendChild(cardContainer);
+          container.appendChild(contractSection);
         }
       }
 
