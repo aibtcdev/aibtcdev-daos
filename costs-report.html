@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stacks Transaction Cost Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      /* Updated to use brand orange color palette */
+      .limit-highlight {
+        background-color: #ff4f03;
+        color: white;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 text-gray-800">
+    <div class="container mx-auto p-4 md:p-8">
+      <header class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">
+          Stacks Transaction Cost Analysis
+        </h1>
+        <p class="mt-2 text-lg text-gray-600">
+          This report analyzes the provided cost data to determine the maximum
+          number of transactions that can fit into a single block, highlighting
+          the limiting factor for each transaction type.
+        </p>
+      </header>
+
+      <!-- Legend for the cost dimensions -->
+      <div
+        class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8"
+      >
+        <h2 class="text-xl font-semibold mb-3 text-gray-800">
+          Understanding the Metrics
+        </h2>
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-sm"
+        >
+          <div class="p-3 bg-gray-100 rounded-lg">
+            <h3 class="font-bold">Runtime</h3>
+            <p class="text-gray-600">The computational effort required.</p>
+          </div>
+          <div class="p-3 bg-gray-100 rounded-lg">
+            <h3 class="font-bold">Read Count</h3>
+            <p class="text-gray-600">Number of database reads.</p>
+          </div>
+          <div class="p-3 bg-gray-100 rounded-lg">
+            <h3 class="font-bold">Read Length</h3>
+            <p class="text-gray-600">Total size (bytes) of data read.</p>
+          </div>
+          <div class="p-3 bg-gray-100 rounded-lg">
+            <h3 class="font-bold">Write Count</h3>
+            <p class="text-gray-600">Number of database writes.</p>
+          </div>
+          <div class="p-3 bg-gray-100 rounded-lg">
+            <h3 class="font-bold">Write Length</h3>
+            <p class="text-gray-600">Total size (bytes) of data written.</p>
+          </div>
+        </div>
+        <p class="mt-4 text-sm text-gray-500">
+          For each transaction, we calculate how many could fit in a block based
+          on each of the five limits. The lowest number determines the actual
+          maximum, and its corresponding metric is the
+          <span class="font-semibold" style="color: #ff4f03"
+            >limiting factor</span
+          >.
+        </p>
+      </div>
+
+      <!-- This div will be populated with transaction cost cards by the script -->
+      <main
+        id="report-container"
+        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+      >
+        <!-- Loading indicator -->
+        <div
+          id="loading"
+          class="col-span-full flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border border-gray-200"
+        >
+          <svg
+            class="animate-spin h-8 w-8 text-gray-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p class="mt-4 text-lg font-medium text-gray-600">
+            Analyzing cost report...
+          </p>
+        </div>
+      </main>
+    </div>
+
+    <script type="module">
+      // Main function to orchestrate the analysis and rendering
+      async function generateReport() {
+        try {
+          // Fetch the cost report data from the local JSON file.
+          // Note: This requires the report to be served from a web server.
+          // It may not work if you open the HTML file directly from your local file system.
+          const response = await fetch("./costs-reports.json");
+          if (!response.ok) {
+            throw new Error(
+              `Failed to fetch costs-reports.json: ${response.statusText}`
+            );
+          }
+          const costsData = await response.json();
+
+          if (!costsData || costsData.length === 0) {
+            throw new Error("Fetched cost data is missing or empty.");
+          }
+
+          const processedTxs = processCostData(costsData);
+          const container = document.getElementById("report-container");
+          container.innerHTML = "";
+          processedTxs.forEach((tx) =>
+            container.appendChild(createTransactionCard(tx))
+          );
+        } catch (error) {
+          console.error("Failed to load or process cost report:", error);
+          const container = document.getElementById("report-container");
+          container.innerHTML = `<div class="col-span-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert"><strong class="font-bold">Error:</strong><span class="block sm:inline"> ${error.message}. Please ensure the JSON file is present and the HTML is accessed via a local server.</span></div>`;
+        }
+      }
+
+      /**
+       * Processes raw cost data to find the highest costs for each unique function call.
+       */
+      function processCostData(data) {
+        const transactionCosts = new Map();
+        data.forEach((item) => {
+          const key = `${item.contract_id}.${item.method}`;
+          if (!transactionCosts.has(key)) {
+            transactionCosts.set(key, {
+              key,
+              contract_id: item.contract_id,
+              method: item.method,
+              cost: {
+                runtime: 0,
+                read_count: 0,
+                read_length: 0,
+                write_count: 0,
+                write_length: 0,
+              },
+              limit: item.cost_result.limit,
+              example_test: item.test_name,
+            });
+          }
+          const current = transactionCosts.get(key);
+          const newCost = item.cost_result.total;
+          Object.keys(current.cost).forEach(
+            (k) => (current.cost[k] = Math.max(current.cost[k], newCost[k]))
+          );
+        });
+        const meaningfulTransactions = Array.from(
+          transactionCosts.values()
+        ).filter((tx) => Object.values(tx.cost).some((v) => v > 0));
+        meaningfulTransactions.sort((a, b) => b.cost.runtime - a.cost.runtime);
+        return meaningfulTransactions;
+      }
+
+      /**
+       * Creates an HTML element for a single transaction's cost analysis.
+       */
+      function createTransactionCard(txData) {
+        const card = document.createElement("div");
+        card.className =
+          "bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-200 flex flex-col";
+
+        const { cost, limit } = txData;
+        const txsPerBlock = {
+          runtime: calculateTxs(limit.runtime, cost.runtime),
+          read_count: calculateTxs(limit.read_count, cost.read_count),
+          read_length: calculateTxs(limit.read_length, cost.read_length),
+          write_count: calculateTxs(limit.write_count, cost.write_count),
+          write_length: calculateTxs(limit.write_length, cost.write_length),
+        };
+
+        const limitingFactor = Object.keys(txsPerBlock).reduce((a, b) =>
+          txsPerBlock[a] < txsPerBlock[b] ? a : b
+        );
+        const minTxs = txsPerBlock[limitingFactor];
+        const contractName =
+          txData.contract_id.split(".")[1] || txData.contract_id;
+
+        const createMetricRow = (name, costVal, txsVal, factorKey) => {
+          const isLimit = factorKey === limitingFactor;
+          // Use Math.floor and toLocaleString to format numbers without decimals.
+          const formattedTxs = isFinite(txsVal)
+            ? Math.floor(txsVal).toLocaleString()
+            : "∞";
+          return `
+                    <div class="flex justify-between items-center py-2.5 px-3 rounded-md ${
+                      isLimit ? "limit-highlight font-bold" : "bg-gray-50"
+                    }">
+                        <span class="text-sm font-medium capitalize">${name.replace(
+                          "_",
+                          " "
+                        )}</span>
+                        <div class="text-right">
+                            <span class="text-sm font-semibold">${costVal.toLocaleString()}</span>
+                            <span class="text-xs ${
+                              isLimit ? "text-white/80" : "text-gray-500"
+                            } ml-2">(${formattedTxs} txs/block)</span>
+                        </div>
+                    </div>
+                `;
+        };
+
+        card.innerHTML = `
+                <div class="flex-grow">
+                    <h3 class="text-xl font-bold text-gray-900 break-words">${contractName}</h3>
+                    <p class="text-md text-gray-500 mb-4 font-mono break-words">${
+                      txData.method
+                    }</p>
+                    
+                    <div class="mb-6 mt-2 pt-4 text-center">
+                        <p class="text-sm text-gray-600">Max transactions per block:</p>
+                        <p class="text-4xl font-bold" style="color: #FF4F03;">${
+                          isFinite(minTxs)
+                            ? Math.floor(minTxs).toLocaleString()
+                            : "∞"
+                        }</p>
+                        <p class="text-sm font-semibold text-gray-800 mt-1">Limited by: <span class="capitalize font-bold" style="color: #FF4F03;">${limitingFactor.replace(
+                          "_",
+                          " "
+                        )}</span></p>
+                    </div>
+
+                    <div class="space-y-2 border-t border-gray-200 pt-4">
+                        ${createMetricRow(
+                          "Runtime",
+                          cost.runtime,
+                          txsPerBlock.runtime,
+                          "runtime"
+                        )}
+                        ${createMetricRow(
+                          "Read Count",
+                          cost.read_count,
+                          txsPerBlock.read_count,
+                          "read_count"
+                        )}
+                        ${createMetricRow(
+                          "Read Length",
+                          cost.read_length,
+                          txsPerBlock.read_length,
+                          "read_length"
+                        )}
+                        ${createMetricRow(
+                          "Write Count",
+                          cost.write_count,
+                          txsPerBlock.write_count,
+                          "write_count"
+                        )}
+                        ${createMetricRow(
+                          "Write Length",
+                          cost.write_length,
+                          txsPerBlock.write_length,
+                          "write_length"
+                        )}
+                    </div>
+                </div>
+            `;
+        return card;
+      }
+
+      /**
+       * Helper to calculate transactions per block, handling division by zero.
+       */
+      function calculateTxs(limit, cost) {
+        return cost === 0 ? Infinity : limit / cost;
+      }
+
+      document.addEventListener("DOMContentLoaded", generateReport);
+    </script>
+  </body>
+</html>
