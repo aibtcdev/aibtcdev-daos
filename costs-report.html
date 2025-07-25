@@ -288,11 +288,12 @@
         }
 
         // 2. Sort
-        const [sortKey, sortDir] = sortBy.split("-");
+        const parts = sortBy.split("-");
+        const sortDir = parts.pop();
+        const sortKey = parts.join("-");
         transactionsToDisplay.sort((a, b) => {
           let valA, valB;
-          if (sortKey === "max") {
-            // Special case for 'max-txs-asc'
+          if (sortKey === "max-txs") {
             valA = a.minTxs;
             valB = b.minTxs;
           } else {
@@ -346,11 +347,11 @@
           let rowClass = "bg-gray-50";
           let txsClass = "text-gray-500";
 
-          if (isLimit) {
-            rowClass = "limit-highlight font-bold";
-            txsClass = "text-white/80";
-          } else if (isSortedBy) {
+          if (isSortedBy) {
             rowClass = "sort-highlight";
+            txsClass = "text-white/80";
+          } else if (isLimit) {
+            rowClass = "limit-highlight font-bold";
             txsClass = "text-white/80";
           }
 
