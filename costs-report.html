@@ -76,6 +76,43 @@
         </p>
       </div>
 
+      <!-- Controls for sorting and filtering -->
+      <div
+        class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 flex flex-col md:flex-row gap-4"
+      >
+        <div class="flex-1">
+          <label
+            for="sort-select"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Sort by</label
+          >
+          <select
+            id="sort-select"
+            class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
+          >
+            <option value="max-txs-asc">Bottlenecks First (Max Txs Asc)</option>
+            <option value="runtime-desc">Runtime (High to Low)</option>
+            <option value="read_count-desc">Read Count (High to Low)</option>
+            <option value="read_length-desc">Read Length (High to Low)</option>
+            <option value="write_count-desc">Write Count (High to Low)</option>
+            <option value="write_length-desc">Write Length (High to Low)</option>
+          </select>
+        </div>
+        <div class="flex-1">
+          <label
+            for="contract-filter-select"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Filter by Contract</label
+          >
+          <select
+            id="contract-filter-select"
+            class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
+          >
+            <option value="all">All Contracts</option>
+          </select>
+        </div>
+      </div>
+
       <!-- This div will be populated with transaction cost cards by the script -->
       <main
         id="report-container"
@@ -114,12 +151,12 @@
     </div>
 
     <script type="module">
+      // Global store for our transaction data
+      let allProcessedTxs = [];
+
       // Main function to orchestrate the analysis and rendering
       async function generateReport() {
         try {
-          // Fetch the cost report data from the local JSON file.
-          // Note: This requires the report to be served from a web server.
-          // It may not work if you open the HTML file directly from your local file system.
           const response = await fetch("./costs-reports.json");
           if (!response.ok) {
             throw new Error(
@@ -132,12 +169,17 @@
             throw new Error("Fetched cost data is missing or empty.");
           }
 
-          const processedTxs = processCostData(costsData);
-          const container = document.getElementById("report-container");
-          container.innerHTML = "";
-          processedTxs.forEach((tx) =>
-            container.appendChild(createTransactionCard(tx))
-          );
+          allProcessedTxs = processCostData(costsData);
+          populateContractFilter(allProcessedTxs);
+          updateReportView(); // Initial render
+
+          // Add event listeners for controls
+          document
+            .getElementById("sort-select")
+            .addEventListener("change", updateReportView);
+          document
+            .getElementById("contract-filter-select")
+            .addEventListener("change", updateReportView);
         } catch (error) {
           console.error("Failed to load or process cost report:", error);
           const container = document.getElementById("report-container");
@@ -146,7 +188,7 @@
       }
 
       /**
-       * Processes raw cost data to find the highest costs for each unique function call.
+       * Processes raw cost data to find the highest costs and calculate bottleneck info.
        */
       function processCostData(data) {
         const transactionCosts = new Map();
@@ -174,11 +216,96 @@
             (k) => (current.cost[k] = Math.max(current.cost[k], newCost[k]))
           );
         });
+
         const meaningfulTransactions = Array.from(
           transactionCosts.values()
         ).filter((tx) => Object.values(tx.cost).some((v) => v > 0));
-        meaningfulTransactions.sort((a, b) => b.cost.runtime - a.cost.runtime);
+
+        // Calculate limiting factors for each transaction
+        meaningfulTransactions.forEach((tx) => {
+          const txsPerBlock = {
+            runtime: calculateTxs(tx.limit.runtime, tx.cost.runtime),
+            read_count: calculateTxs(tx.limit.read_count, tx.cost.read_count),
+            read_length: calculateTxs(
+              tx.limit.read_length,
+              tx.cost.read_length
+            ),
+            write_count: calculateTxs(
+              tx.limit.write_count,
+              tx.cost.write_count
+            ),
+            write_length: calculateTxs(
+              tx.limit.write_length,
+              tx.cost.write_length
+            ),
+          };
+          tx.limitingFactor = Object.keys(txsPerBlock).reduce((a, b) =>
+            txsPerBlock[a] < txsPerBlock[b] ? a : b
+          );
+          tx.minTxs = txsPerBlock[tx.limitingFactor];
+        });
+
         return meaningfulTransactions;
+      }
+
+      /**
+       * Populates the contract filter dropdown with unique contract names.
+       */
+      function populateContractFilter(txs) {
+        const filterSelect = document.getElementById("contract-filter-select");
+        const contractNames = [
+          ...new Set(txs.map((tx) => tx.contract_id)),
+        ].sort();
+        contractNames.forEach((name) => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name.split(".")[1] || name;
+          filterSelect.appendChild(option);
+        });
+      }
+
+      /**
+       * Applies current filters and sorting, then re-renders the report.
+       */
+      function updateReportView() {
+        const container = document.getElementById("report-container");
+        const selectedContract = document.getElementById(
+          "contract-filter-select"
+        ).value;
+        const sortBy = document.getElementById("sort-select").value;
+
+        // 1. Filter
+        let transactionsToDisplay = allProcessedTxs;
+        if (selectedContract !== "all") {
+          transactionsToDisplay = allProcessedTxs.filter(
+            (tx) => tx.contract_id === selectedContract
+          );
+        }
+
+        // 2. Sort
+        const [sortKey, sortDir] = sortBy.split("-");
+        transactionsToDisplay.sort((a, b) => {
+          let valA, valB;
+          if (sortKey === "max") {
+            // Special case for 'max-txs-asc'
+            valA = a.minTxs;
+            valB = b.minTxs;
+          } else {
+            valA = a.cost[sortKey];
+            valB = b.cost[sortKey];
+          }
+          return sortDir === "asc" ? valA - valB : valB - valA;
+        });
+
+        // 3. Render
+        container.innerHTML = ""; // Clear previous results
+        if (transactionsToDisplay.length === 0) {
+          container.innerHTML = `<div class="col-span-full text-center p-12 bg-white rounded-xl shadow-sm border border-gray-200"><p class="text-lg font-medium text-gray-600">No transactions match the current filter.</p></div>`;
+        } else {
+          transactionsToDisplay.forEach((tx) =>
+            container.appendChild(createTransactionCard(tx))
+          );
+        }
       }
 
       /**
@@ -189,7 +316,7 @@
         card.className =
           "bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-200 flex flex-col";
 
-        const { cost, limit } = txData;
+        const { cost, limit, limitingFactor, minTxs } = txData;
         const txsPerBlock = {
           runtime: calculateTxs(limit.runtime, cost.runtime),
           read_count: calculateTxs(limit.read_count, cost.read_count),
@@ -198,10 +325,6 @@
           write_length: calculateTxs(limit.write_length, cost.write_length),
         };
 
-        const limitingFactor = Object.keys(txsPerBlock).reduce((a, b) =>
-          txsPerBlock[a] < txsPerBlock[b] ? a : b
-        );
-        const minTxs = txsPerBlock[limitingFactor];
         const contractName =
           txData.contract_id.split(".")[1] || txData.contract_id;
 
