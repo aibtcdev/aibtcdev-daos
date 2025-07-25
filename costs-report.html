@@ -264,48 +264,61 @@
 
         const container = document.getElementById("summary-container");
 
-        // Find key transactions
-        const overallBottleneck = txs.reduce((prev, curr) =>
-          prev.minTxs < curr.minTxs ? prev : curr
-        );
-        const mostRuntime = txs.reduce((prev, curr) =>
-          prev.cost.runtime > curr.cost.runtime ? prev : curr
-        );
-        const mostReadCount = txs.reduce((prev, curr) =>
-          prev.cost.read_count > curr.cost.read_count ? prev : curr
-        );
-        const mostReadLength = txs.reduce((prev, curr) =>
-          prev.cost.read_length > curr.cost.read_length ? prev : curr
-        );
-        const mostWriteCount = txs.reduce((prev, curr) =>
-          prev.cost.write_count > curr.cost.write_count ? prev : curr
-        );
-        const mostWriteLength = txs.reduce((prev, curr) =>
-          prev.cost.write_length > curr.cost.write_length ? prev : curr
-        );
+        // Find top 3 for each category
+        const top3Bottlenecks = [...txs]
+          .sort((a, b) => a.minTxs - b.minTxs)
+          .slice(0, 3);
+        const top3Runtime = [...txs]
+          .sort((a, b) => b.cost.runtime - a.cost.runtime)
+          .slice(0, 3);
+        const top3ReadCount = [...txs]
+          .sort((a, b) => b.cost.read_count - a.cost.read_count)
+          .slice(0, 3);
+        const top3ReadLength = [...txs]
+          .sort((a, b) => b.cost.read_length - a.cost.read_length)
+          .slice(0, 3);
+        const top3WriteCount = [...txs]
+          .sort((a, b) => b.cost.write_count - a.cost.write_count)
+          .slice(0, 3);
+        const top3WriteLength = [...txs]
+          .sort((a, b) => b.cost.write_length - a.cost.write_length)
+          .slice(0, 3);
 
-        const createRow = (label, tx) => {
-          const contractName = tx.contract_id.split(".")[1] || tx.contract_id;
-          return `
-            <tr>
-              <td class="py-3 px-4 border-b border-gray-200 text-sm font-medium text-gray-800">${label}</td>
-              <td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600 font-mono">${contractName}.${tx.method}</td>
-            </tr>
-          `;
+        const createGroupedRows = (label, topTxs) => {
+          if (topTxs.length === 0) return "";
+          return topTxs
+            .map((tx, index) => {
+              const contractName =
+                tx.contract_id.split(".")[1] || tx.contract_id;
+              const labelCell =
+                index === 0
+                  ? `<td class="py-3 px-4 border-b border-gray-200 text-sm font-medium text-gray-800 align-top" rowspan="${topTxs.length}">${label}</td>`
+                  : "";
+              return `
+                <tr>
+                  ${labelCell}
+                  <td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600 font-mono">${contractName}: ${tx.method}()</td>
+                </tr>
+              `;
+            })
+            .join("");
         };
 
         container.innerHTML = `
           <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800">Key Insights</h2>
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Key Insights (Top 3)</h2>
             <div class="overflow-x-auto">
               <table class="min-w-full bg-white">
                 <tbody>
-                  ${createRow("Overall Bottleneck", overallBottleneck)}
-                  ${createRow("Most Runtime-Intensive", mostRuntime)}
-                  ${createRow("Highest Read Count", mostReadCount)}
-                  ${createRow("Highest Read Length", mostReadLength)}
-                  ${createRow("Highest Write Count", mostWriteCount)}
-                  ${createRow("Highest Write Length", mostWriteLength)}
+                  ${createGroupedRows("Overall Bottlenecks", top3Bottlenecks)}
+                  ${createGroupedRows(
+                    "Most Runtime-Intensive",
+                    top3Runtime
+                  )}
+                  ${createGroupedRows("Highest Read Counts", top3ReadCount)}
+                  ${createGroupedRows("Highest Read Lengths", top3ReadLength)}
+                  ${createGroupedRows("Highest Write Counts", top3WriteCount)}
+                  ${createGroupedRows("Highest Write Lengths", top3WriteLength)}
                 </tbody>
               </table>
             </div>
