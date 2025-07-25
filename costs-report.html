@@ -20,6 +20,10 @@
         background-color: #ff4f03;
         color: white;
       }
+      .sort-highlight {
+        background-color: #0533d1;
+        color: white;
+      }
     </style>
   </head>
   <body class="bg-gray-50 text-gray-800">
@@ -90,7 +94,8 @@
             id="sort-select"
             class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
           >
-            <option value="max-txs-asc">Bottlenecks First (Max Txs Asc)</option>
+            <option value="max-txs-desc">Max Txs (High to Low)</option>
+            <option value="max-txs-asc">Max Txs (Low to High)</option>
             <option value="runtime-desc">Runtime (High to Low)</option>
             <option value="read_count-desc">Read Count (High to Low)</option>
             <option value="read_length-desc">Read Length (High to Low)</option>
@@ -303,7 +308,7 @@
           container.innerHTML = `<div class="col-span-full text-center p-12 bg-white rounded-xl shadow-sm border border-gray-200"><p class="text-lg font-medium text-gray-600">No transactions match the current filter.</p></div>`;
         } else {
           transactionsToDisplay.forEach((tx) =>
-            container.appendChild(createTransactionCard(tx))
+            container.appendChild(createTransactionCard(tx, sortBy))
           );
         }
       }
@@ -311,7 +316,7 @@
       /**
        * Creates an HTML element for a single transaction's cost analysis.
        */
-      function createTransactionCard(txData) {
+      function createTransactionCard(txData, sortBy) {
         const card = document.createElement("div");
         card.className =
           "bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-200 flex flex-col";
@@ -327,26 +332,37 @@
 
         const contractName =
           txData.contract_id.split(".")[1] || txData.contract_id;
+        const [sortKey] = sortBy.split("-");
 
         const createMetricRow = (name, costVal, txsVal, factorKey) => {
           const isLimit = factorKey === limitingFactor;
+          const isSortedBy = factorKey === sortKey;
+
           // Use Math.floor and toLocaleString to format numbers without decimals.
           const formattedTxs = isFinite(txsVal)
             ? Math.floor(txsVal).toLocaleString()
             : "∞";
+
+          let rowClass = "bg-gray-50";
+          let txsClass = "text-gray-500";
+
+          if (isLimit) {
+            rowClass = "limit-highlight font-bold";
+            txsClass = "text-white/80";
+          } else if (isSortedBy) {
+            rowClass = "sort-highlight";
+            txsClass = "text-white/80";
+          }
+
           return `
-                    <div class="flex justify-between items-center py-2.5 px-3 rounded-md ${
-                      isLimit ? "limit-highlight font-bold" : "bg-gray-50"
-                    }">
+                    <div class="flex justify-between items-center py-2.5 px-3 rounded-md ${rowClass}">
                         <span class="text-sm font-medium capitalize">${name.replace(
                           "_",
                           " "
                         )}</span>
                         <div class="text-right">
                             <span class="text-sm font-semibold">${costVal.toLocaleString()}</span>
-                            <span class="text-xs ${
-                              isLimit ? "text-white/80" : "text-gray-500"
-                            } ml-2">(${formattedTxs} txs/block)</span>
+                            <span class="text-xs ${txsClass} ml-2">(${formattedTxs} txs/block)</span>
                         </div>
                     </div>
                 `;
