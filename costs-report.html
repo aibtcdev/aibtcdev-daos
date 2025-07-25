@@ -284,12 +284,13 @@
           .sort((a, b) => b.cost.write_length - a.cost.write_length)
           .slice(0, 3);
 
-        const createGroupedRows = (label, topTxs) => {
+        const createGroupedRows = (label, topTxs, valueFn) => {
           if (topTxs.length === 0) return "";
           return topTxs
             .map((tx, index) => {
               const contractName =
                 tx.contract_id.split(".")[1] || tx.contract_id;
+              const valueText = valueFn(tx);
               const labelCell =
                 index === 0
                   ? `<td class="py-3 px-4 border-b border-gray-200 text-sm font-medium text-gray-800 align-top" rowspan="${topTxs.length}">${label}</td>`
@@ -298,6 +299,7 @@
                 <tr>
                   ${labelCell}
                   <td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600 font-mono">${contractName}: ${tx.method}()</td>
+                  <td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600 font-mono text-right">${valueText}</td>
                 </tr>
               `;
             })
@@ -309,16 +311,45 @@
             <h2 class="text-xl font-semibold mb-4 text-gray-800">Key Insights (Top 3)</h2>
             <div class="overflow-x-auto">
               <table class="min-w-full bg-white">
+                <thead>
+                  <tr>
+                    <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                    <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction</th>
+                    <th class="py-3 px-4 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
+                  </tr>
+                </thead>
                 <tbody>
-                  ${createGroupedRows("Overall Bottlenecks", top3Bottlenecks)}
+                  ${createGroupedRows(
+                    "Overall Bottlenecks",
+                    top3Bottlenecks,
+                    (tx) =>
+                      `${Math.floor(tx.minTxs).toLocaleString()} txs/block`
+                  )}
                   ${createGroupedRows(
                     "Most Runtime-Intensive",
-                    top3Runtime
+                    top3Runtime,
+                    (tx) => `${tx.cost.runtime.toLocaleString()}`
                   )}
-                  ${createGroupedRows("Highest Read Counts", top3ReadCount)}
-                  ${createGroupedRows("Highest Read Lengths", top3ReadLength)}
-                  ${createGroupedRows("Highest Write Counts", top3WriteCount)}
-                  ${createGroupedRows("Highest Write Lengths", top3WriteLength)}
+                  ${createGroupedRows(
+                    "Highest Read Counts",
+                    top3ReadCount,
+                    (tx) => `${tx.cost.read_count.toLocaleString()} reads`
+                  )}
+                  ${createGroupedRows(
+                    "Highest Read Lengths",
+                    top3ReadLength,
+                    (tx) => `${tx.cost.read_length.toLocaleString()} bytes`
+                  )}
+                  ${createGroupedRows(
+                    "Highest Write Counts",
+                    top3WriteCount,
+                    (tx) => `${tx.cost.write_count.toLocaleString()} writes`
+                  )}
+                  ${createGroupedRows(
+                    "Highest Write Lengths",
+                    top3WriteLength,
+                    (tx) => `${tx.cost.write_length.toLocaleString()} bytes`
+                  )}
                 </tbody>
               </table>
             </div>
