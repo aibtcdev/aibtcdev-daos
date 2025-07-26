@@ -44,6 +44,11 @@ contract_id = 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1'
 [[project.requirements]]
 contract_id = 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1'
 
+[contracts.aibtc-agent-account-registry]
+path = "contracts/external/agent-account-registry.clar"
+clarity_version = 3
+epoch = 3.1
+
 # agent account
 
 [contracts.aibtc-agent-account]
