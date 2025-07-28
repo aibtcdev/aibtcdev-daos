@@ -157,11 +157,32 @@ export {
  * Agent Account Types
  * These types are used for interacting with the AIBTC Agent Account contract.
  */
-import type { AgentAccountApprovalType } from "./agent-account-types";
+import type {
+  AgentAccountApprovalType,
+  AgentAccountConfiguration,
+  AgentAccountApprovalTypes,
+  AgentAccountPermissions,
+} from "./agent-account-types";
 import {
   AGENT_ACCOUNT_APPROVAL_TYPES,
   getAgentAccountApprovalType,
+  AGENT_ACCOUNT_DEFAULT_PERMISSIONS,
+  getAgentAccountDefaultPermissions,
+  AGENT_ACCOUNT_DEFAULT_DEPLOYER,
+  getAgentAccountDefaultDeployer,
 } from "./agent-account-types";
 
-export type { AgentAccountApprovalType };
-export { AGENT_ACCOUNT_APPROVAL_TYPES, getAgentAccountApprovalType };
+export type {
+  AgentAccountApprovalType,
+  AgentAccountConfiguration,
+  AgentAccountApprovalTypes,
+  AgentAccountPermissions,
+};
+export {
+  AGENT_ACCOUNT_APPROVAL_TYPES,
+  getAgentAccountApprovalType,
+  AGENT_ACCOUNT_DEFAULT_PERMISSIONS,
+  getAgentAccountDefaultPermissions,
+  AGENT_ACCOUNT_DEFAULT_DEPLOYER,
+  getAgentAccountDefaultDeployer,
+};
