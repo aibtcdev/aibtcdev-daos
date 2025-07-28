@@ -396,6 +396,7 @@
     (type uint)
   )
   (begin
+    (asserts! (is-valid-type type) ERR_INVALID_APPROVAL_TYPE)
     (asserts! (approve-revoke-contract-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/approve-contract",
@@ -422,6 +423,7 @@
     (type uint)
   )
   (begin
+    (asserts! (is-valid-type type) ERR_INVALID_APPROVAL_TYPE)
     (asserts! (approve-revoke-contract-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/revoke-contract",

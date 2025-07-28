@@ -34,7 +34,6 @@ type AgentTraits = {
   AGENT_ACCOUNT_CONFIG: string;
   AGENT_ACCOUNT_SWAPS: string;
   AGENT_DAO_SWAP_ADAPTER: string;
-  AGENT_FAKTORY_BUY_SELL: string;
 };
 
 // combine to define known traits
@@ -92,8 +91,6 @@ const mainnetTraits: KnownTraits = {
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-account-swaps",
   AGENT_DAO_SWAP_ADAPTER:
     "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
-  AGENT_FAKTORY_BUY_SELL:
-    "SP29CK9990DQGE9RGTT1VEQTTYH8KY4E3JE5XP4EC.aibtc-agent-account-traits.faktory-buy-sell",
 };
 
 const testnetTraits: KnownTraits = {
@@ -148,8 +145,6 @@ const testnetTraits: KnownTraits = {
     "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.aibtc-account-swaps",
   AGENT_DAO_SWAP_ADAPTER:
     "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
-  AGENT_FAKTORY_BUY_SELL:
-    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.faktory-buy-sell",
 };
 
 const devnetTraits: KnownTraits = {
@@ -202,8 +197,6 @@ const devnetTraits: KnownTraits = {
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-swaps",
   AGENT_DAO_SWAP_ADAPTER:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
-  AGENT_FAKTORY_BUY_SELL:
-    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.faktory-buy-sell",
 };
 
 // combine the traits for each network

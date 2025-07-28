@@ -63,7 +63,7 @@ describe("Template Processor", () => {
     expect(processed).toBe(template);
   });
 
-  it("should handle templates with unknown replacement keys", () => {
+  it("should throw an error for unknown replacement keys", () => {
     const template = `
 ;; This is a test template
 ;; /g/UNKNOWN_KEY/unknown_value
@@ -74,13 +74,32 @@ describe("Template Processor", () => {
       "DIFFERENT_KEY/different_value": "replacement",
     });
 
-    const processed = processContractTemplate(template, replacements);
+    expect(() => processContractTemplate(template, replacements)).toThrow(
+      "Template variable 'unknown_value' not found in replacements map for comment at line 3"
+    );
+  });
 
-    // The unknown key comment should remain
-    expect(processed).toContain(";; /g/UNKNOWN_KEY/unknown_value");
+  it("should throw an error if a blank line separates a directive from its target", () => {
+    const template = `
+;; /g/KEY/value
 
-    // The value should not be replaced
-    expect(processed).toContain("(define-constant SOME_CONSTANT 'UNKNOWN_KEY)");
+(define-constant FOO 'KEY')
+`;
+    const replacements = createReplacementsMap({ value: "BAR" });
+    expect(() => processContractTemplate(template, replacements)).toThrow(
+      "Could not find a valid target line for replacement key 'KEY' from comment at line 2."
+    );
+  });
+
+  it("should throw an error if the replacement key is not in the target line", () => {
+    const template = `
+;; /g/KEY/value
+(define-constant FOO 'DIFFERENT_STRING')
+`;
+    const replacements = createReplacementsMap({ value: "BAR" });
+    expect(() => processContractTemplate(template, replacements)).toThrow(
+      `Replacement key 'KEY' from comment at line 2 not found in target line 3: "(define-constant FOO 'DIFFERENT_STRING')"`
+    );
   });
 
   it("should process agent account contract template", () => {
@@ -97,8 +116,6 @@ describe("Template Processor", () => {
 (impl-trait .aibtc-agent-account-traits.aibtc-account-proposals)
 ;; /g/.aibtc-agent-account-traits.aibtc-account-config/agent_account_trait_account_config
 (impl-trait .aibtc-agent-account-traits.aibtc-account-config)
-;; /g/.aibtc-agent-account-traits.faktory-buy-sell/agent_account_trait_faktory_buy_sell
-(impl-trait .aibtc-agent-account-traits.faktory-buy-sell)
 ;; /g/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
@@ -132,7 +149,6 @@ describe("Template Processor", () => {
       agent_account_trait_account: ".test-traits.agent-account",
       agent_account_trait_account_proposals: ".test-traits.agent-proposals",
       agent_account_trait_account_config: ".test-traits.agent-account-config",
-      agent_account_trait_faktory_buy_sell: ".test-traits.faktory-buy-sell",
       base_trait_sip010: ".test-traits.sip010",
       dao_trait_proposal: ".test-traits.proposal",
       dao_trait_faktory_dex: ".test-traits.faktory-dex",
@@ -330,8 +346,10 @@ describe("Contract Generator", () => {
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-config",
     agent_account_trait_account_proposals:
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-proposals",
-    agent_account_trait_faktory_buy_sell:
-      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.faktory-buy-sell",
+    agent_account_trait_account_swaps:
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account-swaps",
+    agent_account_trait_dao_swap_adapter:
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
 
     // SIP Trait references
     base_trait_sip010: ".test-traits.sip010",
@@ -355,6 +373,7 @@ describe("Contract Generator", () => {
     // External contracts
     sbtc_contract: "ST000000000000000000002AMW42H.sbtc-token",
     sbtc_token_contract: "'ST000000000000000000002AMW42H.sbtc-token'",
+    base_contract_sbtc: "ST000000000000000000002AMW42H.sbtc-token",
 
     // Configuration values
     dao_manifest: "The mission of this DAO is to test template processing",

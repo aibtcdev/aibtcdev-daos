@@ -50,7 +50,7 @@ const devnetAddresses: KnownAddresses = {
   BITFLOW_CORE: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.xyk-core-v-1-2",
   BITFLOW_STX_TOKEN:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token-stx-v-1-2",
-  BITFLOW_FEE: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+  BITFLOW_FEE: "ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1",
 };
 
 // combine the addresses for each network
@@ -63,13 +63,11 @@ const ADDRESSES: Record<StacksNetworkName, KnownAddresses> = {
 } as const;
 
 // helper to get known addresses for a network
-// TODO: export this in package!
 export function getKnownAddresses(network: StacksNetworkName): KnownAddresses {
   return ADDRESSES[network];
 }
 
 // helper to get a specific address
-// TODO: export this in package!
 export function getKnownAddress(
   network: StacksNetworkName,
   address: keyof KnownAddresses

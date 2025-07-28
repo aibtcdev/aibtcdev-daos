@@ -19,6 +19,7 @@ import {
   AgentAccountSwapAdapterSwapInfo,
 } from "../../../../utilities/dao-types";
 import { getBalancesForPrincipal } from "../../../../utilities/asset-helpers";
+import { dbgLog } from "../../../../utilities/debug-logging";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -94,6 +95,7 @@ describe(`public functions: ${contractName}`, () => {
       [Cl.principal(daoTokenAddress), Cl.uint(10000), Cl.some(Cl.uint(1))],
       deployer
     );
+    dbgLog(`Buy receipt: ${JSON.stringify(receipt)}`);
     expect(receipt.result).toBeOk(Cl.bool(true));
   });
 
@@ -152,6 +154,7 @@ describe(`public functions: ${contractName}`, () => {
       ],
       deployer
     );
+    dbgLog(`Sell receipt: ${JSON.stringify(receipt)}`);
     expect(receipt.result).toBeOk(Cl.bool(true));
   });
 });

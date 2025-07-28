@@ -167,9 +167,6 @@ export function defineExtensionContractDependencies(
           .addTraitDependency("DAO_EXTENSION", "dao_trait_extension")
           .addTraitDependency("DAO_TREASURY", "dao_trait_treasury")
           .addTraitDependency("BASE_SIP010", "base_trait_sip010")
-          .addAddressDependency("SBTC", "base_contract_sbtc")
-          .addAddressDependency("SBTC", "sbtc_token_contract")
-          .addContractDependency("dao_contract_token", "TOKEN", "DAO")
           .addContractDependency("dao_contract_base", "BASE", "DAO")
           .addRuntimeValue("dao_token_symbol");
         break;
