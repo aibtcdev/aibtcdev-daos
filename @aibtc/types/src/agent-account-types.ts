@@ -53,37 +53,14 @@ export interface AgentAccountPermissions {
 }
 
 /**
- * Defines the default permissions for an agent account on each network.
+ * Defines the default permissions for an agent account.
  * These values correspond to the initial data-var values in the contract.
  */
-export const AGENT_ACCOUNT_DEFAULT_PERMISSIONS: Record<
-  StacksNetworkName,
-  AgentAccountPermissions
-> = {
-  mainnet: {
-    canDeposit: true,
-    canUseProposals: true,
-    canApproveRevokeContracts: true,
-    canBuySell: false,
-  },
-  testnet: {
-    canDeposit: true,
-    canUseProposals: true,
-    canApproveRevokeContracts: true,
-    canBuySell: false,
-  },
-  devnet: {
-    canDeposit: true,
-    canUseProposals: true,
-    canApproveRevokeContracts: true,
-    canBuySell: false,
-  },
-  mocknet: {
-    canDeposit: true,
-    canUseProposals: true,
-    canApproveRevokeContracts: true,
-    canBuySell: false,
-  },
+export const AGENT_ACCOUNT_DEFAULT_PERMISSIONS: AgentAccountPermissions = {
+  canDeposit: true,
+  canUseProposals: true,
+  canApproveRevokeContracts: true,
+  canBuySell: false,
 };
 
 /**
@@ -142,14 +119,11 @@ export function getAgentAccountApprovalType(typeInput: string | number): number 
 }
 
 /**
- * Retrieves the default agent permissions for a given network.
- * @param network - The Stacks network name.
- * @returns The default permissions for that network.
+ * Retrieves the default agent permissions.
+ * @returns The default permissions.
  */
-export function getAgentAccountDefaultPermissions(
-  network: StacksNetworkName
-): AgentAccountPermissions {
-  return AGENT_ACCOUNT_DEFAULT_PERMISSIONS[network];
+export function getAgentAccountDefaultPermissions(): AgentAccountPermissions {
+  return AGENT_ACCOUNT_DEFAULT_PERMISSIONS;
 }
 
 /**
