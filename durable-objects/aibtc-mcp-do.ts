@@ -2,14 +2,16 @@ import { z } from "zod";
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ContractGeneratorService } from "../src/services/contract-generator";
+import { CloudflareBindings } from "../src/cf-types";
 import { ContractRegistry } from "../utilities/contract-registry";
+import { DurableObjectState } from "@cloudflare/workers-types";
 
 export class AIBTC_MCP_DO extends McpAgent {
   server = new McpServer({ name: "AIBTC", version: "1.0.0" });
   private registry: ContractRegistry;
   private generatorService: ContractGeneratorService;
 
-  constructor(state: DurableObjectState, env: Env) {
+  constructor(state: DurableObjectState, env: CloudflareBindings) {
     super(state, env);
     this.registry = new ContractRegistry();
     this.generatorService = new ContractGeneratorService();

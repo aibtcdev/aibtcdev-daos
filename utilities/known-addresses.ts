@@ -63,13 +63,11 @@ const ADDRESSES: Record<StacksNetworkName, KnownAddresses> = {
 } as const;
 
 // helper to get known addresses for a network
-// TODO: export this in package!
 export function getKnownAddresses(network: StacksNetworkName): KnownAddresses {
   return ADDRESSES[network];
 }
 
 // helper to get a specific address
-// TODO: export this in package!
 export function getKnownAddress(
   network: StacksNetworkName,
   address: keyof KnownAddresses

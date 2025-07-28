@@ -49,6 +49,29 @@ export type { ContractType, ContractSubtype, AllContractSubtypes };
 export { CONTRACT_NAMES, CONTRACT_TYPES, CONTRACT_SUBTYPES };
 
 /**
+ * Known addresses and traits
+ * These are used to define the known addresses and traits for each network.
+ */
+import type { KnownAddresses } from "../../../utilities/known-addresses";
+import {
+  getKnownAddresses,
+  getKnownAddress,
+} from "../../../utilities/known-addresses";
+import type { KnownTraits } from "../../../utilities/known-traits";
+import {
+  getKnownTraits,
+  getTraitReference,
+} from "../../../utilities/known-traits";
+
+export type { KnownAddresses, KnownTraits };
+export {
+  getKnownAddresses,
+  getKnownAddress,
+  getKnownTraits,
+  getTraitReference,
+};
+
+/**
  * API response types
  * These are used to define the types of responses that can be returned by the API.
  */
@@ -157,11 +180,32 @@ export {
  * Agent Account Types
  * These types are used for interacting with the AIBTC Agent Account contract.
  */
-import type { AgentAccountApprovalType } from "./agent-account-types";
+import type {
+  AgentAccountApprovalType,
+  AgentAccountConfiguration,
+  AgentAccountApprovalTypes,
+  AgentAccountPermissions,
+} from "./agent-account-types";
 import {
   AGENT_ACCOUNT_APPROVAL_TYPES,
   getAgentAccountApprovalType,
+  AGENT_ACCOUNT_DEFAULT_PERMISSIONS,
+  getAgentAccountDefaultPermissions,
+  AGENT_ACCOUNT_DEFAULT_DEPLOYER,
+  getAgentAccountDefaultDeployer,
 } from "./agent-account-types";
 
-export type { AgentAccountApprovalType };
-export { AGENT_ACCOUNT_APPROVAL_TYPES, getAgentAccountApprovalType };
+export type {
+  AgentAccountApprovalType,
+  AgentAccountConfiguration,
+  AgentAccountApprovalTypes,
+  AgentAccountPermissions,
+};
+export {
+  AGENT_ACCOUNT_APPROVAL_TYPES,
+  getAgentAccountApprovalType,
+  AGENT_ACCOUNT_DEFAULT_PERMISSIONS,
+  getAgentAccountDefaultPermissions,
+  AGENT_ACCOUNT_DEFAULT_DEPLOYER,
+  getAgentAccountDefaultDeployer,
+};
