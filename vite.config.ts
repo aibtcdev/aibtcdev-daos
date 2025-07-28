@@ -29,7 +29,7 @@ export default defineConfig(({ command, isSsrBuild }) => {
     ],
     build: {
       rollupOptions: {
-        external: ["cloudflare:workers"],
+        external: ["cloudflare:workers", "cloudflare:email"],
       },
     },
   };
