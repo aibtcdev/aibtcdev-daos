@@ -49,6 +49,29 @@ export type { ContractType, ContractSubtype, AllContractSubtypes };
 export { CONTRACT_NAMES, CONTRACT_TYPES, CONTRACT_SUBTYPES };
 
 /**
+ * Known addresses and traits
+ * These are used to define the known addresses and traits for each network.
+ */
+import type { KnownAddresses } from "../../../utilities/known-addresses";
+import {
+  getKnownAddresses,
+  getKnownAddress,
+} from "../../../utilities/known-addresses";
+import type { KnownTraits } from "../../../utilities/known-traits";
+import {
+  getKnownTraits,
+  getTraitReference,
+} from "../../../utilities/known-traits";
+
+export type { KnownAddresses, KnownTraits };
+export {
+  getKnownAddresses,
+  getKnownAddress,
+  getKnownTraits,
+  getTraitReference,
+};
+
+/**
  * API response types
  * These are used to define the types of responses that can be returned by the API.
  */
