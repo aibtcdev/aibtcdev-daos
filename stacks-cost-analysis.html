@@ -609,10 +609,14 @@
           container.innerHTML = `<div class="text-center p-12 bg-white rounded-xl shadow-sm border border-gray-200"><p class="text-lg font-medium text-gray-600">No transactions match the current filter.</p></div>`;
           return;
         }
-        // Render each contract section.
+        // Create a wrapper for all contract sections.
+        const contractsWrapper = document.createElement("div");
+        contractsWrapper.className =
+          "bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-8";
+
+        // Render each contract section into the wrapper.
         for (const cid in grouped) {
           const section = document.createElement("section");
-          section.className = "mb-12";
           const name = cid.split(".")[1] || cid;
           const title = document.createElement("h2");
           title.className =
@@ -652,8 +656,9 @@
             grid.appendChild(createTransactionCard(tx, sortField));
           });
           section.appendChild(grid);
-          container.appendChild(section);
+          contractsWrapper.appendChild(section);
         }
+        container.appendChild(contractsWrapper);
       }
 
       /**
