@@ -6,5 +6,9 @@
   {
     "name": "Agent Account Only Read Only",
     "path": "/costs/20250729-agent-account-only-read-only.json"
+  },
+  {
+    "name": "Baseline Read Only",
+    "path": "/costs/20250729-1-baseline-read-only.json"
   }
 ]
