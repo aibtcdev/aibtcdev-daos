@@ -22,5 +22,9 @@
   {
     "name": "4 All Tests Enabled Medium String",
     "path": "/costs/20250729-4-all-tests-enabled-medium-string.json"
+  },
+  {
+    "name": "5 All Tests Enabled Large String",
+    "path": "/costs/20250729-5-all-tests-enabled-large-string.json"
   }
 ]
