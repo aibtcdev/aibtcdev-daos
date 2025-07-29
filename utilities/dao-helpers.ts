@@ -17,7 +17,10 @@ import { dbgLog } from "./debug-logging";
 import { getBalancesForPrincipal } from "./asset-helpers";
 
 // single place for all tests so we can assess costs
-export const PROPOSAL_MESSAGE = "Test";
+
+// from FAST12 Proposal #25
+export const PROPOSAL_MESSAGE =
+  "I posted Grok's bitcoin face, and had a chat with him about the project. Anyone who reads it will get an update on the project and understand Bitcoin Faces a bit more. Engaging with Grok more in the future could be a good tactic for getting exposure on X.\n\n--- Metadata ---\nTags: community|partnership|marketing|engagement|social\nReference:https://x.com/daojester/status/1949951684966240719";
 export const DAO_CHARTER_MESSAGE = "Test";
 
 export const VOTING_DELAY = 144;

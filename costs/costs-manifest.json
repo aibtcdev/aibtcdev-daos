@@ -18,5 +18,9 @@
   {
     "name": "3 All Tests Enabled Short String",
     "path": "/costs/20250729-3-all-tests-enabled-short-string.json"
+  },
+  {
+    "name": "4 All Tests Enabled Medium String",
+    "path": "/costs/20250729-4-all-tests-enabled-medium-string.json"
   }
 ]
