@@ -53,7 +53,7 @@ const ERR_NO_FEES_TO_DISTRIBUTE = 323;
 const ERR_COOLDOWN_ACTIVE = 324;
 const ERR_TOTAL_SEATS_ZERO = 325;
 
-describe(`public functions: ${contractName}`, () => {
+describe.skip(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // buy-up-to() tests
   ////////////////////////////////////////

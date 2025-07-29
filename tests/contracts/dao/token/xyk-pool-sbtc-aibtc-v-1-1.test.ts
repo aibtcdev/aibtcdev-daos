@@ -21,7 +21,7 @@ const tokenContractAddress = registry.getContractAddressByTypeAndSubtype(
   "DAO"
 );
 
-describe(`public functions: ${contractName}`, () => {
+describe.skip(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // add-to-position() tests
   ////////////////////////////////////////

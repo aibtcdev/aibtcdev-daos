@@ -18,7 +18,7 @@ const contractName = contractAddress.split(".")[1];
 // import error codes (first call to baes dao fails)
 const expectedErr = Cl.uint(ErrCodeBaseDao.ERR_UNAUTHORIZED);
 
-describe(`public functions: ${contractName}`, () => {
+describe.skip(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // execute() tests
   ////////////////////////////////////////

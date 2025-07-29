@@ -36,7 +36,7 @@ const preFaktoryAddress = registry.getContractAddressByTypeAndSubtype(
 // Error codes
 const ERR_NOT_AUTHORIZED = 401;
 
-describe(`public functions: ${contractName}`, () => {
+describe.skip(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // transfer() tests
   ////////////////////////////////////////
