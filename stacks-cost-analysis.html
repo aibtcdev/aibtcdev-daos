@@ -515,7 +515,7 @@
           .slice(0, 3);
 
         // Helper to build grouped rows with proper rowspans.
-        const createRows = (label, arr, formatFn) => {
+        const createRows = (label, arr, formatFn, metricKey) => {
           if (arr.length === 0) return "";
           return arr
             .map((tx, idx) => {
@@ -525,11 +525,28 @@
                 idx === 0
                   ? `<td class="py-3 px-4 border-b border-gray-200 text-sm font-medium text-gray-800 align-top" rowspan="${arr.length}">${label}</td>`
                   : "";
+
+              let extraCells = "";
+              if (metricKey) {
+                const maxAllowed = tx.limit[metricKey];
+                const cost = tx.cost[metricKey];
+                const percentage =
+                  maxAllowed > 0 ? ((cost / maxAllowed) * 100).toFixed(2) : 0;
+                extraCells = `
+                  <td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600 font-mono text-right">${maxAllowed.toLocaleString()}</td>
+                  <td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600 font-mono text-right">${percentage}%</td>
+                `;
+              } else {
+                // Add placeholder cells to keep table structure for categories without a specific metric.
+                extraCells = `<td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600 font-mono text-right">–</td><td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600 font-mono text-right">–</td>`;
+              }
+
               return `
                 <tr>
                   ${labelCell}
                   <td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600 font-mono">${contractName}: ${tx.method}()</td>
                   <td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600 font-mono text-right">${metricVal}</td>
+                  ${extraCells}
                 </tr>
               `;
             })
@@ -548,6 +565,8 @@
                     <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                     <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction</th>
                     <th class="py-3 px-4 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
+                    <th class="py-3 px-4 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Max Allowed</th>
+                    <th class="py-3 px-4 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">% Capacity Used</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -559,27 +578,32 @@
                   ${createRows(
                     "Most Runtime-Intensive",
                     byRuntime,
-                    (tx) => `${tx.cost.runtime.toLocaleString()}`
+                    (tx) => `${tx.cost.runtime.toLocaleString()} units`,
+                    "runtime"
                   )}
                   ${createRows(
                     "Highest Read Counts",
                     byReadCount,
-                    (tx) => `${tx.cost.read_count.toLocaleString()} reads`
+                    (tx) => `${tx.cost.read_count.toLocaleString()} reads`,
+                    "read_count"
                   )}
                   ${createRows(
                     "Highest Read Lengths",
                     byReadLength,
-                    (tx) => `${tx.cost.read_length.toLocaleString()} bytes`
+                    (tx) => `${tx.cost.read_length.toLocaleString()} bytes`,
+                    "read_length"
                   )}
                   ${createRows(
                     "Highest Write Counts",
                     byWriteCount,
-                    (tx) => `${tx.cost.write_count.toLocaleString()} writes`
+                    (tx) => `${tx.cost.write_count.toLocaleString()} writes`,
+                    "write_count"
                   )}
                   ${createRows(
                     "Highest Write Lengths",
                     byWriteLength,
-                    (tx) => `${tx.cost.write_length.toLocaleString()} bytes`
+                    (tx) => `${tx.cost.write_length.toLocaleString()} bytes`,
+                    "write_length"
                   )}
                 </tbody>
               </table>
