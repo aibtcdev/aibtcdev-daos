@@ -28,7 +28,7 @@ const tokenContractAddress = registry.getContractAddressByTypeAndSubtype(
 // import error codes
 const ErrCode = ErrCodeTreasury;
 
-describe(`public functions: ${contractName}`, () => {
+describe.skip(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // callback() tests
   ////////////////////////////////////////

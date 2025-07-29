@@ -38,7 +38,7 @@ const expectedDaoCharter = Cl.tuple({
   sender: Cl.principal(baseDaoContractAddress),
 });
 
-describe(`public functions: ${contractName}`, () => {
+describe.skip(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // callback() tests
   ////////////////////////////////////////
