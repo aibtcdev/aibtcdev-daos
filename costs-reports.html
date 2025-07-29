@@ -89,6 +89,17 @@
       <div
         class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 flex flex-col md:flex-row gap-4"
       >
+        <div id="report-selector-container" class="flex-1" style="display: none">
+          <label
+            for="report-select"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Select Report</label
+          >
+          <select
+            id="report-select"
+            class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
+          ></select>
+        </div>
         <div class="flex-1">
           <label
             for="sort-select"
@@ -126,75 +137,143 @@
       </div>
 
       <!-- This div will be populated with transaction cost cards by the script -->
-      <main id="report-container">
-        <!-- Loading indicator -->
-        <div
-          id="loading"
-          class="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border border-gray-200"
-        >
-          <svg
-            class="animate-spin h-8 w-8 text-gray-500"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-          <p class="mt-4 text-lg font-medium text-gray-600">
-            Analyzing cost report...
-          </p>
-        </div>
-      </main>
+      <main id="report-container"></main>
     </div>
+
+    <template id="loading-template">
+      <div
+        id="loading"
+        class="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border border-gray-200"
+      >
+        <svg
+          class="animate-spin h-8 w-8 text-gray-500"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+        <p class="mt-4 text-lg font-medium text-gray-600">
+          Analyzing cost report...
+        </p>
+      </div>
+    </template>
 
     <script type="module">
       // Global store for our transaction data
       let allProcessedTxs = [];
 
       // Main function to orchestrate the analysis and rendering
-      async function generateReport() {
+      async function initializeApp() {
+        // Add event listeners for controls ONCE.
+        document
+          .getElementById("sort-select")
+          .addEventListener("change", updateReportView);
+        document
+          .getElementById("contract-filter-select")
+          .addEventListener("change", updateReportView);
+
         try {
-          const response = await fetch("./costs-reports.json");
+          const manifestResponse = await fetch("/costs/costs-manifest.json");
+          if (manifestResponse.ok) {
+            const manifest = await manifestResponse.json();
+            if (manifest && manifest.length > 0) {
+              setupReportSelector(manifest);
+              const firstReport = manifest[0];
+              await loadAndProcessReport(firstReport.path, firstReport.name);
+              return; // Success
+            }
+          }
+          // Fallback for no manifest, empty manifest, or fetch error
+          await loadAndProcessReport(
+            "./costs-reports.json",
+            "Stacks Transaction Cost Analysis"
+          );
+        } catch (error) {
+          console.error("Failed to initialize report:", error);
+          displayError(error);
+        }
+      }
+
+      function setupReportSelector(manifest) {
+        const selectorContainer = document.getElementById(
+          "report-selector-container"
+        );
+        const selector = document.getElementById("report-select");
+
+        selector.innerHTML = ""; // Clear any existing options
+        manifest.forEach((report) => {
+          const option = document.createElement("option");
+          option.value = report.path;
+          option.textContent = report.name;
+          option.dataset.name = report.name; // Store name for title update
+          selector.appendChild(option);
+        });
+
+        selector.addEventListener("change", async (e) => {
+          const selectedOption = e.target.options[e.target.selectedIndex];
+          const reportPath = selectedOption.value;
+          const reportName = selectedOption.dataset.name;
+          await loadAndProcessReport(reportPath, reportName);
+        });
+
+        selectorContainer.style.display = "block";
+      }
+
+      async function loadAndProcessReport(reportPath, reportName) {
+        try {
+          // Show loading indicator and clear previous content
+          document.getElementById("report-container").innerHTML =
+            document.getElementById("loading-template").innerHTML;
+          document.getElementById("summary-container").innerHTML = "";
+          document.getElementById("contract-filter-select").innerHTML =
+            '<option value="all">All Contracts</option>'; // Reset filter
+
+          const response = await fetch(reportPath);
           if (!response.ok) {
             throw new Error(
-              `Failed to fetch costs-reports.json: ${response.statusText}`
+              `Failed to fetch report ${reportPath}: ${response.statusText}`
             );
           }
           const costsData = await response.json();
 
           if (!costsData || costsData.length === 0) {
-            throw new Error("Fetched cost data is missing or empty.");
+            throw new Error(
+              `Fetched cost data is missing or empty from ${reportPath}.`
+            );
           }
+
+          // Update title
+          document.querySelector("h1").textContent = reportName;
 
           allProcessedTxs = processCostData(costsData);
           renderSummary(allProcessedTxs);
           populateContractFilter(allProcessedTxs);
-          updateReportView(); // Initial render
-
-          // Add event listeners for controls
-          document
-            .getElementById("sort-select")
-            .addEventListener("change", updateReportView);
-          document
-            .getElementById("contract-filter-select")
-            .addEventListener("change", updateReportView);
+          updateReportView(); // Render the new report
         } catch (error) {
-          console.error("Failed to load or process cost report:", error);
-          const container = document.getElementById("report-container");
-          container.innerHTML = `<div class="col-span-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert"><strong class="font-bold">Error:</strong><span class="block sm:inline"> ${error.message}. Please ensure the JSON file is present and the HTML is accessed via a local server.</span></div>`;
+          console.error(
+            `Failed to load or process report ${reportPath}:`,
+            error
+          );
+          displayError(error);
         }
+      }
+
+      function displayError(error) {
+        const container = document.getElementById("report-container");
+        container.innerHTML = `<div class="col-span-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert"><strong class="font-bold">Error:</strong><span class="block sm:inline"> ${error.message}. Please ensure the JSON file is present and the HTML is accessed via a local server.</span></div>`;
       }
 
       /**
@@ -567,7 +646,7 @@
         return cost === 0 ? Infinity : limit / cost;
       }
 
-      document.addEventListener("DOMContentLoaded", generateReport);
+      document.addEventListener("DOMContentLoaded", initializeApp);
     </script>
   </body>
 </html>
