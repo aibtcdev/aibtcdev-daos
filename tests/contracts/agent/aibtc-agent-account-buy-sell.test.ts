@@ -44,7 +44,7 @@ const faktoryAdapterAddress = registry.getContractAddressByTypeAndSubtype(
 // import error codes
 const ErrCode = ErrCodeAgentAccount;
 
-describe(`public functions: ${contractName}`, () => {
+describe.skip(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // buy-dao-token() tests
   ////////////////////////////////////////

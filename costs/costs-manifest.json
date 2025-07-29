@@ -6,5 +6,13 @@
   {
     "name": "Second Test Run 2",
     "path": "/costs/20250729-second-test-run-2.json"
+  },
+  {
+    "name": "Agent Account Only",
+    "path": "/costs/20250729-agent-account-only.json"
+  },
+  {
+    "name": "Agent Account Only Read Only",
+    "path": "/costs/20250729-agent-account-only-read-only.json"
   }
 ]

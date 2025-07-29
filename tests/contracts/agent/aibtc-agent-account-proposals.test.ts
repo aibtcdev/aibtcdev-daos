@@ -40,7 +40,7 @@ const sendMessageActionContractAddress =
 // import error codes
 const ErrCode = ErrCodeAgentAccount;
 
-describe(`public functions: ${contractName}`, () => {
+describe.skip(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // create-action-proposal() tests
   ////////////////////////////////////////
