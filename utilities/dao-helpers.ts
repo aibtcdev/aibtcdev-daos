@@ -16,6 +16,10 @@ import { FaktoryContractStatus, FaktoryDexInInfo } from "./dao-types";
 import { dbgLog } from "./debug-logging";
 import { getBalancesForPrincipal } from "./asset-helpers";
 
+// single place for all tests so we can assess costs
+export const PROPOSAL_MESSAGE = "Test";
+export const DAO_CHARTER_MESSAGE = "Test";
+
 export const VOTING_DELAY = 144;
 export const VOTING_PERIOD = 288;
 

@@ -40,7 +40,7 @@ const ERR_STX_BALANCE_TOO_LOW = 1003;
 const ERR_FT_NON_POSITIVE = 1004;
 const ERR_TOKEN_NOT_AUTH = 401;
 
-describe.skip(`public functions: ${contractName}`, () => {
+describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // open-market() tests
   ////////////////////////////////////////

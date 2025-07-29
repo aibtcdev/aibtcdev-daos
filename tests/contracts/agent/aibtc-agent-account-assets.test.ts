@@ -27,7 +27,7 @@ const contractName = contractAddress.split(".")[1];
 // import error codes
 const ErrCode = ErrCodeAgentAccount;
 
-describe.skip(`public functions: ${contractName}`, () => {
+describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // deposit-stx() tests
   ////////////////////////////////////////

@@ -48,7 +48,7 @@ type AgentAccountPermissions = {
   canBuySell: boolean;
 };
 
-describe.skip(`public functions: ${contractName}`, () => {
+describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // approve-contract() tests
   ////////////////////////////////////////

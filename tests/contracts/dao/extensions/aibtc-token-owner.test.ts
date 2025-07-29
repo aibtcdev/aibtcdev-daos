@@ -19,7 +19,7 @@ const contractName = contractAddress.split(".")[1];
 // import error codes
 const ErrCode = ErrCodeTokenOwner;
 
-describe.skip(`public functions: ${contractName}`, () => {
+describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // callback() tests
   ////////////////////////////////////////

@@ -6,6 +6,7 @@ import {
   completePrelaunch,
   constructDao,
   getDaoTokens,
+  PROPOSAL_MESSAGE,
 } from "../../../../utilities/dao-helpers";
 
 // setup accounts
@@ -24,7 +25,7 @@ const contractName = contractAddress.split(".")[1];
 // import error codes
 const ErrCode = ErrCodeOnchainMessaging;
 
-describe.skip(`public functions: ${contractName}`, () => {
+describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // callback() tests
   ////////////////////////////////////////
@@ -69,7 +70,7 @@ describe.skip(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "send",
-      [Cl.stringUtf8("Test message")],
+      [Cl.stringUtf8(PROPOSAL_MESSAGE)],
       address1
     );
     // assert

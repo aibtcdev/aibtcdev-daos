@@ -15,7 +15,7 @@ const contractAddress = registry.getContractAddressByTypeAndSubtype(
 );
 const contractName = contractAddress.split(".")[1];
 
-describe.skip(`public functions: ${contractName}`, () => {
+describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // callback() tests
   ////////////////////////////////////////

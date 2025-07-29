@@ -46,7 +46,7 @@ const tokenDexContractAddress = registry.getContractAddressByTypeAndSubtype(
 // import error codes
 const ErrCode = ErrCodeBitflowSwapAdapter;
 
-describe.skip(`public functions: ${contractName}`, () => {
+describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // buy-dao-token() tests
   ////////////////////////////////////////

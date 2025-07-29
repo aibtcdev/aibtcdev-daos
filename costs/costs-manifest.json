@@ -8,7 +8,15 @@
     "path": "/costs/20250729-agent-account-only-read-only.json"
   },
   {
+    "name": "All Tests Enabled",
+    "path": "/costs/20250729-2-all-tests-enabled.json"
+  },
+  {
     "name": "Baseline Read Only",
     "path": "/costs/20250729-1-baseline-read-only.json"
+  },
+  {
+    "name": "3 All Tests Enabled Short String",
+    "path": "/costs/20250729-3-all-tests-enabled-short-string.json"
   }
 ]
