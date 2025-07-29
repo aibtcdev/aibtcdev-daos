@@ -52,10 +52,6 @@ try {
 
   // 4. Add new reports found in the directory but not in the manifest
   const manifestPaths = new Set(cleanedManifest.map((entry) => entry.path));
-  const allFiles = fs.readdirSync(costsDir);
-  const reportFiles = allFiles.filter(
-    (file) => file.endsWith(".json") && file !== "costs-manifest.json"
-  );
 
   let addedCount = 0;
   for (const reportFile of reportFiles) {
