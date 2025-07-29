@@ -51,39 +51,60 @@
       <section
         class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8"
       >
-        <h2 class="text-xl font-semibold mb-3 text-gray-800">
-          Understanding the Metrics
-        </h2>
-        <div
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-sm"
+        <h2
+          id="metrics-explainer-title"
+          class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-gray-200 cursor-pointer flex justify-between items-center"
         >
-          <div class="p-3 bg-gray-100 rounded-lg">
-            <h3 class="font-bold">Runtime</h3>
-            <p class="text-gray-600">The computational effort required.</p>
+          <span>Understanding the Metrics</span>
+          <svg
+            class="w-6 h-6 transform transition-transform chevron"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            ></path>
+          </svg>
+        </h2>
+        <div id="metrics-explainer-content" style="display: none">
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-sm"
+          >
+            <div class="p-3 bg-gray-100 rounded-lg">
+              <h3 class="font-bold">Runtime</h3>
+              <p class="text-gray-600">The computational effort required.</p>
+            </div>
+            <div class="p-3 bg-gray-100 rounded-lg">
+              <h3 class="font-bold">Read Count</h3>
+              <p class="text-gray-600">Number of database reads.</p>
+            </div>
+            <div class="p-3 bg-gray-100 rounded-lg">
+              <h3 class="font-bold">Read Length</h3>
+              <p class="text-gray-600">Total size (bytes) of data read.</p>
+            </div>
+            <div class="p-3 bg-gray-100 rounded-lg">
+              <h3 class="font-bold">Write Count</h3>
+              <p class="text-gray-600">Number of database writes.</p>
+            </div>
+            <div class="p-3 bg-gray-100 rounded-lg">
+              <h3 class="font-bold">Write Length</h3>
+              <p class="text-gray-600">Total size (bytes) of data written.</p>
+            </div>
           </div>
-          <div class="p-3 bg-gray-100 rounded-lg">
-            <h3 class="font-bold">Read Count</h3>
-            <p class="text-gray-600">Number of database reads.</p>
-          </div>
-          <div class="p-3 bg-gray-100 rounded-lg">
-            <h3 class="font-bold">Read Length</h3>
-            <p class="text-gray-600">Total size (bytes) of data read.</p>
-          </div>
-          <div class="p-3 bg-gray-100 rounded-lg">
-            <h3 class="font-bold">Write Count</h3>
-            <p class="text-gray-600">Number of database writes.</p>
-          </div>
-          <div class="p-3 bg-gray-100 rounded-lg">
-            <h3 class="font-bold">Write Length</h3>
-            <p class="text-gray-600">Total size (bytes) of data written.</p>
-          </div>
+          <p class="mt-4 text-sm text-gray-500">
+            For each transaction we determine how many could fit in a block based
+            on each of the five limits. The smallest number defines the maximum
+            transactions per block and its corresponding metric is called the
+            <span class="font-semibold" style="color: #ff4f03"
+              >limiting factor</span
+            >.
+          </p>
         </div>
-        <p class="mt-4 text-sm text-gray-500">
-          For each transaction we determine how many could fit in a block based
-          on each of the five limits. The smallest number defines the maximum
-          transactions per block and its corresponding metric is called the
-          <span class="font-semibold" style="color: #ff4f03">limiting factor</span>.
-        </p>
       </section>
 
       <!-- Summary of key insights will be injected here -->
@@ -249,6 +270,21 @@
         document
           .getElementById("collapse-all-btn")
           .addEventListener("click", () => toggleAll(false));
+
+        // Add click listener for collapsible metrics explainer.
+        const metricsTitle = document.getElementById("metrics-explainer-title");
+        const metricsContent = document.getElementById(
+          "metrics-explainer-content"
+        );
+        if (metricsTitle && metricsContent) {
+          metricsTitle.addEventListener("click", () => {
+            const isCollapsed = metricsContent.style.display === "none";
+            metricsContent.style.display = isCollapsed ? "block" : "none";
+            metricsTitle
+              .querySelector(".chevron")
+              .classList.toggle("rotate-90", isCollapsed);
+          });
+        }
 
         // Try to load a manifest of reports. This should be a JSON array of
         // objects with `path` and `name` fields.
@@ -433,8 +469,10 @@
         currentTxs = txs;
         // Update page header with report name.
         const header = document.querySelector("header h1");
-        header.textContent =
-          reportNames.get(path) || "Stacks Transaction Cost Analysis";
+        const reportName = reportNames.get(path);
+        header.textContent = `Stacks Transaction Cost Analysis${
+          reportName ? `: ${reportName}` : ""
+        }`;
         // Show/hide view controls.
         const viewControls = document.getElementById("view-controls-container");
         if (txs.length > 0) {
