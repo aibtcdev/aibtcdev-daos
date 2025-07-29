@@ -500,8 +500,11 @@
         };
         container.innerHTML = `
           <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800">Key Insights (Top 3)</h2>
-            <div class="overflow-x-auto">
+            <h2 id="summary-title" class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-gray-200 cursor-pointer flex justify-between items-center">
+              <span>Key Insights (Top 3)</span>
+              <svg class="w-6 h-6 transform transition-transform chevron rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </h2>
+            <div id="summary-content" class="overflow-x-auto">
               <table class="min-w-full table-striped">
                 <thead>
                   <tr>
@@ -546,6 +549,19 @@
             </div>
           </div>
         `;
+
+        // Add click listener for collapsible summary.
+        const summaryTitle = container.querySelector("#summary-title");
+        const summaryContent = container.querySelector("#summary-content");
+        if (summaryTitle && summaryContent) {
+          summaryTitle.addEventListener("click", () => {
+            const isCollapsed = summaryContent.style.display === "none";
+            summaryContent.style.display = isCollapsed ? "block" : "none";
+            summaryTitle
+              .querySelector(".chevron")
+              .classList.toggle("rotate-90", isCollapsed);
+          });
+        }
       }
 
       /**
@@ -872,32 +888,50 @@
           .join("");
         container.innerHTML = `
           <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800">Comparison: ${baseName} vs ${compareName}</h2>
-            <div class="mb-4 text-sm text-gray-600">
-              <span class="mr-4"><strong>${improved}</strong> improved</span>
-              <span class="mr-4"><strong>${regressed}</strong> regressed</span>
-              <span class="mr-4"><strong>${added}</strong> new</span>
-              <span><strong>${removed}</strong> removed</span>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="min-w-full table-striped">
-                <thead>
-                  <tr>
-                    <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction</th>
-                    <th class="py-3 px-4 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Baseline Tx/block</th>
-                    <th class="py-3 px-4 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Compare Tx/block</th>
-                    <th class="py-3 px-4 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Δ Tx/block</th>
-                    <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Limiting Factor</th>
-                    <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost Δ</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${rows}
-                </tbody>
-              </table>
+            <h2 id="comparison-title" class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-gray-200 cursor-pointer flex justify-between items-center">
+              <span>Comparison: ${baseName} vs ${compareName}</span>
+              <svg class="w-6 h-6 transform transition-transform chevron rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </h2>
+            <div id="comparison-content">
+              <div class="mb-4 text-sm text-gray-600">
+                <span class="mr-4"><strong>${improved}</strong> improved</span>
+                <span class="mr-4"><strong>${regressed}</strong> regressed</span>
+                <span class="mr-4"><strong>${added}</strong> new</span>
+                <span><strong>${removed}</strong> removed</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="min-w-full table-striped">
+                  <thead>
+                    <tr>
+                      <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction</th>
+                      <th class="py-3 px-4 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Baseline Tx/block</th>
+                      <th class="py-3 px-4 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Compare Tx/block</th>
+                      <th class="py-3 px-4 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Δ Tx/block</th>
+                      <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Limiting Factor</th>
+                      <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost Δ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${rows}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         `;
+
+        // Add click listener for collapsible comparison.
+        const comparisonTitle = container.querySelector("#comparison-title");
+        const comparisonContent = container.querySelector("#comparison-content");
+        if (comparisonTitle && comparisonContent) {
+          comparisonTitle.addEventListener("click", () => {
+            const isCollapsed = comparisonContent.style.display === "none";
+            comparisonContent.style.display = isCollapsed ? "block" : "none";
+            comparisonTitle
+              .querySelector(".chevron")
+              .classList.toggle("rotate-90", isCollapsed);
+          });
+        }
       }
     </script>
   </body>
