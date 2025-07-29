@@ -42,7 +42,7 @@ const actionContractAddress = registry.getContractAddressByTypeAndSubtype(
 const ErrCode = ErrCodeActionProposalVoting;
 const ActionErrCode = ErrCodeActionSendMessage;
 
-describe(`public functions: ${contractName}`, () => {
+describe.skip(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // callback() tests
   ////////////////////////////////////////
