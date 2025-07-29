@@ -691,7 +691,6 @@
         card.className =
           "bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-200 flex flex-col";
         const { cost, limit, limitingFactor, minTxs, txsPerBlock } = tx;
-        const contractName = tx.contract_id.split(".")[1] || tx.contract_id;
 
         // Helper to build a metric row.
         const makeRow = (label, value, txsVal, key) => {
@@ -719,8 +718,7 @@
         };
         card.innerHTML = `
           <div class="flex-grow">
-            <h3 class="text-xl font-bold text-gray-900 break-words">${contractName}</h3>
-            <p class="text-md text-gray-500 mb-4 font-mono break-words">${tx.method}</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-4 font-mono break-words">${tx.method}</h3>
             <div class="mb-6 mt-2 pt-4 text-center">
               <p class="text-sm text-gray-600">Max transactions per block:</p>
               <p class="text-4xl font-bold" style="color:#FF4F03;">${isFinite(minTxs) ? Math.floor(minTxs).toLocaleString() : "∞"}</p>
