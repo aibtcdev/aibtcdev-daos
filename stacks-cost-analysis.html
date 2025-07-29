@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stacks Transaction Cost Analysis</title>
+    <!-- TailwindCSS via CDN for quick styling. This makes the page lightweight and
+         easy to ship with any Stacks project without additional build steps. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Preconnects improve the loading performance of Google fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      /* Brand colours used to highlight limiting factors and sort criteria. */
+      .limit-highlight {
+        background-color: #ff4f03;
+        color: white;
+      }
+      .sort-highlight {
+        background-color: #0533d1;
+        color: white;
+      }
+      /* Improve table readability by alternating row backgrounds. */
+      .table-striped tbody tr:nth-child(odd) {
+        background-color: #f9fafb;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 text-gray-800">
+    <div class="container mx-auto p-4 md:p-8">
+      <!-- Page header -->
+      <header class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">
+          Stacks Transaction Cost Analysis
+        </h1>
+        <p class="mt-2 text-lg text-gray-600">
+          Analyse your Clarinet cost reports to discover bottlenecks and areas for
+          improvement across runtime, reads and writes. Load multiple reports to
+          compare changes over time or between branches.
+        </p>
+      </header>
+
+      <!-- Legend describing the five cost dimensions -->
+      <section
+        class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8"
+      >
+        <h2 class="text-xl font-semibold mb-3 text-gray-800">
+          Understanding the Metrics
+        </h2>
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-sm"
+        >
+          <div class="p-3 bg-gray-100 rounded-lg">
+            <h3 class="font-bold">Runtime</h3>
+            <p class="text-gray-600">The computational effort required.</p>
+          </div>
+          <div class="p-3 bg-gray-100 rounded-lg">
+            <h3 class="font-bold">Read Count</h3>
+            <p class="text-gray-600">Number of database reads.</p>
+          </div>
+          <div class="p-3 bg-gray-100 rounded-lg">
+            <h3 class="font-bold">Read Length</h3>
+            <p class="text-gray-600">Total size (bytes) of data read.</p>
+          </div>
+          <div class="p-3 bg-gray-100 rounded-lg">
+            <h3 class="font-bold">Write Count</h3>
+            <p class="text-gray-600">Number of database writes.</p>
+          </div>
+          <div class="p-3 bg-gray-100 rounded-lg">
+            <h3 class="font-bold">Write Length</h3>
+            <p class="text-gray-600">Total size (bytes) of data written.</p>
+          </div>
+        </div>
+        <p class="mt-4 text-sm text-gray-500">
+          For each transaction we determine how many could fit in a block based
+          on each of the five limits. The smallest number defines the maximum
+          transactions per block and its corresponding metric is called the
+          <span class="font-semibold" style="color: #ff4f03">limiting factor</span>.
+        </p>
+      </section>
+
+      <!-- Summary of key insights will be injected here -->
+      <section id="summary-container" class="mb-8"></section>
+
+      <!-- Controls to select baseline report, comparison report, sorting and filtering -->
+      <section
+        class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 flex flex-col gap-4 md:flex-row md:items-end"
+      >
+        <!-- Baseline report selector -->
+        <div class="flex-1" id="baseline-selector-container" style="display:none">
+          <label
+            for="report-select"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Baseline Report</label
+          >
+          <select
+            id="report-select"
+            class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
+          ></select>
+        </div>
+        <!-- Comparison report selector; hidden until there are at least two reports -->
+        <div class="flex-1" id="compare-selector-container" style="display:none">
+          <label
+            for="compare-report-select"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Compare Against</label
+          >
+          <select
+            id="compare-report-select"
+            class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
+          >
+            <!-- options will be populated dynamically -->
+          </select>
+        </div>
+        <!-- Sorting control for transactions within a report -->
+        <div class="flex-1">
+          <label
+            for="sort-select"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Sort by</label
+          >
+          <select
+            id="sort-select"
+            class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
+          >
+            <option value="max-txs-desc">Max Txs (High to Low)</option>
+            <option value="max-txs-asc">Max Txs (Low to High)</option>
+            <option value="runtime-desc">Runtime (High to Low)</option>
+            <option value="read_count-desc">Read Count (High to Low)</option>
+            <option value="read_length-desc">Read Length (High to Low)</option>
+            <option value="write_count-desc">Write Count (High to Low)</option>
+            <option value="write_length-desc">Write Length (High to Low)</option>
+          </select>
+        </div>
+        <!-- Contract filter to narrow down visible cards -->
+        <div class="flex-1">
+          <label
+            for="contract-filter-select"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Filter by Contract</label
+          >
+          <select
+            id="contract-filter-select"
+            class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
+          >
+            <option value="all">All Contracts</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Container for transaction cards (per report) -->
+      <main id="report-container"></main>
+
+      <!-- Container for comparison results; hidden until a comparison is selected -->
+      <section id="comparison-container" class="mt-12"></section>
+    </div>
+
+    <!-- Template to display a loading spinner while processing cost reports -->
+    <template id="loading-template">
+      <div
+        class="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border border-gray-200"
+      >
+        <svg
+          class="animate-spin h-8 w-8 text-gray-500"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+        <p class="mt-4 text-lg font-medium text-gray-600">
+          Loading report...
+        </p>
+      </div>
+    </template>
+
+    <script type="module">
+      /**
+       * This script orchestrates loading multiple cost reports, rendering a summary,
+       * sorting/filtering, and optionally comparing two reports. It relies on
+       * relative file fetching via HTTP, so please serve this file with a local
+       * server (e.g. `python -m http.server`) when opening it. Browsers block
+       * `fetch` on the file protocol for security reasons.
+       */
+
+      // Store processed transactions per report path.
+      const reportData = new Map();
+      // Keep a list of human friendly names for each report.
+      const reportNames = new Map();
+      // Active processed transactions for baseline view.
+      let currentTxs = [];
+
+      /**
+       * Entry point: discover available reports and initialise UI.
+       */
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Bind controls only once.
+        document
+          .getElementById("sort-select")
+          .addEventListener("change", updateReportView);
+        document
+          .getElementById("contract-filter-select")
+          .addEventListener("change", updateReportView);
+        document
+          .getElementById("compare-report-select")
+          .addEventListener("change", handleComparisonChange);
+
+        // Try to load a manifest of reports. This should be a JSON array of
+        // objects with `path` and `name` fields. If not present we'll fall back
+        // to `./costs-reports.json` and any files under ./costs/ that we know about.
+        let manifest;
+        try {
+          const resp = await fetch("./costs/costs-manifest.json");
+          if (resp.ok) {
+            manifest = await resp.json();
+          }
+        } catch (err) {
+          // No manifest; ignore errors – we'll fall back below.
+        }
+
+        // If manifest is missing or empty, build a synthetic manifest.
+        if (!manifest || manifest.length === 0) {
+          manifest = [];
+          // Always attempt to load the default costs_reports.json generated by Clarinet tests.
+          manifest.push({ path: "./costs-reports.json", name: "Latest Report" });
+        }
+
+        // Populate baseline selector and preload reports.
+        const baselineSelector = document.getElementById("report-select");
+        const compareSelector = document.getElementById("compare-report-select");
+        manifest.forEach((report, idx) => {
+          reportNames.set(report.path, report.name || report.path);
+          const option = document.createElement("option");
+          option.value = report.path;
+          option.textContent = report.name || report.path;
+          baselineSelector.appendChild(option.cloneNode(true));
+          compareSelector.appendChild(option);
+        });
+
+        // Show selectors if more than zero reports.
+        if (manifest.length > 0) {
+          document.getElementById("baseline-selector-container").style.display = "block";
+        }
+        if (manifest.length > 1) {
+          document.getElementById("compare-selector-container").style.display = "block";
+        }
+
+        // Preload all reports to enable rapid switching and comparison.
+        for (const report of manifest) {
+          try {
+            const response = await fetch(report.path);
+            if (!response.ok) {
+              console.warn(
+                `Could not load report at ${report.path}: ${response.statusText}`
+              );
+              continue;
+            }
+            const rawData = await response.json();
+            const processed = processCostData(rawData);
+            reportData.set(report.path, processed);
+          } catch (error) {
+            console.warn(`Error loading report ${report.path}:`, error);
+          }
+        }
+
+        // If at least one report loaded, display the first one as baseline.
+        const firstReport = manifest.find((r) => reportData.has(r.path));
+        if (firstReport) {
+          baselineSelector.value = firstReport.path;
+          currentTxs = reportData.get(firstReport.path);
+          updateViewForReport(firstReport.path);
+        } else {
+          // Display error if no reports could be loaded.
+          displayError(
+            new Error(
+              "No cost reports were loaded. Make sure costs-reports.json exists or serve via HTTP."
+            )
+          );
+        }
+      });
+
+      /**
+       * Transform raw cost data into a more usable form. For each unique method
+       * we keep the highest observed cost across tests and compute how many
+       * transactions can fit into a block per dimension. We also determine
+       * which dimension limits the throughput.
+       */
+      function processCostData(data) {
+        const txMap = new Map();
+        data.forEach((item) => {
+          const key = `${item.contract_id}.${item.method}`;
+          if (!txMap.has(key)) {
+            txMap.set(key, {
+              key,
+              contract_id: item.contract_id,
+              method: item.method,
+              cost: {
+                runtime: 0,
+                read_count: 0,
+                read_length: 0,
+                write_count: 0,
+                write_length: 0,
+              },
+              limit: item.cost_result.limit,
+            });
+          }
+          const entry = txMap.get(key);
+          const newCost = item.cost_result.total;
+          Object.keys(entry.cost).forEach((metric) => {
+            entry.cost[metric] = Math.max(entry.cost[metric], newCost[metric]);
+          });
+        });
+        const results = Array.from(txMap.values()).filter((tx) =>
+          Object.values(tx.cost).some((v) => v > 0)
+        );
+        // Compute limiting factor and minTxs for each transaction.
+        results.forEach((tx) => {
+          const txsPerBlock = {
+            runtime: calculateTxs(tx.limit.runtime, tx.cost.runtime),
+            read_count: calculateTxs(
+              tx.limit.read_count,
+              tx.cost.read_count
+            ),
+            read_length: calculateTxs(
+              tx.limit.read_length,
+              tx.cost.read_length
+            ),
+            write_count: calculateTxs(
+              tx.limit.write_count,
+              tx.cost.write_count
+            ),
+            write_length: calculateTxs(
+              tx.limit.write_length,
+              tx.cost.write_length
+            ),
+          };
+          const limitingFactor = Object.keys(txsPerBlock).reduce((a, b) =>
+            txsPerBlock[a] < txsPerBlock[b] ? a : b
+          );
+          tx.limitingFactor = limitingFactor;
+          tx.minTxs = txsPerBlock[limitingFactor];
+          tx.txsPerBlock = txsPerBlock;
+        });
+        return results;
+      }
+
+      /**
+       * Calculate transactions per block, guarding against division by zero.
+       */
+      function calculateTxs(limit, cost) {
+        return cost === 0 ? Infinity : limit / cost;
+      }
+
+      /**
+       * Display an error message in place of report contents.
+       */
+      function displayError(error) {
+        const container = document.getElementById("report-container");
+        container.innerHTML = `<div class="col-span-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert"><strong class="font-bold">Error:</strong><span class="block sm:inline"> ${error.message}. Please ensure the JSON files are available and this page is served over HTTP.</span></div>`;
+      }
+
+      /**
+       * When the baseline report changes, load its data and re-render the view.
+       */
+      document
+        .getElementById("report-select")
+        .addEventListener("change", (e) => {
+          const path = e.target.value;
+          updateViewForReport(path);
+          // Reset comparison if baseline changes.
+          document.getElementById("compare-report-select").value = "";
+          document.getElementById("comparison-container").innerHTML = "";
+        });
+
+      /**
+       * Update both the summary and detailed view when switching reports.
+       */
+      function updateViewForReport(path) {
+        const txs = reportData.get(path) || [];
+        currentTxs = txs;
+        // Update page header with report name.
+        const header = document.querySelector("header h1");
+        header.textContent = reportNames.get(path) || "Stacks Transaction Cost Analysis";
+        // Render summary and card view.
+        renderSummary(txs);
+        populateContractFilter(txs);
+        updateReportView();
+      }
+
+      /**
+       * Build the key insights table for a report.
+       */
+      function renderSummary(txs) {
+        const container = document.getElementById("summary-container");
+        if (!txs || txs.length === 0) {
+          container.innerHTML = "";
+          return;
+        }
+        // Determine top 3 across categories.
+        const byBottleneck = [...txs]
+          .sort((a, b) => a.minTxs - b.minTxs)
+          .slice(0, 3);
+        const byRuntime = [...txs]
+          .sort((a, b) => b.cost.runtime - a.cost.runtime)
+          .slice(0, 3);
+        const byReadCount = [...txs]
+          .sort((a, b) => b.cost.read_count - a.cost.read_count)
+          .slice(0, 3);
+        const byReadLength = [...txs]
+          .sort((a, b) => b.cost.read_length - a.cost.read_length)
+          .slice(0, 3);
+        const byWriteCount = [...txs]
+          .sort((a, b) => b.cost.write_count - a.cost.write_count)
+          .slice(0, 3);
+        const byWriteLength = [...txs]
+          .sort((a, b) => b.cost.write_length - a.cost.write_length)
+          .slice(0, 3);
+
+        // Helper to build grouped rows with proper rowspans.
+        const createRows = (label, arr, formatFn) => {
+          if (arr.length === 0) return "";
+          return arr
+            .map((tx, idx) => {
+              const contractName = tx.contract_id.split(".")[1] || tx.contract_id;
+              const metricVal = formatFn(tx);
+              const labelCell =
+                idx === 0
+                  ? `<td class="py-3 px-4 border-b border-gray-200 text-sm font-medium text-gray-800 align-top" rowspan="${arr.length}">${label}</td>`
+                  : "";
+              return `
+                <tr>
+                  ${labelCell}
+                  <td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600 font-mono">${contractName}: ${tx.method}()</td>
+                  <td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600 font-mono text-right">${metricVal}</td>
+                </tr>
+              `;
+            })
+            .join("");
+        };
+        container.innerHTML = `
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Key Insights (Top 3)</h2>
+            <div class="overflow-x-auto">
+              <table class="min-w-full table-striped">
+                <thead>
+                  <tr>
+                    <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                    <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction</th>
+                    <th class="py-3 px-4 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${createRows(
+                    "Overall Bottlenecks",
+                    byBottleneck,
+                    (tx) => `${Math.floor(tx.minTxs).toLocaleString()} txs/block`
+                  )}
+                  ${createRows(
+                    "Most Runtime-Intensive",
+                    byRuntime,
+                    (tx) => `${tx.cost.runtime.toLocaleString()}`
+                  )}
+                  ${createRows(
+                    "Highest Read Counts",
+                    byReadCount,
+                    (tx) => `${tx.cost.read_count.toLocaleString()} reads`
+                  )}
+                  ${createRows(
+                    "Highest Read Lengths",
+                    byReadLength,
+                    (tx) => `${tx.cost.read_length.toLocaleString()} bytes`
+                  )}
+                  ${createRows(
+                    "Highest Write Counts",
+                    byWriteCount,
+                    (tx) => `${tx.cost.write_count.toLocaleString()} writes`
+                  )}
+                  ${createRows(
+                    "Highest Write Lengths",
+                    byWriteLength,
+                    (tx) => `${tx.cost.write_length.toLocaleString()} bytes`
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      /**
+       * Populate the contract filter dropdown with unique contract IDs.
+       */
+      function populateContractFilter(txs) {
+        const select = document.getElementById("contract-filter-select");
+        select.innerHTML = `<option value="all">All Contracts</option>`;
+        const uniqueContracts = [...new Set(txs.map((tx) => tx.contract_id))].sort();
+        uniqueContracts.forEach((cid) => {
+          const opt = document.createElement("option");
+          opt.value = cid;
+          opt.textContent = cid.split(".")[1] || cid;
+          select.appendChild(opt);
+        });
+      }
+
+      /**
+       * Update the report view based on current transactions, sort order and filter.
+       */
+      function updateReportView() {
+        const container = document.getElementById("report-container");
+        if (!currentTxs || currentTxs.length === 0) {
+          container.innerHTML = "";
+          return;
+        }
+        // Filter by contract.
+        const selectedContract = document.getElementById("contract-filter-select").value;
+        let txs = currentTxs;
+        if (selectedContract !== "all") {
+          txs = txs.filter((tx) => tx.contract_id === selectedContract);
+        }
+        // Group by contract to create separate sections per contract.
+        const grouped = txs.reduce((acc, tx) => {
+          (acc[tx.contract_id] = acc[tx.contract_id] || []).push(tx);
+          return acc;
+        }, {});
+        // Determine sort order.
+        const sortValue = document.getElementById("sort-select").value;
+        const [sortField, sortDir] = sortValue.split("-");
+
+        container.innerHTML = "";
+        // If no transactions after filtering, display a message.
+        if (Object.keys(grouped).length === 0) {
+          container.innerHTML = `<div class="text-center p-12 bg-white rounded-xl shadow-sm border border-gray-200"><p class="text-lg font-medium text-gray-600">No transactions match the current filter.</p></div>`;
+          return;
+        }
+        // Render each contract section.
+        for (const cid in grouped) {
+          const section = document.createElement("section");
+          section.className = "mb-12";
+          const name = cid.split(".")[1] || cid;
+          const title = document.createElement("h2");
+          title.className = "text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-gray-200";
+          title.textContent = name;
+          section.appendChild(title);
+          const grid = document.createElement("div");
+          grid.className = "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6";
+          const entries = grouped[cid];
+          entries.sort((a, b) => {
+            let valA, valB;
+            if (sortField === "max") {
+              valA = a.minTxs;
+              valB = b.minTxs;
+            } else if (sortField === "max-txs") {
+              valA = a.minTxs;
+              valB = b.minTxs;
+            } else {
+              valA = a.cost[sortField];
+              valB = b.cost[sortField];
+            }
+            return sortDir === "asc" ? valA - valB : valB - valA;
+          });
+          entries.forEach((tx) => {
+            grid.appendChild(createTransactionCard(tx, sortField));
+          });
+          section.appendChild(grid);
+          container.appendChild(section);
+        }
+      }
+
+      /**
+       * Create a card summarising a single transaction's cost profile.
+       */
+      function createTransactionCard(tx, sortField) {
+        const card = document.createElement("div");
+        card.className =
+          "bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-200 flex flex-col";
+        const { cost, limit, limitingFactor, minTxs, txsPerBlock } = tx;
+        const contractName = tx.contract_id.split(".")[1] || tx.contract_id;
+
+        // Helper to build a metric row.
+        const makeRow = (label, value, txsVal, key) => {
+          const isLimit = key === limitingFactor;
+          const isSort = key === sortField || (sortField === "max-txs" && key === limitingFactor);
+          const formattedTxs = isFinite(txsVal) ? Math.floor(txsVal).toLocaleString() : "∞";
+          let rowClass = "bg-gray-50";
+          let txsClass = "text-gray-500";
+          if (isSort) {
+            rowClass = "sort-highlight";
+            txsClass = "text-white/80";
+          } else if (isLimit) {
+            rowClass = "limit-highlight font-bold";
+            txsClass = "text-white/80";
+          }
+          return `
+            <div class="flex justify-between items-center py-2.5 px-3 rounded-md ${rowClass}">
+              <span class="text-sm font-medium capitalize">${label.replace("_", " ")}</span>
+              <div class="text-right">
+                <span class="text-sm font-semibold">${value.toLocaleString()}</span>
+                <span class="text-xs ${txsClass} ml-2">(${formattedTxs} txs/block)</span>
+              </div>
+            </div>
+          `;
+        };
+        card.innerHTML = `
+          <div class="flex-grow">
+            <h3 class="text-xl font-bold text-gray-900 break-words">${contractName}</h3>
+            <p class="text-md text-gray-500 mb-4 font-mono break-words">${tx.method}</p>
+            <div class="mb-6 mt-2 pt-4 text-center">
+              <p class="text-sm text-gray-600">Max transactions per block:</p>
+              <p class="text-4xl font-bold" style="color:#FF4F03;">${isFinite(minTxs) ? Math.floor(minTxs).toLocaleString() : "∞"}</p>
+              <p class="text-sm font-semibold text-gray-800 mt-1">Limited by: <span class="capitalize font-bold" style="color:#FF4F03;">${limitingFactor.replace("_", " ")}</span></p>
+            </div>
+            <div class="space-y-2 border-t border-gray-200 pt-4">
+              ${makeRow("Runtime", cost.runtime, txsPerBlock.runtime, "runtime")}
+              ${makeRow("Read Count", cost.read_count, txsPerBlock.read_count, "read_count")}
+              ${makeRow("Read Length", cost.read_length, txsPerBlock.read_length, "read_length")}
+              ${makeRow("Write Count", cost.write_count, txsPerBlock.write_count, "write_count")}
+              ${makeRow("Write Length", cost.write_length, txsPerBlock.write_length, "write_length")}
+            </div>
+          </div>
+        `;
+        return card;
+      }
+
+      /**
+       * When the comparison selector changes, compute and render diff results.
+       */
+      function handleComparisonChange(e) {
+        const comparePath = e.target.value;
+        const baselinePath = document.getElementById("report-select").value;
+        const container = document.getElementById("comparison-container");
+        // Clear previous comparison.
+        container.innerHTML = "";
+        if (!comparePath || comparePath === baselinePath) {
+          return;
+        }
+        const baselineTxs = reportData.get(baselinePath) || [];
+        const compareTxs = reportData.get(comparePath) || [];
+        const diff = computeDiff(baselineTxs, compareTxs);
+        renderComparison(diff, baselinePath, comparePath);
+      }
+
+      /**
+       * Compute the difference between two reports' processed transactions. Returns
+       * an array of diff objects keyed by contract.method. Each diff contains
+       * baseline and comparison values as well as deltas.
+       */
+      function computeDiff(baseline, compare) {
+        const diffMap = new Map();
+        const baselineMap = new Map();
+        baseline.forEach((tx) => baselineMap.set(tx.key, tx));
+        const compareMap = new Map();
+        compare.forEach((tx) => compareMap.set(tx.key, tx));
+        // Consider union of keys from both reports.
+        const allKeys = new Set([...baselineMap.keys(), ...compareMap.keys()]);
+        allKeys.forEach((key) => {
+          const base = baselineMap.get(key);
+          const comp = compareMap.get(key);
+          // Skip methods that don't exist in either (shouldn't happen).
+          if (!base && !comp) return;
+          const diffObj = {
+            key,
+            contract: key.split(".")[1] || key,
+            method: base?.method || comp?.method || "",
+            baseline: base || null,
+            compare: comp || null,
+          };
+          // Compute differences in metrics if both available.
+          if (base && comp) {
+            diffObj.minTxsDelta = (comp.minTxs || 0) - (base.minTxs || 0);
+            // For each cost dimension compute delta and sign.
+            diffObj.costDiff = {};
+            ["runtime", "read_count", "read_length", "write_count", "write_length"].forEach((metric) => {
+              diffObj.costDiff[metric] = (comp.cost[metric] || 0) - (base.cost[metric] || 0);
+            });
+            diffObj.limitingFactorChanged = base.limitingFactor !== comp.limitingFactor;
+          } else {
+            // New or removed transaction.
+            diffObj.minTxsDelta = comp ? Infinity : -Infinity;
+            diffObj.costDiff = null;
+            diffObj.limitingFactorChanged = false;
+          }
+          diffMap.set(key, diffObj);
+        });
+        return Array.from(diffMap.values());
+      }
+
+      /**
+       * Render the comparison table given diff results.
+       */
+      function renderComparison(diff, basePath, comparePath) {
+        const container = document.getElementById("comparison-container");
+        const baseName = reportNames.get(basePath) || basePath;
+        const compareName = reportNames.get(comparePath) || comparePath;
+        if (!diff || diff.length === 0) {
+          container.innerHTML = "";
+          return;
+        }
+        // Summarise the diff: count improvements and regressions.
+        let improved = 0;
+        let regressed = 0;
+        let added = 0;
+        let removed = 0;
+        diff.forEach((d) => {
+          if (d.baseline && d.compare) {
+            if (isFinite(d.minTxsDelta) && d.minTxsDelta > 0) improved++;
+            if (isFinite(d.minTxsDelta) && d.minTxsDelta < 0) regressed++;
+          } else if (!d.baseline && d.compare) {
+            added++;
+          } else if (d.baseline && !d.compare) {
+            removed++;
+          }
+        });
+        // Sort diffs by absolute change in minTxs (descending) and then by key.
+        diff.sort((a, b) => {
+          const absA = Math.abs(a.minTxsDelta || 0);
+          const absB = Math.abs(b.minTxsDelta || 0);
+          if (absA === absB) {
+            return a.key.localeCompare(b.key);
+          }
+          return absB - absA;
+        });
+        // Build rows for comparison table.
+        const rows = diff
+          .map((d) => {
+            // Skip identical (no baseline or compare) but keep add/remove.
+            let status;
+            let deltaCell;
+            let baselineCell;
+            let compareCell;
+            if (d.baseline && d.compare) {
+              const delta = d.minTxsDelta;
+              status = delta > 0 ? "improved" : delta < 0 ? "regressed" : "unchanged";
+              const indicator = delta > 0 ? "+" : delta < 0 ? "−" : "";
+              const deltaVal = isFinite(delta) ? `${indicator}${Math.abs(Math.floor(delta)).toLocaleString()}` : "∞";
+              deltaCell = `<span class="font-bold ${status === "improved" ? 'text-green-600' : status === 'regressed' ? 'text-red-600' : 'text-gray-600'}">${deltaVal}</span>`;
+              baselineCell = d.baseline ? Math.floor(d.baseline.minTxs).toLocaleString() : "–";
+              compareCell = d.compare ? Math.floor(d.compare.minTxs).toLocaleString() : "–";
+            } else if (!d.baseline && d.compare) {
+              status = "new";
+              deltaCell = `<span class="text-green-600 font-semibold">New</span>`;
+              baselineCell = "–";
+              compareCell = isFinite(d.compare.minTxs) ? Math.floor(d.compare.minTxs).toLocaleString() : "∞";
+            } else if (d.baseline && !d.compare) {
+              status = "removed";
+              deltaCell = `<span class="text-red-600 font-semibold">Removed</span>`;
+              baselineCell = isFinite(d.baseline.minTxs) ? Math.floor(d.baseline.minTxs).toLocaleString() : "∞";
+              compareCell = "–";
+            }
+            // Compose cost diff cells if present.
+            let costDiffCell = "";
+            if (d.costDiff) {
+              costDiffCell = `<div class="space-y-1">
+                ${Object.entries(d.costDiff)
+                  .map(([metric, delta]) => {
+                    const sign = delta > 0 ? "+" : delta < 0 ? "−" : "";
+                    const val = Math.abs(delta);
+                    const colour = delta < 0 ? 'text-green-600' : delta > 0 ? 'text-red-600' : 'text-gray-600';
+                    return `<div class="flex justify-between text-xs"><span class="capitalize">${metric.replace('_',' ')}</span><span class="${colour}">${sign}${val.toLocaleString()}</span></div>`;
+                  })
+                  .join("")}
+              </div>`;
+            }
+            // Limiting factor change cell.
+            const factorCell = d.baseline && d.compare ? (d.limitingFactorChanged ? `<span class="font-semibold text-yellow-600">${d.baseline.limitingFactor.replace('_',' ')} → ${d.compare.limitingFactor.replace('_',' ')}</span>` : `<span class="text-gray-600">${d.baseline.limitingFactor.replace('_',' ')}</span>`) : "";
+            return `
+              <tr>
+                <td class="py-3 px-4 border-b border-gray-200 text-sm font-mono">${d.contract}: ${d.method}()</td>
+                <td class="py-3 px-4 border-b border-gray-200 text-sm text-center">${baselineCell}</td>
+                <td class="py-3 px-4 border-b border-gray-200 text-sm text-center">${compareCell}</td>
+                <td class="py-3 px-4 border-b border-gray-200 text-sm text-center">${deltaCell}</td>
+                <td class="py-3 px-4 border-b border-gray-200 text-sm">${factorCell}</td>
+                <td class="py-3 px-4 border-b border-gray-200 text-sm">${costDiffCell}</td>
+              </tr>
+            `;
+          })
+          .join("");
+        container.innerHTML = `
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Comparison: ${baseName} vs ${compareName}</h2>
+            <div class="mb-4 text-sm text-gray-600">
+              <span class="mr-4"><strong>${improved}</strong> improved</span>
+              <span class="mr-4"><strong>${regressed}</strong> regressed</span>
+              <span class="mr-4"><strong>${added}</strong> new</span>
+              <span><strong>${removed}</strong> removed</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full table-striped">
+                <thead>
+                  <tr>
+                    <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction</th>
+                    <th class="py-3 px-4 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Baseline Tx/block</th>
+                    <th class="py-3 px-4 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Compare Tx/block</th>
+                    <th class="py-3 px-4 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Δ Tx/block</th>
+                    <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Limiting Factor</th>
+                    <th class="py-3 px-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost Δ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rows}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+    </script>
+  </body>
+</html>
