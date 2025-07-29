@@ -76,29 +76,29 @@
           >
             <div class="p-3 bg-gray-100 rounded-lg">
               <h3 class="font-bold">Runtime</h3>
-              <p class="text-gray-600">Computational cost.</p>
+              <p class="text-gray-600">The computational effort required.</p>
             </div>
             <div class="p-3 bg-gray-100 rounded-lg">
               <h3 class="font-bold">Read Count</h3>
-              <p class="text-gray-600">Number of DB reads.</p>
+              <p class="text-gray-600">Number of database reads.</p>
             </div>
             <div class="p-3 bg-gray-100 rounded-lg">
               <h3 class="font-bold">Read Length</h3>
-              <p class="text-gray-600">Total bytes read.</p>
+              <p class="text-gray-600">Total size (bytes) of data read.</p>
             </div>
             <div class="p-3 bg-gray-100 rounded-lg">
               <h3 class="font-bold">Write Count</h3>
-              <p class="text-gray-600">Number of DB writes.</p>
+              <p class="text-gray-600">Number of database writes.</p>
             </div>
             <div class="p-3 bg-gray-100 rounded-lg">
               <h3 class="font-bold">Write Length</h3>
-              <p class="text-gray-600">Total bytes written.</p>
+              <p class="text-gray-600">Total size (bytes) of data written.</p>
             </div>
           </div>
           <p class="mt-4 text-sm text-gray-500">
-            For each transaction we determine how many could fit in a block based
-            on each of the five limits. The smallest number defines the maximum
-            transactions per block and its corresponding metric is called the
+            For each transaction, we calculate the maximum number that can fit
+            in a block based on each cost limit. The most restrictive of these
+            is the
             <span class="font-semibold" style="color: #ff4f03"
               >limiting factor</span
             >.
