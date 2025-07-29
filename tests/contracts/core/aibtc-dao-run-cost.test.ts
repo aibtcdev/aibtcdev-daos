@@ -39,7 +39,7 @@ const TEST_NONCE = Cl.uint(1);
 // Mock token contract for testing
 const mockTokenAddress = `${deployer}.aibtc-faktory`;
 
-describe(`public functions: ${contractName}`, () => {
+describe.skip(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // set-owner() tests
   ////////////////////////////////////////

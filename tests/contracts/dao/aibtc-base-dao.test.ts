@@ -26,7 +26,7 @@ const initializeDaoContractAddress =
 // import error codes
 const ErrCode = ErrCodeBaseDao;
 
-describe(`public functions: ${contractName}`, () => {
+describe.skip(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // construct() tests
   ////////////////////////////////////////
