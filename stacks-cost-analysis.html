@@ -1142,11 +1142,14 @@
         const blob = new Blob([htmlContent], { type: "text/html" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        const date = new Date().toISOString().split("T")[0];
+        const now = new Date();
+        const yyyymmdd = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}`;
+        const hhss = `${now.getHours().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
+        const timestamp = `${yyyymmdd}-${hhss}`;
         const sanitizedBase = baseName.toLowerCase().replace(/[^a-z0-9]/g, '-');
         const sanitizedCompare = compareName.toLowerCase().replace(/[^a-z0-9]/g, '-');
         a.href = url;
-        a.download = `comparison-${sanitizedBase}-vs-${sanitizedCompare}-${date}.html`;
+        a.download = `${timestamp}-comparison-${sanitizedBase}-vs-${sanitizedCompare}.html`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
