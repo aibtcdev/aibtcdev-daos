@@ -645,6 +645,14 @@
        */
       function updateReportView() {
         const container = document.getElementById("report-container");
+        const expansionState = new Map();
+        container.querySelectorAll("section[data-contract-id]").forEach(section => {
+          const cid = section.dataset.contractId;
+          const grid = section.querySelector(".grid");
+          if (cid && grid) {
+            expansionState.set(cid, grid.style.display !== "none");
+          }
+        });
         if (!currentTxs || currentTxs.length === 0) {
           container.innerHTML = "";
           return;
@@ -662,7 +670,13 @@
         }, {});
         // Determine sort order.
         const sortValue = document.getElementById("sort-select").value;
-        const [sortField, sortDir] = sortValue.split("-");
+        let sortField, sortDir;
+        if (sortValue.startsWith("max-txs")) {
+          sortField = "max-txs";
+          sortDir = sortValue.endsWith("asc") ? "asc" : "desc";
+        } else {
+          [sortField, sortDir] = sortValue.split("-");
+        }
 
         container.innerHTML = "";
         // If no transactions after filtering, display a message.
@@ -678,6 +692,7 @@
         // Render each contract section into the wrapper.
         for (const cid in grouped) {
           const section = document.createElement("section");
+          section.dataset.contractId = cid;
           const name = cid.split(".")[1] || cid;
           const title = document.createElement("h2");
           title.className =
@@ -701,10 +716,7 @@
           const entries = grouped[cid];
           entries.sort((a, b) => {
             let valA, valB;
-            if (sortField === "max") {
-              valA = a.minTxs;
-              valB = b.minTxs;
-            } else if (sortField === "max-txs") {
+            if (sortField === "max-txs") {
               valA = a.minTxs;
               valB = b.minTxs;
             } else {
@@ -720,6 +732,21 @@
           contractsWrapper.appendChild(section);
         }
         container.appendChild(contractsWrapper);
+
+        // Re-apply expansion state
+        expansionState.forEach((isExpanded, cid) => {
+          if (isExpanded) {
+            const section = contractsWrapper.querySelector(`section[data-contract-id="${cid}"]`);
+            if (section) {
+              const title = section.querySelector("h2");
+              const grid = section.querySelector(".grid");
+              if (title && grid) {
+                grid.style.display = "grid";
+                title.querySelector(".chevron").classList.add("rotate-90");
+              }
+            }
+          }
+        });
       }
 
       /**
