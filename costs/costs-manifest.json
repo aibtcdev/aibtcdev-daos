@@ -26,5 +26,9 @@
   {
     "name": "5 All Tests Enabled Large String",
     "path": "/costs/20250729-5-all-tests-enabled-large-string.json"
+  },
+  {
+    "name": "6 Less Block Height Reads",
+    "path": "/costs/20250729-6-less-block-height-reads.json"
   }
 ]
