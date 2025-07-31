@@ -1,5 +1,5 @@
 ;; title: aibtc-dao-traits
-;; version: 3.2.0
+;; version: 3.3.3
 ;; summary: A collection of traits for aibtc cohort 0.
 
 ;; IMPORTS
