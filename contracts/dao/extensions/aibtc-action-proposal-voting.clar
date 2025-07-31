@@ -70,8 +70,8 @@
 (define-data-var concludedProposalCount uint u0) ;; total number of concluded proposals
 (define-data-var executedProposalCount uint u0) ;; total number of executed proposals
 
-(define-data-var lastProposalStacksBlock uint stacks-block-height) ;; stacks block height of last proposal created
-(define-data-var lastProposalBitcoinBlock uint burn-block-height) ;; bitcoin block height of last proposal created
+(define-data-var lastProposalStacksBlock uint DEPLOYED_STACKS_BLOCK) ;; stacks block height of last proposal created
+(define-data-var lastProposalBitcoinBlock uint DEPLOYED_BITCOIN_BLOCK) ;; bitcoin block height of last proposal created
 
 ;; data maps
 ;;
@@ -164,7 +164,7 @@
       (createdStx (- stacks-block-height u1))
       (createdBtc burn-block-height)
       (liquidTokens (try! (get-liquid-supply createdStx)))
-      (voteStart (+ burn-block-height VOTING_DELAY))
+      (voteStart (+ createdBtc VOTING_DELAY))
       (voteEnd (+ voteStart VOTING_PERIOD))
       (execStart (+ voteEnd VOTING_DELAY))
       (execEnd (+ execStart VOTING_PERIOD))
@@ -471,7 +471,8 @@
       ))
       ;; check info for running action
       (validAction (is-action-valid action))
-      (notExpired (< burn-block-height (get execEnd proposalBlocks)))
+      (burnBlock burn-block-height)
+      (notExpired (< burnBlock (get execEnd proposalBlocks)))
       (tryToExecute (and
         votePassed
         validAction
@@ -481,11 +482,11 @@
     ;; proposal not already concluded
     (asserts! (not (get concluded proposalRecord)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     ;; proposal is past voting period
-    (asserts! (>= burn-block-height (get voteEnd proposalBlocks))
+    (asserts! (>= burnBlock (get voteEnd proposalBlocks))
       ERR_PROPOSAL_VOTING_ACTIVE
     )
     ;; proposal is past execution delay
-    (asserts! (>= burn-block-height (get execStart proposalBlocks))
+    (asserts! (>= burnBlock (get execStart proposalBlocks))
       ERR_PROPOSAL_EXECUTION_DELAY
     )
     ;; action must be the same as the one in proposal

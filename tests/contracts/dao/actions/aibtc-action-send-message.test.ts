@@ -6,6 +6,7 @@ import {
   constructDao,
   formatSerializedBuffer,
   passActionProposal,
+  PROPOSAL_MESSAGE,
 } from "../../../../utilities/dao-helpers";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 
@@ -47,7 +48,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////
   it("run() fails if called directly", () => {
     // act
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const receipt = simnet.callPublicFn(
       contractAddress,
       "run",
@@ -68,7 +69,7 @@ describe(`public functions: ${contractName}`, () => {
     // pass the action proposal
     passActionProposal(
       "SEND_MESSAGE",
-      Cl.stringUtf8(memo),
+      Cl.stringUtf8(PROPOSAL_MESSAGE),
       deployer,
       deployer,
       voters,

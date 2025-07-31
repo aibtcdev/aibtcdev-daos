@@ -735,8 +735,9 @@ describe(`read-only functions: ${contractName}`, () => {
     );
 
     // assert updated state
-    const updatedPermissionsData =
-      convertClarityTuple<AgentAccountPermissions>(updatedPermissionsCV.result);
+    const updatedPermissionsData = convertClarityTuple<AgentAccountPermissions>(
+      updatedPermissionsCV.result
+    );
     expect(updatedPermissionsData).toEqual(expectedUpdatedPermissions);
   });
 

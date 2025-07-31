@@ -16,6 +16,13 @@ import { FaktoryContractStatus, FaktoryDexInInfo } from "./dao-types";
 import { dbgLog } from "./debug-logging";
 import { getBalancesForPrincipal } from "./asset-helpers";
 
+// single place for all tests so we can assess costs
+
+// from FAST12 Proposal #16 doubled up so close to max
+export const PROPOSAL_MESSAGE =
+  "I finished the implementation for the latest agent account contract approval process. Agent account contract approvals and revocations now require specifying a type parameter that represents a hardcoded constant in the contract. Following the changes in the contract additional supporting changes were required in the frontend, backend, and agent tooling. Summary of the updates: frontend: updated button style and text, updated modal with approval info, added default type for VOTING; backend: updated API endpoint to accept type from frontend, updated python wrapper for bun tool to accept parameter and pass to bun script; agent tools: updated script to accept type parameter and validate it using @aibtc/types library, added parameter to contract function call. Everything is updated and functional now as evidenced by this contribution being submitted and evaluated. This unlocked the testing flow for the team which was blocked by errors. --- Metadata --- Title: Implement Type Parameter for Agent Account Approvals | Tags: technical update|contract approval|development tools|testing enablement|infrastructure upgrade | Reference:https://x.com/whoabuddydev/status/1947759645394932080";
+export const DAO_CHARTER_MESSAGE = "Test";
+
 export const VOTING_DELAY = 144;
 export const VOTING_PERIOD = 288;
 

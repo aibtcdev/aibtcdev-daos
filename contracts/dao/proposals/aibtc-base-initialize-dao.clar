@@ -5,8 +5,8 @@
 ;; /g/.aibtc-dao-traits.proposal/dao_trait_proposal
 (impl-trait .aibtc-dao-traits.proposal)
 
-;; /g/aibtc mission goes here/dao_manifest
-(define-constant CFG_DAO_MANIFEST_TEXT u"aibtc mission goes here")
+;; /g/Test/dao_manifest
+(define-constant CFG_DAO_MANIFEST_TEXT u"Test")
 ;; /g/.aibtc-faktory/dao_contract_token
 (define-constant CFG_DAO_TOKEN .aibtc-faktory)
 ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_token_contract

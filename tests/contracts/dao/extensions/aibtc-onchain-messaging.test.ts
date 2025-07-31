@@ -6,6 +6,7 @@ import {
   completePrelaunch,
   constructDao,
   getDaoTokens,
+  PROPOSAL_MESSAGE,
 } from "../../../../utilities/dao-helpers";
 
 // setup accounts
@@ -69,7 +70,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "send",
-      [Cl.stringUtf8("Test message")],
+      [Cl.stringUtf8(PROPOSAL_MESSAGE)],
       address1
     );
     // assert

@@ -9,6 +9,7 @@ import {
   constructDao,
   formatSerializedBuffer,
   fundAgentAccount,
+  PROPOSAL_MESSAGE,
   VOTING_DELAY,
   VOTING_PERIOD,
 } from "../../../utilities/dao-helpers";
@@ -46,7 +47,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   it("create-action-proposal() fails if caller is not authorized (user or agent)", () => {
     // arrange
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
 
@@ -69,7 +70,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("create-action-proposal() fails if proposal contract is not approved", () => {
     // arrange
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
     constructDao(deployer);
@@ -93,7 +94,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("create-action-proposal() succeeds when called by owner", () => {
     // arrange
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
     completePrelaunch(deployer);
@@ -130,7 +131,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("create-action-proposal() succeeds for agent if permission is granted", () => {
     // arrange
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
     constructDao(deployer);
@@ -175,7 +176,7 @@ describe(`public functions: ${contractName}`, () => {
 
   it("create-action-proposal() emits the correct notification event", () => {
     // arrange
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const expectedEvent = {
       notification: "aibtc-agent-account/create-action-proposal",
       payload: {
@@ -269,7 +270,7 @@ describe(`public functions: ${contractName}`, () => {
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -335,7 +336,7 @@ describe(`public functions: ${contractName}`, () => {
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -399,7 +400,7 @@ describe(`public functions: ${contractName}`, () => {
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -477,7 +478,7 @@ describe(`public functions: ${contractName}`, () => {
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -538,7 +539,7 @@ describe(`public functions: ${contractName}`, () => {
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -593,7 +594,7 @@ describe(`public functions: ${contractName}`, () => {
     expect(permissionReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -651,7 +652,7 @@ describe(`public functions: ${contractName}`, () => {
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -725,7 +726,7 @@ describe(`public functions: ${contractName}`, () => {
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -815,7 +816,7 @@ describe(`public functions: ${contractName}`, () => {
     expect(permissionReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -883,7 +884,7 @@ describe(`public functions: ${contractName}`, () => {
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -961,7 +962,7 @@ describe(`public functions: ${contractName}`, () => {
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -1018,7 +1019,7 @@ describe(`public functions: ${contractName}`, () => {
 describe(`read-only functions: ${contractName}`, () => {
   it("agent fails to create proposals if not authorized", () => {
     // arrange
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
     constructDao(deployer);
@@ -1063,7 +1064,7 @@ describe(`read-only functions: ${contractName}`, () => {
 
   it("agent fails to create proposals if contract is not approved", () => {
     // arrange
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
     constructDao(deployer);
@@ -1124,7 +1125,7 @@ describe(`read-only functions: ${contractName}`, () => {
     expect(permissionReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first (owner does this)
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -1229,7 +1230,7 @@ describe(`read-only functions: ${contractName}`, () => {
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -1303,7 +1304,7 @@ describe(`read-only functions: ${contractName}`, () => {
     expect(permissionReceipt.result).toBeOk(Cl.bool(true));
 
     // Create a proposal first
-    const message = Cl.stringUtf8("hello world");
+    const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
