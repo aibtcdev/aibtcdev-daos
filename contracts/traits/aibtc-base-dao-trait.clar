@@ -1,5 +1,5 @@
 ;; title: aibtc-base-dao-trait
-;; version: 3.1.0
+;; version: 3.3.3
 ;; summary: A trait that defines an aibtc base dao.
 
 (use-trait proposal-trait .aibtc-dao-traits.proposal)
