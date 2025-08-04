@@ -2,7 +2,10 @@ import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeDaoCharter } from "../../../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
-import { constructDao } from "../../../../utilities/dao-helpers";
+import {
+  constructDao,
+  DAO_CHARTER_MESSAGE,
+} from "../../../../utilities/dao-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -29,7 +32,7 @@ const intializeDaoAddress = registry.getContractAddressByTypeAndSubtype(
 const ErrCode = ErrCodeDaoCharter;
 
 const expectedDaoCharterVersion = Cl.uint(1);
-const expectedDaoCharterString = Cl.stringUtf8("aibtc mission goes here");
+const expectedDaoCharterString = Cl.stringUtf8(DAO_CHARTER_MESSAGE);
 const expectedDaoCharter = Cl.tuple({
   burnHeight: Cl.uint(4), // deployed btc block height
   caller: Cl.principal(intializeDaoAddress),
@@ -67,7 +70,7 @@ describe(`public functions: ${contractName}`, () => {
       const receipt = simnet.callPublicFn(
         contractAddress,
         "set-dao-charter",
-        [Cl.stringUtf8("Test Charter")],
+        [Cl.stringUtf8(DAO_CHARTER_MESSAGE)],
         address1
       );
       // assert
