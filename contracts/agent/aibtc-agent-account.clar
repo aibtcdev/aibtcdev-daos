@@ -1,5 +1,5 @@
 ;; title: aibtc-agent-account
-;; version: 3.0.0
+;; version: 3.3.3
 ;; summary: A special account contract between a user and an agent for managing assets and DAO interactions. Only the user can withdraw funds.
 
 ;; traits
