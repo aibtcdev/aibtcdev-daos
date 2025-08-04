@@ -75,6 +75,10 @@
 ))
 
 (define-trait aibtc-account-config (
+  (set-agent-can-manage-assets
+    (bool)
+    (response bool uint)
+  )
   (set-agent-can-use-proposals
     (bool)
     (response bool uint)

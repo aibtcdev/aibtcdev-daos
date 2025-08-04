@@ -42,7 +42,7 @@ type AgentAccountApprovalTypes = {
 };
 
 type AgentAccountPermissions = {
-  canDeposit: boolean;
+  canManageAssets: boolean;
   canUseProposals: boolean;
   canApproveRevokeContracts: boolean;
   canBuySell: boolean;
@@ -285,17 +285,17 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   ////////////////////////////////////////
-  // set-agent-can-deposit-assets() tests
+  // set-agent-can-manage-assets() tests
   ////////////////////////////////////////
-  it("set-agent-can-deposit-assets() fails if caller is not the owner", () => {
+  it("set-agent-can-manage-assets() fails if caller is not the owner", () => {
     // arrange
-    const canDeposit = false;
+    const canManage = false;
 
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
-      "set-agent-can-deposit-assets",
-      [Cl.bool(canDeposit)],
+      "set-agent-can-manage-assets",
+      [Cl.bool(canManage)],
       address3
     );
 
@@ -303,15 +303,15 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_CALLER_NOT_OWNER));
   });
 
-  it("set-agent-can-deposit-assets() succeeds and sets agent permission", () => {
+  it("set-agent-can-manage-assets() succeeds and sets agent permission", () => {
     // arrange
-    const canDeposit = false;
+    const canManage = false;
 
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
-      "set-agent-can-deposit-assets",
-      [Cl.bool(canDeposit)],
+      "set-agent-can-manage-assets",
+      [Cl.bool(canManage)],
       deployer
     );
 
@@ -319,13 +319,13 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeOk(Cl.bool(true));
   });
 
-  it("set-agent-can-deposit-assets() emits the correct notification event", () => {
+  it("set-agent-can-manage-assets() emits the correct notification event", () => {
     // arrange
-    const canDeposit = false;
+    const canManage = false;
     const expectedEvent = {
-      notification: "aibtc-agent-account/set-agent-can-deposit-assets",
+      notification: "aibtc-agent-account/set-agent-can-manage-assets",
       payload: {
-        canDeposit: canDeposit,
+        canManageAssets: canManage,
         sender: deployer,
         caller: deployer,
       },
@@ -334,8 +334,8 @@ describe(`public functions: ${contractName}`, () => {
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
-      "set-agent-can-deposit-assets",
-      [Cl.bool(canDeposit)],
+      "set-agent-can-manage-assets",
+      [Cl.bool(canManage)],
       deployer
     );
 
@@ -344,7 +344,7 @@ describe(`public functions: ${contractName}`, () => {
     const event = receipt.events[0];
     expect(event).toBeDefined();
     const printEvent = convertSIP019PrintEvent(receipt.events[0]);
-    dbgLog(printEvent, { titleBefore: "set-agent-can-deposit-assets() event" });
+    dbgLog(printEvent, { titleBefore: "set-agent-can-manage-assets() event" });
     expect(printEvent).toStrictEqual(expectedEvent);
   });
 
@@ -693,7 +693,7 @@ describe(`read-only functions: ${contractName}`, () => {
   it("get-agent-permissions() returns the correct agent permissions", () => {
     // arrange
     const expectedInitialPermissions: AgentAccountPermissions = {
-      canDeposit: true,
+      canManageAssets: true,
       canUseProposals: true,
       canApproveRevokeContracts: true,
       canBuySell: false,

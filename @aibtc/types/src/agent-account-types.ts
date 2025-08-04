@@ -46,7 +46,7 @@ export interface AgentAccountApprovalTypes {
  * Represents the response from the `get-agent-permissions` function in the `aibtc-agent-account` contract.
  */
 export interface AgentAccountPermissions {
-  canDeposit: boolean;
+  canManageAssets: boolean;
   canUseProposals: boolean;
   canApproveRevokeContracts: boolean;
   canBuySell: boolean;
@@ -57,7 +57,7 @@ export interface AgentAccountPermissions {
  * These values correspond to the initial data-var values in the contract.
  */
 export const AGENT_ACCOUNT_DEFAULT_PERMISSIONS: AgentAccountPermissions = {
-  canDeposit: true,
+  canManageAssets: true,
   canUseProposals: true,
   canApproveRevokeContracts: true,
   canBuySell: false,

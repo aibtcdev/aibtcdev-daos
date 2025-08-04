@@ -55,7 +55,7 @@ describe(`public functions: ${contractName}`, () => {
     // revoke permission
     const revokeReceipt = simnet.callPublicFn(
       contractAddress,
-      "set-agent-can-deposit-assets",
+      "set-agent-can-manage-assets",
       [Cl.bool(false)],
       deployer
     );
@@ -80,7 +80,7 @@ describe(`public functions: ${contractName}`, () => {
     // ensure permission is granted
     const grantReceipt = simnet.callPublicFn(
       contractAddress,
-      "set-agent-can-deposit-assets",
+      "set-agent-can-manage-assets",
       [Cl.bool(true)],
       deployer
     );
@@ -178,7 +178,7 @@ describe(`public functions: ${contractName}`, () => {
     // revoke permission
     const revokeReceipt = simnet.callPublicFn(
       contractAddress,
-      "set-agent-can-deposit-assets",
+      "set-agent-can-manage-assets",
       [Cl.bool(false)],
       deployer
     );
@@ -203,7 +203,7 @@ describe(`public functions: ${contractName}`, () => {
     // ensure permission is granted
     const grantReceipt = simnet.callPublicFn(
       contractAddress,
-      "set-agent-can-deposit-assets",
+      "set-agent-can-manage-assets",
       [Cl.bool(true)],
       deployer
     );
@@ -306,7 +306,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // withdraw-stx() tests
   ////////////////////////////////////////
-  it("withdraw-stx() fails if caller is not the owner", () => {
+  it("withdraw-stx() fails if caller is not authorized", () => {
     // arrange
     const amount = 1000000; // 1 STX
 
@@ -319,7 +319,75 @@ describe(`public functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_CALLER_NOT_OWNER));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
+  });
+
+  it("withdraw-stx() fails for agent if permission is revoked", () => {
+    // arrange
+    const amount = 1000000; // 1 STX
+
+    // deposit stx so we can withdraw
+    const depositReceipt = simnet.callPublicFn(
+      contractAddress,
+      "deposit-stx",
+      [Cl.uint(amount)],
+      deployer
+    );
+    expect(depositReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    // revoke permission
+    const revokeReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-manage-assets",
+      [Cl.bool(false)],
+      deployer
+    );
+    expect(revokeReceipt.result).toBeOk(Cl.bool(true));
+
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "withdraw-stx",
+      [Cl.uint(amount)],
+      address2 // agent
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
+  });
+
+  it("withdraw-stx() succeeds for agent if permission is granted", () => {
+    // arrange
+    const amount = 1000000; // 1 STX
+
+    // deposit stx so we can withdraw
+    const depositReceipt = simnet.callPublicFn(
+      contractAddress,
+      "deposit-stx",
+      [Cl.uint(amount)],
+      deployer
+    );
+    expect(depositReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    // ensure permission is granted
+    const grantReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-manage-assets",
+      [Cl.bool(true)],
+      deployer
+    );
+    expect(grantReceipt.result).toBeOk(Cl.bool(true));
+
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "withdraw-stx",
+      [Cl.uint(amount)],
+      address2 // agent
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
   });
 
   it("withdraw-stx() succeeds and transfers STX to owner", () => {
@@ -389,7 +457,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // withdraw-ft() tests
   ////////////////////////////////////////
-  it("withdraw-ft() fails if caller is not the owner", () => {
+  it("withdraw-ft() fails if caller is not authorized", () => {
     // arrange
     const amount = 10000000;
 
@@ -402,7 +470,89 @@ describe(`public functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_CALLER_NOT_OWNER));
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
+  });
+
+  it("withdraw-ft() fails for agent if permission is revoked", () => {
+    // arrange
+    const amount = 10000000;
+
+    // deposit ft so we can withdraw
+    const faucetReceipt = simnet.callPublicFn(
+      SBTC_CONTRACT,
+      "faucet",
+      [],
+      deployer
+    );
+    expect(faucetReceipt.result).toBeOk(Cl.bool(true));
+    const depositReceipt = simnet.callPublicFn(
+      contractAddress,
+      "deposit-ft",
+      [Cl.principal(SBTC_CONTRACT), Cl.uint(amount)],
+      deployer
+    );
+    expect(depositReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    // revoke permission
+    const revokeReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-manage-assets",
+      [Cl.bool(false)],
+      deployer
+    );
+    expect(revokeReceipt.result).toBeOk(Cl.bool(true));
+
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "withdraw-ft",
+      [Cl.principal(SBTC_CONTRACT), Cl.uint(amount)],
+      address2 // agent
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_OPERATION_NOT_ALLOWED));
+  });
+
+  it("withdraw-ft() succeeds for agent if permission is granted", () => {
+    // arrange
+    const amount = 10000000;
+
+    // deposit ft so we can withdraw
+    const faucetReceipt = simnet.callPublicFn(
+      SBTC_CONTRACT,
+      "faucet",
+      [],
+      deployer
+    );
+    expect(faucetReceipt.result).toBeOk(Cl.bool(true));
+    const depositReceipt = simnet.callPublicFn(
+      contractAddress,
+      "deposit-ft",
+      [Cl.principal(SBTC_CONTRACT), Cl.uint(amount)],
+      deployer
+    );
+    expect(depositReceipt.result).toBeOk(Cl.bool(true));
+
+    // act
+    // ensure permission is granted
+    const grantReceipt = simnet.callPublicFn(
+      contractAddress,
+      "set-agent-can-manage-assets",
+      [Cl.bool(true)],
+      deployer
+    );
+    expect(grantReceipt.result).toBeOk(Cl.bool(true));
+
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "withdraw-ft",
+      [Cl.principal(SBTC_CONTRACT), Cl.uint(amount)],
+      address2 // agent
+    );
+
+    // assert
+    expect(receipt.result).toBeOk(Cl.bool(true));
   });
 
   it("withdraw-ft() fails if contract is not approved", () => {
