@@ -1,5 +1,5 @@
 ;; title: aibtc-agent-account-traits
-;; version: 3.0.0
+;; version: 3.3.3
 ;; summary: A collection of traits for smart contracts that manage agent accounts.
 
 ;; IMPORTS
@@ -75,6 +75,10 @@
 ))
 
 (define-trait aibtc-account-config (
+  (set-agent-can-manage-assets
+    (bool)
+    (response bool uint)
+  )
   (set-agent-can-use-proposals
     (bool)
     (response bool uint)

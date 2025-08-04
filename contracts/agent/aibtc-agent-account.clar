@@ -1,5 +1,5 @@
 ;; title: aibtc-agent-account
-;; version: 3.0.0
+;; version: 3.3.3
 ;; summary: A special account contract between a user and an agent for managing assets and DAO interactions. Only the user can withdraw funds.
 
 ;; traits
@@ -69,7 +69,7 @@
 )
 
 ;; data vars
-(define-data-var agentCanDepositAssets bool true)
+(define-data-var agentCanManageAssets bool true)
 (define-data-var agentCanUseProposals bool true)
 (define-data-var agentCanApproveRevokeContracts bool true)
 (define-data-var agentCanBuySellAssets bool false)
@@ -79,7 +79,7 @@
 ;; the owner or agent can deposit STX to this contract
 (define-public (deposit-stx (amount uint))
   (begin
-    (asserts! (deposit-allowed) ERR_OPERATION_NOT_ALLOWED)
+    (asserts! (manage-assets-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/deposit-stx",
       payload: {
@@ -99,7 +99,7 @@
     (amount uint)
   )
   (begin
-    (asserts! (deposit-allowed) ERR_OPERATION_NOT_ALLOWED)
+    (asserts! (manage-assets-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/deposit-ft",
       payload: {
@@ -114,10 +114,11 @@
   )
 )
 
-;; only the owner can withdraw STX from this contract
+;; only the owner or authorized agent can withdraw STX from this contract
+;; funds are always sent to the hardcoded ACCOUNT_OWNER
 (define-public (withdraw-stx (amount uint))
   (begin
-    (asserts! (is-owner) ERR_CALLER_NOT_OWNER)
+    (asserts! (manage-assets-allowed) ERR_OPERATION_NOT_ALLOWED)
     (print {
       notification: "aibtc-agent-account/withdraw-stx",
       payload: {
@@ -131,13 +132,14 @@
   )
 )
 
-;; only the owner can withdraw FT from this contract if the asset contract is approved
+;; only the owner or authorized agent can withdraw FT from this contract if the asset contract is approved
+;; funds are always sent to the hardcoded ACCOUNT_OWNER
 (define-public (withdraw-ft
     (ft <ft-trait>)
     (amount uint)
   )
   (begin
-    (asserts! (is-owner) ERR_CALLER_NOT_OWNER)
+    (asserts! (manage-assets-allowed) ERR_OPERATION_NOT_ALLOWED)
     (asserts! (is-approved-contract (contract-of ft) APPROVED_CONTRACT_TOKEN)
       ERR_CONTRACT_NOT_APPROVED
     )
@@ -326,19 +328,19 @@
 
 ;; Agent Account Configuration Functions
 
-;; the owner can set whether the agent can deposit assets
-(define-public (set-agent-can-deposit-assets (canDeposit bool))
+;; the owner can set whether the agent can manage assets (deposit/withdraw)
+(define-public (set-agent-can-manage-assets (canManage bool))
   (begin
     (asserts! (is-owner) ERR_CALLER_NOT_OWNER)
     (print {
-      notification: "aibtc-agent-account/set-agent-can-deposit-assets",
+      notification: "aibtc-agent-account/set-agent-can-manage-assets",
       payload: {
-        canDeposit: canDeposit,
+        canManageAssets: canManage,
         sender: tx-sender,
         caller: contract-caller,
       },
     })
-    (ok (var-set agentCanDepositAssets canDeposit))
+    (ok (var-set agentCanManageAssets canManage))
   )
 )
 
@@ -484,7 +486,7 @@
 
 (define-read-only (get-agent-permissions)
   {
-    canDeposit: (var-get agentCanDepositAssets),
+    canManageAssets: (var-get agentCanManageAssets),
     canUseProposals: (var-get agentCanUseProposals),
     canApproveRevokeContracts: (var-get agentCanApproveRevokeContracts),
     canBuySell: (var-get agentCanBuySellAssets),
@@ -509,8 +511,8 @@
   )
 )
 
-(define-private (deposit-allowed)
-  (or (is-owner) (and (is-agent) (var-get agentCanDepositAssets)))
+(define-private (manage-assets-allowed)
+  (or (is-owner) (and (is-agent) (var-get agentCanManageAssets)))
 )
 
 (define-private (use-proposals-allowed)
