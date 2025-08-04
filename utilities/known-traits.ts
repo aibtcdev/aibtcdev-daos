@@ -82,15 +82,15 @@ const mainnetTraits: KnownTraits = {
   DAO_USERS: "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.users",
   // Agent traits
   AGENT_ACCOUNT:
-    "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-agent-account-traits.aibtc-account",
+    "SP6382W148DH1J3BMEBGWENZ9AK8DXCN5XJPP01C.aibtc-agent-account-traits.aibtc-account",
   AGENT_ACCOUNT_PROPOSALS:
-    "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-agent-account-traits.aibtc-account-proposals",
+    "SP6382W148DH1J3BMEBGWENZ9AK8DXCN5XJPP01C.aibtc-agent-account-traits.aibtc-account-proposals",
   AGENT_ACCOUNT_CONFIG:
-    "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-agent-account-traits.aibtc-account-config",
+    "SP6382W148DH1J3BMEBGWENZ9AK8DXCN5XJPP01C.aibtc-agent-account-traits.aibtc-account-config",
   AGENT_ACCOUNT_SWAPS:
-    "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-agent-account-traits.aibtc-account-swaps",
+    "SP6382W148DH1J3BMEBGWENZ9AK8DXCN5XJPP01C.aibtc-agent-account-traits.aibtc-account-swaps",
   AGENT_DAO_SWAP_ADAPTER:
-    "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
+    "SP6382W148DH1J3BMEBGWENZ9AK8DXCN5XJPP01C.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
 };
 
 const testnetTraits: KnownTraits = {
@@ -136,15 +136,15 @@ const testnetTraits: KnownTraits = {
     "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.dao-users",
   // Agent traits
   AGENT_ACCOUNT:
-    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.aibtc-account",
+    "ST3BVJM8WCP85RNFWXRRNRWRQREB5GK25TJWM016Z.aibtc-agent-account-traits.aibtc-account",
   AGENT_ACCOUNT_PROPOSALS:
-    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.aibtc-account-proposals",
+    "ST3BVJM8WCP85RNFWXRRNRWRQREB5GK25TJWM016Z.aibtc-agent-account-traits.aibtc-account-proposals",
   AGENT_ACCOUNT_CONFIG:
-    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.aibtc-account-config",
+    "ST3BVJM8WCP85RNFWXRRNRWRQREB5GK25TJWM016Z.aibtc-agent-account-traits.aibtc-account-config",
   AGENT_ACCOUNT_SWAPS:
-    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.aibtc-account-swaps",
+    "ST3BVJM8WCP85RNFWXRRNRWRQREB5GK25TJWM016Z.aibtc-agent-account-traits.aibtc-account-swaps",
   AGENT_DAO_SWAP_ADAPTER:
-    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
+    "ST3BVJM8WCP85RNFWXRRNRWRQREB5GK25TJWM016Z.aibtc-agent-account-traits.aibtc-dao-swap-adapter",
 };
 
 const devnetTraits: KnownTraits = {

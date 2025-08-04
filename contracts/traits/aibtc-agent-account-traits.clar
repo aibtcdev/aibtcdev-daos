@@ -1,5 +1,5 @@
 ;; title: aibtc-agent-account-traits
-;; version: 3.0.0
+;; version: 3.3.3
 ;; summary: A collection of traits for smart contracts that manage agent accounts.
 
 ;; IMPORTS
