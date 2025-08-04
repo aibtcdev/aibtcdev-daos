@@ -16,6 +16,7 @@ import {
   VOTING_DELAY,
   VOTING_PERIOD,
   completePrelaunch,
+  PROPOSAL_MESSAGE,
 } from "../../../../utilities/dao-helpers";
 import { convertClarityTuple } from "../../../../utilities/contract-helpers";
 
@@ -110,7 +111,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(`${deployer}.${sendMessageContract!.name}`),
-        formatSerializedBuffer(Cl.stringUtf8("test")),
+        formatSerializedBuffer(Cl.stringUtf8(PROPOSAL_MESSAGE)),
         Cl.none(),
       ],
       address1
@@ -197,7 +198,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(sendMessageContractAddress),
-        formatSerializedBuffer(Cl.stringUtf8("test")),
+        formatSerializedBuffer(Cl.stringUtf8(PROPOSAL_MESSAGE)),
         Cl.none(),
       ],
       address1
@@ -295,7 +296,7 @@ describe(`public functions: ${contractName}`, () => {
     constructDao(deployer);
     passActionProposal(
       "SEND_MESSAGE",
-      Cl.stringUtf8("test"),
+      Cl.stringUtf8(PROPOSAL_MESSAGE),
       deployer,
       address1, // creator
       [deployer, address1] // voters
@@ -363,7 +364,7 @@ describe(`public functions: ${contractName}`, () => {
       "create-action-proposal",
       [
         Cl.principal(sendMessageContractAddress),
-        formatSerializedBuffer(Cl.stringUtf8("another test")),
+        formatSerializedBuffer(Cl.stringUtf8(PROPOSAL_MESSAGE)),
         Cl.none(),
       ],
       address1 // creator
