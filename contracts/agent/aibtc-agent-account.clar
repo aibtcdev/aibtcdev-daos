@@ -115,6 +115,7 @@
 )
 
 ;; only the owner or authorized agent can withdraw STX from this contract
+;; funds are always sent to the hardcoded ACCOUNT_OWNER
 (define-public (withdraw-stx (amount uint))
   (begin
     (asserts! (manage-assets-allowed) ERR_OPERATION_NOT_ALLOWED)
@@ -132,6 +133,7 @@
 )
 
 ;; only the owner or authorized agent can withdraw FT from this contract if the asset contract is approved
+;; funds are always sent to the hardcoded ACCOUNT_OWNER
 (define-public (withdraw-ft
     (ft <ft-trait>)
     (amount uint)
