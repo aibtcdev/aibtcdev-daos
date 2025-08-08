@@ -155,9 +155,9 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   ////////////////////////////////////////
-  // transfer-dao-token() tests
+  // transfer-token() tests
   ////////////////////////////////////////
-  it("transfer-dao-token() fails if called by non-owner", () => {
+  it("transfer-token() fails if called by non-owner", () => {
     // arrange
     // Set up an allowed asset first
     const assetNonce = Cl.uint(2);
@@ -183,7 +183,7 @@ describe(`public functions: ${contractName}`, () => {
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         TEST_NONCE,
         Cl.principal(mockTokenAddress),
@@ -197,14 +197,14 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ERR_NOT_OWNER));
   });
 
-  it("transfer-dao-token() fails if asset is not allowed", () => {
+  it("transfer-token() fails if asset is not allowed", () => {
     // arrange
     const unknownToken = `${deployer}.unknown-token`;
 
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         TEST_NONCE,
         Cl.principal(unknownToken),
@@ -469,7 +469,7 @@ describe(`edge cases: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ERR_PROPOSAL_MISMATCH));
   });
 
-  it("transfer-dao-token() fails if confirmation has mismatched parameters", () => {
+  it("transfer-token() fails if confirmation has mismatched parameters", () => {
     // arrange
     const nonce = Cl.uint(402);
     simnet.callPublicFn(
@@ -493,7 +493,7 @@ describe(`edge cases: ${contractName}`, () => {
 
     simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         nonce,
         Cl.principal(mockTokenAddress),
@@ -506,7 +506,7 @@ describe(`edge cases: ${contractName}`, () => {
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         nonce,
         Cl.principal(mockTokenAddress),
@@ -574,7 +574,7 @@ describe(`contract initialization: ${contractName}`, () => {
 });
 
 describe(`transfer functionality: ${contractName}`, () => {
-  it("transfer-dao-token successfully transfers tokens when confirmed", () => {
+  it("transfer-token successfully transfers tokens when confirmed", () => {
     // arrange
     const satsAmount = 1000000;
     const transferNonce = 200;
@@ -605,7 +605,7 @@ describe(`transfer functionality: ${contractName}`, () => {
     // First confirmation creates proposal but doesn't execute
     const receipt1 = simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         Cl.uint(transferNonce),
         Cl.principal(mockTokenAddress),
@@ -619,7 +619,7 @@ describe(`transfer functionality: ${contractName}`, () => {
     // Second confirmation doesn't execute yet
     const receipt2 = simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         Cl.uint(transferNonce),
         Cl.principal(mockTokenAddress),
@@ -633,7 +633,7 @@ describe(`transfer functionality: ${contractName}`, () => {
     // Third confirmation reaches threshold and executes
     const receipt3 = simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         Cl.uint(transferNonce),
         Cl.principal(mockTokenAddress),
@@ -923,7 +923,7 @@ describe(`read-only functions: ${contractName}`, () => {
     });
     simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [nonce, Cl.principal(mockTokenAddress), amount, Cl.principal(address3)],
       deployer
     );

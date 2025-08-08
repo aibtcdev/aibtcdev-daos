@@ -11,8 +11,7 @@
 ;; traits
 ;;
 
-;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
-(use-trait sip010-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.sip-010-trait-ft-standard.sip-010-trait)
+(use-trait sip010-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; constants
 ;;
@@ -200,7 +199,7 @@
   )
 )
 
-(define-public (transfer-dao-token
+(define-public (transfer-token
     (nonce uint)
     (ft <sip010-trait>)
     (amount uint)
@@ -232,7 +231,7 @@
       )
     )
     (print {
-      notification: "dao-run-cost/transfer-dao-token",
+      notification: "dao-run-cost/transfer-token",
       payload: {
         nonce: nonce,
         amount: amount,
@@ -514,18 +513,9 @@
   (map-set Owners 'SP1NTCBRTGWGD2PVT020E7ZK5X2TSYC58HNEBNBYH true)
   (map-set Owners 'SP28DDT2YH6KTMVJ2H4JMNYA6TZH42ZA5KNFKM6DG true)
   (map-set Owners 'SP3GG4GT63YKM4P2TESZ2W1RMFTV3BMWP3H0T3GBD true)
-  ;; owners below used in tests (REMOVE BEFORE MAINNET DEPLOYMENT)
-  (map-set Owners 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM true)
-  (map-set Owners 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5 true)
-  (map-set Owners 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true)
-  (map-set Owners 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true)
-  (map-set Owners 'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND true)
   ;; set initial assets
-  ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_sbtc_contract
-  (map-set AllowedAssets 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
+  (map-set AllowedAssets 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token
     true
   )
-  ;; /g/.aibtc-token/dao_token_contract
-  (map-set AllowedAssets .aibtc-faktory true)
   (print (get-contract-info))
 )
