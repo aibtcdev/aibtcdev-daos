@@ -44,6 +44,10 @@ contract_id = 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1'
 [[project.requirements]]
 contract_id = 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1'
 
+# faktory agent account registry for automated registration
+[[project.requirements]]
+contract_id = 'SPV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RCJDC22.agent-account-registry'
+
 # agent account
 
 [contracts.aibtc-agent-account]
