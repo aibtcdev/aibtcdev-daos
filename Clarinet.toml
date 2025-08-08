@@ -162,7 +162,7 @@ epoch = 3.1
 
 # helper to simulate xyk-core from bitflow
 [contracts.xyk-core-v-1-2]
-path = "contracts/dao/trading/xyk-core-v-1-2.clar"
+path = "contracts/external/xyk-core-v-1-2.clar"
 clarity_version = 3
 epoch = 3.1
 
