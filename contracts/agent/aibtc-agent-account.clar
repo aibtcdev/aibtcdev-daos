@@ -528,11 +528,6 @@
 )
 
 (begin
-  ;; auto-register the agent account
-  (try! (contract-call?
-    'SPV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RCJDC22.agent-account-registry
-    auto-register-agent-account ACCOUNT_OWNER ACCOUNT_AGENT
-  ))
   ;; print creation event
   (print {
     notification: "aibtc-agent-account/user-agent-account-created",
@@ -542,4 +537,8 @@
       agentPermissions: (get-agent-permissions),
     },
   })
+  ;; auto-register the agent account
+  (contract-call? .agent-account-registry auto-register-agent-account
+    ACCOUNT_OWNER ACCOUNT_AGENT
+  )
 )
