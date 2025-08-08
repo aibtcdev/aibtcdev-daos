@@ -28,7 +28,7 @@ echo "Finding Clarity contracts..."
 echo "Excluding test contracts and DAO traits..."
 while IFS= read -r contract; do
     contracts+=("$contract")
-done < <(find contracts -name "*.clar" -not -path "contracts/test/*" -not -path "contracts/dao/traits/*" -not -path "contracts/external/*")
+done < <(find contracts -name "*.clar")
 
 echo "Found ${#contracts[@]} contract files"
 
