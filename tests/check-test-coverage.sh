@@ -43,14 +43,14 @@ fi
 echo -e "\nChecking test file coverage..."
 echo "==================================="
 for contract in "${contracts[@]}"; do
-    # band-aid to skip trait file in diff location
+    # band-aid to skip trait files
     if [[ "$contract" == *"traits"* ]]; then
         echo "⏩ Skipping trait file: $contract"
         continue
     fi
-    # band-aid to skip xyk-core-v-1-2 local copy
-    if [[ "$contract" == *"xyk-core-v-1-2"* ]]; then
-        echo "⏩ Skipping local copy of xyk-core-v-1-2: $contract"
+    # band-aid to skip external contracts
+    if [[ "$contract" == *"external"* ]]; then
+        echo "⏩ Skipping external contract: $contract"
         continue
     fi
 
