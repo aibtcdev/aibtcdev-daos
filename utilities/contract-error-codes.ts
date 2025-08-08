@@ -11,6 +11,7 @@ export enum ErrCodeAgentAccount {
   ERR_CALLER_NOT_OWNER = 1100,
   ERR_CONTRACT_NOT_APPROVED,
   ERR_OPERATION_NOT_ALLOWED = 1103,
+  ERR_INVALID_APPROVAL_TYPE = 1104,
 }
 
 // aibtc-base-dao.clar
