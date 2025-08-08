@@ -84,7 +84,7 @@ describe(`public functions: ${contractName}`, () => {
       notification: "aibtc-agent-account/approve-contract",
       payload: {
         contract: newContract,
-        type: AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN.toString(),
+        type: BigInt(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN),
         approved: true,
         sender: deployer,
         caller: deployer,
@@ -168,7 +168,7 @@ describe(`public functions: ${contractName}`, () => {
       notification: "aibtc-agent-account/revoke-contract",
       payload: {
         contract: contract,
-        type: AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN.toString(),
+        type: BigInt(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN),
         approved: false,
         sender: deployer,
         caller: deployer,
