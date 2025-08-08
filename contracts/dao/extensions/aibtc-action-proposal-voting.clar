@@ -45,21 +45,19 @@
 ;; voting configuration
 (define-constant VOTING_QUORUM u15) ;; 15% of liquid supply must participate
 (define-constant VOTING_THRESHOLD u66) ;; 66% of votes must be in favor
-(define-constant VOTING_BOND u50000000000) ;; action proposal bond, 500 DAO tokens w/ 8 decimals
+(define-constant VOTING_BOND u25000000000) ;; action proposal bond, 250 DAO tokens w/ 8 decimals
 (define-constant VOTING_REWARD u100000000000) ;; action proposal reward, 1,000 DAO tokens w/ 8 decimals
 ;; /g/.aibtc-treasury/dao_contract_treasury
 (define-constant VOTING_TREASURY .aibtc-treasury) ;; used to calculate liquid supply
 
 ;; set voting delay
-;; mainnet: 144 blocks (24 hours)
-;; testnet: 1 blocks (10 minutes)
-;; devnet: 144 blocks (24 hours)
-(define-constant VOTING_DELAY u144)
-;; set voting period
-;; mainnet: 288 blocks (48 hours)
+;; mainnet: 12 blocks (2 hours)
 ;; testnet: 3 blocks (30 minutes)
-;; devnet: 288 blocks (48 hours)
-(define-constant VOTING_PERIOD u288)
+(define-constant VOTING_DELAY u12)
+;; set voting period
+;; mainnet: 24 blocks (4 hours)
+;; testnet: 3 blocks (30 minutes)
+(define-constant VOTING_PERIOD u24)
 
 (define-constant REPUTATION_CHANGE u1) ;; reputation increase/decrease
 
