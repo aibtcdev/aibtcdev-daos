@@ -43,8 +43,8 @@
 ;; error codes
 (define-constant ERR_CALLER_NOT_OWNER (err u1100))
 (define-constant ERR_CONTRACT_NOT_APPROVED (err u1101))
-(define-constant ERR_OPERATION_NOT_ALLOWED (err u1103))
-(define-constant ERR_INVALID_APPROVAL_TYPE (err u1104))
+(define-constant ERR_OPERATION_NOT_ALLOWED (err u1102))
+(define-constant ERR_INVALID_APPROVAL_TYPE (err u1103))
 
 ;; contract approval types
 (define-constant APPROVED_CONTRACT_VOTING u1)
