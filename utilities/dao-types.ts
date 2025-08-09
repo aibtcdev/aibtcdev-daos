@@ -52,9 +52,3 @@ export type AgentAccountSwapAdapterSwapInfo = {
   totalSells: bigint;
   totalSwaps: bigint;
 };
-
-export enum AgentAccountApprovalType {
-  VOTING = 1,
-  SWAP = 2,
-  TOKEN = 3,
-}

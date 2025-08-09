@@ -2,7 +2,8 @@ codecov:
   require_ci_to_pass: true
 
 ignore:
-  - "contracts/dao/trading/xyk-core-v-1-2.clar"
+  - "contracts/external/**"
+  - "contracts/traits/**"
 
 coverage:
   precision: 2

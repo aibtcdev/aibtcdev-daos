@@ -1,7 +1,6 @@
 import { Cl, cvToValue } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeAgentAccount } from "../../../utilities/contract-error-codes";
-import { AgentAccountApprovalType } from "../../../utilities/dao-types";
 import { setupFullContractRegistry } from "../../../utilities/contract-registry";
 import { convertSIP019PrintEvent } from "../../../utilities/contract-helpers";
 import {
@@ -14,6 +13,7 @@ import {
   VOTING_PERIOD,
 } from "../../../utilities/dao-helpers";
 import { dbgLog } from "../../../utilities/debug-logging";
+import { AGENT_ACCOUNT_APPROVAL_TYPES } from "../../../utilities/agent-account-types";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -106,7 +106,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -142,7 +142,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -197,7 +197,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -263,7 +263,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -290,7 +290,7 @@ describe(`public functions: ${contractName}`, () => {
       "revoke-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -329,7 +329,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -393,7 +393,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -471,7 +471,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -498,7 +498,7 @@ describe(`public functions: ${contractName}`, () => {
       "revoke-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -532,7 +532,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -578,7 +578,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -645,7 +645,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -719,7 +719,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -765,7 +765,7 @@ describe(`public functions: ${contractName}`, () => {
       "revoke-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -800,7 +800,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -877,7 +877,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -955,7 +955,7 @@ describe(`public functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -1030,7 +1030,7 @@ describe(`read-only functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -1109,7 +1109,7 @@ describe(`read-only functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -1223,7 +1223,7 @@ describe(`read-only functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -1250,7 +1250,7 @@ describe(`read-only functions: ${contractName}`, () => {
       "revoke-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );
@@ -1288,7 +1288,7 @@ describe(`read-only functions: ${contractName}`, () => {
       "approve-contract",
       [
         Cl.principal(actionProposalsContractAddress),
-        Cl.uint(AgentAccountApprovalType.VOTING),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
       ],
       deployer
     );

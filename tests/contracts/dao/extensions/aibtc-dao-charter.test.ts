@@ -34,10 +34,10 @@ const ErrCode = ErrCodeDaoCharter;
 const expectedDaoCharterVersion = Cl.uint(1);
 const expectedDaoCharterString = Cl.stringUtf8(DAO_CHARTER_MESSAGE);
 const expectedDaoCharter = Cl.tuple({
-  burnHeight: Cl.uint(4), // deployed btc block height
+  burnHeight: Cl.uint(5), // deployed btc block height
   caller: Cl.principal(intializeDaoAddress),
   charter: expectedDaoCharterString,
-  createdAt: Cl.uint(6), // deployed stx block height
+  createdAt: Cl.uint(8), // deployed stx block height
   sender: Cl.principal(baseDaoContractAddress),
 });
 
