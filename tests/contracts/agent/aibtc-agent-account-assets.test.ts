@@ -1,7 +1,6 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeAgentAccount } from "../../../utilities/contract-error-codes";
-import { AgentAccountApprovalType } from "../../../utilities/dao-types";
 import { setupFullContractRegistry } from "../../../utilities/contract-registry";
 import {
   convertSIP019PrintEvent,
@@ -9,6 +8,7 @@ import {
 } from "../../../utilities/contract-helpers";
 import { getBalancesForPrincipal } from "../../../utilities/asset-helpers";
 import { dbgLog } from "../../../utilities/debug-logging";
+import { AGENT_ACCOUNT_APPROVAL_TYPES } from "../../../utilities/agent-account-types";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -257,7 +257,10 @@ describe(`public functions: ${contractName}`, () => {
     const isApproved = simnet.callReadOnlyFn(
       contractAddress,
       "is-approved-contract",
-      [Cl.principal(SBTC_CONTRACT), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [
+        Cl.principal(SBTC_CONTRACT),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN),
+      ],
       deployer
     );
     expect(isApproved.result).toStrictEqual(Cl.bool(true));

@@ -1,4 +1,4 @@
-import { Cl, ClarityType, ClarityValue, cvToValue } from "@stacks/transactions";
+import { Cl, ClarityType } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeAgentAccount } from "../../../utilities/contract-error-codes";
 import {
@@ -84,7 +84,7 @@ describe(`public functions: ${contractName}`, () => {
       notification: "aibtc-agent-account/approve-contract",
       payload: {
         contract: newContract,
-        type: BigInt(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN),
+        type: AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN.toString(),
         approved: true,
         sender: deployer,
         caller: deployer,
@@ -168,7 +168,7 @@ describe(`public functions: ${contractName}`, () => {
       notification: "aibtc-agent-account/revoke-contract",
       payload: {
         contract: contract,
-        type: BigInt(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN),
+        type: AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN.toString(),
         approved: false,
         sender: deployer,
         caller: deployer,
