@@ -55,34 +55,32 @@
 )
 
 (define-public (get-or-create-user-index (address principal))
-  (begin
-    (try! (is-dao-or-extension))
-    (match (map-get? UserIndexes address)
-      ;; user already exists, return the index
-      value
-      (ok value)
-      ;; user does not exist, create a new one
-      (let ((userIndex (+ u1 (var-get userCount))))
-        (print {
-          ;; /g/aibtc/dao_token_symbol
-          notification: "aibtc-dao-users/get-or-create-user-index",
-          payload: {
-            userIndex: userIndex,
-            address: address,
-            createdAt: burn-block-height,
-            contractCaller: contract-caller,
-            txSender: tx-sender,
-          },
-        })
-        (map-insert UserIndexes address userIndex)
-        (map-insert UserData userIndex {
+  (match (map-get? UserIndexes address)
+    ;; user already exists, return the index
+    value
+    (ok value)
+    ;; user does not exist, create a new one
+    (let ((userIndex (+ u1 (var-get userCount))))
+      (try! (is-dao-or-extension))
+      (print {
+        ;; /g/aibtc/dao_token_symbol
+        notification: "aibtc-dao-users/get-or-create-user-index",
+        payload: {
+          userIndex: userIndex,
           address: address,
           createdAt: burn-block-height,
-          reputation: 0,
-        })
-        (var-set userCount userIndex)
-        (ok userIndex)
-      )
+          contractCaller: contract-caller,
+          txSender: tx-sender,
+        },
+      })
+      (map-insert UserIndexes address userIndex)
+      (map-insert UserData userIndex {
+        address: address,
+        createdAt: burn-block-height,
+        reputation: 0,
+      })
+      (var-set userCount userIndex)
+      (ok userIndex)
     )
   )
 )
