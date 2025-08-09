@@ -51,6 +51,26 @@ const errorDefinitions: {
         ERR_INVALID_APPROVAL_TYPE: "The specified approval type is invalid.",
       },
     },
+    FAKTORY_SWAP_ADAPTER: {
+      enumObject: ClarityErrors.ErrCodeFaktorySwapAdapter,
+      descriptions: {
+        ERR_INVALID_DAO_TOKEN:
+          "The specified DAO token is invalid for this adapter.",
+        ERR_SWAP_FAILED: "The swap operation failed.",
+        ERR_QUOTE_FAILED: "Failed to get a quote for the swap.",
+        ERR_SLIPPAGE_TOO_HIGH: "Slippage is higher than the allowed limit.",
+      },
+    },
+    BITFLOW_SWAP_ADAPTER: {
+      enumObject: ClarityErrors.ErrCodeBitflowSwapAdapter,
+      descriptions: {
+        ERR_INVALID_DAO_TOKEN:
+          "The specified DAO token is invalid for this adapter.",
+        ERR_SWAP_FAILED: "The swap operation failed.",
+        ERR_MIN_RECEIVE_REQUIRED:
+          "A minimum receive amount is required for the swap.",
+      },
+    },
   },
   BASE: {
     DAO: {
