@@ -1,7 +1,12 @@
-import { Cl, ClarityType, ClarityValue, cvToValue } from "@stacks/transactions";
+import { Cl, ClarityType } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeAgentAccount } from "../../../utilities/contract-error-codes";
-import { AgentAccountApprovalType } from "../../../utilities/dao-types";
+import {
+  AGENT_ACCOUNT_APPROVAL_TYPES,
+  AgentAccountApprovalTypes,
+  AgentAccountConfiguration,
+  AgentAccountPermissions,
+} from "../../../utilities/agent-account-types";
 import { setupFullContractRegistry } from "../../../utilities/contract-registry";
 import {
   convertClarityTuple,
@@ -27,27 +32,6 @@ const contractName = contractAddress.split(".")[1];
 // import error codes
 const ErrCode = ErrCodeAgentAccount;
 
-// types
-type AgentAccountConfiguration = {
-  account: string;
-  agent: string;
-  owner: string;
-  sbtc: string;
-};
-
-type AgentAccountApprovalTypes = {
-  proposalVoting: bigint;
-  swap: bigint;
-  token: bigint;
-};
-
-type AgentAccountPermissions = {
-  canManageAssets: boolean;
-  canUseProposals: boolean;
-  canApproveRevokeContracts: boolean;
-  canBuySell: boolean;
-};
-
 describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // approve-contract() tests
@@ -60,7 +44,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(newContract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(newContract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       address3
     );
 
@@ -76,7 +60,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(newContract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(newContract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
 
@@ -87,7 +71,7 @@ describe(`public functions: ${contractName}`, () => {
     const isApproved = simnet.callReadOnlyFn(
       contractAddress,
       "is-approved-contract",
-      [Cl.principal(newContract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(newContract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
     expect(isApproved.result).toStrictEqual(Cl.bool(true));
@@ -100,7 +84,7 @@ describe(`public functions: ${contractName}`, () => {
       notification: "aibtc-agent-account/approve-contract",
       payload: {
         contract: newContract,
-        type: AgentAccountApprovalType.TOKEN.toString(),
+        type: AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN.toString(),
         approved: true,
         sender: deployer,
         caller: deployer,
@@ -111,7 +95,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(newContract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(newContract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
 
@@ -135,7 +119,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "revoke-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       address3
     );
 
@@ -151,7 +135,7 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
@@ -160,7 +144,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "revoke-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
 
@@ -171,7 +155,7 @@ describe(`public functions: ${contractName}`, () => {
     const isApproved = simnet.callReadOnlyFn(
       contractAddress,
       "is-approved-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
     expect(isApproved.result).toStrictEqual(Cl.bool(false));
@@ -184,7 +168,7 @@ describe(`public functions: ${contractName}`, () => {
       notification: "aibtc-agent-account/revoke-contract",
       payload: {
         contract: contract,
-        type: AgentAccountApprovalType.TOKEN.toString(),
+        type: AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN.toString(),
         approved: false,
         sender: deployer,
         caller: deployer,
@@ -195,7 +179,7 @@ describe(`public functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
@@ -204,7 +188,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "revoke-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
 
@@ -224,7 +208,7 @@ describe(`public functions: ${contractName}`, () => {
     simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
     // enable agent to revoke
@@ -239,7 +223,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "revoke-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       address2 // agent
     );
 
@@ -248,7 +232,7 @@ describe(`public functions: ${contractName}`, () => {
     const isApproved = simnet.callReadOnlyFn(
       contractAddress,
       "is-approved-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
     expect(isApproved.result).toStrictEqual(Cl.bool(false));
@@ -261,7 +245,7 @@ describe(`public functions: ${contractName}`, () => {
     simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
     // disable agent to revoke
@@ -276,7 +260,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "revoke-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       address2 // agent
     );
 
@@ -586,7 +570,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const isApproved = simnet.callReadOnlyFn(
       contractAddress,
       "is-approved-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
 
@@ -597,7 +581,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const approveReceipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
     expect(approveReceipt.result).toBeOk(Cl.bool(true));
@@ -606,7 +590,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const isApproved2 = simnet.callReadOnlyFn(
       contractAddress,
       "is-approved-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
 
@@ -617,7 +601,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const revokeReceipt = simnet.callPublicFn(
       contractAddress,
       "revoke-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
     expect(revokeReceipt.result).toBeOk(Cl.bool(true));
@@ -626,7 +610,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const isApproved3 = simnet.callReadOnlyFn(
       contractAddress,
       "is-approved-contract",
-      [Cl.principal(contract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(contract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
 
@@ -667,9 +651,9 @@ describe(`read-only functions: ${contractName}`, () => {
   it("get-approval-types() returns the correct approval types", () => {
     // arrange
     const expectedTypes: AgentAccountApprovalTypes = {
-      proposalVoting: BigInt(AgentAccountApprovalType.VOTING),
-      swap: BigInt(AgentAccountApprovalType.SWAP),
-      token: BigInt(AgentAccountApprovalType.TOKEN),
+      proposalVoting: BigInt(AGENT_ACCOUNT_APPROVAL_TYPES.VOTING),
+      swap: BigInt(AGENT_ACCOUNT_APPROVAL_TYPES.SWAP),
+      token: BigInt(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN),
     };
 
     // act
@@ -759,7 +743,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(newContract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(newContract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       address2 // agent address
     );
 
@@ -768,7 +752,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const isApproved = simnet.callReadOnlyFn(
       contractAddress,
       "is-approved-contract",
-      [Cl.principal(newContract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [Cl.principal(newContract), Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN)],
       deployer
     );
     expect(isApproved.result).toStrictEqual(Cl.bool(true));
@@ -786,7 +770,10 @@ describe(`read-only functions: ${contractName}`, () => {
     const receipt2 = simnet.callPublicFn(
       contractAddress,
       "approve-contract",
-      [Cl.principal(anotherContract), Cl.uint(AgentAccountApprovalType.TOKEN)],
+      [
+        Cl.principal(anotherContract),
+        Cl.uint(AGENT_ACCOUNT_APPROVAL_TYPES.TOKEN),
+      ],
       address2 // agent address
     );
 

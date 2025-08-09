@@ -843,7 +843,7 @@ describe(`read-only functions: ${contractName}`, () => {
       who: Cl.principal(address3),
       status: Cl.bool(true),
       executed: Cl.none(),
-      created: Cl.uint(4), // set by contract
+      created: Cl.uint(5),
     });
     simnet.callPublicFn(
       contractAddress,
@@ -878,7 +878,7 @@ describe(`read-only functions: ${contractName}`, () => {
       token: Cl.principal(mockTokenAddress),
       enabled: Cl.bool(true),
       executed: Cl.none(),
-      created: Cl.uint(4), // set by contract
+      created: Cl.uint(5),
     });
     simnet.callPublicFn(
       contractAddress,
@@ -915,7 +915,7 @@ describe(`read-only functions: ${contractName}`, () => {
       amount: Cl.uint(500),
       to: Cl.principal(address3),
       executed: Cl.none(),
-      created: Cl.uint(4), // set by contract
+      created: Cl.uint(5),
     });
     simnet.callPublicFn(
       contractAddress,
@@ -950,7 +950,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const expectedProposal = Cl.tuple({
       required: Cl.uint(2),
       executed: Cl.none(),
-      created: Cl.uint(4), // set by contract
+      created: Cl.uint(5),
     });
     simnet.callPublicFn(
       contractAddress,

@@ -14,6 +14,10 @@ import {
   PROPOSAL_MESSAGE,
   VOTING_DELAY,
   VOTING_PERIOD,
+  PROPOSAL_BOND,
+  PROPOSAL_REWARD,
+  PROPOSAL_QUORUM,
+  PROPOSAL_THRESHOLD,
 } from "../../../../utilities/dao-helpers";
 
 // setup accounts
@@ -968,13 +972,13 @@ describe(`read-only functions: ${contractName}`, () => {
         self: Cl.principal(contractAddress),
         deployedBitcoinBlock: Cl.uint(4),
         deployedStacksBlock: Cl.uint(4),
-        delay: Cl.uint(144),
-        period: Cl.uint(288),
-        quorum: Cl.uint(15),
-        threshold: Cl.uint(66),
+        delay: Cl.uint(VOTING_DELAY),
+        period: Cl.uint(VOTING_PERIOD),
+        quorum: Cl.uint(PROPOSAL_QUORUM),
+        threshold: Cl.uint(PROPOSAL_THRESHOLD),
         treasury: Cl.principal(treasuryContractAddress),
-        proposalBond: Cl.uint(50000000000),
-        proposalReward: Cl.uint(100000000000),
+        proposalBond: Cl.uint(PROPOSAL_BOND),
+        proposalReward: Cl.uint(PROPOSAL_REWARD),
       })
     );
   });

@@ -30,5 +30,13 @@
   {
     "name": "6 Less Block Height Reads",
     "path": "/costs/20250729-6-less-block-height-reads.json"
+  },
+  {
+    "name": "Final value adjustments run 1",
+    "path": "/costs/20250808-final-value-adjustments-run-1.json"
+  },
+  {
+    "name": "Final value adjustments after user lookup fix",
+    "path": "/costs/20250808-final-value-adjustments-after-user-lookup-fix.json"
   }
 ]

@@ -10,7 +10,7 @@ export enum ErrCodeDaoRunCost {
 export enum ErrCodeAgentAccount {
   ERR_CALLER_NOT_OWNER = 1100,
   ERR_CONTRACT_NOT_APPROVED,
-  ERR_OPERATION_NOT_ALLOWED = 1103,
+  ERR_OPERATION_NOT_ALLOWED,
   ERR_INVALID_APPROVAL_TYPE,
 }
 
@@ -86,4 +86,19 @@ export enum ErrCodeTreasury {
 export enum ErrCodeActionSendMessage {
   ERR_NOT_DAO_OR_EXTENSION = 2000,
   ERR_INVALID_PARAMETERS,
+}
+
+// aibtc-acct-swap-faktory-aibtc-sbtc.clar
+export enum ErrCodeFaktorySwapAdapter {
+  ERR_INVALID_DAO_TOKEN = 2200,
+  ERR_SWAP_FAILED,
+  ERR_QUOTE_FAILED,
+  ERR_SLIPPAGE_TOO_HIGH,
+}
+
+// aibtc-acct-swap-bitflow-aibtc-sbtc.clar
+export enum ErrCodeBitflowSwapAdapter {
+  ERR_INVALID_DAO_TOKEN = 2300,
+  ERR_SWAP_FAILED,
+  ERR_MIN_RECEIVE_REQUIRED,
 }
