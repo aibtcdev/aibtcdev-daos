@@ -47,6 +47,7 @@
 (define-data-var setAssetProposalsTotal uint u0)
 (define-data-var transferProposalsTotal uint u0)
 (define-data-var setConfirmationsProposalsTotal uint u0)
+(define-data-var totalOwners uint u0)
 
 ;; data maps
 ;;
@@ -296,6 +297,10 @@
   }
 )
 
+(define-read-only (get-total-owners)
+  (var-get totalOwners)
+)
+
 (define-read-only (is-owner (who principal))
   (default-to false (map-get? Owners who))
 )
@@ -407,6 +412,10 @@
   (let ((proposal (unwrap! (map-get? SetOwnerProposals nonce) false)))
     (asserts! (can-execute (get created proposal)) false)
     (asserts! (is-none (get executed proposal)) false)
+    (if (get status proposal)
+      (and (not (is-owner (get who proposal))) (var-set totalOwners (+ (var-get totalOwners) u1)))
+      (and (is-owner (get who proposal)) (var-set totalOwners (- (var-get totalOwners) u1)))
+    )
     (map-set Owners (get who proposal) (get status proposal))
     (map-set SetOwnerProposals nonce
       (merge proposal { executed: (some burn-block-height) })
@@ -522,6 +531,7 @@
   (map-set Owners 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true) ;; tests
   (map-set Owners 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true) ;; tests
   (map-set Owners 'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND true) ;; tests
+  (var-set totalOwners u14)
   ;; set initial assets
   ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_sbtc_contract
   (map-set AllowedAssets 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token

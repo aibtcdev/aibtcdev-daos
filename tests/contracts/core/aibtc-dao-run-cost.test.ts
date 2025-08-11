@@ -96,6 +96,15 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     ).result;
     expect(isOwner).toStrictEqual(Cl.bool(true));
+
+    // Verify the total owners count was updated
+    const totalOwners = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-total-owners",
+      [],
+      deployer
+    ).result;
+    expect(totalOwners).toStrictEqual(Cl.uint(15));
   });
 
   ////////////////////////////////////////
@@ -424,6 +433,118 @@ describe(`edge cases: ${contractName}`, () => {
     expect(receipt.result).toBeOk(Cl.bool(false));
   });
 
+  it("set-owner() correctly decrements owner count when removing an owner", () => {
+    // arrange
+    const nonce = Cl.uint(103);
+    // remove address2
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address2), Cl.bool(false)],
+      deployer
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address2), Cl.bool(false)],
+      address1
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address2), Cl.bool(false)],
+      address3
+    );
+
+    // act
+    const totalOwners = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-total-owners",
+      [],
+      deployer
+    ).result;
+    const isOwner = simnet.callReadOnlyFn(
+      contractAddress,
+      "is-owner",
+      [Cl.principal(address2)],
+      deployer
+    ).result;
+
+    // assert
+    expect(isOwner).toStrictEqual(Cl.bool(false));
+    expect(totalOwners).toStrictEqual(Cl.uint(13)); // 14 initial - 1
+  });
+
+  it("set-owner() does not change owner count when re-adding an existing owner", () => {
+    // arrange
+    const nonce = Cl.uint(104);
+    // re-add deployer
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(deployer), Cl.bool(true)],
+      address1
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(deployer), Cl.bool(true)],
+      address2
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(deployer), Cl.bool(true)],
+      address3
+    );
+
+    // act
+    const totalOwners = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-total-owners",
+      [],
+      deployer
+    ).result;
+
+    // assert
+    expect(totalOwners).toStrictEqual(Cl.uint(14)); // should not change
+  });
+
+  it("set-owner() does not change owner count when removing a non-owner", () => {
+    // arrange
+    const nonce = Cl.uint(105);
+    // remove address5 (not an owner)
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address5), Cl.bool(false)],
+      deployer
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address5), Cl.bool(false)],
+      address1
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address5), Cl.bool(false)],
+      address2
+    );
+
+    // act
+    const totalOwners = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-total-owners",
+      [],
+      deployer
+    ).result;
+
+    // assert
+    expect(totalOwners).toStrictEqual(Cl.uint(14)); // should not change
+  });
+
   it("set-owner() fails if confirmation has mismatched parameters", () => {
     // arrange
     const nonce = Cl.uint(400);
@@ -564,6 +685,16 @@ describe(`contract initialization: ${contractName}`, () => {
       ).result;
       expect(isOwner).toStrictEqual(Cl.bool(true));
     }
+  });
+
+  it("initial total owners count is correct", () => {
+    const totalOwners = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-total-owners",
+      [],
+      deployer
+    ).result;
+    expect(totalOwners).toStrictEqual(Cl.uint(14));
   });
 });
 
@@ -1020,6 +1151,22 @@ describe(`read-only functions: ${contractName}`, () => {
       expect(tupleData.deployedBurnBlock).toBeDefined();
       expect(tupleData.deployedStacksBlock).toBeDefined();
     }
+  });
+
+  ////////////////////////////////////////
+  // get-total-owners() tests
+  ////////////////////////////////////////
+  it("get-total-owners() returns the correct initial owner count", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-total-owners",
+      [],
+      deployer
+    ).result;
+    // assert
+    expect(result).toStrictEqual(Cl.uint(14));
   });
 
   ////////////////////////////////////////
