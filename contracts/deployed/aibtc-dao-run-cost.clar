@@ -2,12 +2,6 @@
 ;; version: 1.0.0
 ;; summary: A contract that holds and manages fees for AIBTC services.
 
-;; funds are transferred to this contract every time a proposal is created
-;; will be a mix of several different dao tokens over time
-;;
-;; only allows withdrawal with 3-of-N approval from an approved list of addresses
-;; an approved address can add/remove other addresses with quorum
-
 ;; traits
 ;;
 
