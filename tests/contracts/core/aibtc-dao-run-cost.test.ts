@@ -547,12 +547,6 @@ describe(`contract initialization: ${contractName}`, () => {
   it("initial owners are correctly set up", () => {
     // Check that the initial owners from the contract are set up correctly
     const initialOwners = [
-      // mainnet addresses
-      "SP21A72YQGHFXRFMMZHB5F0XBXH4WFD22BYSJT8FD",
-      "SP99E4DXJBZV3ZSXF1F1324C08VQ9RPJA1R35RR0",
-      "SP1NTCBRTGWGD2PVT020E7ZK5X2TSYC58HNEBNBYH",
-      "SP28DDT2YH6KTMVJ2H4JMNYA6TZH42ZA5KNFKM6DG",
-      "SP3GG4GT63YKM4P2TESZ2W1RMFTV3BMWP3H0T3GBD",
       // test addresses
       "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
       "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
