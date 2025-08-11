@@ -43,12 +43,15 @@ fi
 echo -e "\nChecking test file coverage..."
 echo "==================================="
 for contract in "${contracts[@]}"; do
-    # band-aid to skip trait files
+    # simple skip for designated folders
+    if [[ "$contract" == *"deployed"* ]]; then
+        echo "⏩ Skipping deployed contract: $contract"
+        continue
+    fi
     if [[ "$contract" == *"traits"* ]]; then
         echo "⏩ Skipping trait file: $contract"
         continue
     fi
-    # band-aid to skip external contracts
     if [[ "$contract" == *"external"* ]]; then
         echo "⏩ Skipping external contract: $contract"
         continue

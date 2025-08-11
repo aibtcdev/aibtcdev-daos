@@ -538,6 +538,7 @@
     },
   })
   ;; auto-register the agent account
+  ;; /g/.agent-account-registry/faktory_agent_account_registry
   (contract-call? .agent-account-registry auto-register-agent-account
     ACCOUNT_OWNER ACCOUNT_AGENT
   )

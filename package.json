@@ -29,9 +29,9 @@
     "hono": "^4.9.0"
   },
   "devDependencies": {
-    "@aibtc/types": "^0.17.0",
+    "@aibtc/types": "^0.18.0",
     "@cloudflare/vite-plugin": "^1.11.2",
-    "@cloudflare/workers-types": "^4.20250807.0",
+    "@cloudflare/workers-types": "^4.20250810.0",
     "@hirosystems/clarinet-sdk": "^3.5.0",
     "@hono/vite-build": "^1.7.0",
     "@stacks/transactions": "^7.2.0",

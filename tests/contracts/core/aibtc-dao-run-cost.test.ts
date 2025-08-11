@@ -96,6 +96,15 @@ describe(`public functions: ${contractName}`, () => {
       deployer
     ).result;
     expect(isOwner).toStrictEqual(Cl.bool(true));
+
+    // Verify the total owners count was updated
+    const totalOwners = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-total-owners",
+      [],
+      deployer
+    ).result;
+    expect(totalOwners).toStrictEqual(Cl.uint(15));
   });
 
   ////////////////////////////////////////
@@ -155,9 +164,9 @@ describe(`public functions: ${contractName}`, () => {
   });
 
   ////////////////////////////////////////
-  // transfer-dao-token() tests
+  // transfer-token() tests
   ////////////////////////////////////////
-  it("transfer-dao-token() fails if called by non-owner", () => {
+  it("transfer-token() fails if called by non-owner", () => {
     // arrange
     // Set up an allowed asset first
     const assetNonce = Cl.uint(2);
@@ -183,7 +192,7 @@ describe(`public functions: ${contractName}`, () => {
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         TEST_NONCE,
         Cl.principal(mockTokenAddress),
@@ -197,14 +206,14 @@ describe(`public functions: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ERR_NOT_OWNER));
   });
 
-  it("transfer-dao-token() fails if asset is not allowed", () => {
+  it("transfer-token() fails if asset is not allowed", () => {
     // arrange
     const unknownToken = `${deployer}.unknown-token`;
 
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         TEST_NONCE,
         Cl.principal(unknownToken),
@@ -424,6 +433,118 @@ describe(`edge cases: ${contractName}`, () => {
     expect(receipt.result).toBeOk(Cl.bool(false));
   });
 
+  it("set-owner() correctly decrements owner count when removing an owner", () => {
+    // arrange
+    const nonce = Cl.uint(103);
+    // remove address2
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address2), Cl.bool(false)],
+      deployer
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address2), Cl.bool(false)],
+      address1
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address2), Cl.bool(false)],
+      address3
+    );
+
+    // act
+    const totalOwners = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-total-owners",
+      [],
+      deployer
+    ).result;
+    const isOwner = simnet.callReadOnlyFn(
+      contractAddress,
+      "is-owner",
+      [Cl.principal(address2)],
+      deployer
+    ).result;
+
+    // assert
+    expect(isOwner).toStrictEqual(Cl.bool(false));
+    expect(totalOwners).toStrictEqual(Cl.uint(13)); // 14 initial - 1
+  });
+
+  it("set-owner() does not change owner count when re-adding an existing owner", () => {
+    // arrange
+    const nonce = Cl.uint(104);
+    // re-add deployer
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(deployer), Cl.bool(true)],
+      address1
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(deployer), Cl.bool(true)],
+      address2
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(deployer), Cl.bool(true)],
+      address3
+    );
+
+    // act
+    const totalOwners = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-total-owners",
+      [],
+      deployer
+    ).result;
+
+    // assert
+    expect(totalOwners).toStrictEqual(Cl.uint(14)); // should not change
+  });
+
+  it("set-owner() does not change owner count when removing a non-owner", () => {
+    // arrange
+    const nonce = Cl.uint(105);
+    // remove address5 (not an owner)
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address5), Cl.bool(false)],
+      deployer
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address5), Cl.bool(false)],
+      address1
+    );
+    simnet.callPublicFn(
+      contractAddress,
+      "set-owner",
+      [nonce, Cl.principal(address5), Cl.bool(false)],
+      address2
+    );
+
+    // act
+    const totalOwners = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-total-owners",
+      [],
+      deployer
+    ).result;
+
+    // assert
+    expect(totalOwners).toStrictEqual(Cl.uint(14)); // should not change
+  });
+
   it("set-owner() fails if confirmation has mismatched parameters", () => {
     // arrange
     const nonce = Cl.uint(400);
@@ -469,7 +590,7 @@ describe(`edge cases: ${contractName}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ERR_PROPOSAL_MISMATCH));
   });
 
-  it("transfer-dao-token() fails if confirmation has mismatched parameters", () => {
+  it("transfer-token() fails if confirmation has mismatched parameters", () => {
     // arrange
     const nonce = Cl.uint(402);
     simnet.callPublicFn(
@@ -493,7 +614,7 @@ describe(`edge cases: ${contractName}`, () => {
 
     simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         nonce,
         Cl.principal(mockTokenAddress),
@@ -506,7 +627,7 @@ describe(`edge cases: ${contractName}`, () => {
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         nonce,
         Cl.principal(mockTokenAddress),
@@ -547,14 +668,12 @@ describe(`contract initialization: ${contractName}`, () => {
   it("initial owners are correctly set up", () => {
     // Check that the initial owners from the contract are set up correctly
     const initialOwners = [
-      "ST349A3QB5Z4CSTBKAG5ZJFCP5T3ABX1RZXJBQF3W", // p
-      "ST31S76S7P99YHZK9TFYNMN6FG4A57KZ556BPRKEV", // c
-      "ST3YT0XW92E6T2FE59B2G5N2WNNFSBZ6MZKQS5D18", // w
-      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM", // tests
-      "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5", // tests
-      "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG", // tests
-      "ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC", // tests
-      "ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND", // tests
+      // test addresses
+      "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+      "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
+      "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG",
+      "ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC",
+      "ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND",
     ];
 
     for (const owner of initialOwners) {
@@ -567,10 +686,20 @@ describe(`contract initialization: ${contractName}`, () => {
       expect(isOwner).toStrictEqual(Cl.bool(true));
     }
   });
+
+  it("initial total owners count is correct", () => {
+    const totalOwners = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-total-owners",
+      [],
+      deployer
+    ).result;
+    expect(totalOwners).toStrictEqual(Cl.uint(14));
+  });
 });
 
 describe(`transfer functionality: ${contractName}`, () => {
-  it("transfer-dao-token successfully transfers tokens when confirmed", () => {
+  it("transfer-token successfully transfers tokens when confirmed", () => {
     // arrange
     const satsAmount = 1000000;
     const transferNonce = 200;
@@ -601,7 +730,7 @@ describe(`transfer functionality: ${contractName}`, () => {
     // First confirmation creates proposal but doesn't execute
     const receipt1 = simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         Cl.uint(transferNonce),
         Cl.principal(mockTokenAddress),
@@ -615,7 +744,7 @@ describe(`transfer functionality: ${contractName}`, () => {
     // Second confirmation doesn't execute yet
     const receipt2 = simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         Cl.uint(transferNonce),
         Cl.principal(mockTokenAddress),
@@ -629,7 +758,7 @@ describe(`transfer functionality: ${contractName}`, () => {
     // Third confirmation reaches threshold and executes
     const receipt3 = simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [
         Cl.uint(transferNonce),
         Cl.principal(mockTokenAddress),
@@ -919,7 +1048,7 @@ describe(`read-only functions: ${contractName}`, () => {
     });
     simnet.callPublicFn(
       contractAddress,
-      "transfer-dao-token",
+      "transfer-token",
       [nonce, Cl.principal(mockTokenAddress), amount, Cl.principal(address3)],
       deployer
     );
@@ -1022,6 +1151,22 @@ describe(`read-only functions: ${contractName}`, () => {
       expect(tupleData.deployedBurnBlock).toBeDefined();
       expect(tupleData.deployedStacksBlock).toBeDefined();
     }
+  });
+
+  ////////////////////////////////////////
+  // get-total-owners() tests
+  ////////////////////////////////////////
+  it("get-total-owners() returns the correct initial owner count", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-total-owners",
+      [],
+      deployer
+    ).result;
+    // assert
+    expect(result).toStrictEqual(Cl.uint(14));
   });
 
   ////////////////////////////////////////

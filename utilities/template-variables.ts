@@ -376,6 +376,13 @@ export function generateTemplateReplacements(
     defaultAgentAddress;
   replacements["account_agent"] = defaultAgentAddress;
 
+  const faktoryAgentAccountRegistry =
+    (addresses as any).FAKTORY_REGISTRY ||
+    `${addresses.DEPLOYER}.agent-registry`;
+  replacements[".agent-account-registry/faktory_agent_account_registry"] =
+    faktoryAgentAccountRegistry;
+  replacements["faktory_agent_account_registry"] = faktoryAgentAccountRegistry;
+
   // 8. Merge custom replacements (raw values, these take precedence)
   for (const key in customReplacements) {
     if (Object.prototype.hasOwnProperty.call(customReplacements, key)) {
