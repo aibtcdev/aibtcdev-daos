@@ -2,6 +2,7 @@ codecov:
   require_ci_to_pass: true
 
 ignore:
+  - "contracts/deployed/**"
   - "contracts/external/**"
   - "contracts/traits/**"
 

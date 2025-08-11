@@ -391,10 +391,6 @@ export function defineAgentContractDependencies(
             "AGENT_DAO_SWAP_ADAPTER",
             "agent_account_trait_dao_swap_adapter"
           )
-          .addTraitDependency(
-            "AGENT_FAKTORY_BUY_SELL",
-            "agent_account_trait_faktory_buy_sell"
-          )
           .addTraitDependency("BASE_SIP010", "base_trait_sip010")
           .addTraitDependency("DAO_ACTION", "dao_trait_action")
           .addTraitDependency("DAO_PROPOSAL", "dao_trait_proposal")
@@ -405,6 +401,10 @@ export function defineAgentContractDependencies(
           .addTraitDependency("DAO_TOKEN_DEX", "dao_trait_faktory_dex")
           .addTraitDependency("DAO_TOKEN", "dao_trait_faktory_token")
           .addAddressDependency("SBTC", "base_contract_sbtc")
+          .addAddressDependency(
+            "FAKTORY_REGISTRY",
+            "faktory_agent_account_registry"
+          )
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
           .addContractDependency("dao_contract_token_dex", "TOKEN", "DEX")
           .addRuntimeValue("account_owner")
@@ -455,11 +455,7 @@ export function defineTradingContractDependencies(
           .addAddressDependency("SBTC", "base_contract_sbtc")
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
           .addAddressDependency("BITFLOW_CORE", "external_bitflow_core")
-          .addContractDependency(
-            "dao_contract_bitflow_pool",
-            "TOKEN",
-            "POOL"
-          )
+          .addContractDependency("dao_contract_bitflow_pool", "TOKEN", "POOL")
           .addRuntimeValue("dao_token_symbol");
         break;
 
