@@ -527,7 +527,7 @@
   (map-set AllowedAssets 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
     true
   )
-  ;; /g/.aibtc-token/dao_token_contract
+  ;; /g/.aibtc-faktory/dao_token_contract
   (map-set AllowedAssets .aibtc-faktory true)
   (print (get-contract-info))
 )
