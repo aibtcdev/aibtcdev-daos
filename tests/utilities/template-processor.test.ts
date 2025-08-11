@@ -369,6 +369,7 @@ describe("Contract Generator", () => {
     dao_action_send_message: ".test-send-message",
     base_contract_dao_run_cost: ".test-dao-run-cost",
     dao_contract_rewards_account: ".test-rewards-account",
+    faktory_agent_account_registry: ".test-agent-registry",
 
     // External contracts
     sbtc_contract: "ST000000000000000000002AMW42H.sbtc-token",
