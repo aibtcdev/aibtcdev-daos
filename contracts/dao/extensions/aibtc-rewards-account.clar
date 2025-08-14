@@ -18,7 +18,6 @@
 
 ;; error messages
 (define-constant ERR_NOT_DAO_OR_EXTENSION (err u1700))
-(define-constant ERR_INSUFFICIENT_BALANCE (err u1701))
 
 ;; contract details
 (define-constant DEPLOYED_BURN_BLOCK burn-block-height)
@@ -39,10 +38,8 @@
     (recipient principal)
     (amount uint)
   )
-  ;; /g/.aibtc-faktory/dao_contract_token
-  (let ((contractBalance (unwrap-panic (contract-call? .aibtc-faktory get-balance SELF))))
+  (begin
     (try! (is-dao-or-extension))
-    (asserts! (>= contractBalance amount) ERR_INSUFFICIENT_BALANCE)
     (print {
       ;; /g/aibtc/dao_token_symbol
       notification: "aibtc-rewards-account/transfer-reward",

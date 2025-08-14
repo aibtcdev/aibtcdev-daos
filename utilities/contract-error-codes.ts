@@ -68,7 +68,6 @@ export enum ErrCodeOnchainMessaging {
 // aibtc-rewards-account.clar
 export enum ErrCodeRewardsAccount {
   ERR_NOT_DAO_OR_EXTENSION = 1700,
-  ERR_INSUFFICIENT_BALANCE,
 }
 
 // aibtc-token-owner.clar
