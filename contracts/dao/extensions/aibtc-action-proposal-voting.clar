@@ -438,7 +438,7 @@
         (not vetoActivated) ;; veto: reached quorum and more than yes votes
       ))
       ;; check info for running action
-      (validAction (is-action-valid action))
+      (validAction (and votePassed (is-action-valid action)))
       (burnBlock burn-block-height)
       (notExpired (< burnBlock (get execEnd proposal)))
       (tryToExecute (and
