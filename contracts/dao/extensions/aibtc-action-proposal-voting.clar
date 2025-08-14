@@ -166,10 +166,6 @@
       (voteEnd (+ voteStart VOTING_PERIOD))
       (execStart (+ voteEnd VOTING_DELAY))
       (execEnd (+ execStart VOTING_PERIOD))
-      ;; /g/.aibtc-faktory/dao_contract_token
-      (senderBalance (unwrap! (contract-call? .aibtc-faktory get-balance contract-caller)
-        ERR_FETCHING_TOKEN_DATA
-      ))
       (validAction (is-action-valid action))
     )
     ;; liquidTokens is greater than zero
@@ -182,8 +178,6 @@
     (asserts! (> createdBtc (var-get lastProposalBitcoinBlock))
       ERR_PROPOSAL_RATE_LIMIT
     )
-    ;; caller has the required balance
-    (asserts! (> senderBalance VOTING_BOND) ERR_INSUFFICIENT_BALANCE)
     ;; print proposal creation event
     (print {
       ;; /g/aibtc/dao_token_symbol
@@ -289,7 +283,7 @@
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
-      (senderBalance (unwrap!
+      (voteAmount (unwrap!
         (at-block proposalBlockHash
           ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance contract-caller)
@@ -312,7 +306,7 @@
       ))
     )
     ;; caller has the required balance
-    (asserts! (> senderBalance u0) ERR_INSUFFICIENT_BALANCE)
+    (asserts! (> voteAmount u0) ERR_INSUFFICIENT_BALANCE)
     ;; proposal was not already concluded
     (asserts! (not (get concluded proposalRecord)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     ;; proposal vote is still active
@@ -339,7 +333,7 @@
         voter: contract-caller,
         voterUserId: userId,
         proposalId: proposalId,
-        amount: senderBalance,
+        amount: voteAmount,
         vote: vote,
       },
     })
@@ -355,8 +349,8 @@
     ;; update the proposal record
     (map-set ProposalRecords proposalId
       (if vote
-        (merge proposalRecord { votesFor: (+ (get votesFor proposalRecord) senderBalance) })
-        (merge proposalRecord { votesAgainst: (+ (get votesAgainst proposalRecord) senderBalance) })
+        (merge proposalRecord { votesFor: (+ (get votesFor proposalRecord) voteAmount) })
+        (merge proposalRecord { votesAgainst: (+ (get votesAgainst proposalRecord) voteAmount) })
       ))
     ;; record the vote for the sender
     (ok (map-set VoteRecords {
@@ -364,7 +358,7 @@
       voter: contract-caller,
     } {
       vote: vote,
-      amount: senderBalance,
+      amount: voteAmount,
     }))
   )
 )
@@ -375,7 +369,7 @@
       (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
       (proposalBlock (get createdStx proposalBlocks))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
-      (senderBalance (unwrap!
+      (vetoAmount (unwrap!
         (at-block proposalBlockHash
           ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance contract-caller)
@@ -386,7 +380,7 @@
       (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index contract-caller)))
     )
     ;; caller has the required balance
-    (asserts! (> senderBalance u0) ERR_INSUFFICIENT_BALANCE)
+    (asserts! (> vetoAmount u0) ERR_INSUFFICIENT_BALANCE)
     ;; proposal was not already concluded
     (asserts! (not (get concluded proposalRecord)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     ;; proposal vote ended, in execution delay
@@ -414,19 +408,19 @@
         vetoer: contract-caller,
         vetoerUserId: userId,
         proposalId: proposalId,
-        amount: senderBalance,
+        amount: vetoAmount,
       },
     })
     ;; update the proposal record
     (map-set ProposalRecords proposalId
-      (merge proposalRecord { vetoVotes: (+ (get vetoVotes proposalRecord) senderBalance) })
+      (merge proposalRecord { vetoVotes: (+ (get vetoVotes proposalRecord) vetoAmount) })
     )
     ;; update the veto vote record for the sender
     (ok (map-set VetoVoteRecords {
       proposalId: proposalId,
       voter: contract-caller,
     }
-      senderBalance
+      vetoAmount
     ))
   )
 )
