@@ -74,49 +74,38 @@
 ;; data maps
 ;;
 
-(define-map ProposalDetails
+(define-map Proposals
   uint ;; proposal ID
   {
-    action: principal, ;; action contract to execute
-    parameters: (buff 2048), ;; parameters to pass to action contract
-    bond: uint, ;; proposal bond amount
-    caller: principal, ;; contract-caller
-    creator: principal, ;; contract-caller
-    creatorUserId: uint, ;; user index in DAO
-    liquidTokens: uint, ;; liquid tokens
-    memo: (optional (string-ascii 1024)), ;; memo for the proposal
-  }
-)
-
-(define-map ProposalBlocks
-  uint ;; proposal id
-  {
-    createdBtc: uint, ;; bitcoin block height
-    createdStx: uint, ;; stacks block height for at-block calls
-    voteStart: uint, ;; bitcoin block height
-    voteEnd: uint, ;; bitcoin block height
-    execStart: uint, ;; bitcoin block height
-    execEnd: uint, ;; bitcoin block height
-  }
-)
-
-(define-map ProposalRecords
-  uint ;; proposal id
-  {
-    ;; accumulated in proposal life cycle
-    votesFor: uint, ;; total votes for
-    votesAgainst: uint, ;; total votes against
-    vetoVotes: uint, ;; total veto votes
-    ;; updated after conclusion
-    concluded: bool, ;; was the proposal concluded
-    metQuorum: bool, ;; did the proposal meet quorum
-    metThreshold: bool, ;; did the proposal meet threshold
-    passed: bool, ;; did the proposal pass
-    executed: bool, ;; did the proposal execute
-    expired: bool, ;; was the proposal expired
-    vetoMetQuorum: bool, ;; did the veto meet quorum
-    vetoExceedsYes: bool, ;; did the veto exceed yes votes
-    vetoed: bool, ;; was the proposal vetoed
+    ;; from ProposalDetails
+    action: principal,
+    parameters: (buff 2048),
+    bond: uint,
+    caller: principal,
+    creator: principal,
+    creatorUserId: uint,
+    liquidTokens: uint,
+    memo: (optional (string-ascii 1024)),
+    ;; from ProposalBlocks
+    createdBtc: uint,
+    createdStx: uint,
+    voteStart: uint,
+    voteEnd: uint,
+    execStart: uint,
+    execEnd: uint,
+    ;; from ProposalRecords
+    votesFor: uint,
+    votesAgainst: uint,
+    vetoVotes: uint,
+    concluded: bool,
+    metQuorum: bool,
+    metThreshold: bool,
+    passed: bool,
+    executed: bool,
+    expired: bool,
+    vetoMetQuorum: bool,
+    vetoExceedsYes: bool,
+    vetoed: bool,
   }
 )
 
@@ -207,9 +196,10 @@
         votingReward: VOTING_REWARD,
       },
     })
-    ;; create the proposal details
+    ;; create the proposal
     (asserts!
-      (map-insert ProposalDetails newId {
+      (map-insert Proposals newId {
+        ;; from ProposalDetails
         action: actionContract,
         parameters: parameters,
         bond: VOTING_BOND,
@@ -218,24 +208,14 @@
         creatorUserId: userId,
         liquidTokens: liquidTokens,
         memo: memo,
-      })
-      ERR_SAVING_PROPOSAL
-    )
-    ;; create the proposal blocks
-    (asserts!
-      (map-insert ProposalBlocks newId {
+        ;; from ProposalBlocks
         createdBtc: createdBtc,
         createdStx: createdStx,
         voteStart: voteStart,
         voteEnd: voteEnd,
         execStart: execStart,
         execEnd: execEnd,
-      })
-      ERR_SAVING_PROPOSAL
-    )
-    ;; create the proposal record
-    (asserts!
-      (map-insert ProposalRecords newId {
+        ;; from ProposalRecords
         votesFor: u0,
         votesAgainst: u0,
         vetoVotes: u0,
@@ -279,9 +259,8 @@
     (vote bool)
   )
   (let (
-      (proposalRecord (unwrap! (map-get? ProposalRecords proposalId) ERR_PROPOSAL_NOT_FOUND))
-      (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
-      (proposalBlock (get createdStx proposalBlocks))
+      (proposal (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (proposalBlock (get createdStx proposal))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
       (voteAmount (unwrap!
         (at-block proposalBlockHash
@@ -308,12 +287,12 @@
     ;; caller has the required balance
     (asserts! (> voteAmount u0) ERR_INSUFFICIENT_BALANCE)
     ;; proposal was not already concluded
-    (asserts! (not (get concluded proposalRecord)) ERR_PROPOSAL_ALREADY_CONCLUDED)
+    (asserts! (not (get concluded proposal)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     ;; proposal vote is still active
-    (asserts! (>= burn-block-height (get voteStart proposalBlocks))
+    (asserts! (>= burn-block-height (get voteStart proposal))
       ERR_VOTE_TOO_SOON
     )
-    (asserts! (< burn-block-height (get voteEnd proposalBlocks))
+    (asserts! (< burn-block-height (get voteEnd proposal))
       ERR_VOTE_TOO_LATE
     )
     ;; proposal vote not already cast
@@ -340,17 +319,17 @@
     (and
       (is-some previousVote)
       ;; update the proposal record to remove the previous vote
-      (map-set ProposalRecords proposalId
+      (map-set Proposals proposalId
         (if (is-eq (unwrap-panic previousVote) true)
-          (merge proposalRecord { votesFor: (- (get votesFor proposalRecord) (unwrap-panic previousVoteAmount)) })
-          (merge proposalRecord { votesAgainst: (- (get votesAgainst proposalRecord) (unwrap-panic previousVoteAmount)) })
+          (merge proposal { votesFor: (- (get votesFor proposal) (unwrap-panic previousVoteAmount)) })
+          (merge proposal { votesAgainst: (- (get votesAgainst proposal) (unwrap-panic previousVoteAmount)) })
         ))
     )
     ;; update the proposal record
-    (map-set ProposalRecords proposalId
+    (map-set Proposals proposalId
       (if vote
-        (merge proposalRecord { votesFor: (+ (get votesFor proposalRecord) voteAmount) })
-        (merge proposalRecord { votesAgainst: (+ (get votesAgainst proposalRecord) voteAmount) })
+        (merge proposal { votesFor: (+ (get votesFor proposal) voteAmount) })
+        (merge proposal { votesAgainst: (+ (get votesAgainst proposal) voteAmount) })
       ))
     ;; record the vote for the sender
     (ok (map-set VoteRecords {
@@ -365,9 +344,8 @@
 
 (define-public (veto-action-proposal (proposalId uint))
   (let (
-      (proposalRecord (unwrap! (map-get? ProposalRecords proposalId) ERR_PROPOSAL_NOT_FOUND))
-      (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
-      (proposalBlock (get createdStx proposalBlocks))
+      (proposal (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (proposalBlock (get createdStx proposal))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
       (vetoAmount (unwrap!
         (at-block proposalBlockHash
@@ -382,12 +360,12 @@
     ;; caller has the required balance
     (asserts! (> vetoAmount u0) ERR_INSUFFICIENT_BALANCE)
     ;; proposal was not already concluded
-    (asserts! (not (get concluded proposalRecord)) ERR_PROPOSAL_ALREADY_CONCLUDED)
+    (asserts! (not (get concluded proposal)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     ;; proposal vote ended, in execution delay
-    (asserts! (>= burn-block-height (get voteEnd proposalBlocks))
+    (asserts! (>= burn-block-height (get voteEnd proposal))
       ERR_VOTE_TOO_SOON
     )
-    (asserts! (< burn-block-height (get execStart proposalBlocks))
+    (asserts! (< burn-block-height (get execStart proposal))
       ERR_VOTE_TOO_LATE
     )
     ;; veto not already cast
@@ -412,8 +390,8 @@
       },
     })
     ;; update the proposal record
-    (map-set ProposalRecords proposalId
-      (merge proposalRecord { vetoVotes: (+ (get vetoVotes proposalRecord) vetoAmount) })
+    (map-set Proposals proposalId
+      (merge proposal { vetoVotes: (+ (get vetoVotes proposal) vetoAmount) })
     )
     ;; update the veto vote record for the sender
     (ok (map-set VetoVoteRecords {
@@ -431,14 +409,12 @@
   )
   (let (
       (actionContract (contract-of action))
-      (proposalDetails (unwrap! (map-get? ProposalDetails proposalId) ERR_PROPOSAL_NOT_FOUND))
-      (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
-      (proposalRecord (unwrap! (map-get? ProposalRecords proposalId) ERR_PROPOSAL_NOT_FOUND))
-      (creator (get creator proposalDetails))
-      (liquidTokens (get liquidTokens proposalDetails))
-      (votesFor (get votesFor proposalRecord))
-      (votesAgainst (get votesAgainst proposalRecord))
-      (vetoVotes (get vetoVotes proposalRecord))
+      (proposal (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (creator (get creator proposal))
+      (liquidTokens (get liquidTokens proposal))
+      (votesFor (get votesFor proposal))
+      (votesAgainst (get votesAgainst proposal))
+      (vetoVotes (get vetoVotes proposal))
       (hasVotes (> (+ votesFor votesAgainst) u0))
       (metQuorum (and
         hasVotes
@@ -464,7 +440,7 @@
       ;; check info for running action
       (validAction (is-action-valid action))
       (burnBlock burn-block-height)
-      (notExpired (< burnBlock (get execEnd proposalBlocks)))
+      (notExpired (< burnBlock (get execEnd proposal)))
       (tryToExecute (and
         votePassed
         validAction
@@ -472,17 +448,17 @@
       ))
     )
     ;; proposal not already concluded
-    (asserts! (not (get concluded proposalRecord)) ERR_PROPOSAL_ALREADY_CONCLUDED)
+    (asserts! (not (get concluded proposal)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     ;; proposal is past voting period
-    (asserts! (>= burnBlock (get voteEnd proposalBlocks))
+    (asserts! (>= burnBlock (get voteEnd proposal))
       ERR_PROPOSAL_VOTING_ACTIVE
     )
     ;; proposal is past execution delay
-    (asserts! (>= burnBlock (get execStart proposalBlocks))
+    (asserts! (>= burnBlock (get execStart proposal))
       ERR_PROPOSAL_EXECUTION_DELAY
     )
     ;; action must be the same as the one in proposal
-    (asserts! (is-eq (get action proposalDetails) actionContract)
+    (asserts! (is-eq (get action proposal) actionContract)
       ERR_INVALID_ACTION
     )
     ;; record user in dao if not already
@@ -496,12 +472,12 @@
         contractCaller: contract-caller,
         txSender: tx-sender,
         action: actionContract,
-        parameters: (get parameters proposalDetails),
-        bond: (get bond proposalDetails),
+        parameters: (get parameters proposal),
+        bond: (get bond proposal),
         creator: creator,
-        creatorUserId: (get creatorUserId proposalDetails),
+        creatorUserId: (get creatorUserId proposal),
         liquidTokens: liquidTokens,
-        memo: (get memo proposalDetails),
+        memo: (get memo proposal),
         proposalId: proposalId,
         votesFor: votesFor,
         votesAgainst: votesAgainst,
@@ -517,8 +493,8 @@
       },
     })
     ;; update the proposal record
-    (map-set ProposalRecords proposalId
-      (merge proposalRecord {
+    (map-set Proposals proposalId
+      (merge proposal {
         concluded: true,
         metQuorum: metQuorum,
         metThreshold: metThreshold,
@@ -533,11 +509,11 @@
     ;; transfer the bond based on the outcome
     (if votePassed
       ;; /g/.aibtc-faktory/dao_contract_token
-      (try! (as-contract (contract-call? .aibtc-faktory transfer (get bond proposalDetails) SELF
+      (try! (as-contract (contract-call? .aibtc-faktory transfer (get bond proposal) SELF
         creator none
       )))
       ;; /g/.aibtc-faktory/dao_contract_token
-      (try! (as-contract (contract-call? .aibtc-faktory transfer (get bond proposalDetails) SELF
+      (try! (as-contract (contract-call? .aibtc-faktory transfer (get bond proposal) SELF
         VOTING_TREASURY none
       )))
     )
@@ -560,7 +536,7 @@
         ;; increment the executed proposal count
         (var-set executedProposalCount (+ (var-get executedProposalCount) u1))
         ;; try to run the action
-        (match (contract-call? action run (get parameters proposalDetails))
+        (match (contract-call? action run (get parameters proposal))
           ;; running the action succeeded
           ok_
           ;; /g/.aibtc-rewards-account/dao_contract_rewards_account
@@ -596,8 +572,8 @@
     (voter principal)
   )
   (let (
-      (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) ERR_PROPOSAL_NOT_FOUND))
-      (proposalBlockHash (unwrap! (get-block-hash (get createdStx proposalBlocks))
+      (proposal (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (proposalBlockHash (unwrap! (get-block-hash (get createdStx proposal))
         ERR_RETRIEVING_START_BLOCK_HASH
       ))
     )
@@ -607,13 +583,7 @@
 )
 
 (define-read-only (get-proposal (proposalId uint))
-  (let (
-      (proposalDetails (unwrap! (map-get? ProposalDetails proposalId) none))
-      (proposalBlocks (unwrap! (map-get? ProposalBlocks proposalId) none))
-      (proposalRecord (unwrap! (map-get? ProposalRecords proposalId) none))
-    )
-    (some (merge proposalDetails (merge proposalBlocks proposalRecord)))
-  )
+  (map-get? Proposals proposalId)
 )
 
 (define-read-only (get-vote-record
