@@ -35,6 +35,17 @@
 (define-constant ERR_ALREADY_VOTED (err u1312))
 (define-constant ERR_INVALID_ACTION (err u1313))
 
+;; proposal status flags
+(define-constant STATUS_CONCLUDED (pow u2 u0))
+(define-constant STATUS_MET_QUORUM (pow u2 u1))
+(define-constant STATUS_MET_THRESHOLD (pow u2 u2))
+(define-constant STATUS_PASSED (pow u2 u3))
+(define-constant STATUS_EXECUTED (pow u2 u4))
+(define-constant STATUS_EXPIRED (pow u2 u5))
+(define-constant STATUS_VETO_MET_QUORUM (pow u2 u6))
+(define-constant STATUS_VETO_EXCEEDS_YES (pow u2 u7))
+(define-constant STATUS_VETOED (pow u2 u8))
+
 (define-constant AIBTC_DAO_RUN_COST_AMOUNT u20000000000) ;; 200 DAO tokens w/ 8 decimals
 
 ;; /g/.aibtc-dao-run-cost/base_contract_dao_run_cost
@@ -97,15 +108,7 @@
     votesFor: uint,
     votesAgainst: uint,
     vetoVotes: uint,
-    concluded: bool,
-    metQuorum: bool,
-    metThreshold: bool,
-    passed: bool,
-    executed: bool,
-    expired: bool,
-    vetoMetQuorum: bool,
-    vetoExceedsYes: bool,
-    vetoed: bool,
+    status: uint,
   }
 )
 
@@ -219,15 +222,7 @@
         votesFor: u0,
         votesAgainst: u0,
         vetoVotes: u0,
-        concluded: false,
-        metQuorum: false,
-        metThreshold: false,
-        passed: false,
-        executed: false,
-        expired: false,
-        vetoMetQuorum: false,
-        vetoExceedsYes: false,
-        vetoed: false,
+        status: u0,
       })
       ERR_SAVING_PROPOSAL
     )
@@ -287,7 +282,7 @@
     ;; caller has the required balance
     (asserts! (> voteAmount u0) ERR_INSUFFICIENT_BALANCE)
     ;; proposal was not already concluded
-    (asserts! (not (get concluded proposal)) ERR_PROPOSAL_ALREADY_CONCLUDED)
+    (asserts! (is-eq u0 (bit-and (get status proposal) STATUS_CONCLUDED)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     ;; proposal vote is still active
     (asserts! (>= burn-block-height (get voteStart proposal))
       ERR_VOTE_TOO_SOON
@@ -360,7 +355,7 @@
     ;; caller has the required balance
     (asserts! (> vetoAmount u0) ERR_INSUFFICIENT_BALANCE)
     ;; proposal was not already concluded
-    (asserts! (not (get concluded proposal)) ERR_PROPOSAL_ALREADY_CONCLUDED)
+    (asserts! (is-eq u0 (bit-and (get status proposal) STATUS_CONCLUDED)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     ;; proposal vote ended, in execution delay
     (asserts! (>= burn-block-height (get voteEnd proposal))
       ERR_VOTE_TOO_SOON
@@ -446,9 +441,20 @@
         validAction
         notExpired
       ))
+      (newStatus (+
+        STATUS_CONCLUDED
+        (if metQuorum STATUS_MET_QUORUM u0)
+        (if metThreshold STATUS_MET_THRESHOLD u0)
+        (if votePassed STATUS_PASSED u0)
+        (if tryToExecute STATUS_EXECUTED u0)
+        (if (not notExpired) STATUS_EXPIRED u0)
+        (if vetoMetQuorum STATUS_VETO_MET_QUORUM u0)
+        (if vetoExceedsYes STATUS_VETO_EXCEEDS_YES u0)
+        (if vetoActivated STATUS_VETOED u0)
+      ))
     )
     ;; proposal not already concluded
-    (asserts! (not (get concluded proposal)) ERR_PROPOSAL_ALREADY_CONCLUDED)
+    (asserts! (is-eq u0 (bit-and (get status proposal) STATUS_CONCLUDED)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     ;; proposal is past voting period
     (asserts! (>= burnBlock (get voteEnd proposal))
       ERR_PROPOSAL_VOTING_ACTIVE
@@ -490,21 +496,12 @@
         passed: votePassed,
         expired: (not notExpired),
         executed: tryToExecute,
+        status: newStatus,
       },
     })
     ;; update the proposal record
     (map-set Proposals proposalId
-      (merge proposal {
-        concluded: true,
-        metQuorum: metQuorum,
-        metThreshold: metThreshold,
-        passed: votePassed,
-        expired: (not notExpired),
-        executed: tryToExecute,
-        vetoMetQuorum: vetoMetQuorum,
-        vetoExceedsYes: vetoExceedsYes,
-        vetoed: vetoActivated,
-      })
+      (merge proposal { status: newStatus })
     )
     ;; transfer the bond based on the outcome
     (if votePassed
@@ -583,7 +580,21 @@
 )
 
 (define-read-only (get-proposal (proposalId uint))
-  (map-get? Proposals proposalId)
+  (match (map-get? Proposals proposalId)
+    proposal
+    (some (merge proposal {
+      concluded: (not (is-eq u0 (bit-and (get status proposal) STATUS_CONCLUDED))),
+      metQuorum: (not (is-eq u0 (bit-and (get status proposal) STATUS_MET_QUORUM))),
+      metThreshold: (not (is-eq u0 (bit-and (get status proposal) STATUS_MET_THRESHOLD))),
+      passed: (not (is-eq u0 (bit-and (get status proposal) STATUS_PASSED))),
+      executed: (not (is-eq u0 (bit-and (get status proposal) STATUS_EXECUTED))),
+      expired: (not (is-eq u0 (bit-and (get status proposal) STATUS_EXPIRED))),
+      vetoMetQuorum: (not (is-eq u0 (bit-and (get status proposal) STATUS_VETO_MET_QUORUM))),
+      vetoExceedsYes: (not (is-eq u0 (bit-and (get status proposal) STATUS_VETO_EXCEEDS_YES))),
+      vetoed: (not (is-eq u0 (bit-and (get status proposal) STATUS_VETOED)))
+    }))
+    none
+  )
 )
 
 (define-read-only (get-vote-record
