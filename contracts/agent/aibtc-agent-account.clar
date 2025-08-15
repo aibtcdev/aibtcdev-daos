@@ -46,6 +46,12 @@
 (define-constant ERR_OPERATION_NOT_ALLOWED (err u1102))
 (define-constant ERR_INVALID_APPROVAL_TYPE (err u1103))
 
+;; permission flags
+(define-constant PERMISSION_MANAGE_ASSETS (pow u2 u0))
+(define-constant PERMISSION_USE_PROPOSALS (pow u2 u1))
+(define-constant PERMISSION_APPROVE_REVOKE_CONTRACTS (pow u2 u2))
+(define-constant PERMISSION_BUY_SELL_ASSETS (pow u2 u3))
+
 ;; contract approval types
 (define-constant APPROVED_CONTRACT_VOTING u1)
 (define-constant APPROVED_CONTRACT_SWAP u2)
@@ -69,10 +75,12 @@
 )
 
 ;; data vars
-(define-data-var agentCanManageAssets bool true)
-(define-data-var agentCanUseProposals bool true)
-(define-data-var agentCanApproveRevokeContracts bool true)
-(define-data-var agentCanBuySellAssets bool false)
+(define-constant DEFAULT_PERMISSIONS (+
+  PERMISSION_MANAGE_ASSETS
+  PERMISSION_USE_PROPOSALS
+  PERMISSION_APPROVE_REVOKE_CONTRACTS
+))
+(define-data-var agentPermissions uint DEFAULT_PERMISSIONS)
 
 ;; public functions
 
@@ -340,7 +348,14 @@
         caller: contract-caller,
       },
     })
-    (ok (var-set agentCanManageAssets canManage))
+    (let ((currentPermissions (var-get agentPermissions)))
+      (ok (var-set agentPermissions
+        (if canManage
+          (bit-or currentPermissions PERMISSION_MANAGE_ASSETS)
+          (bit-and currentPermissions (bit-not PERMISSION_MANAGE_ASSETS))
+        )
+      ))
+    )
   )
 )
 
@@ -356,7 +371,14 @@
         caller: contract-caller,
       },
     })
-    (ok (var-set agentCanUseProposals canUseProposals))
+    (let ((currentPermissions (var-get agentPermissions)))
+      (ok (var-set agentPermissions
+        (if canUseProposals
+          (bit-or currentPermissions PERMISSION_USE_PROPOSALS)
+          (bit-and currentPermissions (bit-not PERMISSION_USE_PROPOSALS))
+        )
+      ))
+    )
   )
 )
 
@@ -372,7 +394,14 @@
         caller: contract-caller,
       },
     })
-    (ok (var-set agentCanApproveRevokeContracts canApproveRevokeContracts))
+    (let ((currentPermissions (var-get agentPermissions)))
+      (ok (var-set agentPermissions
+        (if canApproveRevokeContracts
+          (bit-or currentPermissions PERMISSION_APPROVE_REVOKE_CONTRACTS)
+          (bit-and currentPermissions (bit-not PERMISSION_APPROVE_REVOKE_CONTRACTS))
+        )
+      ))
+    )
   )
 )
 
@@ -388,7 +417,14 @@
         caller: contract-caller,
       },
     })
-    (ok (var-set agentCanBuySellAssets canBuySell))
+    (let ((currentPermissions (var-get agentPermissions)))
+      (ok (var-set agentPermissions
+        (if canBuySell
+          (bit-or currentPermissions PERMISSION_BUY_SELL_ASSETS)
+          (bit-and currentPermissions (bit-not PERMISSION_BUY_SELL_ASSETS))
+        )
+      ))
+    )
   )
 )
 
@@ -485,12 +521,14 @@
 )
 
 (define-read-only (get-agent-permissions)
-  {
-    canManageAssets: (var-get agentCanManageAssets),
-    canUseProposals: (var-get agentCanUseProposals),
-    canApproveRevokeContracts: (var-get agentCanApproveRevokeContracts),
-    canBuySell: (var-get agentCanBuySellAssets),
-  }
+  (let ((permissions (var-get agentPermissions)))
+    {
+      canManageAssets: (not (is-eq u0 (bit-and permissions PERMISSION_MANAGE_ASSETS))),
+      canUseProposals: (not (is-eq u0 (bit-and permissions PERMISSION_USE_PROPOSALS))),
+      canApproveRevokeContracts: (not (is-eq u0 (bit-and permissions PERMISSION_APPROVE_REVOKE_CONTRACTS))),
+      canBuySell: (not (is-eq u0 (bit-and permissions PERMISSION_BUY_SELL_ASSETS))),
+    }
+  )
 )
 
 ;; private functions
@@ -512,19 +550,19 @@
 )
 
 (define-private (manage-assets-allowed)
-  (or (is-owner) (and (is-agent) (var-get agentCanManageAssets)))
+  (or (is-owner) (and (is-agent) (not (is-eq u0 (bit-and (var-get agentPermissions) PERMISSION_MANAGE_ASSETS)))))
 )
 
 (define-private (use-proposals-allowed)
-  (or (is-owner) (and (is-agent) (var-get agentCanUseProposals)))
+  (or (is-owner) (and (is-agent) (not (is-eq u0 (bit-and (var-get agentPermissions) PERMISSION_USE_PROPOSALS)))))
 )
 
 (define-private (approve-revoke-contract-allowed)
-  (or (is-owner) (and (is-agent) (var-get agentCanApproveRevokeContracts)))
+  (or (is-owner) (and (is-agent) (not (is-eq u0 (bit-and (var-get agentPermissions) PERMISSION_APPROVE_REVOKE_CONTRACTS)))))
 )
 
 (define-private (buy-sell-assets-allowed)
-  (or (is-owner) (and (is-agent) (var-get agentCanBuySellAssets)))
+  (or (is-owner) (and (is-agent) (not (is-eq u0 (bit-and (var-get agentPermissions) PERMISSION_BUY_SELL_ASSETS)))))
 )
 
 (begin

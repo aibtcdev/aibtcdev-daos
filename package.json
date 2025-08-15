@@ -5,8 +5,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "test": "vitest run",
-    "test:report": "vitest run -- --coverage --costs",
+    "test": "vitest run --silent",
+    "test:report": "vitest run --silent -- --coverage --costs",
     "test:watch": "chokidar \"tests/**/*.ts\" \"contracts/**/*.clar\" -c \"npm run test:report\"",
     "test:check-coverage": "bash ./tests/check-test-coverage.sh",
     "test:endpoints": "bash ./tests/check-endpoints.sh http://localhost:8787",
