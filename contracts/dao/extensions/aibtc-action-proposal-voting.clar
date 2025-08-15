@@ -282,14 +282,12 @@
     ;; caller has the required balance
     (asserts! (> voteAmount u0) ERR_INSUFFICIENT_BALANCE)
     ;; proposal was not already concluded
-    (asserts! (is-eq u0 (bit-and (get status proposal) STATUS_CONCLUDED)) ERR_PROPOSAL_ALREADY_CONCLUDED)
+    (asserts! (is-eq u0 (bit-and (get status proposal) STATUS_CONCLUDED))
+      ERR_PROPOSAL_ALREADY_CONCLUDED
+    )
     ;; proposal vote is still active
-    (asserts! (>= burn-block-height (get voteStart proposal))
-      ERR_VOTE_TOO_SOON
-    )
-    (asserts! (< burn-block-height (get voteEnd proposal))
-      ERR_VOTE_TOO_LATE
-    )
+    (asserts! (>= burn-block-height (get voteStart proposal)) ERR_VOTE_TOO_SOON)
+    (asserts! (< burn-block-height (get voteEnd proposal)) ERR_VOTE_TOO_LATE)
     ;; proposal vote not already cast
     (and
       (is-some voterRecord)
@@ -355,14 +353,12 @@
     ;; caller has the required balance
     (asserts! (> vetoAmount u0) ERR_INSUFFICIENT_BALANCE)
     ;; proposal was not already concluded
-    (asserts! (is-eq u0 (bit-and (get status proposal) STATUS_CONCLUDED)) ERR_PROPOSAL_ALREADY_CONCLUDED)
+    (asserts! (is-eq u0 (bit-and (get status proposal) STATUS_CONCLUDED))
+      ERR_PROPOSAL_ALREADY_CONCLUDED
+    )
     ;; proposal vote ended, in execution delay
-    (asserts! (>= burn-block-height (get voteEnd proposal))
-      ERR_VOTE_TOO_SOON
-    )
-    (asserts! (< burn-block-height (get execStart proposal))
-      ERR_VOTE_TOO_LATE
-    )
+    (asserts! (>= burn-block-height (get voteEnd proposal)) ERR_VOTE_TOO_SOON)
+    (asserts! (< burn-block-height (get execStart proposal)) ERR_VOTE_TOO_LATE)
     ;; veto not already cast
     (asserts!
       (is-none (map-get? VetoVoteRecords {
@@ -441,32 +437,52 @@
         validAction
         notExpired
       ))
-      (newStatus (+
-        STATUS_CONCLUDED
-        (if metQuorum STATUS_MET_QUORUM u0)
-        (if metThreshold STATUS_MET_THRESHOLD u0)
-        (if votePassed STATUS_PASSED u0)
-        (if tryToExecute STATUS_EXECUTED u0)
-        (if (not notExpired) STATUS_EXPIRED u0)
-        (if vetoMetQuorum STATUS_VETO_MET_QUORUM u0)
-        (if vetoExceedsYes STATUS_VETO_EXCEEDS_YES u0)
-        (if vetoActivated STATUS_VETOED u0)
-      ))
+      (newStatus (+ STATUS_CONCLUDED
+        (if metQuorum
+          STATUS_MET_QUORUM
+          u0
+        )
+        (if metThreshold
+          STATUS_MET_THRESHOLD
+          u0
+        )
+        (if votePassed
+          STATUS_PASSED
+          u0
+        )
+        (if tryToExecute
+          STATUS_EXECUTED
+          u0
+        )
+        (if (not notExpired)
+          STATUS_EXPIRED
+          u0
+        )
+        (if vetoMetQuorum
+          STATUS_VETO_MET_QUORUM
+          u0
+        )
+        (if vetoExceedsYes
+          STATUS_VETO_EXCEEDS_YES
+          u0
+        )
+        (if vetoActivated
+          STATUS_VETOED
+          u0
+        )))
     )
     ;; proposal not already concluded
-    (asserts! (is-eq u0 (bit-and (get status proposal) STATUS_CONCLUDED)) ERR_PROPOSAL_ALREADY_CONCLUDED)
-    ;; proposal is past voting period
-    (asserts! (>= burnBlock (get voteEnd proposal))
-      ERR_PROPOSAL_VOTING_ACTIVE
+    (asserts! (is-eq u0 (bit-and (get status proposal) STATUS_CONCLUDED))
+      ERR_PROPOSAL_ALREADY_CONCLUDED
     )
+    ;; proposal is past voting period
+    (asserts! (>= burnBlock (get voteEnd proposal)) ERR_PROPOSAL_VOTING_ACTIVE)
     ;; proposal is past execution delay
     (asserts! (>= burnBlock (get execStart proposal))
       ERR_PROPOSAL_EXECUTION_DELAY
     )
     ;; action must be the same as the one in proposal
-    (asserts! (is-eq (get action proposal) actionContract)
-      ERR_INVALID_ACTION
-    )
+    (asserts! (is-eq (get action proposal) actionContract) ERR_INVALID_ACTION)
     ;; record user in dao if not already
     ;; /g/.aibtc-dao-users/dao_contract_users
     (try! (contract-call? .aibtc-dao-users get-or-create-user-index contract-caller))
@@ -500,14 +516,12 @@
       },
     })
     ;; update the proposal record
-    (map-set Proposals proposalId
-      (merge proposal { status: newStatus })
-    )
+    (map-set Proposals proposalId (merge proposal { status: newStatus }))
     ;; transfer the bond based on the outcome
     (if votePassed
       ;; /g/.aibtc-faktory/dao_contract_token
-      (try! (as-contract (contract-call? .aibtc-faktory transfer (get bond proposal) SELF
-        creator none
+      (try! (as-contract (contract-call? .aibtc-faktory transfer (get bond proposal) SELF creator
+        none
       )))
       ;; /g/.aibtc-faktory/dao_contract_token
       (try! (as-contract (contract-call? .aibtc-faktory transfer (get bond proposal) SELF
@@ -581,8 +595,7 @@
 
 (define-read-only (get-proposal (proposalId uint))
   (match (map-get? Proposals proposalId)
-    proposal
-    (some (merge proposal {
+    proposal (some (merge proposal {
       concluded: (not (is-eq u0 (bit-and (get status proposal) STATUS_CONCLUDED))),
       metQuorum: (not (is-eq u0 (bit-and (get status proposal) STATUS_MET_QUORUM))),
       metThreshold: (not (is-eq u0 (bit-and (get status proposal) STATUS_MET_THRESHOLD))),
@@ -591,7 +604,7 @@
       expired: (not (is-eq u0 (bit-and (get status proposal) STATUS_EXPIRED))),
       vetoMetQuorum: (not (is-eq u0 (bit-and (get status proposal) STATUS_VETO_MET_QUORUM))),
       vetoExceedsYes: (not (is-eq u0 (bit-and (get status proposal) STATUS_VETO_EXCEEDS_YES))),
-      vetoed: (not (is-eq u0 (bit-and (get status proposal) STATUS_VETOED)))
+      vetoed: (not (is-eq u0 (bit-and (get status proposal) STATUS_VETOED))),
     }))
     none
   )
