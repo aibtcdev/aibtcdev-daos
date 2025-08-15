@@ -100,10 +100,6 @@
     ;; from ProposalBlocks
     createdBtc: uint,
     createdStx: uint,
-    voteStart: uint,
-    voteEnd: uint,
-    execStart: uint,
-    execEnd: uint,
     ;; from ProposalRecords
     votesFor: uint,
     votesAgainst: uint,
@@ -214,10 +210,6 @@
         ;; from ProposalBlocks
         createdBtc: createdBtc,
         createdStx: createdStx,
-        voteStart: voteStart,
-        voteEnd: voteEnd,
-        execStart: execStart,
-        execEnd: execEnd,
         ;; from ProposalRecords
         votesFor: u0,
         votesAgainst: u0,
@@ -255,6 +247,9 @@
   )
   (let (
       (proposal (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (createdBtc (get createdBtc proposal))
+      (voteStart (+ createdBtc VOTING_DELAY))
+      (voteEnd (+ voteStart VOTING_PERIOD))
       (proposalBlock (get createdStx proposal))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
       (voteAmount (unwrap!
@@ -286,8 +281,8 @@
       ERR_PROPOSAL_ALREADY_CONCLUDED
     )
     ;; proposal vote is still active
-    (asserts! (>= burn-block-height (get voteStart proposal)) ERR_VOTE_TOO_SOON)
-    (asserts! (< burn-block-height (get voteEnd proposal)) ERR_VOTE_TOO_LATE)
+    (asserts! (>= burn-block-height voteStart) ERR_VOTE_TOO_SOON)
+    (asserts! (< burn-block-height voteEnd) ERR_VOTE_TOO_LATE)
     ;; proposal vote not already cast
     (and
       (is-some voterRecord)
@@ -338,6 +333,9 @@
 (define-public (veto-action-proposal (proposalId uint))
   (let (
       (proposal (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (createdBtc (get createdBtc proposal))
+      (voteEnd (+ (+ createdBtc VOTING_DELAY) VOTING_PERIOD))
+      (execStart (+ voteEnd VOTING_DELAY))
       (proposalBlock (get createdStx proposal))
       (proposalBlockHash (unwrap! (get-block-hash proposalBlock) ERR_RETRIEVING_START_BLOCK_HASH))
       (vetoAmount (unwrap!
@@ -357,8 +355,8 @@
       ERR_PROPOSAL_ALREADY_CONCLUDED
     )
     ;; proposal vote ended, in execution delay
-    (asserts! (>= burn-block-height (get voteEnd proposal)) ERR_VOTE_TOO_SOON)
-    (asserts! (< burn-block-height (get execStart proposal)) ERR_VOTE_TOO_LATE)
+    (asserts! (>= burn-block-height voteEnd) ERR_VOTE_TOO_SOON)
+    (asserts! (< burn-block-height execStart) ERR_VOTE_TOO_LATE)
     ;; veto not already cast
     (asserts!
       (is-none (map-get? VetoVoteRecords {
@@ -401,6 +399,10 @@
   (let (
       (actionContract (contract-of action))
       (proposal (unwrap! (map-get? Proposals proposalId) ERR_PROPOSAL_NOT_FOUND))
+      (createdBtc (get createdBtc proposal))
+      (voteEnd (+ (+ createdBtc VOTING_DELAY) VOTING_PERIOD))
+      (execStart (+ voteEnd VOTING_DELAY))
+      (execEnd (+ execStart VOTING_PERIOD))
       (creator (get creator proposal))
       (liquidTokens (get liquidTokens proposal))
       (votesFor (get votesFor proposal))
@@ -431,7 +433,7 @@
       ;; check info for running action
       (validAction (and votePassed (is-action-valid action)))
       (burnBlock burn-block-height)
-      (notExpired (< burnBlock (get execEnd proposal)))
+      (notExpired (< burnBlock execEnd))
       (tryToExecute (and
         votePassed
         validAction
@@ -476,9 +478,9 @@
       ERR_PROPOSAL_ALREADY_CONCLUDED
     )
     ;; proposal is past voting period
-    (asserts! (>= burnBlock (get voteEnd proposal)) ERR_PROPOSAL_VOTING_ACTIVE)
+    (asserts! (>= burnBlock voteEnd) ERR_PROPOSAL_VOTING_ACTIVE)
     ;; proposal is past execution delay
-    (asserts! (>= burnBlock (get execStart proposal))
+    (asserts! (>= burnBlock execStart)
       ERR_PROPOSAL_EXECUTION_DELAY
     )
     ;; action must be the same as the one in proposal
@@ -595,17 +597,30 @@
 
 (define-read-only (get-proposal (proposalId uint))
   (match (map-get? Proposals proposalId)
-    proposal (some (merge proposal {
-      concluded: (not (is-eq u0 (bit-and (get status proposal) STATUS_CONCLUDED))),
-      metQuorum: (not (is-eq u0 (bit-and (get status proposal) STATUS_MET_QUORUM))),
-      metThreshold: (not (is-eq u0 (bit-and (get status proposal) STATUS_MET_THRESHOLD))),
-      passed: (not (is-eq u0 (bit-and (get status proposal) STATUS_PASSED))),
-      executed: (not (is-eq u0 (bit-and (get status proposal) STATUS_EXECUTED))),
-      expired: (not (is-eq u0 (bit-and (get status proposal) STATUS_EXPIRED))),
-      vetoMetQuorum: (not (is-eq u0 (bit-and (get status proposal) STATUS_VETO_MET_QUORUM))),
-      vetoExceedsYes: (not (is-eq u0 (bit-and (get status proposal) STATUS_VETO_EXCEEDS_YES))),
-      vetoed: (not (is-eq u0 (bit-and (get status proposal) STATUS_VETOED))),
-    }))
+    proposal
+    (let (
+        (createdBtc (get createdBtc proposal))
+        (voteStart (+ createdBtc VOTING_DELAY))
+        (voteEnd (+ voteStart VOTING_PERIOD))
+        (execStart (+ voteEnd VOTING_DELAY))
+        (execEnd (+ execStart VOTING_PERIOD))
+      )
+      (some (merge proposal {
+        voteStart: voteStart,
+        voteEnd: voteEnd,
+        execStart: execStart,
+        execEnd: execEnd,
+        concluded: (not (is-eq u0 (bit-and (get status proposal) STATUS_CONCLUDED))),
+        metQuorum: (not (is-eq u0 (bit-and (get status proposal) STATUS_MET_QUORUM))),
+        metThreshold: (not (is-eq u0 (bit-and (get status proposal) STATUS_MET_THRESHOLD))),
+        passed: (not (is-eq u0 (bit-and (get status proposal) STATUS_PASSED))),
+        executed: (not (is-eq u0 (bit-and (get status proposal) STATUS_EXECUTED))),
+        expired: (not (is-eq u0 (bit-and (get status proposal) STATUS_EXPIRED))),
+        vetoMetQuorum: (not (is-eq u0 (bit-and (get status proposal) STATUS_VETO_MET_QUORUM))),
+        vetoExceedsYes: (not (is-eq u0 (bit-and (get status proposal) STATUS_VETO_EXCEEDS_YES))),
+        vetoed: (not (is-eq u0 (bit-and (get status proposal) STATUS_VETOED))),
+      }))
+    )
     none
   )
 )
