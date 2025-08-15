@@ -730,7 +730,7 @@
           const name = cid.split(".")[1] || cid;
           const title = document.createElement("h2");
           title.className =
-            "text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-gray-200 cursor-pointer flex justify-between items-center";
+            "text-xl font-bold text-gray-800 mb-4 cursor-pointer flex justify-between items-center";
           title.innerHTML = `
             <span>${name}</span>
             <svg class="w-6 h-6 transform transition-transform chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -1063,6 +1063,11 @@
         if (showUnchangedToggle) {
           showUnchangedToggle.addEventListener("change", (e) => {
             container.classList.toggle("show-unchanged", e.target.checked);
+          });
+          // Stop click propagation on the parent div of the checkbox and label
+          // to prevent the accordion from toggling.
+          showUnchangedToggle.parentElement.addEventListener("click", (e) => {
+            e.stopPropagation();
           });
         }
 
