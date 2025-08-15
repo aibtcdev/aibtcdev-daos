@@ -75,12 +75,22 @@
 ;; data vars
 ;;
 
-(define-data-var proposalCount uint u0) ;; total number of proposals
-(define-data-var concludedProposalCount uint u0) ;; total number of concluded proposals
-(define-data-var executedProposalCount uint u0) ;; total number of executed proposals
-
-(define-data-var lastProposalStacksBlock uint DEPLOYED_STACKS_BLOCK) ;; stacks block height of last proposal created
-(define-data-var lastProposalBitcoinBlock uint DEPLOYED_BITCOIN_BLOCK) ;; bitcoin block height of last proposal created
+(define-data-var state
+  {
+    proposalCount: uint,
+    concludedProposalCount: uint,
+    executedProposalCount: uint,
+    lastProposalStacksBlock: uint,
+    lastProposalBitcoinBlock: uint,
+  }
+  {
+    proposalCount: u0,
+    concludedProposalCount: u0,
+    executedProposalCount: u0,
+    lastProposalStacksBlock: DEPLOYED_STACKS_BLOCK,
+    lastProposalBitcoinBlock: DEPLOYED_BITCOIN_BLOCK,
+  }
+)
 
 ;; data maps
 ;;
@@ -143,10 +153,11 @@
     (memo (optional (string-ascii 1024)))
   )
   (let (
+      (currentState (var-get state))
       (actionContract (contract-of action))
       ;; /g/.aibtc-dao-users/dao_contract_users
       (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index contract-caller)))
-      (newId (+ (var-get proposalCount) u1))
+      (newId (+ (get proposalCount currentState) u1))
       (createdStx (- stacks-block-height u1))
       (createdBtc burn-block-height)
       (liquidTokens (try! (get-liquid-supply createdStx)))
@@ -163,7 +174,7 @@
     ;; verify the parameters are valid
     (try! (contract-call? action check-parameters parameters))
     ;; at least one btc block has passed since last proposal
-    (asserts! (> createdBtc (var-get lastProposalBitcoinBlock))
+    (asserts! (> createdBtc (get lastProposalBitcoinBlock currentState))
       ERR_PROPOSAL_RATE_LIMIT
     )
     ;; print proposal creation event
@@ -218,11 +229,12 @@
       })
       ERR_SAVING_PROPOSAL
     )
-    ;; set last proposal created block height
-    (var-set lastProposalBitcoinBlock createdBtc)
-    (var-set lastProposalStacksBlock createdStx)
-    ;; increment proposal count
-    (var-set proposalCount newId)
+    ;; set last proposal created block height and increment proposal count
+    (var-set state (merge currentState {
+      lastProposalBitcoinBlock: createdBtc,
+      lastProposalStacksBlock: createdStx,
+      proposalCount: newId,
+    }))
     ;; transfer the proposal bond to this contract
     ;; /g/.aibtc-faktory/dao_contract_token
     (try! (contract-call? .aibtc-faktory transfer VOTING_BOND contract-caller SELF none))
@@ -541,13 +553,17 @@
         REPUTATION_CHANGE
       ))
     )
-    ;; increment the concluded proposal count
-    (var-set concludedProposalCount (+ (var-get concludedProposalCount) u1))
-    ;; try to execute the action if the proposal passed
-    (ok (if tryToExecute
-      (and
-        ;; increment the executed proposal count
-        (var-set executedProposalCount (+ (var-get executedProposalCount) u1))
+    (let ((currentState (var-get state)))
+      ;; update proposal counts
+      (var-set state (merge currentState {
+        concludedProposalCount: (+ (get concludedProposalCount currentState) u1),
+        executedProposalCount: (if tryToExecute
+          (+ (get executedProposalCount currentState) u1)
+          (get executedProposalCount currentState)
+        ),
+      }))
+      ;; try to execute the action if the proposal passed
+      (ok (if tryToExecute
         ;; try to run the action
         (match (contract-call? action run (get parameters proposal))
           ;; running the action succeeded
@@ -571,9 +587,9 @@
             false
           )
         )
-      )
-      false
-    ))
+        false
+      ))
+    )
   )
 )
 
@@ -656,13 +672,15 @@
 )
 
 (define-read-only (get-total-proposals)
-  {
-    proposalCount: (var-get proposalCount),
-    concludedProposalCount: (var-get concludedProposalCount),
-    executedProposalCount: (var-get executedProposalCount),
-    lastProposalStacksBlock: (var-get lastProposalStacksBlock),
-    lastProposalBitcoinBlock: (var-get lastProposalBitcoinBlock),
-  }
+  (let ((currentState (var-get state)))
+    {
+      proposalCount: (get proposalCount currentState),
+      concludedProposalCount: (get concludedProposalCount currentState),
+      executedProposalCount: (get executedProposalCount currentState),
+      lastProposalStacksBlock: (get lastProposalStacksBlock currentState),
+      lastProposalBitcoinBlock: (get lastProposalBitcoinBlock currentState),
+    }
+  )
 )
 
 (define-read-only (get-voting-configuration)
