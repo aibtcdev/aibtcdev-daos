@@ -64,8 +64,9 @@ const mainnetTraits: KnownTraits = {
   DAO_ACTION_PROPOSAL_VOTING:
     "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.action-proposal-voting",
   DAO_CHARTER:
-    "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.charter",
-  DAO_EPOCH: "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.epoch",
+    "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.dao-charter",
+  DAO_EPOCH:
+    "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.dao-epoch",
   DAO_MESSAGING:
     "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.messaging",
   DAO_REWARDS_ACCOUNT:
@@ -79,7 +80,8 @@ const mainnetTraits: KnownTraits = {
     "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.bitflow-pool",
   DAO_TREASURY:
     "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.treasury",
-  DAO_USERS: "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.users",
+  DAO_USERS:
+    "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.dao-users",
   // Agent traits
   AGENT_ACCOUNT:
     "SP6382W148DH1J3BMEBGWENZ9AK8DXCN5XJPP01C.aibtc-agent-account-traits.aibtc-account",
