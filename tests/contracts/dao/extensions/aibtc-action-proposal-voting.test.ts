@@ -172,7 +172,8 @@ describe(`public functions: ${contractName}`, () => {
       address1
     );
     // assert
-    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INSUFFICIENT_BALANCE));
+    // u1 is the default from ft-transfer?
+    expect(receipt.result).toBeErr(Cl.uint(1));
   });
 
   it("create-action-proposal() succeeds if called with sufficient balance", () => {

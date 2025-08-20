@@ -31,6 +31,23 @@
       .table-striped tbody tr:nth-child(odd) {
         background-color: #f9fafb;
       }
+      /* Hide unchanged rows in comparison by default */
+      #comparison-container table tbody tr.unchanged-row {
+        display: none;
+      }
+      /* Show unchanged rows when the container has the 'show-unchanged' class */
+      #comparison-container.show-unchanged table tbody tr.unchanged-row {
+        display: table-row;
+      }
+      /* Styles for truncating long report names in the comparison title */
+      .report-name-truncate {
+        display: inline-block;
+        max-width: 15ch;
+        vertical-align: bottom;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     </style>
   </head>
   <body class="bg-gray-50 text-gray-800">
@@ -111,7 +128,7 @@
 
       <!-- Controls to select baseline report, comparison report, sorting and filtering -->
       <section
-        class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 flex flex-col gap-4 md:flex-row md:items-end"
+        class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 flex flex-col gap-4 md:flex-row md:items-end sticky top-0 z-10"
       >
         <!-- Baseline report selector -->
         <div class="flex-1" id="baseline-selector-container" style="display:none">
@@ -150,8 +167,8 @@
             id="sort-select"
             class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
           >
-            <option value="max-txs-desc">Max Txs (High to Low)</option>
             <option value="max-txs-asc">Max Txs (Low to High)</option>
+            <option value="max-txs-desc">Max Txs (High to Low)</option>
             <option value="runtime-desc">Runtime (High to Low)</option>
             <option value="read_count-desc">Read Count (High to Low)</option>
             <option value="read_length-desc">Read Length (High to Low)</option>
@@ -687,7 +704,24 @@
         // Create a wrapper for all contract sections.
         const contractsWrapper = document.createElement("div");
         contractsWrapper.className =
-          "bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-8";
+          "bg-white p-6 rounded-xl shadow-sm border border-gray-200";
+
+        const mainTitle = document.createElement("h2");
+        mainTitle.className = "text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-gray-200 cursor-pointer flex justify-between items-center";
+        mainTitle.innerHTML = `
+          <span>Individual Contracts</span>
+          <svg class="w-6 h-6 transform transition-transform chevron rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        `;
+        contractsWrapper.appendChild(mainTitle);
+
+        const contentDiv = document.createElement("div");
+        contentDiv.className = "space-y-8 pt-4";
+
+        mainTitle.addEventListener("click", () => {
+          const isCollapsed = contentDiv.style.display === "none";
+          contentDiv.style.display = isCollapsed ? "block" : "none";
+          mainTitle.querySelector(".chevron").classList.toggle("rotate-90", isCollapsed);
+        });
 
         // Render each contract section into the wrapper.
         for (const cid in grouped) {
@@ -696,7 +730,7 @@
           const name = cid.split(".")[1] || cid;
           const title = document.createElement("h2");
           title.className =
-            "text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-gray-200 cursor-pointer flex justify-between items-center";
+            "text-xl font-bold text-gray-800 mb-4 cursor-pointer flex justify-between items-center";
           title.innerHTML = `
             <span>${name}</span>
             <svg class="w-6 h-6 transform transition-transform chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -729,8 +763,9 @@
             grid.appendChild(createTransactionCard(tx, sortField));
           });
           section.appendChild(grid);
-          contractsWrapper.appendChild(section);
+          contentDiv.appendChild(section);
         }
+        contractsWrapper.appendChild(contentDiv);
         container.appendChild(contractsWrapper);
 
         // Re-apply expansion state
@@ -949,6 +984,7 @@
               baselineCell = isFinite(d.baseline.minTxs) ? Math.floor(d.baseline.minTxs).toLocaleString() : "∞";
               compareCell = "–";
             }
+            const rowClass = status === 'unchanged' ? 'unchanged-row' : '';
             // Compose cost diff cells if present.
             let costDiffCell = "";
             if (d.costDiff) {
@@ -966,7 +1002,7 @@
             // Limiting factor change cell.
             const factorCell = d.baseline && d.compare ? (d.limitingFactorChanged ? `<span class="font-semibold text-yellow-600">${d.baseline.limitingFactor.replace('_',' ')} → ${d.compare.limitingFactor.replace('_',' ')}</span>` : `<span class="text-gray-600">${d.baseline.limitingFactor.replace('_',' ')}</span>`) : "";
             return `
-              <tr>
+              <tr class="${rowClass}">
                 <td class="py-3 px-4 border-b border-gray-200 text-sm font-mono">${d.contract}: ${d.method}()</td>
                 <td class="py-3 px-4 border-b border-gray-200 text-sm text-center">${baselineCell}</td>
                 <td class="py-3 px-4 border-b border-gray-200 text-sm text-center">${compareCell}</td>
@@ -980,8 +1016,12 @@
         container.innerHTML = `
           <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <h2 id="comparison-title" class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-gray-200 cursor-pointer flex justify-between items-center">
-              <span>Comparison: ${baseName} vs ${compareName}</span>
+              <span>Comparison: <span class="report-name-truncate">${baseName}</span> vs <span class="report-name-truncate">${compareName}</span></span>
               <div class="flex items-center gap-4">
+                <div class="flex items-center text-sm">
+                  <input type="checkbox" id="show-unchanged-toggle" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                  <label for="show-unchanged-toggle" class="font-medium text-gray-700 cursor-pointer">Show unchanged</label>
+                </div>
                 <button id="export-comparison-btn" class="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md">Export</button>
                 <svg class="w-6 h-6 transform transition-transform chevron rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
               </div>
@@ -1018,6 +1058,18 @@
         const comparisonTitle = container.querySelector("#comparison-title");
         const comparisonContent = container.querySelector("#comparison-content");
         const exportBtn = container.querySelector("#export-comparison-btn");
+        const showUnchangedToggle = container.querySelector("#show-unchanged-toggle");
+
+        if (showUnchangedToggle) {
+          showUnchangedToggle.addEventListener("change", (e) => {
+            container.classList.toggle("show-unchanged", e.target.checked);
+          });
+          // Stop click propagation on the parent div of the checkbox and label
+          // to prevent the accordion from toggling.
+          showUnchangedToggle.parentElement.addEventListener("click", (e) => {
+            e.stopPropagation();
+          });
+        }
 
         if (exportBtn) {
           exportBtn.addEventListener("click", (e) => {
