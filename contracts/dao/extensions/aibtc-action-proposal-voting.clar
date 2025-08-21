@@ -340,7 +340,6 @@
           ;; /g/.aibtc-faktory/dao_contract_token
           (contract-call? .aibtc-faktory get-balance contract-caller)
         )
-        )
         ERR_FETCHING_TOKEN_DATA
       ))
     )
