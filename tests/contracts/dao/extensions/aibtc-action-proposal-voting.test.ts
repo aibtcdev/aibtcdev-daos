@@ -1,5 +1,6 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
+import { getSpecificAssetBalance } from "../../../../utilities/asset-helpers";
 import {
   ErrCodeActionProposalVoting,
   ErrCodeActionSendMessage,
@@ -42,6 +43,7 @@ const actionContractAddress = registry.getContractAddressByTypeAndSubtype(
   "ACTIONS",
   "SEND_MESSAGE"
 );
+const DAO_TOKEN_ASSET_IDENTIFIER = ".aibtc-faktory.SYMBOL-AIBTC-DAO";
 
 // import error codes
 const ErrCode = ErrCodeActionProposalVoting;
@@ -834,18 +836,14 @@ describe(`public functions: ${contractName}`, () => {
     // progress chain past voting period and veto delay
     simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY);
     // get balances before concluding
-    const daoTokenContractAddress = registry.getContractAddressByTypeAndSubtype(
-      "TOKEN",
-      "DAO"
-    );
-    const daoTokenAssetName = daoTokenContractAddress.split(".")[1];
-    const daoTokenAssetAddress = `${daoTokenContractAddress}.${daoTokenAssetName}`;
-    const treasuryBalanceBefore =
-      simnet.getAssetsMap().get(daoTokenAssetAddress)!.get(
-        treasuryContractAddress
-      )!;
-    const creatorBalanceBefore =
-      simnet.getAssetsMap().get(daoTokenAssetAddress)!.get(deployer)!;
+    const treasuryBalanceBefore = getSpecificAssetBalance(
+      treasuryContractAddress,
+      DAO_TOKEN_ASSET_IDENTIFIER
+    )!;
+    const creatorBalanceBefore = getSpecificAssetBalance(
+      deployer,
+      DAO_TOKEN_ASSET_IDENTIFIER
+    )!;
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -856,12 +854,14 @@ describe(`public functions: ${contractName}`, () => {
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
     // get balances after concluding
-    const treasuryBalanceAfter =
-      simnet.getAssetsMap().get(daoTokenAssetAddress)!.get(
-        treasuryContractAddress
-      )!;
-    const creatorBalanceAfter =
-      simnet.getAssetsMap().get(daoTokenAssetAddress)!.get(deployer)!;
+    const treasuryBalanceAfter = getSpecificAssetBalance(
+      treasuryContractAddress,
+      DAO_TOKEN_ASSET_IDENTIFIER
+    )!;
+    const creatorBalanceAfter = getSpecificAssetBalance(
+      deployer,
+      DAO_TOKEN_ASSET_IDENTIFIER
+    )!;
     // check balances
     expect(treasuryBalanceAfter).toBe(treasuryBalanceBefore - PROPOSAL_REWARD);
     expect(creatorBalanceAfter).toBe(creatorBalanceBefore + PROPOSAL_REWARD);
