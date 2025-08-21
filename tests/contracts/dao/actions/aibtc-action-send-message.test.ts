@@ -8,6 +8,7 @@ import {
   passActionProposal,
   PROPOSAL_MESSAGE,
 } from "../../../../utilities/dao-helpers";
+import { convertSIP019PrintEvent } from "../../../../utilities/contract-helpers";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 
 // setup accounts
@@ -32,7 +33,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////
   // callback() tests
   ////////////////////////////////////
-  it("callback() should respond with (ok true)", () => {
+  it("callback() responds with (ok true)", () => {
     // act
     const callback = simnet.callPublicFn(
       contractAddress,
@@ -77,14 +78,21 @@ describe(`public functions: ${contractName}`, () => {
     );
 
     // assert: check for the print event from the action contract
-    const printEvent = receipt.events.find(
+    const printEventResult = receipt.events.find(
       (e: any) => e.event === "print_event"
     );
-    expect(printEvent).toBeDefined();
-    const eventPayload = (printEvent as any).data.value.data;
-    expect(eventPayload.notification.value).toBe(
-      "aibtc-action-send-message/run"
-    );
-    expect(eventPayload.payload.value.data.message.value).toBe(PROPOSAL_MESSAGE);
+    expect(printEventResult).toBeDefined();
+    const printEvent = convertSIP019PrintEvent(printEventResult);
+    const baseDaoContractAddress =
+      registry.getContractAddressByTypeAndSubtype("BASE", "DAO");
+    const expectedEvent = {
+      notification: "aibtc-action-send-message/run",
+      payload: {
+        message: PROPOSAL_MESSAGE,
+        memo: memo,
+        sender: baseDaoContractAddress,
+      },
+    };
+    expect(printEvent).toStrictEqual(expectedEvent);
   });
 });
