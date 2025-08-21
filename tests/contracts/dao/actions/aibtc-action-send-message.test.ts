@@ -58,7 +58,7 @@ describe(`public functions: ${contractName}`, () => {
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
-  it("run() succeeds if called as a DAO action proposal", () => {
+  it("run() succeeds if called as a DAO action proposal, emitting a print event", () => {
     // arrange
     const memo = "hello world";
     // fund accounts for creating and voting on proposals
@@ -66,8 +66,8 @@ describe(`public functions: ${contractName}`, () => {
     // construct the DAO
     completePrelaunch(deployer);
     constructDao(deployer);
-    // pass the action proposal
-    passActionProposal(
+    // act: pass the action proposal, which will execute the `run` function
+    const receipt = passActionProposal(
       "SEND_MESSAGE",
       Cl.stringUtf8(PROPOSAL_MESSAGE),
       deployer,
@@ -75,5 +75,16 @@ describe(`public functions: ${contractName}`, () => {
       voters,
       memo
     );
+
+    // assert: check for the print event from the action contract
+    const printEvent = receipt.events.find(
+      (e: any) => e.event === "print_event"
+    );
+    expect(printEvent).toBeDefined();
+    const eventPayload = (printEvent as any).data.value.data;
+    expect(eventPayload.notification.value).toBe(
+      "aibtc-action-send-message/run"
+    );
+    expect(eventPayload.payload.value.data.message.value).toBe(PROPOSAL_MESSAGE);
   });
 });

@@ -273,6 +273,7 @@ export function passActionProposal(
   );
   dbgLog(concludeProposalReceipt);
   expect(concludeProposalReceipt.result).toBeOk(Cl.bool(true));
+  return concludeProposalReceipt;
 }
 
 // helper to format the expected buffer format since stacks 7.X
