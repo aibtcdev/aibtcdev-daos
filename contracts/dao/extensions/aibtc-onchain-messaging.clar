@@ -12,8 +12,9 @@
 
 ;; constants
 ;;
-(define-constant ERR_INVALID_INPUT (err u1600))
-(define-constant ERR_FETCHING_TOKEN_DATA (err u1601))
+(define-constant ERR_NOT_DAO_OR_EXTENSION (err u1600))
+(define-constant ERR_INVALID_INPUT (err u1601))
+(define-constant ERR_FETCHING_TOKEN_DATA (err u1602))
 
 ;; data-vars
 (define-data-var messageCost uint u0)
@@ -35,6 +36,7 @@
       (senderBalance (unwrap! (contract-call? .aibtc-faktory get-balance tx-sender)
         ERR_FETCHING_TOKEN_DATA
       ))
+      (isFromDao (is-ok (is-dao-or-extension)))
       (isFromHolder (> senderBalance u0))
     )
     ;; check there is a message
@@ -47,21 +49,39 @@
         contractCaller: contract-caller,
         txSender: tx-sender,
         height: stacks-block-height,
-        isFromDao: false,
+        isFromDao: isFromDao,
         isFromHolder: isFromHolder,
         messageLength: (len msg),
         message: msg,
       },
     })
-    ;; transfer the message cost to the dao
-    ;; /g/.aibtc-treasury/dao_contract_treasury
-    ;; /g/.aibtc-faktory/dao_contract_token
-    (contract-call? .aibtc-treasury deposit-ft .aibtc-faktory
-      (var-get messageCost)
-    )
+    ;; check if sender is not dao via proposal
+    (ok (and
+      (not isFromDao)
+      ;; transfer the message cost to the dao
+      ;; /g/.aibtc-treasury/dao_contract_treasury
+      ;; /g/.aibtc-faktory/dao_contract_token
+      (try! (contract-call? .aibtc-treasury deposit-ft .aibtc-faktory
+        (var-get messageCost)
+      ))
+    ))
   )
 )
 
+;; private functions
+;;
+
+(define-private (is-dao-or-extension)
+  (ok (asserts!
+    (or
+      ;; /g/.aibtc-base-dao/dao_contract_base
+      (is-eq tx-sender .aibtc-base-dao)
+      ;; /g/.aibtc-base-dao/dao_contract_base
+      (contract-call? .aibtc-base-dao is-extension contract-caller)
+    )
+    ERR_NOT_DAO_OR_EXTENSION
+  ))
+)
 
 ;; initialization
 ;;

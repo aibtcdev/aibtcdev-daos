@@ -60,7 +60,8 @@ export enum ErrCodeDaoUsers {
 
 // aibtc-onchain-messaging.clar
 export enum ErrCodeOnchainMessaging {
-  ERR_INVALID_INPUT = 1600,
+  ERR_NOT_DAO_OR_EXTENSION = 1600,
+  ERR_INVALID_INPUT,
   ERR_FETCHING_TOKEN_DATA,
 }
 
