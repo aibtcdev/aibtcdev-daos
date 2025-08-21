@@ -85,14 +85,21 @@ describe(`public functions: ${contractName}`, () => {
     );
     expect(printEventResult).toBeDefined();
     const printEvent = convertSIP019PrintEvent(printEventResult);
-    const baseDaoContractAddress =
-      registry.getContractAddressByTypeAndSubtype("BASE", "DAO");
+    const proposalVotingContractAddress =
+      registry.getContractAddressByTypeAndSubtype(
+        "EXTENSIONS",
+        "ACTION_PROPOSAL_VOTING"
+      );
     const expectedEvent = {
       notification: "aibtc-action-send-message/run",
       payload: {
+        contractCaller: proposalVotingContractAddress,
+        height: receipt.block_height.toString(),
+        isFromDao: true,
+        isFromHolder: false,
         message: PROPOSAL_MESSAGE,
-        memo: memo,
-        sender: baseDaoContractAddress,
+        messageLength: PROPOSAL_MESSAGE.length.toString(),
+        txSender: deployer,
       },
     };
     expect(printEvent).toStrictEqual(expectedEvent);
