@@ -79,7 +79,9 @@ describe(`public functions: ${contractName}`, () => {
 
     // assert: check for the print event from the action contract
     const printEventResult = receipt.events.find(
-      (e: any) => e.event === "print_event"
+      (e: any) =>
+        e.event === "print_event" &&
+        e.data.contract_identifier === contractAddress
     );
     expect(printEventResult).toBeDefined();
     const printEvent = convertSIP019PrintEvent(printEventResult);
