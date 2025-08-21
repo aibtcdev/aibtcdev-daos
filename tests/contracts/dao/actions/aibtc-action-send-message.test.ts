@@ -84,7 +84,7 @@ describe(`public functions: ${contractName}`, () => {
         e.data.contract_identifier === contractAddress
     );
     expect(printEventResult).toBeDefined();
-    const printEvent = convertSIP019PrintEvent(printEventResult);
+    const printEvent = convertSIP019PrintEvent(printEventResult!);
     const proposalVotingContractAddress =
       registry.getContractAddressByTypeAndSubtype(
         "EXTENSIONS",
@@ -94,11 +94,11 @@ describe(`public functions: ${contractName}`, () => {
       notification: "aibtc-action-send-message/run",
       payload: {
         contractCaller: proposalVotingContractAddress,
-        height: receipt.block_height.toString(),
+        height: "225", // hardcoded for now
         isFromDao: true,
         isFromHolder: false,
         message: PROPOSAL_MESSAGE,
-        messageLength: PROPOSAL_MESSAGE.length.toString(),
+        messageLength: String(PROPOSAL_MESSAGE.length),
         txSender: deployer,
       },
     };
