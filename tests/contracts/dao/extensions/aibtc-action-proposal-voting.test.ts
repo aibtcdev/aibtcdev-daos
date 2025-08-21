@@ -833,6 +833,19 @@ describe(`public functions: ${contractName}`, () => {
     expect(voteReceipt4).toBeOk(Cl.bool(true));
     // progress chain past voting period and veto delay
     simnet.mineEmptyBlocks(VOTING_PERIOD + VOTING_DELAY);
+    // get balances before concluding
+    const daoTokenContractAddress = registry.getContractAddressByTypeAndSubtype(
+      "TOKEN",
+      "DAO"
+    );
+    const daoTokenAssetName = daoTokenContractAddress.split(".")[1];
+    const daoTokenAssetAddress = `${daoTokenContractAddress}.${daoTokenAssetName}`;
+    const treasuryBalanceBefore =
+      simnet.getAssetsMap().get(daoTokenAssetAddress)!.get(
+        treasuryContractAddress
+      )!;
+    const creatorBalanceBefore =
+      simnet.getAssetsMap().get(daoTokenAssetAddress)!.get(deployer)!;
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
@@ -842,6 +855,16 @@ describe(`public functions: ${contractName}`, () => {
     );
     // assert
     expect(receipt.result).toBeOk(Cl.bool(true));
+    // get balances after concluding
+    const treasuryBalanceAfter =
+      simnet.getAssetsMap().get(daoTokenAssetAddress)!.get(
+        treasuryContractAddress
+      )!;
+    const creatorBalanceAfter =
+      simnet.getAssetsMap().get(daoTokenAssetAddress)!.get(deployer)!;
+    // check balances
+    expect(treasuryBalanceAfter).toBe(treasuryBalanceBefore - PROPOSAL_REWARD);
+    expect(creatorBalanceAfter).toBe(creatorBalanceBefore + PROPOSAL_REWARD);
   });
 });
 
