@@ -864,7 +864,9 @@ describe(`public functions: ${contractName}`, () => {
     )!;
     // check balances
     expect(treasuryBalanceAfter).toBe(treasuryBalanceBefore - PROPOSAL_REWARD);
-    expect(creatorBalanceAfter).toBe(creatorBalanceBefore + PROPOSAL_REWARD);
+    expect(creatorBalanceAfter).toBe(
+      creatorBalanceBefore + PROPOSAL_BOND + PROPOSAL_REWARD
+    );
   });
 });
 
