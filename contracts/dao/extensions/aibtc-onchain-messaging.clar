@@ -32,11 +32,11 @@
 ;; DAO token holders can send messages by paying a fee
 (define-public (send (msg (string-utf8 10000)))
   (let (
-      (isFromDao (is-ok (is-dao-or-extension)))
       ;; /g/.aibtc-faktory/dao_contract_token
       (senderBalance (unwrap! (contract-call? .aibtc-faktory get-balance tx-sender)
         ERR_FETCHING_TOKEN_DATA
       ))
+      (isFromDao (is-ok (is-dao-or-extension)))
       (isFromHolder (> senderBalance u0))
     )
     ;; check there is a message

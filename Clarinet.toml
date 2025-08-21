@@ -109,18 +109,8 @@ path = 'contracts/dao/extensions/aibtc-dao-epoch.clar'
 clarity_version = 3
 epoch = 3.1
 
-[contracts.aibtc-dao-users]
-path = 'contracts/dao/extensions/aibtc-dao-users.clar'
-clarity_version = 3
-epoch = 3.1
-
 [contracts.aibtc-onchain-messaging]
 path = 'contracts/dao/extensions/aibtc-onchain-messaging.clar'
-clarity_version = 3
-epoch = 3.1
-
-[contracts.aibtc-rewards-account]
-path = 'contracts/dao/extensions/aibtc-rewards-account.clar'
 clarity_version = 3
 epoch = 3.1
 

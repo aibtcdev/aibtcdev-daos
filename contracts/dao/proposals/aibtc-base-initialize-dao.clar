@@ -35,11 +35,6 @@
           enabled: true,
         }
         {
-          ;; /g/.aibtc-dao-users/dao_contract_users
-          extension: .aibtc-dao-users,
-          enabled: true,
-        }
-        {
           ;; /g/.aibtc-onchain-messaging/dao_contract_messaging
           extension: .aibtc-onchain-messaging,
           enabled: true,

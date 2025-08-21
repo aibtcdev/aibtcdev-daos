@@ -180,12 +180,16 @@ export function constructDao(deployer: string) {
     throw new Error("Required DAO contracts not found in registry");
   }
 
+  console.log("Constructing DAO with base contract:", baseDaoContract);
+  console.log("Using initialize contract:", initializeContract);
+
   const constructDaoReceipt = simnet.callPublicFn(
     `${deployer}.${baseDaoContract.name}`,
     "construct",
     [Cl.principal(`${deployer}.${initializeContract.name}`)],
     deployer
   );
+  console.log("Construct DAO receipt:", constructDaoReceipt);
   expect(constructDaoReceipt.result).toBeOk(Cl.bool(true));
 
   // progress chain for at-block calls
@@ -273,6 +277,7 @@ export function passActionProposal(
   );
   dbgLog(concludeProposalReceipt);
   expect(concludeProposalReceipt.result).toBeOk(Cl.bool(true));
+  return concludeProposalReceipt;
 }
 
 // helper to format the expected buffer format since stacks 7.X
