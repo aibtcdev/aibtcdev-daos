@@ -24,13 +24,7 @@
 ;; error codes
 (define-constant ERR_INVALID_DAO_TOKEN (err u2300))
 (define-constant ERR_INVALID_AMOUNT (err u2301))
-(define-constant ERR_SWAP_FAILED (err u2302))
-(define-constant ERR_MIN_RECEIVE_REQUIRED (err u2303))
-
-;; data vars
-
-(define-data-var totalBuys uint u0)
-(define-data-var totalSells uint u0)
+(define-constant ERR_MIN_RECEIVE_REQUIRED (err u2302))
 
 ;; public functions
 
@@ -48,13 +42,10 @@
     (asserts! (is-some minReceive) ERR_MIN_RECEIVE_REQUIRED)
     ;; /g/.xyk-core-v-1-2/external_bitflow_core
     ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
-    (match (contract-call? .xyk-core-v-1-2 swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1
+    (try! (contract-call? .xyk-core-v-1-2 swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1
       SBTC_TOKEN daoToken amount (unwrap-panic minReceive)
-    )
-      success (ok (var-set totalBuys (+ (var-get totalBuys) u1)))
-      error
-      ERR_SWAP_FAILED
-    )
+    ))
+    (ok true)
   )
 )
 
@@ -68,13 +59,10 @@
     (asserts! (is-some minReceive) ERR_MIN_RECEIVE_REQUIRED)
     ;; /g/.xyk-core-v-1-2/external_bitflow_core
     ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool 
-    (match (contract-call? .xyk-core-v-1-2 swap-y-for-x .xyk-pool-sbtc-aibtc-v-1-1
+    (try! (contract-call? .xyk-core-v-1-2 swap-y-for-x .xyk-pool-sbtc-aibtc-v-1-1
       SBTC_TOKEN daoToken amount (unwrap-panic minReceive)
-    )
-      success (ok (var-set totalSells (+ (var-get totalSells) u1)))
-      error
-      ERR_SWAP_FAILED
-    )
+    ))
+    (ok true)
   )
 )
 
@@ -90,13 +78,5 @@
     ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
     swapContract: .xyk-pool-sbtc-aibtc-v-1-1,
     daoToken: DAO_TOKEN,
-  }
-)
-
-(define-read-only (get-swap-info)
-  {
-    totalBuys: (var-get totalBuys),
-    totalSells: (var-get totalSells),
-    totalSwaps: (+ (var-get totalBuys) (var-get totalSells)),
   }
 )
