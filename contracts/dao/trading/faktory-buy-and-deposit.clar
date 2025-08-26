@@ -17,9 +17,10 @@
 
 ;; error codes
 (define-constant ERR_INVALID_DAO_TOKEN (err u2400))
-(define-constant ERR_SWAP_FAILED (err u2401))
-(define-constant ERR_QUOTE_FAILED (err u2402))
-(define-constant ERR_SLIPPAGE_TOO_HIGH (err u2403))
+(define-constant ERR_INVALID_AMOUNT (err u2401))
+(define-constant ERR_SWAP_FAILED (err u2402))
+(define-constant ERR_QUOTE_FAILED (err u2403))
+(define-constant ERR_SLIPPAGE_TOO_HIGH (err u2404))
 
 ;; public functions
 
@@ -39,6 +40,8 @@
     )
     ;; verify token matches adapter config
     (asserts! (is-eq daoTokenContract DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
+    ;; verify amount is positive
+    (asserts! (> amount u0) ERR_INVALID_AMOUNT)
     ;; if minReceive is set, check slippage
     (and
       (is-some minReceive)

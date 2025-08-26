@@ -19,10 +19,11 @@
 
 ;; error codes
 (define-constant ERR_INVALID_DAO_TOKEN (err u2500))
-(define-constant ERR_SWAP_FAILED (err u2501))
-(define-constant ERR_QUOTE_FAILED (err u2502))
-(define-constant ERR_SLIPPAGE_TOO_HIGH (err u2503))
-(define-constant ERR_MIN_RECEIVE_REQUIRED (err u2504))
+(define-constant ERR_INVALID_AMOUNT (err u2501))
+(define-constant ERR_SWAP_FAILED (err u2502))
+(define-constant ERR_QUOTE_FAILED (err u2503))
+(define-constant ERR_SLIPPAGE_TOO_HIGH (err u2504))
+(define-constant ERR_MIN_RECEIVE_REQUIRED (err u2505))
 
 ;; public functions
 
@@ -40,6 +41,8 @@
     )
     ;; verify token matches adapter config
     (asserts! (is-eq daoTokenContract DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
+    ;; verify amount is positive
+    (asserts! (> amount u0) ERR_INVALID_AMOUNT)
     ;; take an action depending on if we found agent account
     (match agentAccount
       ;; agent account found
