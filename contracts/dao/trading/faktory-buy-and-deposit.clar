@@ -23,8 +23,15 @@
 
 ;; public functions
 
-(define-public (buy-and-deposit (daoToken <sip010-trait>) (amount uint) (minReceive (optional uint)))
-(let (
+(define-public (buy-and-deposit
+    (daoToken <sip010-trait>)
+    (amount uint)
+    (minReceive (optional uint))
+  )
+  (let (
+      (caller contract-caller)
+      ;; /g/.agent-account-registry/TODO
+      (agentAccount (contract-call? .agent-account-registry get-agent-account-by-owner caller))
       (daoTokenContract (contract-of daoToken))
       ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
       (swapInInfo (unwrap! (contract-call? .aibtc-faktory-dex get-in amount) ERR_QUOTE_FAILED))
@@ -32,15 +39,32 @@
     )
     ;; verify token matches adapter config
     (asserts! (is-eq daoTokenContract DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
-    ;; if min-receive is set, check slippage
+    ;; if minReceive is set, check slippage
     (and
       (is-some minReceive)
       (asserts! (>= swapTokensOut (unwrap-panic minReceive))
         ERR_SLIPPAGE_TOO_HIGH
       )
     )
-    ;; call faktory dex to perform the swap
-    ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
-    (contract-call? .aibtc-faktory-dex buy daoToken amount)
+    ;; take an action depending on if we found agent account
+    (match agentAccount
+      ;; agent account found
+      account
+      (begin
+        ;; transfer sBTC to this contract
+        ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
+        (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
+          transfer amount caller SELF none
+        ))
+        ;; buy as this contract to receive DAO tokens
+        (try! (as-contract (contract-call? .aibtc-faktory-dex buy daoToken amount)))
+        ;; transfer DAO tokens to agent account
+        ;; TODO: amount is sBTC amount here, not dao token amount, do we need a quote? how do we know actual amount?
+        (as-contract (contract-call? daoToken transfer amount SELF account none))
+      )
+      ;; no agent account, call faktory dex to perform the swap
+      ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
+      (contract-call? .aibtc-faktory-dex buy daoToken amount)
+    )
   )
 )
