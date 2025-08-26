@@ -33,7 +33,7 @@
   )
   (let (
       (caller contract-caller)
-      ;; /g/.agent-account-registry/TODO
+      ;; /g/.agent-account-registry/faktory_agent_account_registry
       (agentAccount (contract-call? .agent-account-registry get-agent-account-by-owner caller))
       (daoTokenContract (contract-of daoToken))
       (minReceiveVal (unwrap! minReceive ERR_MIN_RECEIVE_REQUIRED))
