@@ -44,30 +44,25 @@
     (match agentAccount
       ;; agent account found
       account
-      (begin
-        ;; transfer sBTC to this contract
-        ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
-        (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
-          transfer amount caller SELF none
-        ))
-        ;; buy as this contract to receive DAO tokens
-
-        (asserts!
-          ;; /g/.xyk-core-v-1-2/external_bitflow_core
-          ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
-          (is-ok (as-contract (contract-call? .xyk-core-v-1-2 swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1
-            SBTC_TOKEN daoToken amount minReceiveVal
+      (let (
+          ;; transfer sBTC to this contract to perform the buy
+          ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
+          (sbtcTransfer (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
+            transfer amount caller SELF none
           )))
-          ERR_SWAP_FAILED
+          ;; buy tokens as contract, capture total in output
+          (daoTokensReceived (try! (as-contract (contract-call? .xyk-core-v-1-2 swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1
+            SBTC_TOKEN daoToken amount minReceiveVal
+          ))))
         )
         ;; transfer DAO tokens to agent account
-        ;; TODO: amount is sBTC amount here, not dao token amount, do we need a quote? how do we know actual amount?
-        (as-contract (contract-call? daoToken transfer amount SELF account none))
+        (try! (as-contract (contract-call? daoToken transfer daoTokensReceived SELF account none)))
+        (ok daoTokensReceived)
       )
       ;; no agent account, call bitflow pool to perform the swap
       ;; /g/.xyk-core-v-1-2/external_bitflow_core
       ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
-      (ok (is-ok (contract-call? .xyk-core-v-1-2 swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1
+      (ok (try! (contract-call? .xyk-core-v-1-2 swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1
         SBTC_TOKEN daoToken amount minReceiveVal
       )))
     )

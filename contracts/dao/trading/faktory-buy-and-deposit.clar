@@ -35,14 +35,14 @@
       (daoTokenContract (contract-of daoToken))
       ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
       (swapInInfo (unwrap! (contract-call? .aibtc-faktory-dex get-in amount) ERR_QUOTE_FAILED))
-      (swapTokensOut (get tokens-out swapInInfo))
+      (daoTokensReceived (get tokens-out swapInInfo))
     )
     ;; verify token matches adapter config
     (asserts! (is-eq daoTokenContract DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
     ;; if minReceive is set, check slippage
     (and
       (is-some minReceive)
-      (asserts! (>= swapTokensOut (unwrap-panic minReceive))
+      (asserts! (>= daoTokensReceived (unwrap-panic minReceive))
         ERR_SLIPPAGE_TOO_HIGH
       )
     )
@@ -59,12 +59,16 @@
         ;; buy as this contract to receive DAO tokens
         (try! (as-contract (contract-call? .aibtc-faktory-dex buy daoToken amount)))
         ;; transfer DAO tokens to agent account
-        ;; TODO: amount is sBTC amount here, not dao token amount, do we need a quote? how do we know actual amount?
-        (as-contract (contract-call? daoToken transfer amount SELF account none))
+        (try! (as-contract (contract-call? daoToken transfer daoTokensReceived SELF account none)))
+        ;; return (ok uint) same as bitflow
+        (ok daoTokensReceived)
       )
       ;; no agent account, call faktory dex to perform the swap
       ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
-      (contract-call? .aibtc-faktory-dex buy daoToken amount)
+      (begin
+        (try! (contract-call? .aibtc-faktory-dex buy daoToken amount))
+        (ok daoTokensReceived)
+      )
     )
   )
 )
