@@ -72,3 +72,18 @@
     )
   )
 )
+
+;; read-only functions
+
+(define-read-only (get-contract-info)
+  {
+    self: SELF,
+    deployedBurnBlock: DEPLOYED_BURN_BLOCK,
+    deployedStacksBlock: DEPLOYED_STACKS_BLOCK,
+    ;; /g/.agent-account-registry/faktory_agent_account_registry
+    agentAccountRegistry: .agent-account-registry,
+    ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
+    swapContract: .aibtc-faktory-dex,
+    daoToken: DAO_TOKEN,
+  }
+)
