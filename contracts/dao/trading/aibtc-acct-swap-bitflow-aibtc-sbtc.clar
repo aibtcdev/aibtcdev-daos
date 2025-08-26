@@ -38,14 +38,14 @@
     (amount uint)
     (minReceive (optional uint))
   )
-  (let ((daoTokenContract (contract-of daoToken)))
+  (let ((daoTokenContract (contract-of daoToken))
+        (minimum-receive (unwrap! minReceive ERR_MIN_RECEIVE_REQUIRED)))
     (asserts! (is-eq daoTokenContract DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
-    (asserts! (is-some minReceive) ERR_MIN_RECEIVE_REQUIRED)
     ;; /g/.xyk-core-v-1-2/external_bitflow_core
     (match (contract-call? .xyk-core-v-1-2
       ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
-      swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1 SBTC_TOKEN daoToken amount
-      (unwrap-panic minReceive)
+      swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1 SBTC_TOKEN daoToken amount 
+      minimum-receive
     )
       success (ok (var-set totalBuys (+ (var-get totalBuys) u1)))
       error
@@ -59,14 +59,14 @@
     (amount uint)
     (minReceive (optional uint))
   )
-  (let ((daoTokenContract (contract-of daoToken)))
+  (let ((daoTokenContract (contract-of daoToken))
+        (minimum-receive (unwrap! minReceive ERR_MIN_RECEIVE_REQUIRED)))
     (asserts! (is-eq daoTokenContract DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
-    (asserts! (is-some minReceive) ERR_MIN_RECEIVE_REQUIRED)
     ;; /g/.xyk-core-v-1-2/external_bitflow_core
     (match (contract-call? .xyk-core-v-1-2
       ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
       swap-y-for-x .xyk-pool-sbtc-aibtc-v-1-1 SBTC_TOKEN daoToken amount
-      (unwrap-panic minReceive)
+      minimum-receive
     )
       success (ok (var-set totalSells (+ (var-get totalSells) u1)))
       error
