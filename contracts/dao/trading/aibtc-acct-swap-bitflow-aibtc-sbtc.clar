@@ -23,8 +23,9 @@
 
 ;; error codes
 (define-constant ERR_INVALID_DAO_TOKEN (err u2300))
-(define-constant ERR_SWAP_FAILED (err u2301))
-(define-constant ERR_MIN_RECEIVE_REQUIRED (err u2302))
+(define-constant ERR_INVALID_AMOUNT (err u2301))
+(define-constant ERR_SWAP_FAILED (err u2302))
+(define-constant ERR_MIN_RECEIVE_REQUIRED (err u2303))
 
 ;; data vars
 
@@ -39,13 +40,16 @@
     (minReceive (optional uint))
   )
   (let ((daoTokenContract (contract-of daoToken)))
+    ;; verify token matches adapter config
     (asserts! (is-eq daoTokenContract DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
+    ;; verify amount is positive
+    (asserts! (> amount u0) ERR_INVALID_AMOUNT)
+    ;; verify minReceive is provided as param
     (asserts! (is-some minReceive) ERR_MIN_RECEIVE_REQUIRED)
     ;; /g/.xyk-core-v-1-2/external_bitflow_core
-    (match (contract-call? .xyk-core-v-1-2
-      ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
-      swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1 SBTC_TOKEN daoToken amount
-      (unwrap-panic minReceive)
+    ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
+    (match (contract-call? .xyk-core-v-1-2 swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1
+      SBTC_TOKEN daoToken amount (unwrap-panic minReceive)
     )
       success (ok (var-set totalBuys (+ (var-get totalBuys) u1)))
       error
@@ -63,10 +67,9 @@
     (asserts! (is-eq daoTokenContract DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
     (asserts! (is-some minReceive) ERR_MIN_RECEIVE_REQUIRED)
     ;; /g/.xyk-core-v-1-2/external_bitflow_core
-    (match (contract-call? .xyk-core-v-1-2
-      ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
-      swap-y-for-x .xyk-pool-sbtc-aibtc-v-1-1 SBTC_TOKEN daoToken amount
-      (unwrap-panic minReceive)
+    ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool 
+    (match (contract-call? .xyk-core-v-1-2 swap-y-for-x .xyk-pool-sbtc-aibtc-v-1-1
+      SBTC_TOKEN daoToken amount (unwrap-panic minReceive)
     )
       success (ok (var-set totalSells (+ (var-get totalSells) u1)))
       error
