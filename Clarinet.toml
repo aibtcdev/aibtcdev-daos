@@ -160,6 +160,16 @@ path = "contracts/dao/trading/aibtc-acct-swap-faktory-aibtc-sbtc.clar"
 clarity_version = 3
 epoch = 3.1
 
+[contracts.bitflow-buy-and-deposit]
+path = "contracts/dao/trading/bitflow-buy-and-deposit.clar"
+clarity_version = 3
+epoch = 3.1
+
+[contracts.faktory-buy-and-deposit]
+path = "contracts/dao/trading/faktory-buy-and-deposit.clar"
+clarity_version = 3
+epoch = 3.1
+
 # helper to simulate xyk-core from bitflow
 [contracts.xyk-core-v-1-2]
 path = "contracts/external/xyk-core-v-1-2.clar"
