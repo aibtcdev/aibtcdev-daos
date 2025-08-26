@@ -51,19 +51,19 @@
       ;; agent account found
       account
       (begin
-        ;; transfer sBTC to this contract
+        ;; transfer sBTC to this contract to perform the buy
         ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
         (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
           transfer amount caller SELF none
         ))
-        ;; buy as this contract to receive DAO tokens
+        ;; buy DAO tokens as this contract to receive DAO tokens
         (try! (as-contract (contract-call? .aibtc-faktory-dex buy daoToken amount)))
         ;; transfer DAO tokens to agent account
         (try! (as-contract (contract-call? daoToken transfer daoTokensReceived SELF account none)))
-        ;; return (ok uint) same as bitflow
+        ;; return (ok uint) with amount transferred
         (ok daoTokensReceived)
       )
-      ;; no agent account, call faktory dex to perform the swap
+      ;; no agent account, call faktory dex directly to perform the swap
       ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
       (begin
         (try! (contract-call? .aibtc-faktory-dex buy daoToken amount))

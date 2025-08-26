@@ -50,7 +50,7 @@
           (sbtcTransfer (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
             transfer amount caller SELF none
           )))
-          ;; buy tokens as contract, capture total in output
+          ;; buy tokens as contract, capture total received in output
           (daoTokensReceived (try! (as-contract (contract-call? .xyk-core-v-1-2 swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1
             SBTC_TOKEN daoToken amount minReceiveVal
           ))))
@@ -81,5 +81,6 @@
     ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
     swapContract: .aibtc-faktory-dex,
     daoToken: DAO_TOKEN,
+    sbtcToken: SBTC_TOKEN,
   }
 )
