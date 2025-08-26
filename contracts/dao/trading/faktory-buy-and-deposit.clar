@@ -29,9 +29,9 @@
     (minReceive (optional uint))
   )
   (let (
-      (caller contract-caller)
+      (sender tx-sender)
       ;; /g/.agent-account-registry/faktory_agent_account_registry
-      (agentAccount (contract-call? .agent-account-registry get-agent-account-by-owner caller))
+      (agentAccount (contract-call? .agent-account-registry get-agent-account-by-owner sender))
       (daoTokenContract (contract-of daoToken))
       ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
       (swapInInfo (unwrap! (contract-call? .aibtc-faktory-dex get-in amount) ERR_QUOTE_FAILED))
@@ -56,7 +56,7 @@
         ;; transfer sBTC to this contract to perform the buy
         ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
         (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
-          transfer amount caller SELF none
+          transfer amount sender SELF none
         ))
         ;; buy DAO tokens as this contract to receive DAO tokens
         (try! (as-contract (contract-call? .aibtc-faktory-dex buy daoToken amount)))
