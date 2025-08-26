@@ -51,23 +51,25 @@
           transfer amount caller SELF none
         ))
         ;; buy as this contract to receive DAO tokens
-        (try! (as-contract
+
+        (asserts!
           ;; /g/.xyk-core-v-1-2/external_bitflow_core
-          (contract-call? .xyk-core-v-1-2
-            ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool swap-x-for-y
-            .xyk-pool-sbtc-aibtc-v-1-1 SBTC_TOKEN daoToken amount
-            minReceiveVal
+          ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
+          (is-ok (as-contract (contract-call? .xyk-core-v-1-2 swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1
+            SBTC_TOKEN daoToken amount minReceiveVal
           )))
+          ERR_SWAP_FAILED
+        )
         ;; transfer DAO tokens to agent account
         ;; TODO: amount is sBTC amount here, not dao token amount, do we need a quote? how do we know actual amount?
         (as-contract (contract-call? daoToken transfer amount SELF account none))
       )
       ;; no agent account, call bitflow pool to perform the swap
       ;; /g/.xyk-core-v-1-2/external_bitflow_core
-      (contract-call? .xyk-core-v-1-2
-        ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool swap-x-for-y
-        .xyk-pool-sbtc-aibtc-v-1-1 SBTC_TOKEN daoToken amount minReceiveVal
-      )
+      ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
+      (ok (is-ok (contract-call? .xyk-core-v-1-2 swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1
+        SBTC_TOKEN daoToken amount minReceiveVal
+      )))
     )
   )
 )
