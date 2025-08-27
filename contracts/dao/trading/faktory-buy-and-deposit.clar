@@ -6,6 +6,7 @@
 
 ;; /g/'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait/base_trait_sip010
 (use-trait sip010-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+(use-trait prelaunch-trait 'SPV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RCJDC22.prelaunch-faktory-trait.prelaunch-trait)
 
 ;; constants
 (define-constant DEPLOYED_BURN_BLOCK burn-block-height)
@@ -14,12 +15,15 @@
 
 ;; /g/.aibtc-faktory/dao_contract_token
 (define-constant DAO_TOKEN .aibtc-faktory)
+(define-constant DAO_SEAT .pre-aibtc-faktory)
+(define-constant PRICE-PER-SEAT u20000)
 
 ;; error codes
 (define-constant ERR_INVALID_DAO_TOKEN (err u2400))
 (define-constant ERR_INVALID_AMOUNT (err u2401))
 (define-constant ERR_QUOTE_FAILED (err u2402))
 (define-constant ERR_SLIPPAGE_TOO_HIGH (err u2403))
+(define-constant ERR_BUYING_SEATS (err u2404))
 
 ;; public functions
 
@@ -75,6 +79,35 @@
   )
 )
 
+(define-public (buy-seats-and-deposit (amount uint))
+  (let (
+      (sender tx-sender)
+      (agentAccount (contract-call? .agent-account-registry get-agent-account-by-owner sender))
+      (max-seat (/ amount PRICE-PER-SEAT))
+    )
+    (asserts! (>= amount PRICE-PER-SEAT) ERR_INVALID_AMOUNT)
+    
+    (match agentAccount
+      ;; agent account found
+      account
+      (match (as-contract (contract-call? .aibtc-pre-faktory buy-up-to max-seat (some account)))
+          actual-seat (let ((user-change (- amount (* actual-seat PRICE-PER-SEAT))))
+                        (if (> user-change u0)
+                        (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer 
+                                                  user-change SELF account none)))
+                        true)
+                        (ok actual-seat))
+          error       (begin 
+                        (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer 
+                                                  amount SELF account none)))
+                        (ok amount)))
+      (let ((actual-seat (unwrap! (contract-call? .aibtc-pre-faktory buy-up-to max-seat (some sender)) ERR_BUYING_SEATS))) ;; or none
+            (ok actual-seat)
+      )
+    )
+  )
+)
+
 ;; read-only functions
 
 (define-read-only (get-contract-info)
@@ -87,5 +120,7 @@
     ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
     swapContract: .aibtc-faktory-dex,
     daoToken: DAO_TOKEN,
+    seatContract: .aibtc-pre-faktory,
+    pricePerSeat: PRICE-PER-SEAT,
   }
 )
