@@ -82,9 +82,9 @@
       (sender tx-sender)
       ;; /g/.agent-account-registry/faktory_agent_account_registry
       (agentAccount (contract-call? .agent-account-registry get-agent-account-by-owner sender))
-      (max-seat (/ amount PRICE-PER-SEAT))
+      (max-seat (/ amount PRICE_PER_SEAT))
     )
-    (asserts! (>= amount PRICE-PER-SEAT) ERR_INVALID_AMOUNT)
+    (asserts! (>= amount PRICE_PER_SEAT) ERR_INVALID_AMOUNT)
     
     (match agentAccount
       ;; agent account found
@@ -92,7 +92,7 @@
       (match
           ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch 
           (as-contract (contract-call? .aibtc-pre-faktory buy-up-to max-seat (some account)))
-          actual-seat (let ((user-change (- amount (* actual-seat PRICE-PER-SEAT))))
+          actual-seat (let ((user-change (- amount (* actual-seat PRICE_PER_SEAT))))
                         (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
                                                   transfer amount sender SELF none))
                         (if (> user-change u0)
@@ -127,6 +127,6 @@
     daoToken: DAO_TOKEN,
     ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
     daoTokenPrelaunch: .aibtc-pre-faktory,
-    pricePerSeat: PRICE-PER-SEAT,
+    pricePerSeat: PRICE_PER_SEAT,
   }
 )
