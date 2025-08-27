@@ -21,8 +21,6 @@
 (define-constant ERR_INVALID_AMOUNT (err u2401))
 (define-constant ERR_QUOTE_FAILED (err u2402))
 (define-constant ERR_SLIPPAGE_TOO_HIGH (err u2403))
-(define-constant ERR_BUYING_SEATS (err u2404))
-(define-constant ERR_REFUNDING_SEATS (err u2405))
 
 ;; public functions
 
