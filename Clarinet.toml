@@ -1,9 +1,15 @@
 [project]
-name = 'aibtcdev-daos'
-description = ''
+name = "aibtcdev-daos"
+description = ""
 authors = []
 telemetry = true
-cache_dir = './.cache'
+cache_dir = "./.cache"
+
+[repl.analysis]
+passes = ["check_checker"]
+check_checker = { trusted_sender = false, trusted_caller = false, callee_filter = false }
+
+# external contracts loaded by clarinet
 
 [[project.requirements]]
 contract_id = 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait'
@@ -14,191 +20,202 @@ contract_id = 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standa
 [[project.requirements]]
 contract_id = 'ST3VXT52QEQPZ5246A16RFNMR1PRJ96JK6YYX37N8.sip-010-trait-ft-standard'
 
+# testnet POX contract
 [[project.requirements]]
 contract_id = 'ST000000000000000000002AMW42H.pox-4'
 
+# aibtc testnet bitflow core (allows pool creation)
 [[project.requirements]]
 contract_id = 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-core-v-1-2'
 
+# aibtc testnet bitflow pool trait
 [[project.requirements]]
 contract_id = 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.xyk-pool-trait-v-1-2'
 
+# faktory testnet sBTC contract
 [[project.requirements]]
 contract_id = 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token'
 
+# faktory SIP-010 trait
 [[project.requirements]]
 contract_id = 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-trait-v1'
 
+# faktory DEX trait
 [[project.requirements]]
 contract_id = 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.faktory-dex-trait-v1-1'
 
+# faktory agent account registry for automated registration
 [[project.requirements]]
 contract_id = 'SPV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RCJDC22.agent-account-registry'
 
-[[project.requirements]]
-contract_id = 'SPV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RCJDC22.prelaunch-faktory-trait.prelaunch-trait'
-
-[[project.requirements]]
-contract_id = 'SPV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RCJDC22.prelaunch-faktory-trait'
-
+# simulation of contract above since it won't download 2025/08/08
 [contracts.agent-account-registry]
-path = 'contracts/external/agent-account-registry.clar'
+path = "contracts/external/agent-account-registry.clar"
 clarity_version = 2
-epoch = '3.1'
+epoch = 3.1
 
-[contracts.aibtc-acct-swap-bitflow-aibtc-sbtc]
-path = 'contracts/dao/trading/aibtc-acct-swap-bitflow-aibtc-sbtc.clar'
-clarity_version = 3
-epoch = '3.1'
+# agent account
 
-[contracts.aibtc-acct-swap-faktory-aibtc-sbtc]
-path = 'contracts/dao/trading/aibtc-acct-swap-faktory-aibtc-sbtc.clar'
+[contracts.aibtc-agent-account]
+path = "contracts/agent/aibtc-agent-account.clar"
 clarity_version = 3
-epoch = '3.1'
+epoch = 3.1
+
+[contracts.aibtc-agent-account-traits]
+path = "contracts/traits/aibtc-agent-account-traits.clar"
+clarity_version = 3
+epoch = 3.1
+
+# dao run cost (collects fee per proposal)
+
+[contracts.aibtc-dao-run-cost]
+path = "contracts/core/aibtc-dao-run-cost.clar"
+clarity_version = 3
+epoch = 3.1
+
+# dao traits
+
+[contracts.aibtc-dao-traits]
+path = "contracts/traits/aibtc-dao-traits.clar"
+clarity_version = 3
+epoch = 3.1
+
+[contracts.aibtc-base-dao-trait]
+path = "contracts/traits/aibtc-base-dao-trait.clar"
+clarity_version = 3
+epoch = 3.1
+
+# dao base contract
+
+[contracts.aibtc-base-dao]
+path = "contracts/dao/aibtc-base-dao.clar"
+clarity_version = 3
+epoch = 3.1
+
+# dao extensions
 
 [contracts.aibtc-action-proposal-voting]
 path = 'contracts/dao/extensions/aibtc-action-proposal-voting.clar'
 clarity_version = 3
-epoch = '3.1'
-
-[contracts.aibtc-action-send-message]
-path = 'contracts/dao/actions/aibtc-action-send-message.clar'
-clarity_version = 3
-epoch = '3.1'
-
-[contracts.aibtc-agent-account]
-path = 'contracts/agent/aibtc-agent-account.clar'
-clarity_version = 3
-epoch = '3.1'
-
-[contracts.aibtc-agent-account-traits]
-path = 'contracts/traits/aibtc-agent-account-traits.clar'
-clarity_version = 3
-epoch = '3.1'
-
-[contracts.aibtc-base-dao]
-path = 'contracts/dao/aibtc-base-dao.clar'
-clarity_version = 3
-epoch = '3.1'
-
-[contracts.aibtc-base-dao-trait]
-path = 'contracts/traits/aibtc-base-dao-trait.clar'
-clarity_version = 3
-epoch = '3.1'
-
-[contracts.aibtc-base-initialize-dao]
-path = 'contracts/dao/proposals/aibtc-base-initialize-dao.clar'
-clarity_version = 3
-epoch = '3.1'
+epoch = 3.1
 
 [contracts.aibtc-dao-charter]
 path = 'contracts/dao/extensions/aibtc-dao-charter.clar'
 clarity_version = 3
-epoch = '3.1'
+epoch = 3.1
 
 [contracts.aibtc-dao-epoch]
 path = 'contracts/dao/extensions/aibtc-dao-epoch.clar'
 clarity_version = 3
-epoch = '3.1'
-
-[contracts.aibtc-dao-run-cost]
-path = 'contracts/core/aibtc-dao-run-cost.clar'
-clarity_version = 3
-epoch = '3.1'
-
-[contracts.aibtc-dao-traits]
-path = 'contracts/traits/aibtc-dao-traits.clar'
-clarity_version = 3
-epoch = '3.1'
+epoch = 3.1
 
 [contracts.aibtc-dao-users]
 path = 'contracts/dao/extensions/aibtc-dao-users.clar'
 clarity_version = 3
-epoch = '3.1'
-
-[contracts.aibtc-faktory]
-path = 'contracts/dao/token/aibtc-faktory.clar'
-clarity_version = 2
-epoch = '3.1'
-
-[contracts.aibtc-faktory-dex]
-path = 'contracts/dao/token/aibtc-faktory-dex.clar'
-clarity_version = 2
-epoch = '3.1'
+epoch = 3.1
 
 [contracts.aibtc-onchain-messaging]
 path = 'contracts/dao/extensions/aibtc-onchain-messaging.clar'
 clarity_version = 3
-epoch = '3.1'
-
-[contracts.aibtc-pre-faktory]
-path = 'contracts/dao/token/aibtc-pre-faktory.clar'
-clarity_version = 2
-epoch = '3.1'
+epoch = 3.1
 
 [contracts.aibtc-rewards-account]
 path = 'contracts/dao/extensions/aibtc-rewards-account.clar'
 clarity_version = 3
-epoch = '3.1'
+epoch = 3.1
 
 [contracts.aibtc-token-owner]
 path = 'contracts/dao/extensions/aibtc-token-owner.clar'
 clarity_version = 3
-epoch = '3.1'
+epoch = 3.1
 
 [contracts.aibtc-treasury]
 path = 'contracts/dao/extensions/aibtc-treasury.clar'
 clarity_version = 3
-epoch = '3.1'
+epoch = 3.1
 
-[contracts.bitflow-buy-and-deposit]
-path = 'contracts/dao/trading/bitflow-buy-and-deposit.clar'
-clarity_version = 3
-epoch = '3.1'
+# dao actions (as extensions)
 
-[contracts.faktory-buy-and-deposit]
-path = 'contracts/dao/trading/faktory-buy-and-deposit.clar'
-clarity_version = 3
-epoch = '3.1'
-
-[contracts.unknown-action]
+[contracts.aibtc-action-send-message]
 path = 'contracts/dao/actions/aibtc-action-send-message.clar'
 clarity_version = 3
-epoch = '3.1'
+epoch = 3.1
 
-[contracts.unknown-adapter]
-path = 'contracts/dao/trading/aibtc-acct-swap-faktory-aibtc-sbtc.clar'
+# dao proposals
+
+[contracts.aibtc-base-initialize-dao]
+path = 'contracts/dao/proposals/aibtc-base-initialize-dao.clar'
 clarity_version = 3
-epoch = '3.1'
+epoch = 3.1
 
-[contracts.unknown-dex]
-path = 'contracts/dao/token/aibtc-faktory-dex.clar'
-clarity_version = 2
-epoch = '3.1'
+# dao trading adapters
 
-[contracts.unknown-token]
+[contracts.aibtc-acct-swap-bitflow-aibtc-sbtc]
+path = "contracts/dao/trading/aibtc-acct-swap-bitflow-aibtc-sbtc.clar"
+clarity_version = 3
+epoch = 3.1
+
+[contracts.aibtc-acct-swap-faktory-aibtc-sbtc]
+path = "contracts/dao/trading/aibtc-acct-swap-faktory-aibtc-sbtc.clar"
+clarity_version = 3
+epoch = 3.1
+
+[contracts.bitflow-buy-and-deposit]
+path = "contracts/dao/trading/bitflow-buy-and-deposit.clar"
+clarity_version = 3
+epoch = 3.1
+
+[contracts.faktory-buy-and-deposit]
+path = "contracts/dao/trading/faktory-buy-and-deposit.clar"
+clarity_version = 3
+epoch = 3.1
+
+# helper to simulate xyk-core from bitflow
+[contracts.xyk-core-v-1-2]
+path = "contracts/external/xyk-core-v-1-2.clar"
+clarity_version = 3
+epoch = 3.1
+
+# faktory contracts
+
+[contracts.aibtc-faktory]
 path = 'contracts/dao/token/aibtc-faktory.clar'
 clarity_version = 2
-epoch = '3.1'
+epoch = 3.1
 
-[contracts.xyk-core-v-1-2]
-path = 'contracts/external/xyk-core-v-1-2.clar'
-clarity_version = 3
-epoch = '3.1'
+[contracts.aibtc-pre-faktory]
+path = 'contracts/dao/token/aibtc-pre-faktory.clar'
+clarity_version = 2
+epoch = 3.1
+
+[contracts.aibtc-faktory-dex]
+path = 'contracts/dao/token/aibtc-faktory-dex.clar'
+clarity_version = 2
+epoch = 3.1
 
 [contracts.xyk-pool-sbtc-aibtc-v-1-1]
 path = 'contracts/dao/token/xyk-pool-sbtc-aibtc-v-1-1.clar'
 clarity_version = 2
-epoch = '3.1'
-[repl.analysis]
-passes = ['check_checker']
+epoch = 3.1
 
-[repl.analysis.check_checker]
-strict = false
-trusted_sender = false
-trusted_caller = false
-callee_filter = false
+# used for testing
 
-[repl.remote_data]
-enabled = false
-api_url = 'https://api.hiro.so'
+[contracts.unknown-adapter]
+path = 'contracts/dao/trading/aibtc-acct-swap-faktory-aibtc-sbtc.clar'
+clarity_version = 3
+epoch = 3.1
+
+[contracts.unknown-token]
+path = 'contracts/dao/token/aibtc-faktory.clar'
+clarity_version = 2
+epoch = 3.1
+
+[contracts.unknown-dex]
+path = 'contracts/dao/token/aibtc-faktory-dex.clar'
+clarity_version = 2
+epoch = 3.1
+
+[contracts.unknown-action]
+path = 'contracts/dao/actions/aibtc-action-send-message.clar'
+clarity_version = 3
+epoch = 3.1
