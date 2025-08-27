@@ -93,14 +93,17 @@
           ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch 
           (as-contract (contract-call? .aibtc-pre-faktory buy-up-to max-seat (some account)))
           actual-seat (let ((user-change (- amount (* actual-seat PRICE_PER_SEAT))))
+                        ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
                         (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
                                                   transfer amount sender SELF none))
                         (if (> user-change u0)
+                        ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
                         (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer 
                                                   user-change SELF account none)))
                         true)
                         (ok actual-seat))
-          error       (begin 
+          error       (begin
+                        ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc 
                         (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer 
                                                   amount sender account none))
                         (ok amount)))
