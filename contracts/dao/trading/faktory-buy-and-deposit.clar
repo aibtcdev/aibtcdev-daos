@@ -22,6 +22,7 @@
 (define-constant ERR_QUOTE_FAILED (err u2402))
 (define-constant ERR_SLIPPAGE_TOO_HIGH (err u2403))
 (define-constant ERR_BUYING_SEATS (err u2404))
+(define-constant ERR_REFUNDING_SEATS (err u2405))
 
 ;; public functions
 
@@ -113,6 +114,28 @@
             (ok actual-seat)
       )
     )
+  )
+)
+
+(define-public (refund-seat-and-deposit)
+  (let (
+      (sender tx-sender)
+      ;; /g/.agent-account-registry/faktory_agent_account_registry
+      (agentAccount (contract-call? .agent-account-registry get-agent-account-by-owner sender)))
+
+    (match agentAccount
+          ;; agent account found
+          account
+          (let (
+              ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch 
+              (actual-seat (unwrap! (contract-call? .aibtc-pre-faktory refund (some account)) ERR_REFUNDING_SEATS)))
+              (ok actual-seat))
+          (let (
+                ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
+              (actual-seat (unwrap! (contract-call? .aibtc-pre-faktory refund (some sender)) ERR_REFUNDING_SEATS)))
+              (ok actual-seat)
+          )
+        )
   )
 )
 
