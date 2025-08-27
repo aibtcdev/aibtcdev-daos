@@ -15,8 +15,7 @@
 
 ;; /g/.aibtc-faktory/dao_contract_token
 (define-constant DAO_TOKEN .aibtc-faktory)
-(define-constant DAO_SEAT .pre-aibtc-faktory)
-(define-constant PRICE-PER-SEAT u20000)
+(define-constant PRICE_PER_SEAT u20000)
 
 ;; error codes
 (define-constant ERR_INVALID_DAO_TOKEN (err u2400))
@@ -82,6 +81,7 @@
 (define-public (buy-seats-and-deposit (amount uint))
   (let (
       (sender tx-sender)
+      ;; /g/.agent-account-registry/faktory_agent_account_registry
       (agentAccount (contract-call? .agent-account-registry get-agent-account-by-owner sender))
       (max-seat (/ amount PRICE-PER-SEAT))
     )
@@ -90,7 +90,9 @@
     (match agentAccount
       ;; agent account found
       account
-      (match (as-contract (contract-call? .aibtc-pre-faktory buy-up-to max-seat (some account)))
+      (match
+          ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch 
+          (as-contract (contract-call? .aibtc-pre-faktory buy-up-to max-seat (some account)))
           actual-seat (let ((user-change (- amount (* actual-seat PRICE-PER-SEAT))))
                         (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
                                                   transfer amount sender SELF none))
@@ -103,7 +105,9 @@
                         (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer 
                                                   amount sender account none))
                         (ok amount)))
-      (let ((actual-seat (unwrap! (contract-call? .aibtc-pre-faktory buy-up-to max-seat (some sender)) ERR_BUYING_SEATS))) ;; or none
+      (let (
+            ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
+            (actual-seat (unwrap! (contract-call? .aibtc-pre-faktory buy-up-to max-seat (some sender)) ERR_BUYING_SEATS))) ;; or none
             (ok actual-seat)
       )
     )
@@ -122,7 +126,8 @@
     ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
     swapContract: .aibtc-faktory-dex,
     daoToken: DAO_TOKEN,
-    seatContract: .aibtc-pre-faktory,
+    ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
+    daoTokenPrelaunch: .aibtc-pre-faktory,
     pricePerSeat: PRICE-PER-SEAT,
   }
 )
