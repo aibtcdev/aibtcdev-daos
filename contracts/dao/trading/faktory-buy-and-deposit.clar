@@ -104,8 +104,8 @@
     (maxSeats uint)
     (recipient principal)
   )
-  ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch 
   (match
+    ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch 
     (as-contract (contract-call? .aibtc-pre-faktory buy-up-to maxSeats (some recipient)))
     seatsReceived
     (let ((changeToUser (- amount (* seatsReceived PRICE_PER_SEAT))))
