@@ -33,7 +33,7 @@ export const CONTRACT_SUBTYPES = {
   ] as const,
   PROPOSALS: ["INITIALIZE_DAO"] as const,
   TOKEN: ["DAO", "DEX", "POOL", "PRELAUNCH"] as const,
-  TRADING: ["FAKTORY_SBTC", "BITFLOW_SBTC"] as const,
+  TRADING: ["FAKTORY_SBTC", "BITFLOW_SBTC", "FAKTORY_BUY_AND_DEPOSIT", "BITFLOW_BUY_AND_DEPOSIT"] as const,
   CORE: ["DAO_RUN_COST"] as const,
 } as const;
 
@@ -77,6 +77,8 @@ export const CONTRACT_NAMES: {
   TRADING: {
     FAKTORY_SBTC: "aibtc-acct-swap-faktory-aibtc-sbtc",
     BITFLOW_SBTC: "aibtc-acct-swap-bitflow-aibtc-sbtc",
+    FAKTORY_BUY_AND_DEPOSIT: "faktory-buy-and-deposit",
+    BITFLOW_BUY_AND_DEPOSIT: "bitflow-buy-and-deposit",
   },
   CORE: {
     DAO_RUN_COST: "aibtc-dao-run-cost",

@@ -86,3 +86,6 @@ Add types for contract outputs (e.g., get-contract-info) only if required for ty
 - If issues arise, iterate on this PLAN.md by editing and re-testing.
 
 This plan is iterative; update as steps are completed or questions resolved.
+
+## Progress
+- **Step 1:** Completed. Updated CONTRACT_SUBTYPES and CONTRACT_NAMES in utilities/contract-types.ts to include new buy-and-deposit subtypes.
