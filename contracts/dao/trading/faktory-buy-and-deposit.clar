@@ -14,12 +14,14 @@
 
 ;; /g/.aibtc-faktory/dao_contract_token
 (define-constant DAO_TOKEN .aibtc-faktory)
+(define-constant PRICE_PER_SEAT u20000)
 
 ;; error codes
 (define-constant ERR_INVALID_DAO_TOKEN (err u2400))
 (define-constant ERR_INVALID_AMOUNT (err u2401))
 (define-constant ERR_QUOTE_FAILED (err u2402))
 (define-constant ERR_SLIPPAGE_TOO_HIGH (err u2403))
+(define-constant ERR_REFUNDING_SEATS (err u2404))
 
 ;; public functions
 
@@ -75,6 +77,68 @@
   )
 )
 
+(define-public (buy-seats-and-deposit (amount uint))
+  (let (
+      (sender tx-sender)
+      ;; /g/.agent-account-registry/faktory_agent_account_registry
+      (agentAccount (contract-call? .agent-account-registry get-agent-account-by-owner sender))
+      (max-seat (/ amount PRICE_PER_SEAT))
+    )
+    (asserts! (>= amount PRICE_PER_SEAT) ERR_INVALID_AMOUNT)
+    
+    ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
+    (try! (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
+                                transfer amount sender SELF none))
+
+    (match agentAccount
+      ;; agent account found
+      account (buy-seats-and-handle-change amount max-seat account)
+      (buy-seats-and-handle-change amount max-seat sender)
+    )
+  )
+)
+
+(define-private (buy-seats-and-handle-change (amount uint) (max-seat uint) (recipient principal))
+  (match
+    ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch 
+    (as-contract (contract-call? .aibtc-pre-faktory buy-up-to max-seat (some recipient)))
+    actual-seat (let ((user-change (- amount (* actual-seat PRICE_PER_SEAT))))
+                  (if (> user-change u0)
+                    ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
+                    (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer 
+                                              user-change SELF recipient none)))
+                    true)
+                  (ok actual-seat))
+    error       (begin
+                  ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc 
+                  (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer 
+                                            amount SELF recipient none)))
+                  (ok amount))
+  )
+)
+
+(define-public (refund-seat-and-deposit)
+  (let (
+      (sender tx-sender)
+      ;; /g/.agent-account-registry/faktory_agent_account_registry
+      (agentAccount (contract-call? .agent-account-registry get-agent-account-by-owner sender)))
+
+    (match agentAccount
+          ;; agent account found
+          account
+          (let (
+              ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch 
+              (actual-seat (unwrap! (contract-call? .aibtc-pre-faktory refund (some account)) ERR_REFUNDING_SEATS)))
+              (ok actual-seat))
+          (let (
+                ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
+              (actual-seat (unwrap! (contract-call? .aibtc-pre-faktory refund (some sender)) ERR_REFUNDING_SEATS)))
+              (ok actual-seat)
+          )
+        )
+  )
+)
+
 ;; read-only functions
 
 (define-read-only (get-contract-info)
@@ -87,5 +151,8 @@
     ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
     swapContract: .aibtc-faktory-dex,
     daoToken: DAO_TOKEN,
+    ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch
+    daoTokenPrelaunch: .aibtc-pre-faktory,
+    pricePerSeat: PRICE_PER_SEAT,
   }
 )
