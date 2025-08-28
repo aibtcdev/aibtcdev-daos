@@ -282,6 +282,21 @@ export function generateTemplateReplacements(
               `${placeholderContractRef}/${simplifiedTemplateKeyName2}`
             ] = actualContractRef;
           }
+        } else if (type === "TRADING") {
+          const tradingMapping: Record<string, string> = {
+            FAKTORY_SBTC: "faktory_sbtc",
+            BITFLOW_SBTC: "bitflow_sbtc",
+            FAKTORY_BUY_AND_DEPOSIT: "faktory_buy_and_deposit",
+            BITFLOW_BUY_AND_DEPOSIT: "bitflow_buy_and_deposit",
+          };
+          const simplifiedSubkey = tradingMapping[subtype];
+          if (simplifiedSubkey) {
+            const simplifiedTemplateKeyName = `dao_contract_${simplifiedSubkey}`;
+            replacements[simplifiedTemplateKeyName] = actualContractRef;
+            replacements[
+              `${placeholderContractRef}/${simplifiedTemplateKeyName}`
+            ] = actualContractRef;
+          }
         }
       }
     }

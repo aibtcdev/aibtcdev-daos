@@ -77,8 +77,8 @@ export const CONTRACT_NAMES: {
   TRADING: {
     FAKTORY_SBTC: "aibtc-acct-swap-faktory-aibtc-sbtc",
     BITFLOW_SBTC: "aibtc-acct-swap-bitflow-aibtc-sbtc",
-    FAKTORY_BUY_AND_DEPOSIT: "faktory-buy-and-deposit",
-    BITFLOW_BUY_AND_DEPOSIT: "bitflow-buy-and-deposit",
+    FAKTORY_BUY_AND_DEPOSIT: "aibtc-faktory-buy-and-deposit",
+    BITFLOW_BUY_AND_DEPOSIT: "aibtc-bitflow-buy-and-deposit",
   },
   CORE: {
     DAO_RUN_COST: "aibtc-dao-run-cost",
