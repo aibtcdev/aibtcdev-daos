@@ -90,3 +90,5 @@ This plan is iterative; update as steps are completed or questions resolved.
 ## Progress
 - **Step 1:** Completed. Updated CONTRACT_SUBTYPES and CONTRACT_NAMES in utilities/contract-types.ts to include new buy-and-deposit subtypes.
 - **Step 2:** Completed. Updated DEPLOYMENT_ORDER in utilities/contract-deployment-order.ts to include new buy-and-deposit subtypes with appropriate order numbers.
+- **Step 3:** Completed. Added and verified templating comments in aibtc-faktory-buy-and-deposit.clar and aibtc-bitflow-buy-and-deposit.clar.
+- **Step 4:** Completed. Updated template replacements in utilities/template-variables.ts for new trading subtypes, including simplified keys. Updated CONTRACT_NAMES to support per-DAO naming.
