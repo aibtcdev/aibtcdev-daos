@@ -21,6 +21,7 @@
 (define-constant ERR_INVALID_AMOUNT (err u2401))
 (define-constant ERR_QUOTE_FAILED (err u2402))
 (define-constant ERR_SLIPPAGE_TOO_HIGH (err u2403))
+(define-constant ERR_REFUNDING_SEATS (err u2404))
 
 ;; public functions
 
@@ -91,38 +92,28 @@
 
     (match agentAccount
       ;; agent account found
-      account
-      (match
-          ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch 
-          (as-contract (contract-call? .aibtc-pre-faktory buy-up-to max-seat (some account)))
-          actual-seat (let ((user-change (- amount (* actual-seat PRICE_PER_SEAT))))
-                        (if (> user-change u0)
-                        ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
-                        (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer 
-                                                  user-change SELF account none)))
-                        true)
-                        (ok actual-seat))
-          error       (begin
-                        ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc 
-                        (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer 
-                                                  amount SELF account none)))
-                        (ok amount)))
-      (match
-          ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch 
-          (as-contract (contract-call? .aibtc-pre-faktory buy-up-to max-seat (some sender)))
-          actual-seat (let ((user-change (- amount (* actual-seat PRICE_PER_SEAT))))
-                        (if (> user-change u0)
-                        ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
-                        (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer 
-                                                  user-change SELF sender none)))
-                        true)
-                        (ok actual-seat))
-          error       (begin
-                        ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc 
-                        (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer 
-                                                  amount SELF sender none)))
-                        (ok amount)))
+      account (buy-seats-and-handle-change amount max-seat account)
+      (buy-seats-and-handle-change amount max-seat sender)
     )
+  )
+)
+
+(define-private (buy-seats-and-handle-change (amount uint) (max-seat uint) (recipient principal))
+  (match
+    ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch 
+    (as-contract (contract-call? .aibtc-pre-faktory buy-up-to max-seat (some recipient)))
+    actual-seat (let ((user-change (- amount (* actual-seat PRICE_PER_SEAT))))
+                  (if (> user-change u0)
+                    ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
+                    (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer 
+                                              user-change SELF recipient none)))
+                    true)
+                  (ok actual-seat))
+    error       (begin
+                  ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc 
+                  (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token transfer 
+                                            amount SELF recipient none)))
+                  (ok amount))
   )
 )
 
