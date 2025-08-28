@@ -49,4 +49,6 @@ export const DEPLOYMENT_ORDER: Record<string, number> = {
   // dao trading adapters
   [useContract("TRADING", "FAKTORY_SBTC")]: 60,
   [useContract("TRADING", "BITFLOW_SBTC")]: 61,
+  [useContract("TRADING", "FAKTORY_BUY_AND_DEPOSIT")]: 62,
+  [useContract("TRADING", "BITFLOW_BUY_AND_DEPOSIT")]: 63,
 };
