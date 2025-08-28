@@ -2,9 +2,10 @@ import { Cl, ClarityType } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
 import { ErrCodeFaktorySwapAdapter } from "../../../utilities/contract-error-codes";
 import { setupFullContractRegistry } from "../../../utilities/contract-registry";
-import { convertClarityTuple, SBTC_CONTRACT } from "../../../utilities/contract-helpers";
+import { convertClarityTuple, SBTC_CONTRACT, convertSIP019PrintEvent } from "../../../utilities/contract-helpers";
 import { dbgLog } from "../../../utilities/debug-logging";
-import { getSbtcFromFaucet, fundAgentAccount, completePrelaunch } from "../../../utilities/dao-helpers";
+import { getSbtcFromFaucet, fundAgentAccount, completePrelaunch, DAO_TOKEN_ASSETS_MAP } from "../../../utilities/dao-helpers";
+import { getBalancesForPrincipal } from "../../../utilities/asset-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -33,6 +34,7 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     // arrange
     getSbtcFromFaucet(address1);
     const amount = 100000; // 0.001 sBTC
+    const initialBalance = getBalancesForPrincipal(address1).get(DAO_TOKEN_ASSETS_MAP) || 0n;
 
     // act
     const receipt = simnet.callPublicFn(
@@ -44,7 +46,10 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
 
     // assert
     expect(receipt.result).toBeOk(Cl.uint(expect.any(Number)));
-    // Check balances or events as needed
+    const finalBalance = getBalancesForPrincipal(address1).get(DAO_TOKEN_ASSETS_MAP) || 0n;
+    expect(finalBalance).toBeGreaterThan(initialBalance);
+    // Check for transfer event (adapt based on actual events emitted)
+    expect(receipt.events).toHaveLength(expect.any(Number));
   });
 
   it("buy-and-deposit succeeds with agent account", () => {
@@ -52,6 +57,7 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     getSbtcFromFaucet(address2);
     fundAgentAccount(agentAccountAddress, address2);
     const amount = 100000;
+    const initialBalance = getBalancesForPrincipal(agentAccountAddress).get(DAO_TOKEN_ASSETS_MAP) || 0n;
 
     // act
     const receipt = simnet.callPublicFn(
@@ -63,7 +69,11 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
 
     // assert
     expect(receipt.result).toBeOk(Cl.uint(expect.any(Number)));
-    // Verify transfer to agent account
+    const finalBalance = getBalancesForPrincipal(agentAccountAddress).get(DAO_TOKEN_ASSETS_MAP) || 0n;
+    expect(finalBalance).toBeGreaterThan(initialBalance);
+    // Verify transfer event to agent
+    const transferEvent = receipt.events.find(e => e.type === "ft_transfer_event");
+    expect(transferEvent).toBeDefined();
   });
 
   it("buy-and-deposit fails with slippage too high", () => {
@@ -84,10 +94,46 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_SLIPPAGE_TOO_HIGH));
   });
 
+  it("buy-and-deposit fails with zero amount", () => {
+    // arrange
+    getSbtcFromFaucet(address1);
+    const amount = 0;
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "buy-and-deposit",
+      [Cl.principal(daoTokenAddress), Cl.uint(amount), Cl.none()],
+      address1
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INVALID_AMOUNT));
+  });
+
+  it("buy-and-deposit fails with invalid dao token", () => {
+    // arrange
+    getSbtcFromFaucet(address1);
+    const amount = 100000;
+    const invalidToken = `${deployer}.invalid-token`;
+
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "buy-and-deposit",
+      [Cl.principal(invalidToken), Cl.uint(amount), Cl.none()],
+      address1
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_INVALID_DAO_TOKEN));
+  });
+
   it("buy-seats-and-deposit succeeds and handles change", () => {
     // arrange
     getSbtcFromFaucet(address1);
     const amount = 200000; // enough for seats + change
+    const initialSbtcBalance = getBalancesForPrincipal(address1).get(SBTC_ASSETS_MAP) || 0n;
 
     // act
     const receipt = simnet.callPublicFn(
@@ -99,18 +145,21 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
 
     // assert
     expect(receipt.result).toBeOk(Cl.uint(expect.any(Number)));
+    const finalSbtcBalance = getBalancesForPrincipal(address1).get(SBTC_ASSETS_MAP) || 0n;
+    expect(finalSbtcBalance).toBeLessThan(initialSbtcBalance);
   });
 
   it("refund-seat-and-deposit succeeds", () => {
     // arrange
     // First buy a seat
     getSbtcFromFaucet(address1);
-    simnet.callPublicFn(
+    const buyReceipt = simnet.callPublicFn(
       contractAddress,
       "buy-seats-and-deposit",
       [Cl.uint(20000)],
       address1
     );
+    expect(buyReceipt.result).toBeOk(Cl.uint(expect.any(Number)));
 
     // act
     const receipt = simnet.callPublicFn(
@@ -122,13 +171,28 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
 
     // assert
     expect(receipt.result).toBeOk(Cl.uint(expect.any(Number)));
+    // Check for refund event or balance increase
+    expect(receipt.events).toHaveLength(expect.any(Number));
+  });
+
+  it("refund-seat-and-deposit fails without prior purchase", () => {
+    // act
+    const receipt = simnet.callPublicFn(
+      contractAddress,
+      "refund-seat-and-deposit",
+      [],
+      address1
+    );
+
+    // assert
+    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_REFUNDING_SEATS));
   });
 });
 
 describe(`read-only functions: ${contractAddress.split(".")[1]}`, () => {
   it("get-contract-info returns correct info", () => {
     // act
-    const info = simnet.callReadOnlyFn(
+    const infoResult = simnet.callReadOnlyFn(
       contractAddress,
       "get-contract-info",
       [],
@@ -136,7 +200,10 @@ describe(`read-only functions: ${contractAddress.split(".")[1]}`, () => {
     );
 
     // assert
-    expect(info.result.type).toBe(ClarityType.Tuple);
-    // Add specific assertions as needed
+    expect(infoResult.result.type).toBe(ClarityType.Tuple);
+    const info = convertClarityTuple(infoResult.result);
+    expect(info.self).toBe(contractAddress);
+    expect(info.daoToken).toBe(daoTokenAddress);
+    // Add more field assertions as needed
   });
 });
