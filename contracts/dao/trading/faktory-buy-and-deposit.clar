@@ -104,8 +104,8 @@
     (maxSeats uint)
     (recipient principal)
   )
-  ;; TODO: match pulls comment up when it shouldn't
-  (match ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch 
+  ;; /g/.aibtc-pre-faktory/dao_contract_token_prelaunch 
+  (match
     (as-contract (contract-call? .aibtc-pre-faktory buy-up-to maxSeats (some recipient)))
     seatsReceived
     (let ((changeToUser (- amount (* seatsReceived PRICE_PER_SEAT))))
@@ -120,7 +120,7 @@
     )
     ;; error
     (begin
-      ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc 
+      ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_contract_sbtc
       (try! (as-contract (contract-call? 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
         transfer amount SELF recipient none
       )))
