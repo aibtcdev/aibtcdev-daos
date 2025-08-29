@@ -31,8 +31,19 @@
       ERR_INVALID_PARAMETERS
     )))
     (try! (is-dao-or-extension))
-    ;; /g/.aibtc-onchain-messaging/dao_contract_messaging
-    (contract-call? .aibtc-onchain-messaging send message)
+    (print {
+      notification: "aibtc-action-send-message/run",
+      payload: {
+        contractCaller: contract-caller,
+        txSender: tx-sender,
+        height: stacks-block-height,
+        isFromDao: true,
+        isFromHolder: false,
+        messageLength: (len message),
+        message: message,
+      },
+    })
+    (ok true)
   )
 )
 

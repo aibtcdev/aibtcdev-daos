@@ -8,6 +8,7 @@ import {
   passActionProposal,
   PROPOSAL_MESSAGE,
 } from "../../../../utilities/dao-helpers";
+import { convertSIP019PrintEvent } from "../../../../utilities/contract-helpers";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 
 // setup accounts
@@ -32,7 +33,7 @@ describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////
   // callback() tests
   ////////////////////////////////////
-  it("callback() should respond with (ok true)", () => {
+  it("callback() responds with (ok true)", () => {
     // act
     const callback = simnet.callPublicFn(
       contractAddress,
@@ -58,7 +59,7 @@ describe(`public functions: ${contractName}`, () => {
     // assert
     expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
   });
-  it("run() succeeds if called as a DAO action proposal", () => {
+  it("run() succeeds if called as a DAO action proposal, emitting a print event", () => {
     // arrange
     const memo = "hello world";
     // fund accounts for creating and voting on proposals
@@ -66,8 +67,8 @@ describe(`public functions: ${contractName}`, () => {
     // construct the DAO
     completePrelaunch(deployer);
     constructDao(deployer);
-    // pass the action proposal
-    passActionProposal(
+    // act: pass the action proposal, which will execute the `run` function
+    const receipt = passActionProposal(
       "SEND_MESSAGE",
       Cl.stringUtf8(PROPOSAL_MESSAGE),
       deployer,
@@ -75,5 +76,32 @@ describe(`public functions: ${contractName}`, () => {
       voters,
       memo
     );
+
+    // assert: check for the print event from the action contract
+    const printEventResult = receipt.events.find(
+      (e: any) =>
+        e.event === "print_event" &&
+        e.data.contract_identifier === contractAddress
+    );
+    expect(printEventResult).toBeDefined();
+    const printEvent = convertSIP019PrintEvent(printEventResult!);
+    const proposalVotingContractAddress =
+      registry.getContractAddressByTypeAndSubtype(
+        "EXTENSIONS",
+        "ACTION_PROPOSAL_VOTING"
+      );
+    const expectedEvent = {
+      notification: "aibtc-action-send-message/run",
+      payload: {
+        contractCaller: proposalVotingContractAddress,
+        height: "225", // hardcoded for now
+        isFromDao: true,
+        isFromHolder: false,
+        message: PROPOSAL_MESSAGE,
+        messageLength: String(PROPOSAL_MESSAGE.length),
+        txSender: deployer,
+      },
+    };
+    expect(printEvent).toStrictEqual(expectedEvent);
   });
 });

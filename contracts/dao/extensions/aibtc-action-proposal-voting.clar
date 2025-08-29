@@ -50,8 +50,6 @@
 
 ;; /g/.aibtc-dao-run-cost/base_contract_dao_run_cost
 (define-constant AIBTC_DAO_RUN_COST_CONTRACT .aibtc-dao-run-cost) ;; AIBTC dao run cost contract
-;; /g/.aibtc-rewards-account/dao_contract_rewards_account
-(define-constant DAO_REWARDS_ACCOUNT .aibtc-rewards-account) ;; rewards account for the DAO
 
 ;; voting configuration
 (define-constant VOTING_QUORUM u15) ;; 15% of liquid supply must participate
@@ -104,7 +102,6 @@
     bond: uint,
     caller: principal,
     creator: principal,
-    creatorUserId: uint,
     liquidTokens: uint,
     memo: (optional (string-ascii 1024)),
     ;; from ProposalBlocks
@@ -155,8 +152,6 @@
   (let (
       (currentState (var-get state))
       (actionContract (contract-of action))
-      ;; /g/.aibtc-dao-users/dao_contract_users
-      (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index contract-caller)))
       (newId (+ (get proposalCount currentState) u1))
       (createdStx (- stacks-block-height u1))
       (createdBtc burn-block-height)
@@ -189,7 +184,6 @@
         bond: VOTING_BOND,
         caller: contract-caller,
         creator: contract-caller,
-        creatorUserId: userId,
         liquidTokens: liquidTokens,
         memo: memo,
         createdBtc: createdBtc,
@@ -215,7 +209,6 @@
         bond: VOTING_BOND,
         caller: contract-caller,
         creator: contract-caller,
-        creatorUserId: userId,
         liquidTokens: liquidTokens,
         memo: memo,
         ;; from ProposalBlocks
@@ -244,12 +237,7 @@
     (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-faktory
       AIBTC_DAO_RUN_COST_AMOUNT AIBTC_DAO_RUN_COST_CONTRACT
     )))
-    ;; transfer reward to the dao rewards account
-    ;; /g/.aibtc-treasury/dao_contract_treasury
-    ;; /g/.aibtc-faktory/dao_contract_token
-    (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-faktory VOTING_REWARD
-      DAO_REWARDS_ACCOUNT
-    ))
+    (ok true)
   )
 )
 
@@ -271,8 +259,6 @@
         )
         ERR_FETCHING_TOKEN_DATA
       ))
-      ;; /g/.aibtc-dao-users/dao_contract_users
-      (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index contract-caller)))
       (voterRecord (map-get? VoteRecords {
         proposalId: proposalId,
         voter: contract-caller,
@@ -310,7 +296,6 @@
         contractCaller: contract-caller,
         txSender: tx-sender,
         voter: contract-caller,
-        voterUserId: userId,
         proposalId: proposalId,
         amount: voteAmount,
         vote: vote,
@@ -357,8 +342,6 @@
         )
         ERR_FETCHING_TOKEN_DATA
       ))
-      ;; /g/.aibtc-dao-users/dao_contract_users
-      (userId (try! (contract-call? .aibtc-dao-users get-or-create-user-index contract-caller)))
     )
     ;; caller has the required balance
     (asserts! (> vetoAmount u0) ERR_INSUFFICIENT_BALANCE)
@@ -385,7 +368,6 @@
         contractCaller: contract-caller,
         txSender: tx-sender,
         vetoer: contract-caller,
-        vetoerUserId: userId,
         proposalId: proposalId,
         amount: vetoAmount,
       },
@@ -497,9 +479,6 @@
     )
     ;; action must be the same as the one in proposal
     (asserts! (is-eq (get action proposal) actionContract) ERR_INVALID_ACTION)
-    ;; record user in dao if not already
-    ;; /g/.aibtc-dao-users/dao_contract_users
-    (try! (contract-call? .aibtc-dao-users get-or-create-user-index contract-caller))
     ;; print conclusion event
     (print {
       ;; /g/aibtc/dao_token_symbol
@@ -511,7 +490,6 @@
         parameters: (get parameters proposal),
         bond: (get bond proposal),
         creator: creator,
-        creatorUserId: (get creatorUserId proposal),
         liquidTokens: liquidTokens,
         memo: (get memo proposal),
         proposalId: proposalId,
@@ -542,17 +520,6 @@
         VOTING_TREASURY none
       )))
     )
-    ;; update the users reputation based on outcome
-    (if votePassed
-      ;; /g/.aibtc-dao-users/dao_contract_users
-      (try! (contract-call? .aibtc-dao-users increase-user-reputation creator
-        REPUTATION_CHANGE
-      ))
-      ;; /g/.aibtc-dao-users/dao_contract_users
-      (try! (contract-call? .aibtc-dao-users decrease-user-reputation creator
-        REPUTATION_CHANGE
-      ))
-    )
     (let ((currentState (var-get state)))
       ;; update proposal counts
       (var-set state (merge currentState {
@@ -568,9 +535,10 @@
         (match (contract-call? action run (get parameters proposal))
           ;; running the action succeeded
           ok_
-          ;; /g/.aibtc-rewards-account/dao_contract_rewards_account
-          (try! (as-contract (contract-call? .aibtc-rewards-account transfer-reward creator
-            VOTING_REWARD
+          ;; /g/.aibtc-treasury/dao_contract_treasury
+          ;; /g/.aibtc-faktory/dao_contract_token
+          (try! (as-contract (contract-call? .aibtc-treasury withdraw-ft .aibtc-faktory
+            VOTING_REWARD creator
           )))
           ;; return false and print error on failure
           err_
@@ -580,10 +548,6 @@
               notification: "aibtc-action-proposal-voting/conclude-action-proposal",
               payload: { executionError: err_ },
             })
-            ;; /g/.aibtc-rewards-account/dao_contract_rewards_account
-            (try! (as-contract (contract-call? .aibtc-rewards-account transfer-reward
-              VOTING_TREASURY VOTING_REWARD
-            )))
             false
           )
         )
