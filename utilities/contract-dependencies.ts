@@ -141,27 +141,6 @@ export function defineExtensionContractDependencies(
           .addRuntimeValue("dao_token_symbol");
         break;
 
-      case "aibtc-dao-users":
-        contract
-          .addTraitDependency("DAO_EXTENSION", "dao_trait_extension")
-          .addTraitDependency("DAO_USERS", "dao_trait_users")
-          .addContractDependency("dao_contract_base", "BASE", "DAO")
-          .addRuntimeValue("dao_token_symbol");
-        break;
-
-      case "aibtc-rewards-account":
-        contract
-          .addTraitDependency("DAO_EXTENSION", "dao_trait_extension")
-          .addTraitDependency(
-            "DAO_REWARDS_ACCOUNT",
-            "dao_trait_rewards_account"
-          )
-          .addTraitDependency("BASE_SIP010", "base_trait_sip010")
-          .addContractDependency("dao_contract_base", "BASE", "DAO")
-          .addContractDependency("dao_contract_token", "TOKEN", "DAO")
-          .addRuntimeValue("dao_token_symbol");
-        break;
-
       case "aibtc-treasury":
         contract
           .addTraitDependency("DAO_EXTENSION", "dao_trait_extension")
@@ -346,7 +325,10 @@ export function defineTokenContractDependencies(
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
           .addContractDependency("dao_contract_token_dex", "TOKEN", "DEX")
           .addAddressDependency("SBTC", "base_contract_sbtc")
-          .addAddressDependency("FAKTORY_REGISTRY", "faktory_agent_account_registry")
+          .addAddressDependency(
+            "FAKTORY_REGISTRY",
+            "faktory_agent_account_registry"
+          )
           .addRuntimeValue("dao_token_symbol");
         break;
 
@@ -464,10 +446,17 @@ export function defineTradingContractDependencies(
         contract
           .addTraitDependency("BASE_SIP010", "base_trait_sip010")
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
-          .addAddressDependency("FAKTORY_REGISTRY", "faktory_agent_account_registry")
+          .addAddressDependency(
+            "FAKTORY_REGISTRY",
+            "faktory_agent_account_registry"
+          )
           .addContractDependency("dao_contract_token_dex", "TOKEN", "DEX")
           .addAddressDependency("SBTC", "base_contract_sbtc")
-          .addContractDependency("dao_contract_token_prelaunch", "TOKEN", "PRELAUNCH")
+          .addContractDependency(
+            "dao_contract_token_prelaunch",
+            "TOKEN",
+            "PRELAUNCH"
+          )
           .addRuntimeValue("dao_token_symbol");
         break;
 
@@ -476,7 +465,10 @@ export function defineTradingContractDependencies(
           .addTraitDependency("BASE_SIP010", "base_trait_sip010")
           .addAddressDependency("SBTC", "base_contract_sbtc")
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
-          .addAddressDependency("FAKTORY_REGISTRY", "faktory_agent_account_registry")
+          .addAddressDependency(
+            "FAKTORY_REGISTRY",
+            "faktory_agent_account_registry"
+          )
           .addAddressDependency("BITFLOW_CORE", "external_bitflow_core")
           .addContractDependency("dao_contract_bitflow_pool", "TOKEN", "POOL")
           .addContractDependency("dao_contract_token_dex", "TOKEN", "DEX")
