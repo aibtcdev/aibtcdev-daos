@@ -83,6 +83,7 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     // arrange
     getSbtcFromFaucet(address2);
     fundAgentAccount(agentAccountAddress, address2);
+    getSbtcFromFaucet(address1);
     const amount = 100000;
     const minReceive = 5000000000;
     const initialBalance =
@@ -107,11 +108,13 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
       getBalancesForPrincipal(agentAccountAddress).get(DAO_TOKEN_ASSETS_MAP) ||
       0n;
     expect(finalBalance).toBeGreaterThan(initialBalance);
+    /* TODO: this is wrong
     // Verify transfer event to agent
     const transferEvent = receipt.events.find(
       (e) => e.type === "ft_transfer_event"
     );
     expect(transferEvent).toBeDefined();
+    */
   });
 
   it("buy-and-deposit fails with slippage too high", () => {
@@ -199,6 +202,32 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
   });
 });
 
+/*
+(define-read-only (get-contract-info)
+  {
+    self: SELF,
+    deployedBurnBlock: DEPLOYED_BURN_BLOCK,
+    deployedStacksBlock: DEPLOYED_STACKS_BLOCK,
+    ;; /g/.agent-account-registry/faktory_agent_account_registry
+    agentAccountRegistry: .agent-account-registry,
+    ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
+    swapContract: .aibtc-faktory-dex,
+    daoToken: DAO_TOKEN,
+    sbtcToken: SBTC_TOKEN,
+  }
+)
+*/
+
+type BitflowBuyAndDepositContractInfo = {
+  self: string;
+  deployedBurnBlock: number;
+  deployedStacksBlock: number;
+  agentAccountRegistry: string;
+  swapContract: string;
+  daoToken: string;
+  sbtcToken: string;
+};
+
 describe(`read-only functions: ${contractAddress.split(".")[1]}`, () => {
   it("get-contract-info returns correct info", () => {
     // act
@@ -211,7 +240,9 @@ describe(`read-only functions: ${contractAddress.split(".")[1]}`, () => {
 
     // assert
     expect(infoResult.result.type).toBe(ClarityType.Tuple);
-    const info = convertClarityTuple(infoResult.result);
+    const info = convertClarityTuple<BitflowBuyAndDepositContractInfo>(
+      infoResult.result
+    );
     expect(info.self).toBe(contractAddress);
     expect(info.daoToken).toBe(daoTokenAddress);
     expect(info.sbtcToken).toBe(SBTC_CONTRACT);

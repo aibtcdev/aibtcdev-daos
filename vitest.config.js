@@ -23,7 +23,7 @@ import {
 
 export default defineConfig({
   test: {
-    silent: "passed-only",
+    silent: true,
     environment: "clarinet", // use vitest-environment-clarinet
     pool: "forks",
     poolOptions: {

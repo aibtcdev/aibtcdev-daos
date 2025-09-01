@@ -70,7 +70,7 @@ describe(`public functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(receipt.result).toBeOk(Cl.bool(true));
+    expect(receipt.result).toBeOk(Cl.uint(2));
 
     // Check that seats were assigned
     const userInfoResult = simnet.callReadOnlyFn(
@@ -135,7 +135,7 @@ describe(`public functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(receipt.result).toBeOk(Cl.bool(true));
+    expect(receipt.result).toBeOk(Cl.uint(3));
 
     // Check that total users and seats were updated
     const newStatusResult = simnet.callReadOnlyFn(
@@ -191,7 +191,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "refund",
-      [],
+      [Cl.none()],
       address4
     );
 
@@ -223,7 +223,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "refund",
-      [],
+      [Cl.none()],
       address5
     );
 

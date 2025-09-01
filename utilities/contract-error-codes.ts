@@ -106,15 +106,15 @@ export enum ErrCodeBitflowSwapAdapter {
 export enum ErrCodeFaktoryBuyAndDeposit {
   ERR_INVALID_DAO_TOKEN = 2400,
   ERR_INVALID_AMOUNT,
+  ERR_QUOTE_FAILED,
   ERR_SLIPPAGE_TOO_HIGH,
-  ERR_MIN_RECEIVE_REQUIRED,
+  ERR_REFUNDING_SEATS,
 }
 
 // bitflow-buy-and-deposit.clar
 export enum ErrCodeBitflowBuyAndDeposit {
-  ERR_INVALID_DAO_TOKEN = 2500,
+  ERR_INVALID_DAO_TOKEN = 2400,
   ERR_INVALID_AMOUNT,
-  ERR_QUOTE_FAILED,
   ERR_SLIPPAGE_TOO_HIGH,
-  ERR_REFUNDING_SEATS,
+  ERR_MIN_RECEIVE_REQUIRED,
 }
