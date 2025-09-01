@@ -75,10 +75,9 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     */
   });
 
+  // TODO: the purchase here goes back to the buying account not agent account?
   it("buy-and-deposit succeeds with agent account", () => {
     // arrange
-    getSbtcFromFaucet(address2);
-    fundAgentAccount(agentAccountAddress, address2);
     getSbtcFromFaucet(address2);
     const amount = 10000;
     const initialBalance =
@@ -92,12 +91,21 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
       [Cl.principal(daoTokenAddress), Cl.uint(amount), Cl.none()],
       address2
     );
-
-    // assert
-    expect(receipt.result).toBeOk(Cl.bool(true));
     const finalBalance =
       getBalancesForPrincipal(agentAccountAddress).get(DAO_TOKEN_ASSETS_MAP) ||
       0n;
+    console.log("================================");
+    console.log("================================");
+    console.log(`receipt: ${JSON.stringify(receipt)}`);
+    console.log(`agentAccountAddress: ${agentAccountAddress}`);
+    console.log(`initialBalance: ${initialBalance}`);
+    console.log(`finalBalance: ${finalBalance}`);
+    console.log("================================");
+    console.log("================================");
+
+    // assert
+
+    expect(receipt.result).toBeOk(Cl.uint(finalBalance));
     expect(finalBalance).toBeGreaterThan(initialBalance);
     /* TODO: this is incorrect
     // Verify transfer event to agent

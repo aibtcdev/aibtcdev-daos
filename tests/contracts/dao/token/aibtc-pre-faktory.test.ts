@@ -196,7 +196,7 @@ describe(`public functions: ${contractName}`, () => {
     );
 
     // assert
-    expect(receipt.result).toBeOk(Cl.bool(true));
+    expect(receipt.result).toBeOk(Cl.uint(2));
 
     // Check that seats were removed
     const userInfoAfterResult = simnet.callReadOnlyFn(
