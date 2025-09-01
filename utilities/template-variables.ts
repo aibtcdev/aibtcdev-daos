@@ -122,19 +122,9 @@ export function generateTemplateReplacements(
       templateToReplacePattern: `.${templateKeySymbol}-dao-traits.dao-epoch`,
     },
     {
-      templateKeyName: "dao_trait_users",
-      knownTraitKey: "DAO_USERS",
-      templateToReplacePattern: `.${templateKeySymbol}-dao-traits.dao-users`,
-    },
-    {
       templateKeyName: "dao_trait_messaging",
       knownTraitKey: "DAO_MESSAGING",
       templateToReplacePattern: `.${templateKeySymbol}-dao-traits.messaging`,
-    },
-    {
-      templateKeyName: "dao_trait_rewards_account",
-      knownTraitKey: "DAO_REWARDS_ACCOUNT",
-      templateToReplacePattern: `.${templateKeySymbol}-dao-traits.rewards-account`,
     },
     {
       templateKeyName: "dao_trait_token_owner",
@@ -253,9 +243,7 @@ export function generateTemplateReplacements(
             ACTION_PROPOSAL_VOTING: "action_proposal_voting",
             DAO_CHARTER: "charter",
             DAO_EPOCH: "epoch",
-            DAO_USERS: "users",
             ONCHAIN_MESSAGING: "messaging",
-            REWARDS_ACCOUNT: "rewards_account",
             TOKEN_OWNER: "token_owner",
             TREASURY: "treasury",
           };

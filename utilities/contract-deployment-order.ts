@@ -31,14 +31,12 @@ export const DEPLOYMENT_ORDER: Record<string, number> = {
   [useContract("BASE", "DAO")]: 20,
 
   // extensions
-  [useContract("EXTENSIONS", "DAO_USERS")]: 30,
-  [useContract("EXTENSIONS", "TREASURY")]: 31,
-  [useContract("EXTENSIONS", "REWARDS_ACCOUNT")]: 32,
-  [useContract("EXTENSIONS", "ACTION_PROPOSAL_VOTING")]: 33,
-  [useContract("EXTENSIONS", "DAO_CHARTER")]: 34,
-  [useContract("EXTENSIONS", "DAO_EPOCH")]: 35,
-  [useContract("EXTENSIONS", "ONCHAIN_MESSAGING")]: 36,
-  [useContract("EXTENSIONS", "TOKEN_OWNER")]: 37,
+  [useContract("EXTENSIONS", "TREASURY")]: 30,
+  [useContract("EXTENSIONS", "ACTION_PROPOSAL_VOTING")]: 31,
+  [useContract("EXTENSIONS", "DAO_CHARTER")]: 32,
+  [useContract("EXTENSIONS", "DAO_EPOCH")]: 33,
+  [useContract("EXTENSIONS", "ONCHAIN_MESSAGING")]: 34,
+  [useContract("EXTENSIONS", "TOKEN_OWNER")]: 35,
 
   // actions
   [useContract("ACTIONS", "SEND_MESSAGE")]: 40,

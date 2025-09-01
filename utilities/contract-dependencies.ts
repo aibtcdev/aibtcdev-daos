@@ -122,19 +122,9 @@ export function defineExtensionContractDependencies(
           .addTraitDependency("DAO_ACTION", "dao_trait_action")
           .addAddressDependency("AIBTC_RUN_COST", "base_contract_dao_run_cost")
           .addContractDependency(
-            "dao_contract_rewards_account",
-            "EXTENSIONS",
-            "REWARDS_ACCOUNT"
-          )
-          .addContractDependency(
             "dao_contract_treasury",
             "EXTENSIONS",
             "TREASURY"
-          )
-          .addContractDependency(
-            "dao_contract_users",
-            "EXTENSIONS",
-            "DAO_USERS"
           )
           .addContractDependency("dao_contract_token", "TOKEN", "DAO")
           .addContractDependency("dao_contract_base", "BASE", "DAO")
@@ -211,11 +201,6 @@ export function defineProposalContractDependencies(
             "dao_contract_epoch",
             "EXTENSIONS",
             "DAO_EPOCH"
-          )
-          .addContractDependency(
-            "dao_contract_users",
-            "EXTENSIONS",
-            "DAO_USERS"
           )
           .addContractDependency(
             "dao_contract_messaging",
