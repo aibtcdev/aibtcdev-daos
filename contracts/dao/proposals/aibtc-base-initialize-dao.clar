@@ -64,9 +64,6 @@
     ;; set DAO manifest in dao-charter extension
     ;; /g/.aibtc-dao-charter/dao_contract_charter
     (try! (contract-call? .aibtc-dao-charter set-dao-charter CFG_DAO_MANIFEST_TEXT))
-    ;; send DAO manifest as onchain message
-    ;; /g/.aibtc-onchain-messaging/dao_contract_messaging
-    (try! (contract-call? .aibtc-onchain-messaging send CFG_DAO_MANIFEST_TEXT))
     ;; print initialization data
     (print {
       ;; /g/aibtc/dao_token_symbol
