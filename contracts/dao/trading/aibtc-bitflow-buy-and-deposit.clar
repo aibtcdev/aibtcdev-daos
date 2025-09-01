@@ -51,6 +51,8 @@
             transfer amount sender SELF none
           )))
           ;; buy tokens as contract, capture total received in output
+          ;; /g/.xyk-core-v-1-2/external_bitflow_core
+          ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
           (daoTokensReceived (try! (as-contract (contract-call? .xyk-core-v-1-2 swap-x-for-y .xyk-pool-sbtc-aibtc-v-1-1
             SBTC_TOKEN daoToken amount minReceiveVal
           ))))
