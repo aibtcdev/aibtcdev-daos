@@ -197,28 +197,28 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
 
   it("refund-seat-and-deposit succeeds", () => {
     // arrange
+    const amountToSpend = 20000;
+    const numberOfSeats = 1;
     // First buy a seat
     getSbtcFromFaucet(address1);
     const buyReceipt = simnet.callPublicFn(
       contractAddress,
       "buy-seats-and-deposit",
-      [Cl.uint(20000)],
+      [Cl.uint(amountToSpend)],
       address1
     );
-    expect(buyReceipt.result).toBeOk(Cl.bool(true));
+    expect(buyReceipt.result).toBeOk(Cl.uint(numberOfSeats));
 
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "refund-seat-and-deposit",
-      [Cl.none()],
+      [],
       address1
     );
 
     // assert
-    expect(receipt.result).toBeOk(Cl.bool(true));
-    // Check for refund event or balance increase
-    expect(receipt.events).toHaveLength(expect.any(Number));
+    expect(receipt.result).toBeOk(Cl.uint(numberOfSeats));
   });
 
   it("refund-seat-and-deposit fails without prior purchase", () => {
@@ -226,7 +226,7 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "refund-seat-and-deposit",
-      [Cl.none()],
+      [],
       address1
     );
 
