@@ -45,6 +45,7 @@ const ErrCode = ErrCodeBitflowBuyAndDeposit;
 describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
   beforeEach(() => {
     // Ensure dex is graduated and pool is created
+    getSbtcFromFaucet(deployer);
     graduateDex(deployer);
     enablePublicPoolCreation(deployer);
     simnet.mineEmptyBlocks(10);
