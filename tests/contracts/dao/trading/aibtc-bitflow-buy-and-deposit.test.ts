@@ -184,7 +184,7 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     getSbtcFromFaucet(address1);
     const amount = 100000;
     const minReceive = 5000000000;
-    const invalidToken = `${deployer}.invalid-token`;
+    const invalidToken = `${deployer}.unknown-token`;
 
     // act
     const receipt = simnet.callPublicFn(

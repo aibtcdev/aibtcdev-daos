@@ -120,7 +120,7 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     // arrange
     getSbtcFromFaucet(address1);
     const amount = 100000;
-    const minReceive = 100000000000; // unrealistically high
+    const minReceive = 100000000000000000n; // unrealistically high
 
     // act
     const receipt = simnet.callPublicFn(
@@ -159,7 +159,7 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     // arrange
     getSbtcFromFaucet(address1);
     const amount = 100000;
-    const invalidToken = `${deployer}.invalid-token`;
+    const invalidToken = `${deployer}.unknown-token`;
 
     // act
     const receipt = simnet.callPublicFn(
