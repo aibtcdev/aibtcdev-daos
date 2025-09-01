@@ -333,7 +333,7 @@ export function completePrelaunch(deployer: string) {
     const buyReceipt = simnet.callPublicFn(
       preFaktoryAddress,
       "buy-up-to",
-      [Cl.uint(2)], // Each user buys 2 seats
+      [Cl.uint(2), Cl.none()], // Each user buys 2 seats
       userAddress
     );
     expect(buyReceipt.result).toBeOk(Cl.bool(true));

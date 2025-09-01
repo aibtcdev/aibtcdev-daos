@@ -65,7 +65,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-up-to",
-      [Cl.uint(2)],
+      [Cl.uint(2), Cl.none()],
       address1
     );
 
@@ -96,7 +96,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-up-to",
-      [Cl.uint(0)],
+      [Cl.uint(0), Cl.none()],
       address2
     );
 
@@ -130,7 +130,7 @@ describe(`public functions: ${contractName}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-up-to",
-      [Cl.uint(3)],
+      [Cl.uint(3), Cl.none()],
       address3
     );
 
@@ -164,7 +164,12 @@ describe(`public functions: ${contractName}`, () => {
     getSbtcFromFaucet(address4);
 
     // First buy some seats
-    simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(2)], address4);
+    simnet.callPublicFn(
+      contractAddress,
+      "buy-up-to",
+      [Cl.uint(2), Cl.none()],
+      address4
+    );
 
     // Verify seats were purchased
     const userInfoBeforeResult = simnet.callReadOnlyFn(
@@ -234,7 +239,12 @@ describe(`public functions: ${contractName}`, () => {
     getSbtcFromFaucet(address6);
 
     // Buy seats
-    simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(2)], address6);
+    simnet.callPublicFn(
+      contractAddress,
+      "buy-up-to",
+      [Cl.uint(2), Cl.none()],
+      address6
+    );
 
     // act
     const receipt = simnet.callPublicFn(
@@ -407,7 +417,12 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     // Ensure address1 has seats
     getSbtcFromFaucet(address1);
-    simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(1)], address1);
+    simnet.callPublicFn(
+      contractAddress,
+      "buy-up-to",
+      [Cl.uint(1), Cl.none()],
+      address1
+    );
 
     // act
     const result = simnet.callReadOnlyFn(
@@ -463,7 +478,12 @@ describe(`read-only functions: ${contractName}`, () => {
     // arrange
     // Ensure address1 has seats
     getSbtcFromFaucet(address1);
-    simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(1)], address1);
+    simnet.callPublicFn(
+      contractAddress,
+      "buy-up-to",
+      [Cl.uint(1), Cl.none()],
+      address1
+    );
 
     // act
     const result = simnet.callReadOnlyFn(
@@ -673,7 +693,12 @@ describe(`read-only functions: ${contractName}`, () => {
   it("get-user-expected-share() returns valid data", () => {
     // arrange
     getSbtcFromFaucet(address1);
-    simnet.callPublicFn(contractAddress, "buy-up-to", [Cl.uint(1)], address1);
+    simnet.callPublicFn(
+      contractAddress,
+      "buy-up-to",
+      [Cl.uint(1), Cl.none()],
+      address1
+    );
 
     // act
     const result = simnet.callReadOnlyFn(
