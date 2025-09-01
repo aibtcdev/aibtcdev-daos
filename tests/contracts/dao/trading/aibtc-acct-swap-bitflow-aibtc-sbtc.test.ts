@@ -189,21 +189,4 @@ describe(`read-only functions: ${contractName}`, () => {
     expect(result.daoToken).toBe(daoTokenAddress);
     expect(result.bitflowCore).toBe(bitflowCoreAddress);
   });
-
-  test("get-swap-info() returns correct swap info", () => {
-    // Act
-    const info = simnet.callReadOnlyFn(
-      contractAddress,
-      "get-swap-info",
-      [],
-      deployer
-    );
-    // Assert
-    const result = convertClarityTuple<AgentAccountSwapAdapterSwapInfo>(
-      info.result
-    );
-    expect(result.totalBuys).toBe(0n);
-    expect(result.totalSells).toBe(0n);
-    expect(result.totalSwaps).toBe(0n);
-  });
 });

@@ -118,10 +118,10 @@ test_api_generate_dao_contracts() {
         "$url")
 
     # Debug the raw response
-    #echo "===================="
-    #echo "Raw response (generate_dao_contracts):"
-    #echo "$response"
-    #echo "===================="
+    echo "===================="
+    echo "Raw response (generate_dao_contracts):"
+    echo "$response"
+    echo "===================="
     
     status=$(echo "$response" | tail -n1)
 

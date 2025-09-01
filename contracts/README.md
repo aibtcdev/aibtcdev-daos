@@ -20,9 +20,7 @@ These Clarity smart contracts implement the core functionality of the DAO, inclu
     - `aibtc-action-proposal-voting.clar` - Governance voting mechanisms
     - `aibtc-dao-charter.clar` - DAO charter management
     - `aibtc-dao-epoch.clar` - Epoch-based timing
-    - `aibtc-dao-users.clar` - User management and reputation tracking
     - `aibtc-onchain-messaging.clar` - On-chain messaging system
-    - `aibtc-rewards-account.clar` - Reward distribution for proposals
     - `aibtc-token-owner.clar` - Token ownership management
     - `aibtc-treasury.clar` - Treasury and asset management
   - [/proposals](/contracts/dao/proposals) - Proposal contracts for governance decisions

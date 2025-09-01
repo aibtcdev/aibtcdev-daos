@@ -19,13 +19,11 @@ type DaoTraits = {
   DAO_CHARTER: string;
   DAO_EPOCH: string;
   DAO_MESSAGING: string;
-  DAO_REWARDS_ACCOUNT: string;
   DAO_TOKEN: string;
   DAO_TOKEN_DEX: string;
   DAO_TOKEN_OWNER: string;
   DAO_TOKEN_POOL: string;
   DAO_TREASURY: string;
-  DAO_USERS: string;
 };
 
 type AgentTraits = {
@@ -69,8 +67,6 @@ const mainnetTraits: KnownTraits = {
     "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.dao-epoch",
   DAO_MESSAGING:
     "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.messaging",
-  DAO_REWARDS_ACCOUNT:
-    "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.rewards-account",
   DAO_TOKEN: "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.token",
   DAO_TOKEN_DEX:
     "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.faktory-dex",
@@ -80,8 +76,6 @@ const mainnetTraits: KnownTraits = {
     "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.bitflow-pool",
   DAO_TREASURY:
     "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.treasury",
-  DAO_USERS:
-    "SPW8QZNWKZGVHX012HCBJVJVPS94PXFG578P53TM.aibtc-dao-traits.dao-users",
   // Agent traits
   AGENT_ACCOUNT:
     "SP6382W148DH1J3BMEBGWENZ9AK8DXCN5XJPP01C.aibtc-agent-account-traits.aibtc-account",
@@ -123,8 +117,6 @@ const testnetTraits: KnownTraits = {
     "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.dao-epoch",
   DAO_MESSAGING:
     "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.messaging",
-  DAO_REWARDS_ACCOUNT:
-    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.rewards-account",
   DAO_TOKEN: "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.token",
   DAO_TOKEN_DEX:
     "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.faktory-dex",
@@ -134,8 +126,6 @@ const testnetTraits: KnownTraits = {
     "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.bitflow-pool",
   DAO_TREASURY:
     "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.treasury",
-  DAO_USERS:
-    "ST1Q9YZ2NY4KVBB08E005HAK3FSM8S3RX2WARP9Q1.aibtc-dao-traits.dao-users",
   // Agent traits
   AGENT_ACCOUNT:
     "ST3BVJM8WCP85RNFWXRRNRWRQREB5GK25TJWM016Z.aibtc-agent-account-traits.aibtc-account",
@@ -176,8 +166,6 @@ const devnetTraits: KnownTraits = {
   DAO_EPOCH: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits.epoch",
   DAO_MESSAGING:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits.messaging",
-  DAO_REWARDS_ACCOUNT:
-    "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits.rewards-account",
   DAO_TOKEN: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits.token",
   DAO_TOKEN_DEX:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits.faktory-dex",
@@ -187,7 +175,6 @@ const devnetTraits: KnownTraits = {
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits.bitflow-pool",
   DAO_TREASURY:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits.treasury",
-  DAO_USERS: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-dao-traits.users",
   // Agent traits
   AGENT_ACCOUNT:
     "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.aibtc-agent-account-traits.aibtc-account",

@@ -171,8 +171,8 @@ describe(`read-only functions: ${contractName}`, () => {
     expect(result).toStrictEqual(
       Cl.tuple({
         self: Cl.principal(contractAddress),
-        deployedBurnBlock: Cl.uint(4), // deployed btc block
-        deployedStacksBlock: Cl.uint(4), // or deployed stx block
+        deployedBurnBlock: Cl.uint(5), // deployed btc block
+        deployedStacksBlock: Cl.uint(6), // or deployed stx block
       })
     );
   });

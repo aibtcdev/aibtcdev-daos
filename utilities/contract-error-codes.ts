@@ -52,22 +52,11 @@ export enum ErrCodeDaoCharter {
 // aibtc-dao-epoch.clar
 // no error paths
 
-// aibtc-dao-users.clar
-export enum ErrCodeDaoUsers {
-  ERR_NOT_DAO_OR_EXTENSION = 1500,
-  ERR_USER_NOT_FOUND,
-}
-
 // aibtc-onchain-messaging.clar
 export enum ErrCodeOnchainMessaging {
   ERR_NOT_DAO_OR_EXTENSION = 1600,
   ERR_INVALID_INPUT,
   ERR_FETCHING_TOKEN_DATA,
-}
-
-// aibtc-rewards-account.clar
-export enum ErrCodeRewardsAccount {
-  ERR_NOT_DAO_OR_EXTENSION = 1700,
 }
 
 // aibtc-token-owner.clar
@@ -99,5 +88,21 @@ export enum ErrCodeFaktorySwapAdapter {
 export enum ErrCodeBitflowSwapAdapter {
   ERR_INVALID_DAO_TOKEN = 2300,
   ERR_SWAP_FAILED,
+  ERR_MIN_RECEIVE_REQUIRED,
+}
+
+// faktory-buy-and-deposit.clar
+export enum ErrCodeFaktoryBuyAndDeposit {
+  ERR_INVALID_DAO_TOKEN = 2400,
+  ERR_INVALID_AMOUNT,
+  ERR_QUOTE_FAILED,
+  ERR_SLIPPAGE_TOO_HIGH,
+  ERR_REFUNDING_SEATS,
+}
+
+// bitflow-buy-and-deposit.clar
+export enum ErrCodeBitflowBuyAndDeposit {
+  ERR_INVALID_DAO_TOKEN = 2500,
+  ERR_INVALID_AMOUNT,
   ERR_MIN_RECEIVE_REQUIRED,
 }

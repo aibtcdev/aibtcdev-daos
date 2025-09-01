@@ -21,14 +21,9 @@
 
 ;; error codes
 (define-constant ERR_INVALID_DAO_TOKEN (err u2200))
-(define-constant ERR_SWAP_FAILED (err u2201))
+(define-constant ERR_INVALID_AMOUNT (err u2201))
 (define-constant ERR_QUOTE_FAILED (err u2202))
 (define-constant ERR_SLIPPAGE_TOO_HIGH (err u2203))
-
-;; data vars
-
-(define-data-var totalBuys uint u0)
-(define-data-var totalSells uint u0)
 
 ;; public functions
 
@@ -45,6 +40,8 @@
     )
     ;; verify token matches adapter config
     (asserts! (is-eq daoTokenContract DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
+    ;; verify amount is positive
+    (asserts! (> amount u0) ERR_INVALID_AMOUNT)
     ;; if min-receive is set, check slippage
     (and
       (is-some minReceive)
@@ -54,11 +51,7 @@
     )
     ;; call faktory dex to perform the swap
     ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
-    (match (contract-call? .aibtc-faktory-dex buy daoToken amount)
-      success (ok (var-set totalBuys (+ (var-get totalBuys) u1)))
-      error
-      ERR_SWAP_FAILED
-    )
+    (contract-call? .aibtc-faktory-dex buy daoToken amount)
   )
 )
 
@@ -84,11 +77,7 @@
     )
     ;; call faktory dex to perform the swap
     ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
-    (match (contract-call? .aibtc-faktory-dex sell daoToken amount)
-      success (ok (var-set totalSells (+ (var-get totalSells) u1)))
-      error
-      ERR_SWAP_FAILED
-    )
+    (contract-call? .aibtc-faktory-dex sell daoToken amount)
   )
 )
 
@@ -102,13 +91,5 @@
     ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
     swapContract: .aibtc-faktory-dex,
     daoToken: DAO_TOKEN,
-  }
-)
-
-(define-read-only (get-swap-info)
-  {
-    totalBuys: (var-get totalBuys),
-    totalSells: (var-get totalSells),
-    totalSwaps: (+ (var-get totalBuys) (var-get totalSells)),
   }
 )

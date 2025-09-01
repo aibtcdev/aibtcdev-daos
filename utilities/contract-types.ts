@@ -25,15 +25,18 @@ export const CONTRACT_SUBTYPES = {
     "ACTION_PROPOSAL_VOTING",
     "DAO_CHARTER",
     "DAO_EPOCH",
-    "DAO_USERS",
     "ONCHAIN_MESSAGING",
-    "REWARDS_ACCOUNT",
     "TOKEN_OWNER",
     "TREASURY",
   ] as const,
   PROPOSALS: ["INITIALIZE_DAO"] as const,
   TOKEN: ["DAO", "DEX", "POOL", "PRELAUNCH"] as const,
-  TRADING: ["FAKTORY_SBTC", "BITFLOW_SBTC"] as const,
+  TRADING: [
+    "FAKTORY_SBTC",
+    "BITFLOW_SBTC",
+    "FAKTORY_BUY_AND_DEPOSIT",
+    "BITFLOW_BUY_AND_DEPOSIT",
+  ] as const,
   CORE: ["DAO_RUN_COST"] as const,
 } as const;
 
@@ -59,9 +62,7 @@ export const CONTRACT_NAMES: {
     ACTION_PROPOSAL_VOTING: "aibtc-action-proposal-voting",
     DAO_CHARTER: "aibtc-dao-charter",
     DAO_EPOCH: "aibtc-dao-epoch",
-    DAO_USERS: "aibtc-dao-users",
     ONCHAIN_MESSAGING: "aibtc-onchain-messaging",
-    REWARDS_ACCOUNT: "aibtc-rewards-account",
     TOKEN_OWNER: "aibtc-token-owner",
     TREASURY: "aibtc-treasury",
   },
@@ -77,6 +78,8 @@ export const CONTRACT_NAMES: {
   TRADING: {
     FAKTORY_SBTC: "aibtc-acct-swap-faktory-aibtc-sbtc",
     BITFLOW_SBTC: "aibtc-acct-swap-bitflow-aibtc-sbtc",
+    FAKTORY_BUY_AND_DEPOSIT: "aibtc-faktory-buy-and-deposit",
+    BITFLOW_BUY_AND_DEPOSIT: "aibtc-bitflow-buy-and-deposit",
   },
   CORE: {
     DAO_RUN_COST: "aibtc-dao-run-cost",
