@@ -38,13 +38,10 @@ const daoTokenAddress = registry.getContractAddressByTypeAndSubtype(
 const ErrCode = ErrCodeFaktoryBuyAndDeposit;
 
 describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
-  beforeEach(() => {
-    // Ensure prelaunch is complete for tests
+  it("buy-and-deposit succeeds without agent account", () => {
+    // complete prelaunch first
     completePrelaunch(deployer);
     simnet.mineEmptyBlocks(10);
-  });
-
-  it("buy-and-deposit succeeds without agent account", () => {
     // arrange
     getSbtcFromFaucet(address1);
     const amount = 100000; // 0.001 sBTC
@@ -84,8 +81,10 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
   });
 
   it("buy-and-deposit succeeds with agent account", () => {
+    // complete prelaunch first
+    completePrelaunch(deployer);
     // arrange
-    getSbtcFromFaucet(address2);
+    getSbtcFromFaucet(deployer);
     const amount = 10000;
     const initialBalance =
       getBalancesForPrincipal(agentAccountAddress).get(DAO_TOKEN_ASSETS_MAP) ||
@@ -123,6 +122,8 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
   });
 
   it("buy-and-deposit fails with slippage too high", () => {
+    // complete prelaunch first
+    completePrelaunch(deployer);
     // arrange
     getSbtcFromFaucet(address1);
     const amount = 100000;
@@ -145,6 +146,8 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
   });
 
   it("buy-and-deposit fails with zero amount", () => {
+    // complete prelaunch first
+    completePrelaunch(deployer);
     // arrange
     getSbtcFromFaucet(address1);
     const amount = 0;
@@ -162,6 +165,8 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
   });
 
   it("buy-and-deposit fails with invalid dao token", () => {
+    // complete prelaunch first
+    completePrelaunch(deployer);
     // arrange
     getSbtcFromFaucet(address1);
     const amount = 100000;
@@ -181,37 +186,53 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
 
   it("buy-seats-and-deposit succeeds and handles change", () => {
     // arrange
-    getSbtcFromFaucet(address1);
-    const amount = 200000; // enough for seats + change
+    getSbtcFromFaucet(deployer);
+    const amount = 23456700n; // enough for 7 seats max + change
+    const totalSeats = 7n;
+
     const initialSbtcBalance =
-      getBalancesForPrincipal(address1).get(SBTC_ASSETS_MAP) || 0n;
+      getBalancesForPrincipal(deployer).get(SBTC_ASSETS_MAP) || 0n;
 
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-seats-and-deposit",
       [Cl.uint(amount)],
-      address1
+      deployer
     );
 
     // assert
-    expect(receipt.result).toBeOk(Cl.bool(true));
+    if (receipt.result.type !== ClarityType.ResponseOk) {
+      throw new Error(
+        `buy-seats-and-deposit failed: ${JSON.stringify(receipt.result)}`
+      );
+    }
+    const { value } = receipt.result;
+    if (value.type !== ClarityType.UInt) {
+      throw new Error(
+        `buy-seats-and-deposit response malformed, unexpected value: ${JSON.stringify(
+          value
+        )}`
+      );
+    }
+
     const finalSbtcBalance =
-      getBalancesForPrincipal(address1).get(SBTC_ASSETS_MAP) || 0n;
+      getBalancesForPrincipal(deployer).get(SBTC_ASSETS_MAP) || 0n;
     expect(finalSbtcBalance).toBeLessThan(initialSbtcBalance);
+    expect(totalSeats).toEqual(value.value);
   });
 
   it("refund-seat-and-deposit succeeds", () => {
     // arrange
-    const amountToSpend = 20000;
-    const numberOfSeats = 1;
+    const amountToSpend = 20000n;
+    const numberOfSeats = 1n;
     // First buy a seat
-    getSbtcFromFaucet(address1);
+    getSbtcFromFaucet(deployer);
     const buyReceipt = simnet.callPublicFn(
       contractAddress,
       "buy-seats-and-deposit",
       [Cl.uint(amountToSpend)],
-      address1
+      deployer
     );
     expect(buyReceipt.result).toBeOk(Cl.uint(numberOfSeats));
 
@@ -220,7 +241,7 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
       contractAddress,
       "refund-seat-and-deposit",
       [],
-      address1
+      deployer
     );
 
     // assert
