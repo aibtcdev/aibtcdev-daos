@@ -58,7 +58,7 @@
     (asserts! (is-eq daoTokenContract DAO_TOKEN) ERR_INVALID_DAO_TOKEN)
     (asserts! (is-some minReceive) ERR_MIN_RECEIVE_REQUIRED)
     ;; /g/.xyk-core-v-1-2/external_bitflow_core
-    ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool 
+    ;; /g/.xyk-pool-sbtc-aibtc-v-1-1/dao_contract_bitflow_pool
     (try! (contract-call? .xyk-core-v-1-2 swap-y-for-x .xyk-pool-sbtc-aibtc-v-1-1
       SBTC_TOKEN daoToken amount (unwrap-panic minReceive)
     ))
