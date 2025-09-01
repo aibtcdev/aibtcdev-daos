@@ -61,6 +61,7 @@
           transfer amount sender SELF none
         ))
         ;; buy DAO tokens as this contract to receive DAO tokens
+        ;; /g/.aibtc-faktory-dex/dao_contract_token_dex
         (try! (as-contract (contract-call? .aibtc-faktory-dex buy daoToken amount)))
         ;; transfer DAO tokens to agent account
         (try! (as-contract (contract-call? daoToken transfer daoTokensReceived SELF account none)))
