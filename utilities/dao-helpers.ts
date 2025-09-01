@@ -361,7 +361,7 @@ export function completePrelaunch(deployer: string) {
 
 // helper to graduate the faktory dex and create the bitflow pool
 export function graduateDex(caller: string) {
-  // Get contract references from registry
+  // 0. Get contract references from registry
   const tokenContract = registry.getContractAddressByTypeAndSubtype(
     "TOKEN",
     "DAO"
@@ -370,8 +370,39 @@ export function graduateDex(caller: string) {
     "TOKEN",
     "DEX"
   );
+  const preFaktoryAddress = registry.getContractAddressByTypeAndSubtype(
+    "TOKEN",
+    "PRELAUNCH"
+  );
 
-  // 1. Calculate amount needed to graduate
+  // 1. Check if prelaunch is already complete
+  const prelaunchStatus = simnet.callReadOnlyFn(
+    preFaktoryAddress,
+    "get-contract-status",
+    [],
+    caller
+  ).result;
+
+  if (
+    prelaunchStatus.type !== ClarityType.ResponseOk ||
+    prelaunchStatus.value.type !== ClarityType.Tuple
+  ) {
+    throw new Error("Failed to get prelaunch contract status");
+  }
+  const status = convertClarityTuple<FaktoryContractStatus>(
+    prelaunchStatus.value
+  );
+
+  // check if the market is open / dex is available
+  if (!status["market-open"]) {
+    // complete prelaunch if not
+    completePrelaunch(caller);
+  }
+
+  // call helper to enable public pool creation in bitflow pool
+  enablePublicPoolCreation(caller);
+
+  // 2. Calculate amount needed to graduate
   const getInResult = simnet.callReadOnlyFn(
     tokenDexContract,
     "get-in",
@@ -395,7 +426,7 @@ export function graduateDex(caller: string) {
 
   const amountToGraduate = dexInfo["stx-to-grad"];
 
-  // 2. Check caller balance
+  // 3. Check caller balance
   const sbtcBalance =
     getBalancesForPrincipal(caller).get(SBTC_ASSETS_MAP) || 0n;
   if (sbtcBalance < amountToGraduate) {
@@ -404,15 +435,7 @@ export function graduateDex(caller: string) {
     );
   }
 
-  // 3. Call buy to graduate the dex
-  const preFaktoryAddress = registry.getContractAddressByTypeAndSubtype(
-    "TOKEN",
-    "PRELAUNCH"
-  );
-  if (!preFaktoryAddress) {
-    throw new Error("Pre-faktory contract not found in registry");
-  }
-
+  // 4. Call buy to graduate the dex
   // --- BEFORE LOGGING ---
   dbgLog("--- State Snapshot BEFORE graduateDex buy call ---");
   const dexOpenBefore = simnet.callReadOnlyFn(
@@ -432,11 +455,11 @@ export function graduateDex(caller: string) {
       preFaktoryStatusBeforeResult.result.value
     );
     dbgLog(
-      `DEX state BEFORE: open=${JSON.stringify(
-        dexOpenBefore.result
-      )}, bonded (inferred)=${status["accelerated-vesting"]}`
+      `DEX open state before: ${JSON.stringify(
+        cvToValue(dexOpenBefore.result)
+      )}`
     );
-    dbgLog(`Pre-faktory status BEFORE: ${status["market-open"]}}`);
+    dbgLog(`Prefaktory status before: ${JSON.stringify(status, null, 2)}`);
   }
 
   dbgLog(`--- Calling 'buy' to graduate DEX ---`);

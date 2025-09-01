@@ -113,7 +113,7 @@ export enum ErrCodeFaktoryBuyAndDeposit {
 
 // bitflow-buy-and-deposit.clar
 export enum ErrCodeBitflowBuyAndDeposit {
-  ERR_INVALID_DAO_TOKEN = 2400,
+  ERR_INVALID_DAO_TOKEN = 2500,
   ERR_INVALID_AMOUNT,
   ERR_SLIPPAGE_TOO_HIGH,
   ERR_MIN_RECEIVE_REQUIRED,
