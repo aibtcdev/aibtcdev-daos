@@ -101,3 +101,20 @@ export enum ErrCodeBitflowSwapAdapter {
   ERR_SWAP_FAILED,
   ERR_MIN_RECEIVE_REQUIRED,
 }
+
+// faktory-buy-and-deposit.clar
+export enum ErrCodeFaktoryBuyAndDeposit {
+  ERR_INVALID_DAO_TOKEN = 2400,
+  ERR_INVALID_AMOUNT,
+  ERR_SLIPPAGE_TOO_HIGH,
+  ERR_MIN_RECEIVE_REQUIRED,
+}
+
+// bitflow-buy-and-deposit.clar
+export enum ErrCodeBitflowBuyAndDeposit {
+  ERR_INVALID_DAO_TOKEN = 2500,
+  ERR_INVALID_AMOUNT,
+  ERR_QUOTE_FAILED,
+  ERR_SLIPPAGE_TOO_HIGH,
+  ERR_REFUNDING_SEATS,
+}

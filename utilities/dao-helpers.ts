@@ -336,7 +336,7 @@ export function completePrelaunch(deployer: string) {
       [Cl.uint(2), Cl.none()], // Each user buys 2 seats
       userAddress
     );
-    expect(buyReceipt.result).toBeOk(Cl.bool(true));
+    expect(buyReceipt.result).toBeOk(Cl.uint(2));
   }
 
   // Verify distribution was initialized and market is open in pre-faktory

@@ -1,11 +1,22 @@
 import { Cl, ClarityType } from "@stacks/transactions";
-import { describe, expect, it } from "vitest";
-import { ErrCodeBitflowSwapAdapter } from "../../../utilities/contract-error-codes";
-import { setupFullContractRegistry } from "../../../utilities/contract-registry";
-import { convertClarityTuple, SBTC_CONTRACT, convertSIP019PrintEvent } from "../../../utilities/contract-helpers";
-import { dbgLog } from "../../../utilities/debug-logging";
-import { getSbtcFromFaucet, fundAgentAccount, graduateDex, enablePublicPoolCreation, DAO_TOKEN_ASSETS_MAP } from "../../../utilities/dao-helpers";
-import { getBalancesForPrincipal } from "../../../utilities/asset-helpers";
+import { beforeEach, describe, expect, it } from "vitest";
+import {
+  ErrCodeBitflowBuyAndDeposit,
+  ErrCodeBitflowSwapAdapter,
+} from "../../../../utilities/contract-error-codes";
+import { setupFullContractRegistry } from "../../../../utilities/contract-registry";
+import {
+  convertClarityTuple,
+  SBTC_CONTRACT,
+  DAO_TOKEN_ASSETS_MAP,
+} from "../../../../utilities/contract-helpers";
+import {
+  getSbtcFromFaucet,
+  fundAgentAccount,
+  graduateDex,
+  enablePublicPoolCreation,
+} from "../../../../utilities/dao-helpers";
+import { getBalancesForPrincipal } from "../../../../utilities/asset-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -15,12 +26,21 @@ const address2 = accounts.get("wallet_2")!; // user with agent
 
 // setup contract info for tests
 const registry = setupFullContractRegistry();
-const contractAddress = registry.getContractAddressByTypeAndSubtype("TRADING", "BITFLOW_BUY_AND_DEPOSIT");
-const agentAccountAddress = registry.getContractAddressByTypeAndSubtype("AGENT", "AGENT_ACCOUNT");
-const daoTokenAddress = registry.getContractAddressByTypeAndSubtype("TOKEN", "DAO");
+const contractAddress = registry.getContractAddressByTypeAndSubtype(
+  "TRADING",
+  "BITFLOW_BUY_AND_DEPOSIT"
+);
+const agentAccountAddress = registry.getContractAddressByTypeAndSubtype(
+  "AGENT",
+  "AGENT_ACCOUNT"
+);
+const daoTokenAddress = registry.getContractAddressByTypeAndSubtype(
+  "TOKEN",
+  "DAO"
+);
 
 // import error codes
-const ErrCode = ErrCodeBitflowSwapAdapter;
+const ErrCode = ErrCodeBitflowBuyAndDeposit;
 
 describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
   beforeEach(() => {
@@ -35,19 +55,25 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     getSbtcFromFaucet(address1);
     const amount = 100000; // 0.001 sBTC
     const minReceive = 5000000000; // example min
-    const initialBalance = getBalancesForPrincipal(address1).get(DAO_TOKEN_ASSETS_MAP) || 0n;
+    const initialBalance =
+      getBalancesForPrincipal(address1).get(DAO_TOKEN_ASSETS_MAP) || 0n;
 
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-and-deposit",
-      [Cl.principal(daoTokenAddress), Cl.uint(amount), Cl.some(Cl.uint(minReceive))],
+      [
+        Cl.principal(daoTokenAddress),
+        Cl.uint(amount),
+        Cl.some(Cl.uint(minReceive)),
+      ],
       address1
     );
 
     // assert
     expect(receipt.result).toBeOk(Cl.uint(expect.any(Number)));
-    const finalBalance = getBalancesForPrincipal(address1).get(DAO_TOKEN_ASSETS_MAP) || 0n;
+    const finalBalance =
+      getBalancesForPrincipal(address1).get(DAO_TOKEN_ASSETS_MAP) || 0n;
     expect(finalBalance).toBeGreaterThan(initialBalance);
     // Check for swap event
     expect(receipt.events).toHaveLength(expect.any(Number));
@@ -59,22 +85,32 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     fundAgentAccount(agentAccountAddress, address2);
     const amount = 100000;
     const minReceive = 5000000000;
-    const initialBalance = getBalancesForPrincipal(agentAccountAddress).get(DAO_TOKEN_ASSETS_MAP) || 0n;
+    const initialBalance =
+      getBalancesForPrincipal(agentAccountAddress).get(DAO_TOKEN_ASSETS_MAP) ||
+      0n;
 
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-and-deposit",
-      [Cl.principal(daoTokenAddress), Cl.uint(amount), Cl.some(Cl.uint(minReceive))],
+      [
+        Cl.principal(daoTokenAddress),
+        Cl.uint(amount),
+        Cl.some(Cl.uint(minReceive)),
+      ],
       address2
     );
 
     // assert
     expect(receipt.result).toBeOk(Cl.uint(expect.any(Number)));
-    const finalBalance = getBalancesForPrincipal(agentAccountAddress).get(DAO_TOKEN_ASSETS_MAP) || 0n;
+    const finalBalance =
+      getBalancesForPrincipal(agentAccountAddress).get(DAO_TOKEN_ASSETS_MAP) ||
+      0n;
     expect(finalBalance).toBeGreaterThan(initialBalance);
     // Verify transfer event to agent
-    const transferEvent = receipt.events.find(e => e.type === "ft_transfer_event");
+    const transferEvent = receipt.events.find(
+      (e) => e.type === "ft_transfer_event"
+    );
     expect(transferEvent).toBeDefined();
   });
 
@@ -88,7 +124,11 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-and-deposit",
-      [Cl.principal(daoTokenAddress), Cl.uint(amount), Cl.some(Cl.uint(minReceive))],
+      [
+        Cl.principal(daoTokenAddress),
+        Cl.uint(amount),
+        Cl.some(Cl.uint(minReceive)),
+      ],
       address1
     );
 
@@ -123,7 +163,11 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-and-deposit",
-      [Cl.principal(daoTokenAddress), Cl.uint(amount), Cl.some(Cl.uint(minReceive))],
+      [
+        Cl.principal(daoTokenAddress),
+        Cl.uint(amount),
+        Cl.some(Cl.uint(minReceive)),
+      ],
       address1
     );
 
@@ -142,7 +186,11 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-and-deposit",
-      [Cl.principal(invalidToken), Cl.uint(amount), Cl.some(Cl.uint(minReceive))],
+      [
+        Cl.principal(invalidToken),
+        Cl.uint(amount),
+        Cl.some(Cl.uint(minReceive)),
+      ],
       address1
     );
 
