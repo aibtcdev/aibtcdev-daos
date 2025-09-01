@@ -949,8 +949,8 @@ describe(`read-only functions: ${contractName}`, () => {
         proposalCount: Cl.uint(0),
         concludedProposalCount: Cl.uint(0),
         executedProposalCount: Cl.uint(0),
-        lastProposalStacksBlock: Cl.uint(4), // deployed block
-        lastProposalBitcoinBlock: Cl.uint(4), // deployed block
+        lastProposalStacksBlock: Cl.uint(6), // deployed block
+        lastProposalBitcoinBlock: Cl.uint(5), // deployed block
       })
     );
   });
@@ -971,8 +971,8 @@ describe(`read-only functions: ${contractName}`, () => {
     expect(result).toStrictEqual(
       Cl.tuple({
         self: Cl.principal(contractAddress),
-        deployedBitcoinBlock: Cl.uint(4),
-        deployedStacksBlock: Cl.uint(4),
+        deployedBitcoinBlock: Cl.uint(5),
+        deployedStacksBlock: Cl.uint(6),
         delay: Cl.uint(VOTING_DELAY),
         period: Cl.uint(VOTING_PERIOD),
         quorum: Cl.uint(PROPOSAL_QUORUM),
