@@ -114,35 +114,10 @@
   )
 ))
 
-;; an extension that tracks the current users and their reputation in the DAO
-(define-trait dao-users (
-  (get-or-create-user-index
-    (principal)
-    (response uint uint)
-  )
-  (increase-user-reputation
-    (principal uint)
-    (response bool uint)
-  )
-  (decrease-user-reputation
-    (principal uint)
-    (response bool uint)
-  )
-))
-
 ;; a messaging contract used by the dao to send verified messages
 (define-trait messaging (
   (send
     ((string-utf8 10000))
-    (response bool uint)
-  )
-))
-
-;; an extension that holds funds from the DAO treasury and allows
-;; the DAO to transfer rewards to users for successful proposals.
-(define-trait rewards-account (
-  (transfer-reward
-    (principal uint)
     (response bool uint)
   )
 ))
