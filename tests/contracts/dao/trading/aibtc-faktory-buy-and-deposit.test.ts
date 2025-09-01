@@ -1,9 +1,6 @@
 import { Cl, ClarityType } from "@stacks/transactions";
 import { beforeEach, describe, expect, it } from "vitest";
-import {
-  ErrCodeFaktoryBuyAndDeposit,
-  ErrCodeFaktorySwapAdapter,
-} from "../../../../utilities/contract-error-codes";
+import { ErrCodeFaktoryBuyAndDeposit } from "../../../../utilities/contract-error-codes";
 import { setupFullContractRegistry } from "../../../../utilities/contract-registry";
 import {
   convertClarityTuple,
@@ -12,16 +9,15 @@ import {
 } from "../../../../utilities/contract-helpers";
 import {
   getSbtcFromFaucet,
-  fundAgentAccount,
   completePrelaunch,
 } from "../../../../utilities/dao-helpers";
 import { getBalancesForPrincipal } from "../../../../utilities/asset-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
-const deployer = accounts.get("deployer")!;
-const address1 = accounts.get("wallet_1")!; // user without agent
-const address2 = accounts.get("wallet_2")!; // user with agent
+const deployer = accounts.get("deployer")!; // owner
+const address1 = accounts.get("wallet_1")!; // agent
+const address2 = accounts.get("wallet_2")!; // no agent account
 
 // setup contract info for tests
 const registry = setupFullContractRegistry();
@@ -52,30 +48,41 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     // arrange
     getSbtcFromFaucet(address1);
     const amount = 100000; // 0.001 sBTC
-    const amountPurchased = 1163204747774481; // from logs
     const initialBalance =
-      getBalancesForPrincipal(address1).get(DAO_TOKEN_ASSETS_MAP) || 0n;
+      getBalancesForPrincipal(address2).get(DAO_TOKEN_ASSETS_MAP) || 0n;
 
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
       "buy-and-deposit",
       [Cl.principal(daoTokenAddress), Cl.uint(amount), Cl.none()],
-      address1
+      address2
     );
 
     // assert
-    expect(receipt.result).toBeOk(Cl.uint(amountPurchased));
+    if (receipt.result.type !== ClarityType.ResponseOk) {
+      throw new Error(
+        `buy-and-deposit failed: ${JSON.stringify(receipt.result)}`
+      );
+    }
+
+    // extract value
+    const { value } = receipt.result;
+
+    if (value.type !== ClarityType.UInt) {
+      throw new Error(
+        `buy-and-deposit response malformed, unexpected value: ${JSON.stringify(
+          value
+        )}`
+      );
+    }
+
     const finalBalance =
-      getBalancesForPrincipal(address1).get(DAO_TOKEN_ASSETS_MAP) || 0n;
+      getBalancesForPrincipal(address2).get(DAO_TOKEN_ASSETS_MAP) || 0n;
     expect(finalBalance).toBeGreaterThan(initialBalance);
-    /* TODO: this is incorrect
-    // Check for transfer event (adapt based on actual events emitted)
-    expect(receipt.events).toHaveLength(expect.any(Number));
-    */
+    expect(finalBalance).toEqual(value.value);
   });
 
-  // TODO: the purchase here goes back to the buying account not agent account?
   it("buy-and-deposit succeeds with agent account", () => {
     // arrange
     getSbtcFromFaucet(address2);
@@ -89,31 +96,30 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
       contractAddress,
       "buy-and-deposit",
       [Cl.principal(daoTokenAddress), Cl.uint(amount), Cl.none()],
-      address2
+      deployer
     );
     const finalBalance =
       getBalancesForPrincipal(agentAccountAddress).get(DAO_TOKEN_ASSETS_MAP) ||
       0n;
-    console.log("================================");
-    console.log("================================");
-    console.log(`receipt: ${JSON.stringify(receipt)}`);
-    console.log(`agentAccountAddress: ${agentAccountAddress}`);
-    console.log(`initialBalance: ${initialBalance}`);
-    console.log(`finalBalance: ${finalBalance}`);
-    console.log("================================");
-    console.log("================================");
 
     // assert
+    if (receipt.result.type !== ClarityType.ResponseOk) {
+      throw new Error(
+        `buy-and-deposit failed: ${JSON.stringify(receipt.result)}`
+      );
+    }
+    const { value } = receipt.result;
+    if (value.type !== ClarityType.UInt) {
+      throw new Error(
+        `buy-and-deposit response malformed, unexpected value: ${JSON.stringify(
+          value
+        )}`
+      );
+    }
 
     expect(receipt.result).toBeOk(Cl.uint(finalBalance));
     expect(finalBalance).toBeGreaterThan(initialBalance);
-    /* TODO: this is incorrect
-    // Verify transfer event to agent
-    const transferEvent = receipt.events.find(
-      (e) => e.type === "ft_transfer_event"
-    );
-    expect(transferEvent).toBeDefined();
-    */
+    expect(finalBalance).toEqual(value.value);
   });
 
   it("buy-and-deposit fails with slippage too high", () => {

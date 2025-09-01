@@ -399,9 +399,6 @@ export function graduateDex(caller: string) {
     completePrelaunch(caller);
   }
 
-  // call helper to enable public pool creation in bitflow pool
-  enablePublicPoolCreation(caller);
-
   // 2. Calculate amount needed to graduate
   const getInResult = simnet.callReadOnlyFn(
     tokenDexContract,

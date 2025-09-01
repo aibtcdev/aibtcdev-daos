@@ -20,8 +20,7 @@
 ;; error codes
 (define-constant ERR_INVALID_DAO_TOKEN (err u2500))
 (define-constant ERR_INVALID_AMOUNT (err u2501))
-(define-constant ERR_SLIPPAGE_TOO_HIGH (err u2502))
-(define-constant ERR_MIN_RECEIVE_REQUIRED (err u2503))
+(define-constant ERR_MIN_RECEIVE_REQUIRED (err u2502))
 
 ;; public functions
 

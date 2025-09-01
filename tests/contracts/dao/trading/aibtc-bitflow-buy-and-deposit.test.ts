@@ -1,9 +1,6 @@
 import { Cl, ClarityType } from "@stacks/transactions";
 import { beforeEach, describe, expect, it } from "vitest";
-import {
-  ErrCodeBitflowBuyAndDeposit,
-  ErrCodeBitflowSwapAdapter,
-} from "../../../../utilities/contract-error-codes";
+import { ErrCodeBitflowBuyAndDeposit } from "../../../../utilities/contract-error-codes";
 import { setupFullContractRegistry } from "../../../../utilities/contract-registry";
 import {
   convertClarityTuple,
@@ -12,7 +9,6 @@ import {
 } from "../../../../utilities/contract-helpers";
 import {
   getSbtcFromFaucet,
-  fundAgentAccount,
   graduateDex,
   enablePublicPoolCreation,
 } from "../../../../utilities/dao-helpers";
@@ -20,9 +16,8 @@ import { getBalancesForPrincipal } from "../../../../utilities/asset-helpers";
 
 // setup accounts
 const accounts = simnet.getAccounts();
-const deployer = accounts.get("deployer")!;
-const address1 = accounts.get("wallet_1")!; // user without agent
-const address2 = accounts.get("wallet_2")!; // user with agent
+const deployer = accounts.get("deployer")!; // owner
+const address1 = accounts.get("wallet_1")!; // agent
 
 // setup contract info for tests
 const registry = setupFullContractRegistry();
@@ -46,8 +41,8 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
   beforeEach(() => {
     // Ensure dex is graduated and pool is created
     getSbtcFromFaucet(deployer);
-    graduateDex(deployer);
     enablePublicPoolCreation(deployer);
+    graduateDex(deployer);
     simnet.mineEmptyBlocks(10);
   });
 
@@ -55,7 +50,7 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
     // arrange
     getSbtcFromFaucet(address1);
     const amount = 100000; // 0.001 sBTC
-    const minReceive = 5000000000; // example min
+    const minReceive = 5000000000; // example min 50 DAO tokens
     const initialBalance =
       getBalancesForPrincipal(address1).get(DAO_TOKEN_ASSETS_MAP) || 0n;
 
@@ -71,20 +66,32 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
       address1
     );
 
+    if (receipt.result.type !== ClarityType.ResponseOk) {
+      throw new Error(
+        `buy-and-deposit failed: ${JSON.stringify(receipt.result)}`
+      );
+    }
+
+    // extract value from receipt
+    const { value } = receipt.result;
+
+    if (value.type !== ClarityType.UInt) {
+      throw new Error(
+        `buy-and-deposit response malformed, unexpected value: ${JSON.stringify(
+          value
+        )}`
+      );
+    }
+
     // assert
-    expect(receipt.result).toBeOk(Cl.uint(expect.any(Number)));
     const finalBalance =
       getBalancesForPrincipal(address1).get(DAO_TOKEN_ASSETS_MAP) || 0n;
     expect(finalBalance).toBeGreaterThan(initialBalance);
-    // Check for swap event
-    expect(receipt.events).toHaveLength(expect.any(Number));
+    expect(finalBalance).toEqual(value.value);
   });
 
   it("buy-and-deposit succeeds with agent account", () => {
     // arrange
-    getSbtcFromFaucet(address2);
-    fundAgentAccount(agentAccountAddress, address2);
-    getSbtcFromFaucet(address1);
     const amount = 100000;
     const minReceive = 5000000000;
     const initialBalance =
@@ -100,29 +107,39 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
         Cl.uint(amount),
         Cl.some(Cl.uint(minReceive)),
       ],
-      address2
+      deployer
     );
 
+    if (receipt.result.type !== ClarityType.ResponseOk) {
+      throw new Error(
+        `buy-and-deposit failed: ${JSON.stringify(receipt.result)}`
+      );
+    }
+
+    // extract value from receipt
+    const { value } = receipt.result;
+
+    if (value.type !== ClarityType.UInt) {
+      throw new Error(
+        `buy-and-deposit response malformed, unexpected value: ${JSON.stringify(
+          value
+        )}`
+      );
+    }
+
     // assert
-    expect(receipt.result).toBeOk(Cl.uint(expect.any(Number)));
     const finalBalance =
       getBalancesForPrincipal(agentAccountAddress).get(DAO_TOKEN_ASSETS_MAP) ||
       0n;
     expect(finalBalance).toBeGreaterThan(initialBalance);
-    /* TODO: this is wrong
-    // Verify transfer event to agent
-    const transferEvent = receipt.events.find(
-      (e) => e.type === "ft_transfer_event"
-    );
-    expect(transferEvent).toBeDefined();
-    */
+    expect(finalBalance).toEqual(value.value);
   });
 
   it("buy-and-deposit fails with slippage too high", () => {
     // arrange
     getSbtcFromFaucet(address1);
     const amount = 100000;
-    const minReceive = 100000000000; // too high
+    const minReceive = 100000000000000000n; // 1B token w/ 8 decimals
 
     // act
     const receipt = simnet.callPublicFn(
@@ -133,11 +150,12 @@ describe(`public functions: ${contractAddress.split(".")[1]}`, () => {
         Cl.uint(amount),
         Cl.some(Cl.uint(minReceive)),
       ],
-      address1
+      deployer
     );
 
     // assert
-    expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_SLIPPAGE_TOO_HIGH));
+    // error u1020 from xyk-core-v-1-2 ERR_MINIMUM_Y_AMOUNT
+    expect(receipt.result).toBeErr(Cl.uint(1020));
   });
 
   it("buy-and-deposit fails without minReceive", () => {
