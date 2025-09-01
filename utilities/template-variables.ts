@@ -239,7 +239,7 @@ export function generateTemplateReplacements(
             DAO: "dao_contract_token",
             DEX: "dao_contract_token_dex",
             PRELAUNCH: "dao_contract_token_prelaunch",
-            POOL: "dao_contract_token_pool",
+            POOL: "dao_contract_bitflow_pool",
           };
           const simplifiedTemplateKeyName = tokenSubtypeMapping[subtype];
           if (simplifiedTemplateKeyName) {
