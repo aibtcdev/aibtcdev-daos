@@ -59,6 +59,10 @@
         {
           "pattern": "daos.aibtc.dev",
           "custom_domain": true
+        },
+        {
+          "pattern": "daos.aibtc.com",
+          "custom_domain": true
         }
       ],
       "durable_objects": {
