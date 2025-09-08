@@ -122,19 +122,9 @@ export function generateTemplateReplacements(
       templateToReplacePattern: `.${templateKeySymbol}-dao-traits.dao-epoch`,
     },
     {
-      templateKeyName: "dao_trait_users",
-      knownTraitKey: "DAO_USERS",
-      templateToReplacePattern: `.${templateKeySymbol}-dao-traits.dao-users`,
-    },
-    {
       templateKeyName: "dao_trait_messaging",
       knownTraitKey: "DAO_MESSAGING",
       templateToReplacePattern: `.${templateKeySymbol}-dao-traits.messaging`,
-    },
-    {
-      templateKeyName: "dao_trait_rewards_account",
-      knownTraitKey: "DAO_REWARDS_ACCOUNT",
-      templateToReplacePattern: `.${templateKeySymbol}-dao-traits.rewards-account`,
     },
     {
       templateKeyName: "dao_trait_token_owner",
@@ -239,7 +229,7 @@ export function generateTemplateReplacements(
             DAO: "dao_contract_token",
             DEX: "dao_contract_token_dex",
             PRELAUNCH: "dao_contract_token_prelaunch",
-            POOL: "dao_contract_token_pool",
+            POOL: "dao_contract_bitflow_pool",
           };
           const simplifiedTemplateKeyName = tokenSubtypeMapping[subtype];
           if (simplifiedTemplateKeyName) {
@@ -253,9 +243,7 @@ export function generateTemplateReplacements(
             ACTION_PROPOSAL_VOTING: "action_proposal_voting",
             DAO_CHARTER: "charter",
             DAO_EPOCH: "epoch",
-            DAO_USERS: "users",
             ONCHAIN_MESSAGING: "messaging",
-            REWARDS_ACCOUNT: "rewards_account",
             TOKEN_OWNER: "token_owner",
             TREASURY: "treasury",
           };
@@ -280,6 +268,21 @@ export function generateTemplateReplacements(
             replacements[simplifiedTemplateKeyName2] = actualContractRef;
             replacements[
               `${placeholderContractRef}/${simplifiedTemplateKeyName2}`
+            ] = actualContractRef;
+          }
+        } else if (type === "TRADING") {
+          const tradingMapping: Record<string, string> = {
+            FAKTORY_SBTC: "faktory_sbtc",
+            BITFLOW_SBTC: "bitflow_sbtc",
+            FAKTORY_BUY_AND_DEPOSIT: "faktory_buy_and_deposit",
+            BITFLOW_BUY_AND_DEPOSIT: "bitflow_buy_and_deposit",
+          };
+          const simplifiedSubkey = tradingMapping[subtype];
+          if (simplifiedSubkey) {
+            const simplifiedTemplateKeyName = `dao_contract_${simplifiedSubkey}`;
+            replacements[simplifiedTemplateKeyName] = actualContractRef;
+            replacements[
+              `${placeholderContractRef}/${simplifiedTemplateKeyName}`
             ] = actualContractRef;
           }
         }

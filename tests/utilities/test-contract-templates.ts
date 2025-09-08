@@ -72,8 +72,6 @@ export const initializeDaoTemplate = `
         {extension: .aibtc-dao-charter, enabled: true}
         ;; /g/.aibtc-dao-epoch/dao_epoch_contract
         {extension: .aibtc-dao-epoch, enabled: true}
-        ;; /g/.aibtc-dao-users/dao_users_contract
-        {extension: .aibtc-dao-users, enabled: true}
         ;; /g/.aibtc-onchain-messaging/dao_messaging_contract
         {extension: .aibtc-onchain-messaging, enabled: true}
         ;; /g/.aibtc-token-owner/dao_token_owner_contract

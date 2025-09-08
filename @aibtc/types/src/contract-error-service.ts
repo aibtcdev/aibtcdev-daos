@@ -106,14 +106,6 @@ const errorDefinitions: {
         ERR_CHARTER_TOO_LONG: "The provided charter is too long.",
       },
     },
-    DAO_USERS: {
-      enumObject: ClarityErrors.ErrCodeDaoUsers,
-      descriptions: {
-        ERR_NOT_DAO_OR_EXTENSION:
-          "Caller is not the DAO or an authorized extension.",
-        ERR_USER_NOT_FOUND: "The specified user was not found.",
-      },
-    },
     ONCHAIN_MESSAGING: {
       enumObject: ClarityErrors.ErrCodeOnchainMessaging,
       descriptions: {
@@ -122,15 +114,6 @@ const errorDefinitions: {
         ERR_INVALID_INPUT: "The input provided for messaging is invalid.",
         ERR_FETCHING_TOKEN_DATA:
           "Failed to fetch token data for messaging conditions.",
-      },
-    },
-    REWARDS_ACCOUNT: {
-      enumObject: ClarityErrors.ErrCodeRewardsAccount,
-      descriptions: {
-        ERR_NOT_DAO_OR_EXTENSION:
-          "Caller is not the DAO or an authorized extension.",
-        ERR_INSUFFICIENT_BALANCE:
-          "Insufficient balance in the rewards account.",
       },
     },
     TOKEN_OWNER: {

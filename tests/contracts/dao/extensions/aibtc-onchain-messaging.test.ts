@@ -48,7 +48,11 @@ describe(`public functions: ${contractName}`, () => {
   // send() tests
   ////////////////////////////////////////
   it("send() fails with empty message", () => {
-    // arrange
+    // arrange: construct the dao and fund the user
+    completePrelaunch(deployer);
+    constructDao(deployer);
+    getDaoTokens(address1, 1000000);
+
     // act
     const receipt = simnet.callPublicFn(
       contractAddress,
