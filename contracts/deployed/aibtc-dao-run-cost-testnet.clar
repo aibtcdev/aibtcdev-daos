@@ -2,16 +2,10 @@
 ;; version: 1.0.0
 ;; summary: A contract that holds and manages fees for AIBTC services.
 
-;; funds are transferred to this contract every time a proposal is created
-;; will be a mix of several different dao tokens over time
-;;
-;; only allows withdrawal with 3-of-N approval from an approved list of addresses
-;; an approved address can add/remove other addresses with quorum
-
 ;; traits
 ;;
 
-(use-trait sip010-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+(use-trait sip010-trait 'STTWD9SPRQVD3P733V89SV0P8RZRZNQADG034F0A.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; constants
 ;;
@@ -518,22 +512,16 @@
 (begin
   ;; set initial owners
   (map-set Owners 'ST349A3QB5Z4CSTBKAG5ZJFCP5T3ABX1RZXJBQF3W true) ;; p
-  (map-set Owners 'ST2EAF5S80BZ0YBH52K4J7RMWFPWDMH01X4W8AFXS true) ;; p-a
   (map-set Owners 'ST31S76S7P99YHZK9TFYNMN6FG4A57KZ556BPRKEV true) ;; c
-  (map-set Owners 'ST1B9N1SJPRK9D3H98FWGT8AXEGH8T4BH5P38Z4ZC true) ;; c-a
-  (map-set Owners 'ST3YT0XW92E6T2FE59B2G5N2WNNFSBZ6MZKQS5D18 true) ;; w
-  (map-set Owners 'ST28Q4F9XY6RAYS5AX4PD54ANQGGCZ9XCCDJB2R6S true) ;; w-a
   (map-set Owners 'STRZ4P1ABSVSZPC4HZ4GDAW834HHEHJMF65X5S6D true) ;; d
   (map-set Owners 'ST295MNE41DC74QYCPRS8N37YYMC06N6Q3VQDZ6G1 true) ;; h
-  (map-set Owners 'ST1994Y3P6ZDJX476QFSABEFE5T6YMTJT0T7RSQDW true) ;; h-a
-  (map-set Owners 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM true) ;; tests
-  (map-set Owners 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5 true) ;; tests
-  (map-set Owners 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true) ;; tests
-  (map-set Owners 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true) ;; tests
-  (map-set Owners 'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND true) ;; tests
-  (var-set totalOwners u14)
+  (map-set Owners 'ST3YT0XW92E6T2FE59B2G5N2WNNFSBZ6MZKQS5D18 true) ;; w
+  (map-set Owners 'ST3ZA8Z9DHHM612MYXNT96DJ3E1N7J04ZKQ3H2FSP true) ;; w2
+  (map-set Owners 'ST1B1CCG03BTGDAAR49R3KM34V48P3RPAQ4P2SSJG true) ;; w3
+  (map-set Owners 'ST252TFQ08T74ZZ6XK426TQNV4EXF1D4RMTTNCWFA true) ;; w4
+  (map-set Owners 'ST3E1TA52MNACYVQAQYVB3NDC5V1MSG662E99XAHK true) ;; w5
+  (var-set totalOwners u9)
   ;; set initial assets
-  ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/base_sbtc_contract
   (map-set AllowedAssets 'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token
     true
   )
