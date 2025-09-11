@@ -713,6 +713,29 @@ describe(`transfer functionality: ${contractName}`, () => {
     completePrelaunch(deployer);
     getDaoTokens(deployer, satsAmount);
 
+    const assetNonce = Cl.uint(1);
+    const setAsset1 = simnet.callPublicFn(
+      contractAddress,
+      "set-asset",
+      [assetNonce, Cl.principal(mockTokenAddress), Cl.bool(true)],
+      deployer
+    );
+    expect(setAsset1.result).toBeOk(Cl.bool(false));
+    const setAsset2 = simnet.callPublicFn(
+      contractAddress,
+      "set-asset",
+      [assetNonce, Cl.principal(mockTokenAddress), Cl.bool(true)],
+      address1
+    );
+    expect(setAsset2.result).toBeOk(Cl.bool(false));
+    const setAsset3 = simnet.callPublicFn(
+      contractAddress,
+      "set-asset",
+      [assetNonce, Cl.principal(mockTokenAddress), Cl.bool(true)],
+      address2
+    );
+    expect(setAsset3.result).toBeOk(Cl.bool(true));
+
     // transfer dao tokens to the contract
     const transferReceipt = simnet.callPublicFn(
       mockTokenAddress,
