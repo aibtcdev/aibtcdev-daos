@@ -25,14 +25,14 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.5",
-    "agents": "^0.1.0",
+    "agents": "^0.1.2",
     "hono": "^4.9.6"
   },
   "devDependencies": {
-    "@aibtc/types": "^0.21.0",
+    "@aibtc/types": "^0.22.0",
     "@cloudflare/vite-plugin": "^1.12.4",
-    "@cloudflare/workers-types": "^4.20250910.0",
-    "@hirosystems/clarinet-sdk": "^3.5.0",
+    "@cloudflare/workers-types": "^4.20250911.0",
+    "@hirosystems/clarinet-sdk": "^3.6.1",
     "@hono/vite-build": "^1.7.0",
     "@stacks/transactions": "^7.2.0",
     "@types/node": "^22.18.1",
