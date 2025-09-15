@@ -14,6 +14,7 @@ import {
 } from "../../../utilities/dao-helpers";
 import { dbgLog } from "../../../utilities/debug-logging";
 import { AGENT_ACCOUNT_APPROVAL_TYPES } from "../../../utilities/agent-account-types";
+import { format } from "node:path";
 
 // setup accounts
 const accounts = simnet.getAccounts();
@@ -48,6 +49,7 @@ describe(`public functions: ${contractName}`, () => {
   it("create-action-proposal() fails if caller is not authorized (user or agent)", () => {
     // arrange
     const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
+    const memo = Cl.some(Cl.stringAscii("Test memo"));
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
 
@@ -59,7 +61,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        formatSerializedBuffer(memo),
       ],
       address3
     );
@@ -71,6 +73,7 @@ describe(`public functions: ${contractName}`, () => {
   it("create-action-proposal() fails if proposal contract is not approved", () => {
     // arrange
     const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
+    const memo = Cl.some(Cl.stringAscii("Test memo"));
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
     constructDao(deployer);
@@ -83,7 +86,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        formatSerializedBuffer(memo),
       ],
       deployer
     );
