@@ -1068,6 +1068,7 @@ describe(`read-only functions: ${contractName}`, () => {
   it("agent fails to create proposals if contract is not approved", () => {
     // arrange
     const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
+    const memo = Cl.some(Cl.stringAscii("Test memo"));
     completePrelaunch(deployer);
     fundAgentAccount(contractAddress, deployer);
     constructDao(deployer);
@@ -1089,7 +1090,7 @@ describe(`read-only functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        formatSerializedBuffer(memo),
       ],
       address2 // agent
     );
@@ -1129,6 +1130,7 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // Create a proposal first (owner does this)
     const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
+    const memo = Cl.some(Cl.stringAscii("Test memo"));
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -1136,7 +1138,7 @@ describe(`read-only functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        formatSerializedBuffer(memo),
       ],
       deployer
     );
@@ -1171,6 +1173,7 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // Create a second proposal
     proposalId = 2;
+    const memo2 = Cl.some(Cl.stringAscii("Test memo 2"));
     const createProposalReceipt2 = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -1178,7 +1181,7 @@ describe(`read-only functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo 2")),
+        formatSerializedBuffer(memo2),
       ],
       deployer // owner still has to create it
     );
@@ -1234,6 +1237,7 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // Create a proposal first
     const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
+    const memo = Cl.some(Cl.stringAscii("Test memo"));
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -1241,7 +1245,7 @@ describe(`read-only functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        formatSerializedBuffer(memo),
       ],
       deployer // owner creates
     );
@@ -1308,6 +1312,7 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // Create a proposal first
     const message = Cl.stringUtf8(PROPOSAL_MESSAGE);
+    const memo = Cl.some(Cl.stringAscii("Test memo"));
     const createProposalReceipt = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -1315,7 +1320,7 @@ describe(`read-only functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        formatSerializedBuffer(memo),
       ],
       deployer
     );
