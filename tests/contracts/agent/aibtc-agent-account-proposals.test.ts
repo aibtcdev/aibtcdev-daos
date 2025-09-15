@@ -9,12 +9,12 @@ import {
   formatSerializedBuffer,
   fundAgentAccount,
   PROPOSAL_MESSAGE,
+  TEST_MEMO_CV,
   VOTING_DELAY,
   VOTING_PERIOD,
 } from "../../../utilities/dao-helpers";
 import { dbgLog } from "../../../utilities/debug-logging";
 import { AGENT_ACCOUNT_APPROVAL_TYPES } from "../../../utilities/agent-account-types";
-import { TEST_MEMO_CV } from "../../common";
 
 // setup accounts
 const accounts = simnet.getAccounts();
