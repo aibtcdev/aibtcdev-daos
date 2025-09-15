@@ -32,7 +32,7 @@
 
 (define-trait aibtc-account-proposals (
   (create-action-proposal
-    (<dao-action-proposal-trait> <dao-action-trait> (buff 2048) (optional (string-ascii 1024)))
+    (<dao-action-proposal-trait> <dao-action-trait> (buff 2048) (optional (buff 250)))
     (response bool uint)
   )
   (vote-on-action-proposal

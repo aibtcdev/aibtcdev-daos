@@ -75,7 +75,7 @@
 ;; a voting contract to vote on whitelisted pre-defined actions
 (define-trait action-proposal-voting (
   (create-action-proposal
-    (<action> (buff 2048) (optional (string-ascii 1024)))
+    (<action> (buff 2048) (optional (buff 250)))
     (response bool uint)
   )
   (vote-on-action-proposal

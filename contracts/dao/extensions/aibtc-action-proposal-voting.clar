@@ -73,22 +73,19 @@
 ;; data vars
 ;;
 
-(define-data-var state
-  {
-    proposalCount: uint,
-    concludedProposalCount: uint,
-    executedProposalCount: uint,
-    lastProposalStacksBlock: uint,
-    lastProposalBitcoinBlock: uint,
-  }
-  {
-    proposalCount: u0,
-    concludedProposalCount: u0,
-    executedProposalCount: u0,
-    lastProposalStacksBlock: DEPLOYED_STACKS_BLOCK,
-    lastProposalBitcoinBlock: DEPLOYED_BITCOIN_BLOCK,
-  }
-)
+(define-data-var state {
+  proposalCount: uint,
+  concludedProposalCount: uint,
+  executedProposalCount: uint,
+  lastProposalStacksBlock: uint,
+  lastProposalBitcoinBlock: uint,
+} {
+  proposalCount: u0,
+  concludedProposalCount: u0,
+  executedProposalCount: u0,
+  lastProposalStacksBlock: DEPLOYED_STACKS_BLOCK,
+  lastProposalBitcoinBlock: DEPLOYED_BITCOIN_BLOCK,
+})
 
 ;; data maps
 ;;
@@ -103,7 +100,7 @@
     caller: principal,
     creator: principal,
     liquidTokens: uint,
-    memo: (optional (string-ascii 1024)),
+    memo: (optional (buff 250)),
     ;; from ProposalBlocks
     createdBtc: uint,
     createdStx: uint,
@@ -147,7 +144,7 @@
 (define-public (create-action-proposal
     (action <action-trait>)
     (parameters (buff 2048))
-    (memo (optional (string-ascii 1024)))
+    (memo (optional (buff 250)))
   )
   (let (
       (currentState (var-get state))
@@ -223,11 +220,13 @@
       ERR_SAVING_PROPOSAL
     )
     ;; set last proposal created block height and increment proposal count
-    (var-set state (merge currentState {
-      lastProposalBitcoinBlock: createdBtc,
-      lastProposalStacksBlock: createdStx,
-      proposalCount: newId,
-    }))
+    (var-set state
+      (merge currentState {
+        lastProposalBitcoinBlock: createdBtc,
+        lastProposalStacksBlock: createdStx,
+        proposalCount: newId,
+      })
+    )
     ;; transfer the proposal bond to this contract
     ;; /g/.aibtc-faktory/dao_contract_token
     (try! (contract-call? .aibtc-faktory transfer VOTING_BOND contract-caller SELF none))
@@ -474,9 +473,7 @@
     ;; proposal is past voting period
     (asserts! (>= burnBlock voteEnd) ERR_PROPOSAL_VOTING_ACTIVE)
     ;; proposal is past execution delay
-    (asserts! (>= burnBlock execStart)
-      ERR_PROPOSAL_EXECUTION_DELAY
-    )
+    (asserts! (>= burnBlock execStart) ERR_PROPOSAL_EXECUTION_DELAY)
     ;; action must be the same as the one in proposal
     (asserts! (is-eq (get action proposal) actionContract) ERR_INVALID_ACTION)
     ;; print conclusion event
@@ -522,13 +519,15 @@
     )
     (let ((currentState (var-get state)))
       ;; update proposal counts
-      (var-set state (merge currentState {
-        concludedProposalCount: (+ (get concludedProposalCount currentState) u1),
-        executedProposalCount: (if tryToExecute
-          (+ (get executedProposalCount currentState) u1)
-          (get executedProposalCount currentState)
-        ),
-      }))
+      (var-set state
+        (merge currentState {
+          concludedProposalCount: (+ (get concludedProposalCount currentState) u1),
+          executedProposalCount: (if tryToExecute
+            (+ (get executedProposalCount currentState) u1)
+            (get executedProposalCount currentState)
+          ),
+        })
+      )
       ;; try to execute the action if the proposal passed
       (ok (if tryToExecute
         ;; try to run the action
@@ -577,8 +576,7 @@
 
 (define-read-only (get-proposal (proposalId uint))
   (match (map-get? Proposals proposalId)
-    proposal
-    (let (
+    proposal (let (
         (createdBtc (get createdBtc proposal))
         (voteStart (+ createdBtc VOTING_DELAY))
         (voteEnd (+ voteStart VOTING_PERIOD))
