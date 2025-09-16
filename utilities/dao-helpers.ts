@@ -255,7 +255,7 @@ export function passActionProposal(
     [
       Cl.principal(proposedActionContractAddress),
       formatSerializedBuffer(proposalParams),
-      memo ? formatSerializedBuffer(Cl.some(Cl.stringAscii(memo))) : Cl.none(),
+      memo ? Cl.some(formatSerializedBuffer(Cl.stringAscii(memo))) : Cl.none(),
     ],
     sender
   );
