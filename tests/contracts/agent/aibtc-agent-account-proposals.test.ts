@@ -1170,7 +1170,6 @@ describe(`read-only functions: ${contractName}`, () => {
 
     // Create a second proposal
     proposalId = 2;
-    const memo2 = Cl.some(Cl.stringAscii("Test memo 2"));
     const createProposalReceipt2 = simnet.callPublicFn(
       contractAddress,
       "create-action-proposal",
@@ -1178,7 +1177,7 @@ describe(`read-only functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        formatSerializedBuffer(memo2),
+        TEST_MEMO_BUFF,
       ],
       deployer // owner still has to create it
     );
