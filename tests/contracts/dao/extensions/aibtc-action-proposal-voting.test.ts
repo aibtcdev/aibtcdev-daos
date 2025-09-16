@@ -19,6 +19,7 @@ import {
   PROPOSAL_REWARD,
   PROPOSAL_QUORUM,
   PROPOSAL_THRESHOLD,
+  TEST_MEMO_BUFF,
 } from "../../../../utilities/dao-helpers";
 
 // setup accounts
@@ -901,6 +902,75 @@ describe(`read-only functions: ${contractName}`, () => {
     ).result;
     // assert
     expect(result).toBeNone();
+
+    // arrange
+    completePrelaunch(deployer);
+    fundVoters([deployer]);
+    constructDao(deployer);
+    const setupReceipt = simnet.callPublicFn(
+      contractAddress,
+      "create-action-proposal",
+      [
+        Cl.principal(actionContractAddress),
+        formatSerializedBuffer(Cl.stringUtf8(PROPOSAL_MESSAGE)),
+        TEST_MEMO_BUFF,
+      ],
+      deployer
+    ).result;
+    expect(setupReceipt).toBeOk(Cl.bool(true));
+
+    const blockHeights = {
+      btc: simnet.burnBlockHeight,
+      stx: simnet.stacksBlockHeight,
+    };
+
+    console.log("block heights after setup:", blockHeights);
+
+    const expectedProposal = Cl.tuple({
+      action: Cl.principal(actionContractAddress),
+      bond: Cl.uint(PROPOSAL_BOND),
+      caller: Cl.principal(deployer),
+      creator: Cl.principal(deployer),
+      execEnd: Cl.uint(
+        blockHeights.btc +
+          VOTING_DELAY +
+          VOTING_PERIOD +
+          VOTING_DELAY +
+          VOTING_PERIOD
+      ),
+      execStart: Cl.uint(
+        blockHeights.btc + VOTING_DELAY + VOTING_PERIOD + VOTING_DELAY
+      ),
+      executed: Cl.bool(false),
+      expired: Cl.bool(false),
+      liquidTokens: Cl.uint(20000000000000000n),
+      metQuorum: Cl.bool(false),
+      metThreshold: Cl.bool(false),
+      votesFor: Cl.uint(0),
+      votesAgainst: Cl.uint(0),
+      passed: Cl.bool(false),
+      status: Cl.uint(0),
+      vetoVotes: Cl.uint(0),
+      vetoMetQuorum: Cl.bool(false),
+      vetoExceedsYes: Cl.bool(false),
+      vetoed: Cl.bool(false),
+      voteStart: Cl.uint(blockHeights.btc + VOTING_DELAY),
+      voteEnd: Cl.uint(blockHeights.btc + VOTING_DELAY + VOTING_PERIOD),
+      concluded: Cl.bool(false),
+      createdBtc: Cl.uint(blockHeights.btc),
+      createdStx: Cl.uint(blockHeights.stx - 1),
+      parameters: formatSerializedBuffer(Cl.stringUtf8(PROPOSAL_MESSAGE)),
+      memo: TEST_MEMO_BUFF,
+    });
+    // act
+    const result2 = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-proposal",
+      [Cl.uint(1)],
+      deployer
+    ).result;
+    // assert
+    expect(result2).toBeSome(expectedProposal);
   });
 
   ////////////////////////////////////////
