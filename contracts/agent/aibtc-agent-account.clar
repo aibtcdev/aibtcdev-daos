@@ -186,6 +186,7 @@
         proposalContract: (contract-of votingContract),
         action: (contract-of action),
         parameters: parameters,
+        memo: memo,
         sender: tx-sender,
         caller: contract-caller,
       },

@@ -184,6 +184,7 @@ describe(`public functions: ${contractName}`, () => {
         proposalContract: actionProposalsContractAddress,
         action: sendMessageActionContractAddress,
         parameters: cvToValue(formatSerializedBuffer(message)),
+        memo: cvToValue(TEST_MEMO_BUFF),
         sender: deployer,
         caller: deployer,
       },
