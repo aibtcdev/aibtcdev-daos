@@ -172,7 +172,7 @@
     (votingContract <action-proposal-voting-trait>)
     (action <action-trait>)
     (parameters (buff 2048))
-    (memo (optional (string-ascii 1024)))
+    (memo (optional (buff 4096)))
   )
   (begin
     (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)
@@ -186,6 +186,7 @@
         proposalContract: (contract-of votingContract),
         action: (contract-of action),
         parameters: parameters,
+        memo: memo,
         sender: tx-sender,
         caller: contract-caller,
       },

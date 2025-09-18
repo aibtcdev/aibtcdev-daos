@@ -1,5 +1,11 @@
 import { expect } from "vitest";
-import { Cl, ClarityType, ClarityValue, cvToValue } from "@stacks/transactions";
+import {
+  BufferCV,
+  Cl,
+  ClarityType,
+  ClarityValue,
+  cvToValue,
+} from "@stacks/transactions";
 import { getKnownAddress } from "./known-addresses";
 import {
   DAO_TOKEN_ASSETS_MAP,
@@ -14,6 +20,10 @@ import { dbgLog } from "./debug-logging";
 import { getBalancesForPrincipal } from "./asset-helpers";
 
 // single place for all tests so we can assess costs
+
+// buffers used with memo values
+export const TEST_MEMO = Cl.stringAscii("test");
+export const TEST_MEMO_BUFF = Cl.some(formatSerializedBuffer(TEST_MEMO));
 
 // from FAST12 Proposal #16 doubled up so close to max
 export const PROPOSAL_MESSAGE =
@@ -245,7 +255,7 @@ export function passActionProposal(
     [
       Cl.principal(proposedActionContractAddress),
       formatSerializedBuffer(proposalParams),
-      memo ? Cl.some(Cl.stringAscii(memo)) : Cl.none(),
+      memo ? Cl.some(formatSerializedBuffer(Cl.stringAscii(memo))) : Cl.none(),
     ],
     sender
   );
@@ -281,7 +291,7 @@ export function passActionProposal(
 }
 
 // helper to format the expected buffer format since stacks 7.X
-export function formatSerializedBuffer(value: ClarityValue): ClarityValue {
+export function formatSerializedBuffer(value: ClarityValue): BufferCV {
   const serialized = Cl.serialize(value);
   const buffer = Cl.bufferFromHex(serialized);
   return buffer;

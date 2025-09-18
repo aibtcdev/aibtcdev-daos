@@ -9,6 +9,7 @@ import {
   formatSerializedBuffer,
   fundAgentAccount,
   PROPOSAL_MESSAGE,
+  TEST_MEMO_BUFF,
   VOTING_DELAY,
   VOTING_PERIOD,
 } from "../../../utilities/dao-helpers";
@@ -59,7 +60,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       address3
     );
@@ -83,7 +84,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -120,7 +121,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -165,7 +166,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       address2 // agent
     );
@@ -183,6 +184,7 @@ describe(`public functions: ${contractName}`, () => {
         proposalContract: actionProposalsContractAddress,
         action: sendMessageActionContractAddress,
         parameters: cvToValue(formatSerializedBuffer(message)),
+        memo: cvToValue(TEST_MEMO_BUFF),
         sender: deployer,
         caller: deployer,
       },
@@ -211,7 +213,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -278,7 +280,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -344,7 +346,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -408,7 +410,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -486,7 +488,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -547,7 +549,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -602,7 +604,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -660,7 +662,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -734,7 +736,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -824,7 +826,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -892,7 +894,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -970,7 +972,7 @@ describe(`public functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -1053,7 +1055,7 @@ describe(`read-only functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       address2 // agent
     );
@@ -1086,7 +1088,7 @@ describe(`read-only functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       address2 // agent
     );
@@ -1133,7 +1135,7 @@ describe(`read-only functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
@@ -1175,7 +1177,7 @@ describe(`read-only functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo 2")),
+        TEST_MEMO_BUFF,
       ],
       deployer // owner still has to create it
     );
@@ -1238,7 +1240,7 @@ describe(`read-only functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer // owner creates
     );
@@ -1312,7 +1314,7 @@ describe(`read-only functions: ${contractName}`, () => {
         Cl.principal(actionProposalsContractAddress),
         Cl.principal(sendMessageActionContractAddress),
         formatSerializedBuffer(message),
-        Cl.some(Cl.stringAscii("Test memo")),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );
