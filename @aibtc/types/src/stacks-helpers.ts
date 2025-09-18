@@ -5,7 +5,7 @@ import {
   validateStacksAddress,
 } from "@stacks/transactions";
 
-type StacksAddressPair = {
+export type StacksAddressPair = {
   mainnet: string;
   testnet: string;
 };
