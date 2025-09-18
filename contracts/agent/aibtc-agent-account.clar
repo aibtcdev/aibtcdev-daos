@@ -172,7 +172,7 @@
     (votingContract <action-proposal-voting-trait>)
     (action <action-trait>)
     (parameters (buff 2048))
-    (memo (optional (buff 250)))
+    (memo (optional (buff 4096)))
   )
   (begin
     (asserts! (use-proposals-allowed) ERR_OPERATION_NOT_ALLOWED)

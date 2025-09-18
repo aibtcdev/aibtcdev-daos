@@ -83,7 +83,7 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(`${deployer}.unknown-action`),
         formatSerializedBuffer(Cl.stringUtf8(PROPOSAL_MESSAGE)),
-        Cl.none(),
+        TEST_MEMO_BUFFER,
       ],
       address1
     );
@@ -101,7 +101,7 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(actionContractAddress),
         formatSerializedBuffer(Cl.tuple({ test: Cl.list([Cl.uint(1)]) })),
-        Cl.none(),
+        TEST_MEMO_BUFFER,
       ],
       address1
     );
@@ -123,7 +123,7 @@ describe(`public functions: ${contractName}`, () => {
       [
         Cl.principal(actionContractAddress),
         formatSerializedBuffer(Cl.stringUtf8(PROPOSAL_MESSAGE)),
-        Cl.none(),
+        TEST_MEMO_BUFF,
       ],
       deployer
     );

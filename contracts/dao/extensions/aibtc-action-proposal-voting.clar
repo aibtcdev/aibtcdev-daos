@@ -100,7 +100,7 @@
     caller: principal,
     creator: principal,
     liquidTokens: uint,
-    memo: (optional (buff 250)),
+    memo: (optional (buff 4096)),
     ;; from ProposalBlocks
     createdBtc: uint,
     createdStx: uint,
@@ -144,7 +144,7 @@
 (define-public (create-action-proposal
     (action <action-trait>)
     (parameters (buff 2048))
-    (memo (optional (buff 250)))
+    (memo (optional (buff 4096)))
   )
   (let (
       (currentState (var-get state))
