@@ -17,6 +17,6 @@
     "src/**/*",
     "../models/contract-template.ts",
     "../utilities/contract-types.ts"
-  ],
+, "scripts/stacks-helpers-test.ts"  ],
   "exclude": ["node_modules", "**/*.test.ts"]
 }

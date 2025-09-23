@@ -209,3 +209,8 @@ export {
   AGENT_ACCOUNT_DEFAULT_DEPLOYER,
   getAgentAccountDefaultDeployer,
 };
+
+import type { StacksAddressPair } from "./stacks-helpers";
+import { getStacksAddressPair } from "./stacks-helpers";
+export type { StacksAddressPair };
+export { getStacksAddressPair };
