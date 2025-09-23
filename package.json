@@ -24,18 +24,18 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.5",
-    "agents": "^0.1.2",
-    "hono": "^4.9.6"
+    "@modelcontextprotocol/sdk": "^1.18.1",
+    "agents": "^0.1.6",
+    "hono": "^4.9.8"
   },
   "devDependencies": {
-    "@aibtc/types": "^0.22.0",
-    "@cloudflare/vite-plugin": "^1.12.4",
-    "@cloudflare/workers-types": "^4.20250911.0",
+    "@aibtc/types": "^0.27.0",
+    "@cloudflare/vite-plugin": "^1.13.3",
+    "@cloudflare/workers-types": "^4.20250922.0",
     "@hirosystems/clarinet-sdk": "^3.6.1",
     "@hono/vite-build": "^1.7.0",
     "@stacks/transactions": "^7.2.0",
-    "@types/node": "^22.18.1",
+    "@types/node": "^22.18.6",
     "chokidar-cli": "^3.0.0",
     "typescript": "^5.9.2",
     "vite": "^6.3.6",
@@ -44,7 +44,7 @@
     "vitest": "^3.2.4",
     "vitest-environment-clarinet": "^2.3.0",
     "workers-mcp": "^0.0.13",
-    "wrangler": "^4.35.0",
+    "wrangler": "^4.38.0",
     "zod": "^3.25.76"
   }
 }

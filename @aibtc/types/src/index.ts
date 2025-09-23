@@ -209,3 +209,26 @@ export {
   AGENT_ACCOUNT_DEFAULT_DEPLOYER,
   getAgentAccountDefaultDeployer,
 };
+
+import type { StacksAddressPair } from "./stacks-helpers";
+import { getStacksAddressPair } from "./stacks-helpers";
+export type { StacksAddressPair };
+export { getStacksAddressPair };
+
+/**
+ * Faktory Bridge Helpers
+ */
+import type { FaktoryBridgeContracts } from "./faktory-helpers";
+import {
+  FAKTORY_BRIDGE_CONTRACTS,
+  getFaktoryBridgeContractsById,
+  getFaktoryBridgeContractsByDaoName,
+  getIdFromFaktoryDaoName,
+} from "./faktory-helpers";
+export type { FaktoryBridgeContracts };
+export {
+  FAKTORY_BRIDGE_CONTRACTS,
+  getFaktoryBridgeContractsById,
+  getFaktoryBridgeContractsByDaoName,
+  getIdFromFaktoryDaoName,
+};
