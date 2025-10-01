@@ -89,6 +89,26 @@ export const FAKTORY_BRIDGE_CONTRACTS: Record<number, FaktoryBridgeContracts> =
       preContract:
         "ST2HQ5J6RP8HSQE9KKGWCHW9PT9SVE4TDGBZQ3EKR.faces3-pre-faktory",
     },
+    9: {
+      daoName: "facefast",
+      dexContract:
+        "ST2HQ5J6RP8HSQE9KKGWCHW9PT9SVE4TDGBZQ3EKR.facefast-faktory-dex",
+      ftContract: "ST2HQ5J6RP8HSQE9KKGWCHW9PT9SVE4TDGBZQ3EKR.facefast-faktory",
+      poolContract:
+        "ST2HQ5J6RP8HSQE9KKGWCHW9PT9SVE4TDGBZQ3EKR.xyk-pool-sbtc-facefast-v-1-1",
+      preContract:
+        "ST2HQ5J6RP8HSQE9KKGWCHW9PT9SVE4TDGBZQ3EKR.facefast-pre-faktory",
+    },
+    10: {
+      daoName: "elonbtc",
+      dexContract:
+        "ST2HQ5J6RP8HSQE9KKGWCHW9PT9SVE4TDGBZQ3EKR.elonbtc-faktory-dex",
+      ftContract: "ST2HQ5J6RP8HSQE9KKGWCHW9PT9SVE4TDGBZQ3EKR.elonbtc-faktory",
+      poolContract:
+        "ST2HQ5J6RP8HSQE9KKGWCHW9PT9SVE4TDGBZQ3EKR.xyk-pool-sbtc-elonbtc-v-1-1",
+      preContract:
+        "ST2HQ5J6RP8HSQE9KKGWCHW9PT9SVE4TDGBZQ3EKR.elonbtc-pre-faktory",
+    },
   } as const;
 
 export function getFaktoryBridgeContractsById(dexId: number) {
