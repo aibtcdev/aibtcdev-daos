@@ -1,6 +1,6 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
-import { ErrCodeDaoCharter } from "@aibtc/types";
+import { ErrCodeDaoCharter } from "../../../../utilities/contract-error-codes";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 import {
   constructDao,
@@ -218,7 +218,7 @@ describe(`read-only functions: ${contractName}`, () => {
       contractAddress,
       "set-dao-monarch",
       [expectedNewMonarch],
-      baseDaoContractAddress
+      deployer
     );
     // act
     const result = simnet.callReadOnlyFn(
@@ -253,7 +253,7 @@ describe(`read-only functions: ${contractName}`, () => {
       contractAddress,
       "set-dao-monarch",
       [expectedNewMonarch],
-      baseDaoContractAddress
+      deployer
     );
     // act
     const result = simnet.callReadOnlyFn(
@@ -288,7 +288,7 @@ describe(`read-only functions: ${contractName}`, () => {
       contractAddress,
       "set-dao-monarch",
       [expectedNewMonarch],
-      baseDaoContractAddress
+      deployer
     );
     // act
     const result = simnet.callReadOnlyFn(
