@@ -41,7 +41,7 @@ const expectedDaoCharter = Cl.tuple({
   sender: Cl.principal(baseDaoContractAddress),
 });
 
-const expectedDaoMonarchIndex = Cl.uint(1);
+const expectedDaoMonarchIndex = Cl.uint(2);
 const expectedNewMonarch = Cl.principal(deployer);
 const expectedDaoMonarch = Cl.tuple({
   burnHeight: Cl.uint(simnet.burnBlockHeight),
