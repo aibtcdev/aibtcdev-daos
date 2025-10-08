@@ -31,26 +31,6 @@ const intializeDaoAddress = registry.getContractAddressByTypeAndSubtype(
 // import error codes
 const ErrCode = ErrCodeDaoCharter;
 
-const expectedDaoCharterIndex = Cl.uint(1);
-const expectedDaoCharterString = Cl.stringUtf8(DAO_CHARTER_MESSAGE);
-const expectedDaoCharter = Cl.tuple({
-  burnHeight: Cl.uint(simnet.burnBlockHeight), // deployed btc block height
-  caller: Cl.principal(intializeDaoAddress),
-  charter: expectedDaoCharterString,
-  createdAt: Cl.uint(simnet.stacksBlockHeight + 1), // deployed stx block height
-  sender: Cl.principal(baseDaoContractAddress),
-});
-
-const expectedDaoMonarchIndex = Cl.uint(2);
-const expectedNewMonarch = Cl.principal(deployer);
-const expectedDaoMonarch = Cl.tuple({
-  burnHeight: Cl.uint(simnet.burnBlockHeight),
-  createdAt: Cl.uint(simnet.stacksBlockHeight + 1),
-  caller: Cl.principal(deployer),
-  sender: Cl.principal(deployer),
-  previousMonarch: Cl.principal(baseDaoContractAddress),
-  newMonarch: expectedNewMonarch,
-});
 
 describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
