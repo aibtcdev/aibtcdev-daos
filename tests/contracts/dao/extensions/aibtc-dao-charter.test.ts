@@ -28,16 +28,18 @@ const intializeDaoAddress = registry.getContractAddressByTypeAndSubtype(
   "INITIALIZE_DAO"
 );
 
+import { ErrCodeDaoCharter } from "@aibtc/types/src/clarity-contract-errors";
+
 // import error codes
 const ErrCode = ErrCodeDaoCharter;
 
-const expectedDaoCharterVersion = Cl.uint(1);
+const expectedDaoCharterIndex = Cl.uint(1);
 const expectedDaoCharterString = Cl.stringUtf8(DAO_CHARTER_MESSAGE);
 const expectedDaoCharter = Cl.tuple({
-  burnHeight: Cl.uint(5), // deployed btc block height
+  burnHeight: Cl.uint(simnet.getCurrentBlockHeight("bitcoin")), // deployed btc block height
   caller: Cl.principal(intializeDaoAddress),
   charter: expectedDaoCharterString,
-  createdAt: Cl.uint(8), // deployed stx block height
+  createdAt: Cl.uint(simnet.getCurrentBlockHeight("stacks")), // deployed stx block height
   sender: Cl.principal(baseDaoContractAddress),
 });
 
@@ -74,39 +76,39 @@ describe(`public functions: ${contractName}`, () => {
         address1
       );
       // assert
-      expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_DAO_OR_EXTENSION));
+      expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_AUTHORIZED));
     });
   });
 });
 
 describe(`read-only functions: ${contractName}`, () => {
   ////////////////////////////////////////
-  // get-current-dao-charter-version() tests
+  // get-current-dao-charter-index() tests
   ////////////////////////////////////////
-  it("get-current-dao-charter-version() returns none before initialized", () => {
+  it("get-current-dao-charter-index() returns none before initialized", () => {
     // arrange
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
-      "get-current-dao-charter-version",
+      "get-current-dao-charter-index",
       [],
       deployer
     ).result;
     // assert
     expect(result).toBeNone();
   });
-  it("get-current-dao-charter-version() returns expected value", () => {
+  it("get-current-dao-charter-index() returns expected value", () => {
     // arrange
     constructDao(deployer);
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
-      "get-current-dao-charter-version",
+      "get-current-dao-charter-index",
       [],
       deployer
     ).result;
     // assert
-    expect(result).toBeSome(expectedDaoCharterVersion);
+    expect(result).toBeSome(expectedDaoCharterIndex);
   });
 
   ////////////////////////////////////////

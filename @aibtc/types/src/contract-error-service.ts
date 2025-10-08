@@ -99,11 +99,12 @@ const errorDefinitions: {
     DAO_CHARTER: {
       enumObject: ClarityErrors.ErrCodeDaoCharter,
       descriptions: {
-        ERR_NOT_DAO_OR_EXTENSION:
-          "Caller is not the DAO or an authorized extension.",
+        ERR_NOT_AUTHORIZED:
+          "Caller is not the DAO, an authorized extension, or the current monarch.",
         ERR_SAVING_CHARTER: "Failed to save the DAO charter.",
         ERR_CHARTER_TOO_SHORT: "The provided charter is too short.",
         ERR_CHARTER_TOO_LONG: "The provided charter is too long.",
+        ERR_SAVING_MONARCH: "Failed to save the monarch history.",
       },
     },
     ONCHAIN_MESSAGING: {

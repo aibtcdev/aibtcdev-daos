@@ -43,10 +43,11 @@ export enum ErrCodeActionProposalVoting {
 
 // aibtc-dao-charter.clar
 export enum ErrCodeDaoCharter {
-  ERR_NOT_DAO_OR_EXTENSION = 1400,
+  ERR_NOT_AUTHORIZED = 1400,
   ERR_SAVING_CHARTER,
   ERR_CHARTER_TOO_SHORT,
   ERR_CHARTER_TOO_LONG,
+  ERR_SAVING_MONARCH,
 }
 
 // aibtc-dao-epoch.clar
