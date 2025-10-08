@@ -46,8 +46,8 @@ const expectedNewMonarch = Cl.principal(deployer);
 const expectedDaoMonarch = Cl.tuple({
   burnHeight: Cl.uint(simnet.burnBlockHeight),
   createdAt: Cl.uint(simnet.stacksBlockHeight + 1),
-  caller: Cl.principal(intializeDaoAddress),
-  sender: Cl.principal(baseDaoContractAddress),
+  caller: Cl.principal(deployer),
+  sender: Cl.principal(deployer),
   previousMonarch: Cl.principal(baseDaoContractAddress),
   newMonarch: expectedNewMonarch,
 });
