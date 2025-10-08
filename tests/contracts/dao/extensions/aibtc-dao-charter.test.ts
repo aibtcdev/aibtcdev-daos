@@ -1,6 +1,6 @@
 import { Cl } from "@stacks/transactions";
 import { describe, expect, it } from "vitest";
-import { ErrCodeDaoCharter } from "../../../../utilities/contract-error-codes";
+import { ErrCodeDaoCharter } from "@aibtc/types";
 import { setupDaoContractRegistry } from "../../../../utilities/contract-registry";
 import {
   constructDao,
@@ -41,6 +41,17 @@ const expectedDaoCharter = Cl.tuple({
   sender: Cl.principal(baseDaoContractAddress),
 });
 
+const expectedDaoMonarchIndex = Cl.uint(1);
+const expectedNewMonarch = Cl.principal(deployer);
+const expectedDaoMonarch = Cl.tuple({
+  burnHeight: Cl.uint(simnet.burnBlockHeight),
+  createdAt: Cl.uint(simnet.stacksBlockHeight + 1),
+  caller: Cl.principal(baseDaoContractAddress),
+  sender: Cl.principal(baseDaoContractAddress),
+  previousMonarch: Cl.principal(baseDaoContractAddress),
+  newMonarch: expectedNewMonarch,
+});
+
 describe(`public functions: ${contractName}`, () => {
   ////////////////////////////////////////
   // callback() tests
@@ -71,6 +82,24 @@ describe(`public functions: ${contractName}`, () => {
         contractAddress,
         "set-dao-charter",
         [Cl.stringUtf8(DAO_CHARTER_MESSAGE)],
+        address1
+      );
+      // assert
+      expect(receipt.result).toBeErr(Cl.uint(ErrCode.ERR_NOT_AUTHORIZED));
+    });
+  });
+
+  ////////////////////////////////////////
+  // set-dao-monarch() tests
+  ////////////////////////////////////////
+  describe("set-dao-monarch()", () => {
+    it("fails if called directly by a user", () => {
+      // arrange
+      // act
+      const receipt = simnet.callPublicFn(
+        contractAddress,
+        "set-dao-monarch",
+        [Cl.principal(address1)],
         address1
       );
       // assert
@@ -165,5 +194,110 @@ describe(`read-only functions: ${contractName}`, () => {
     ).result;
     // assert
     expect(result).toBeSome(expectedDaoCharter);
+  });
+
+  ////////////////////////////////////////
+  // get-current-dao-monarch-index() tests
+  ////////////////////////////////////////
+  it("get-current-dao-monarch-index() returns none before initialized", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-current-dao-monarch-index",
+      [],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeNone();
+  });
+  it("get-current-dao-monarch-index() returns expected value", () => {
+    // arrange
+    constructDao(deployer);
+    simnet.callPublicFn(
+      contractAddress,
+      "set-dao-monarch",
+      [expectedNewMonarch],
+      baseDaoContractAddress
+    );
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-current-dao-monarch-index",
+      [],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeSome(expectedDaoMonarchIndex);
+  });
+
+  ////////////////////////////////////////
+  // get-current-dao-monarch() tests
+  ////////////////////////////////////////
+  it("get-current-dao-monarch() returns none before initialized", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-current-dao-monarch",
+      [],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeNone();
+  });
+  it("get-current-dao-monarch() returns expected value", () => {
+    // arrange
+    constructDao(deployer);
+    simnet.callPublicFn(
+      contractAddress,
+      "set-dao-monarch",
+      [expectedNewMonarch],
+      baseDaoContractAddress
+    );
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-current-dao-monarch",
+      [],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeSome(expectedDaoMonarch);
+  });
+
+  ////////////////////////////////////////
+  // get-dao-monarch() tests
+  ////////////////////////////////////////
+  it("get-dao-monarch() returns none before initialized", () => {
+    // arrange
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-dao-monarch",
+      [Cl.uint(1)],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeNone();
+  });
+  it("get-dao-monarch() returns expected value", () => {
+    // arrange
+    constructDao(deployer);
+    simnet.callPublicFn(
+      contractAddress,
+      "set-dao-monarch",
+      [expectedNewMonarch],
+      baseDaoContractAddress
+    );
+    // act
+    const result = simnet.callReadOnlyFn(
+      contractAddress,
+      "get-dao-monarch",
+      [Cl.uint(1)],
+      deployer
+    ).result;
+    // assert
+    expect(result).toBeSome(expectedDaoMonarch);
   });
 });
