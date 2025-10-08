@@ -28,18 +28,16 @@ const intializeDaoAddress = registry.getContractAddressByTypeAndSubtype(
   "INITIALIZE_DAO"
 );
 
-import { ErrCodeDaoCharter } from "@aibtc/types/src/clarity-contract-errors";
-
 // import error codes
 const ErrCode = ErrCodeDaoCharter;
 
 const expectedDaoCharterIndex = Cl.uint(1);
 const expectedDaoCharterString = Cl.stringUtf8(DAO_CHARTER_MESSAGE);
 const expectedDaoCharter = Cl.tuple({
-  burnHeight: Cl.uint(simnet.getCurrentBlockHeight("bitcoin")), // deployed btc block height
+  burnHeight: Cl.uint(simnet.burnBlockHeight), // deployed btc block height
   caller: Cl.principal(intializeDaoAddress),
   charter: expectedDaoCharterString,
-  createdAt: Cl.uint(simnet.getCurrentBlockHeight("stacks")), // deployed stx block height
+  createdAt: Cl.uint(simnet.stacksBlockHeight + 1), // deployed stx block height
   sender: Cl.principal(baseDaoContractAddress),
 });
 
