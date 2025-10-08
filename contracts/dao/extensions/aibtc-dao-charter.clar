@@ -1,6 +1,6 @@
 ;; title: aibtc-dao-charter
-;; version: 1.0.0
-;; summary: An extension that manages the DAO charter and records the DAO's mission and values on-chain.
+;; version: 2.0.0
+;; summary: An extension that allows a monarch to manage the DAO charter and records the DAO's mission and values on-chain.
 
 ;; traits
 ;;
@@ -17,9 +17,11 @@
 (define-constant DEPLOYED_BURN_BLOCK burn-block-height)
 (define-constant DEPLOYED_STACKS_BLOCK stacks-block-height)
 (define-constant SELF (as-contract tx-sender))
+;; /g/ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/dao_monarch
+(define-constant MONARCH 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; error codes
-(define-constant ERR_NOT_DAO_OR_EXTENSION (err u1400))
+(define-constant ERR_NOT_AUTHORIZED (err u1400))
 (define-constant ERR_SAVING_CHARTER (err u1401))
 (define-constant ERR_CHARTER_TOO_SHORT (err u1402))
 (define-constant ERR_CHARTER_TOO_LONG (err u1403))
@@ -61,8 +63,8 @@
         u""
       ))
     )
-    ;; check if sender is dao or extension
-    (try! (is-dao-or-extension))
+    ;; check if sender is dao, extension, or monarch
+    (asserts! (or (is-dao-or-extension) (is-monarch)) ERR_NOT_AUTHORIZED)
     ;; check length of charter
     (asserts! (>= (len charter) u1) ERR_CHARTER_TOO_SHORT)
     (asserts! (<= (len charter) u16384) ERR_CHARTER_TOO_LONG)
@@ -118,14 +120,19 @@
 
 ;; private functions
 ;;
+
+;; auth functions simplified to bool outputs so that we can check
+;; both versus just is-dao-or-extension like other contracts
+
 (define-private (is-dao-or-extension)
-  (ok (asserts!
-    (or
-      ;; /g/.aibtc-base-dao/dao_contract_base
-      (is-eq tx-sender .aibtc-base-dao)
-      ;; /g/.aibtc-base-dao/dao_contract_base
-      (contract-call? .aibtc-base-dao is-extension contract-caller)
-    )
-    ERR_NOT_DAO_OR_EXTENSION
-  ))
+  (or
+    ;; /g/.aibtc-base-dao/dao_contract_base
+    (is-eq tx-sender .aibtc-base-dao)
+    ;; /g/.aibtc-base-dao/dao_contract_base
+    (contract-call? .aibtc-base-dao is-extension contract-caller)
+  )
+)
+
+(define-private (is-monarch)
+  (is-eq contract-caller MONARCH)
 )
