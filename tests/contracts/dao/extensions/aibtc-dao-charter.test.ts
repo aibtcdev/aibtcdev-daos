@@ -215,7 +215,7 @@ describe(`read-only functions: ${contractName}`, () => {
   it("get-current-dao-monarch-index() returns expected value", () => {
     // arrange
     constructDao(deployer);
-    const expectedDaoMonarchIndex = Cl.uint(2);
+    const expectedDaoMonarchIndex = Cl.uint(1);
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -251,8 +251,8 @@ describe(`read-only functions: ${contractName}`, () => {
     const expectedDaoMonarch = Cl.tuple({
       burnHeight: Cl.uint(burnHeight),
       createdAt: Cl.uint(stacksHeight + 1),
-      caller: Cl.principal(deployer),
-      sender: Cl.principal(deployer),
+      caller: Cl.principal(intializeDaoAddress),
+      sender: Cl.principal(baseDaoContractAddress),
       previousMonarch: Cl.principal(baseDaoContractAddress),
       newMonarch: expectedNewMonarch,
     });
@@ -291,8 +291,8 @@ describe(`read-only functions: ${contractName}`, () => {
     const expectedDaoMonarch = Cl.tuple({
       burnHeight: Cl.uint(burnHeight),
       createdAt: Cl.uint(stacksHeight + 1),
-      caller: Cl.principal(deployer),
-      sender: Cl.principal(deployer),
+      caller: Cl.principal(intializeDaoAddress),
+      sender: Cl.principal(baseDaoContractAddress),
       previousMonarch: Cl.principal(baseDaoContractAddress),
       newMonarch: expectedNewMonarch,
     });
@@ -300,7 +300,7 @@ describe(`read-only functions: ${contractName}`, () => {
     const result = simnet.callReadOnlyFn(
       contractAddress,
       "get-dao-monarch",
-      [Cl.uint(2)],
+      [Cl.uint(1)],
       deployer
     ).result;
     // assert
