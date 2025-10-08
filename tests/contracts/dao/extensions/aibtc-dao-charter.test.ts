@@ -127,6 +127,7 @@ describe(`read-only functions: ${contractName}`, () => {
   it("get-current-dao-charter-index() returns expected value", () => {
     // arrange
     constructDao(deployer);
+    const expectedDaoCharterIndex = Cl.uint(1);
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -155,7 +156,17 @@ describe(`read-only functions: ${contractName}`, () => {
   });
   it("get-current-dao-charter() returns expected value", () => {
     // arrange
+    const burnHeight = simnet.burnBlockHeight;
+    const stacksHeight = simnet.stacksBlockHeight;
     constructDao(deployer);
+    const expectedDaoCharterString = Cl.stringUtf8(DAO_CHARTER_MESSAGE);
+    const expectedDaoCharter = Cl.tuple({
+      burnHeight: Cl.uint(burnHeight),
+      createdAt: Cl.uint(stacksHeight + 1),
+      caller: Cl.principal(intializeDaoAddress),
+      sender: Cl.principal(baseDaoContractAddress),
+      charter: expectedDaoCharterString,
+    });
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -184,7 +195,17 @@ describe(`read-only functions: ${contractName}`, () => {
   });
   it("get-dao-charter() returns expected value", () => {
     // arrange
+    const burnHeight = simnet.burnBlockHeight;
+    const stacksHeight = simnet.stacksBlockHeight;
     constructDao(deployer);
+    const expectedDaoCharterString = Cl.stringUtf8(DAO_CHARTER_MESSAGE);
+    const expectedDaoCharter = Cl.tuple({
+      burnHeight: Cl.uint(burnHeight),
+      createdAt: Cl.uint(stacksHeight + 1),
+      caller: Cl.principal(intializeDaoAddress),
+      sender: Cl.principal(baseDaoContractAddress),
+      charter: expectedDaoCharterString,
+    });
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -214,6 +235,7 @@ describe(`read-only functions: ${contractName}`, () => {
   it("get-current-dao-monarch-index() returns expected value", () => {
     // arrange
     constructDao(deployer);
+    const expectedDaoMonarchIndex = Cl.uint(2);
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -242,7 +264,18 @@ describe(`read-only functions: ${contractName}`, () => {
   });
   it("get-current-dao-monarch() returns expected value", () => {
     // arrange
+    const burnHeight = simnet.burnBlockHeight;
+    const stacksHeight = simnet.stacksBlockHeight;
     constructDao(deployer);
+    const expectedNewMonarch = Cl.principal(deployer);
+    const expectedDaoMonarch = Cl.tuple({
+      burnHeight: Cl.uint(burnHeight),
+      createdAt: Cl.uint(stacksHeight + 1),
+      caller: Cl.principal(deployer),
+      sender: Cl.principal(deployer),
+      previousMonarch: Cl.principal(baseDaoContractAddress),
+      newMonarch: expectedNewMonarch,
+    });
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
@@ -271,12 +304,23 @@ describe(`read-only functions: ${contractName}`, () => {
   });
   it("get-dao-monarch() returns expected value", () => {
     // arrange
+    const burnHeight = simnet.burnBlockHeight;
+    const stacksHeight = simnet.stacksBlockHeight;
     constructDao(deployer);
+    const expectedNewMonarch = Cl.principal(deployer);
+    const expectedDaoMonarch = Cl.tuple({
+      burnHeight: Cl.uint(burnHeight),
+      createdAt: Cl.uint(stacksHeight + 1),
+      caller: Cl.principal(deployer),
+      sender: Cl.principal(deployer),
+      previousMonarch: Cl.principal(baseDaoContractAddress),
+      newMonarch: expectedNewMonarch,
+    });
     // act
     const result = simnet.callReadOnlyFn(
       contractAddress,
       "get-dao-monarch",
-      [Cl.uint(1)],
+      [Cl.uint(2)],
       deployer
     ).result;
     // assert
