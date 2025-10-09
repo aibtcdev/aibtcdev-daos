@@ -206,8 +206,9 @@ export function generateTemplateReplacements(
     const subtypes = CONTRACT_SUBTYPES[type];
 
     for (const subtype of subtypes) {
-      const contractName =
-        CONTRACT_NAMES[type][subtype as ContractSubtype<typeof type>];
+      const contractName = (CONTRACT_NAMES[type] as any)[
+        subtype as ContractSubtype<typeof type>
+      ];
       if (contractName) {
         const symbolizedName = contractName.replace(templateKeySymbol, symbol);
         const actualContractRef = `.${symbolizedName}`;
@@ -366,7 +367,12 @@ export function generateTemplateReplacements(
   ] = `The mission of the ${symbol} is to...`; // Adjusted to use templateKeySymbol
   replacements["dao_manifest"] = `The mission of the ${symbol} is to...`;
 
-  // 7. Add agent account specific replacements
+  // 7. Add DAO monarch (governance controller)
+  replacements["dao_monarch"] = addresses.DEPLOYER;
+  replacements[`${addresses.DEPLOYER.split(".")[0]}/dao_monarch`] =
+    addresses.DEPLOYER;
+
+  // 8. Add agent account specific replacements
   // (These are now merged into the main traitMappings array)
 
   replacements[`${addresses.DEPLOYER.split(".")[0]}/account_owner`] = // Key not formatted
