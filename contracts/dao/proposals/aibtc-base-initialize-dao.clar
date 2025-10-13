@@ -7,6 +7,8 @@
 
 ;; /g/Test/dao_manifest
 (define-constant CFG_DAO_MANIFEST_TEXT u"Test")
+;; /g/'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/dao_monarch
+(define-constant CFG_DAO_MONARCH 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 ;; /g/.aibtc-faktory/dao_contract_token
 (define-constant CFG_DAO_TOKEN .aibtc-faktory)
 ;; /g/'STV9K21TBFAK4KNRJXF5DFP8N7W46G4V9RJ5XDY2.sbtc-token/sbtc_token_contract
@@ -64,6 +66,8 @@
     ;; set DAO manifest in dao-charter extension
     ;; /g/.aibtc-dao-charter/dao_contract_charter
     (try! (contract-call? .aibtc-dao-charter set-dao-charter CFG_DAO_MANIFEST_TEXT))
+    ;; /g/.aibtc-dao-charter/dao_contract_charter
+    (try! (contract-call? .aibtc-dao-charter set-dao-monarch CFG_DAO_MONARCH))
     ;; print initialization data
     (print {
       ;; /g/aibtc/dao_token_symbol

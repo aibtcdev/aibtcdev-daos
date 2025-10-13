@@ -189,6 +189,7 @@ describe("Template Processor", () => {
 
     const replacements = createReplacementsMap({
       dao_manifest: "The mission of this DAO is to test template processing",
+      dao_monarch: "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
       dao_contract_token: ".test-token-contract",
       sbtc_token_contract: "'ST000000000000000000002AMW42H.sbtc-token'",
       dao_trait_proposal: ".test-traits.proposal",
@@ -243,6 +244,7 @@ describe("Template Processor", () => {
       dao_contract_token: ".test-token-contract",
       dao_contract_base: ".test-base-dao",
       dao_token_symbol: "TEST",
+      dao_monarch: "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
     });
 
     const processed = processContractTemplate(templateContent!, replacements);
@@ -378,6 +380,7 @@ describe("Contract Generator", () => {
 
     // Configuration values
     dao_manifest: "The mission of this DAO is to test template processing",
+    dao_monarch: "ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP",
     dao_token_symbol: "TEST",
     // Add other simple keys that were previously in the "Simplified keys" section if they are distinct
     // and used by the contracts being tested (aibtc-action-proposal-voting, aibtc-agent-account, aibtc-base-initialize-dao)
@@ -537,9 +540,6 @@ describe("Contract Generator", () => {
         outputDir,
         "template-scan-issues-report.json"
       );
-      // Note: TemplateScanner.saveReportAsJson is async, ensure to await it if used here.
-      // For simplicity in this test, we'll just log if issues are found.
-      // await TemplateScanner.saveReportAsJson(issues, outputPath); // If you want to save it
       dbgLog(
         `Template scan found ${issues.length} issues. Full report available in template-scan-report.json if run via npm script.`,
         {
@@ -547,8 +547,10 @@ describe("Contract Generator", () => {
           titleBefore: "Template Scan Issues Found in Test",
         }
       );
-      // Optionally print issues to console for easier debugging in test output
       TemplateScanner.printReport(issues);
+      console.log("===== FULL ISSUES OBJECT =====");
+      console.log(JSON.stringify(issues, null, 2));
+      console.log("==============================");
     }
 
     expect(issues).toHaveLength(0);

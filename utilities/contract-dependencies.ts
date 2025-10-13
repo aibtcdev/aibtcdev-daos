@@ -223,7 +223,8 @@ export function defineProposalContractDependencies(
             "SEND_MESSAGE"
           )
           .addRuntimeValue("dao_token_symbol")
-          .addRuntimeValue("dao_manifest");
+          .addRuntimeValue("dao_manifest")
+          .addRuntimeValue("dao_monarch");
         break;
 
       // Add other proposal contracts as needed
