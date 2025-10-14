@@ -89,6 +89,17 @@ export const FAKTORY_BRIDGE_CONTRACTS: Record<number, FaktoryBridgeContracts> =
       preContract:
         "ST2HQ5J6RP8HSQE9KKGWCHW9PT9SVE4TDGBZQ3EKR.faces3-pre-faktory",
     },
+    9: {
+      daoName: "aibtc",
+      dexContract:
+        "ST2Q77H5HHT79JK4932JCFDX4VY6XA3Y1F61A25CD.aibtc-faktory-dex",
+      ftContract: "ST2Q77H5HHT79JK4932JCFDX4VY6XA3Y1F61A25CD.aibtc-faktory",
+      poolContract:
+        "ST2Q77H5HHT79JK4932JCFDX4VY6XA3Y1F61A25CD.xyk-pool-sbtc-aibtc-v-1-1",
+      preContract:
+        "ST2Q77H5HHT79JK4932JCFDX4VY6XA3Y1F61A25CD.aibtc-pre-faktory"
+    }
+    
   } as const;
 
 export function getFaktoryBridgeContractsById(dexId: number) {
