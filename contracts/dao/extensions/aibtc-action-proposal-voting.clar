@@ -54,7 +54,8 @@
 ;; voting configuration
 (define-constant VOTING_QUORUM u15) ;; 15% of liquid supply must participate
 (define-constant VOTING_THRESHOLD u66) ;; 66% of votes must be in favor
-(define-constant VOTING_BOND u25000000000) ;; action proposal bond, 250 DAO tokens w/ 8 decimals
+;; 2025/10: voting bond set to 0 for testing
+(define-constant VOTING_BOND u0) ;; u25000000000 action proposal bond, 250 DAO tokens w/ 8 decimals
 (define-constant VOTING_REWARD u100000000000) ;; action proposal reward, 1,000 DAO tokens w/ 8 decimals
 ;; /g/.aibtc-treasury/dao_contract_treasury
 (define-constant VOTING_TREASURY .aibtc-treasury) ;; used to calculate liquid supply
@@ -75,22 +76,19 @@
 ;; data vars
 ;;
 
-(define-data-var state
-  {
-    proposalCount: uint,
-    concludedProposalCount: uint,
-    executedProposalCount: uint,
-    lastProposalStacksBlock: uint,
-    lastProposalBitcoinBlock: uint,
-  }
-  {
-    proposalCount: u0,
-    concludedProposalCount: u0,
-    executedProposalCount: u0,
-    lastProposalStacksBlock: DEPLOYED_STACKS_BLOCK,
-    lastProposalBitcoinBlock: DEPLOYED_BITCOIN_BLOCK,
-  }
-)
+(define-data-var state {
+  proposalCount: uint,
+  concludedProposalCount: uint,
+  executedProposalCount: uint,
+  lastProposalStacksBlock: uint,
+  lastProposalBitcoinBlock: uint,
+} {
+  proposalCount: u0,
+  concludedProposalCount: u0,
+  executedProposalCount: u0,
+  lastProposalStacksBlock: DEPLOYED_STACKS_BLOCK,
+  lastProposalBitcoinBlock: DEPLOYED_BITCOIN_BLOCK,
+})
 
 ;; data maps
 ;;
@@ -225,14 +223,17 @@
       ERR_SAVING_PROPOSAL
     )
     ;; set last proposal created block height and increment proposal count
-    (var-set state (merge currentState {
-      lastProposalBitcoinBlock: createdBtc,
-      lastProposalStacksBlock: createdStx,
-      proposalCount: newId,
-    }))
+    (var-set state
+      (merge currentState {
+        lastProposalBitcoinBlock: createdBtc,
+        lastProposalStacksBlock: createdStx,
+        proposalCount: newId,
+      })
+    )
     ;; transfer the proposal bond to this contract
     ;; /g/.aibtc-faktory/dao_contract_token
-    (try! (contract-call? .aibtc-faktory transfer VOTING_BOND contract-caller SELF none))
+    ;; 2025/10: voting bond set to 0 for testing
+    ;; (try! (contract-call? .aibtc-faktory transfer VOTING_BOND contract-caller SELF none))
     ;; transfer the run cost fee to the run AIBTC dao cost contract
     ;; /g/.aibtc-treasury/dao_contract_treasury
     ;; /g/.aibtc-faktory/dao_contract_token
@@ -476,9 +477,7 @@
     ;; proposal is past voting period
     (asserts! (>= burnBlock voteEnd) ERR_PROPOSAL_VOTING_ACTIVE)
     ;; proposal is past execution delay
-    (asserts! (>= burnBlock execStart)
-      ERR_PROPOSAL_EXECUTION_DELAY
-    )
+    (asserts! (>= burnBlock execStart) ERR_PROPOSAL_EXECUTION_DELAY)
     ;; action must be the same as the one in proposal
     (asserts! (is-eq (get action proposal) actionContract) ERR_INVALID_ACTION)
     ;; print conclusion event
@@ -511,26 +510,29 @@
     })
     ;; update the proposal record
     (map-set Proposals proposalId (merge proposal { status: newStatus }))
+    ;; 2025/10: voting bond set to 0 for testing
     ;; transfer the bond based on the outcome
-    (if votePassed
-      ;; /g/.aibtc-faktory/dao_contract_token
-      (try! (as-contract (contract-call? .aibtc-faktory transfer (get bond proposal) SELF creator
-        none
-      )))
-      ;; /g/.aibtc-faktory/dao_contract_token
-      (try! (as-contract (contract-call? .aibtc-faktory transfer (get bond proposal) SELF
-        VOTING_TREASURY none
-      )))
-    )
+    ;; (if votePassed
+    ;; /g/.aibtc-faktory/dao_contract_token
+    ;; (try! (as-contract (contract-call? .aibtc-faktory transfer (get bond proposal) SELF creator
+    ;;   none
+    ;; )))
+    ;; /g/.aibtc-faktory/dao_contract_token
+    ;; (try! (as-contract (contract-call? .aibtc-faktory transfer (get bond proposal) SELF
+    ;;   VOTING_TREASURY none
+    ;; )))
+    ;; )
     (let ((currentState (var-get state)))
       ;; update proposal counts
-      (var-set state (merge currentState {
-        concludedProposalCount: (+ (get concludedProposalCount currentState) u1),
-        executedProposalCount: (if tryToExecute
-          (+ (get executedProposalCount currentState) u1)
-          (get executedProposalCount currentState)
-        ),
-      }))
+      (var-set state
+        (merge currentState {
+          concludedProposalCount: (+ (get concludedProposalCount currentState) u1),
+          executedProposalCount: (if tryToExecute
+            (+ (get executedProposalCount currentState) u1)
+            (get executedProposalCount currentState)
+          ),
+        })
+      )
       ;; try to execute the action if the proposal passed
       (ok (if tryToExecute
         ;; try to run the action
@@ -579,8 +581,7 @@
 
 (define-read-only (get-proposal (proposalId uint))
   (match (map-get? Proposals proposalId)
-    proposal
-    (let (
+    proposal (let (
         (createdBtc (get createdBtc proposal))
         (voteStart (+ createdBtc VOTING_DELAY))
         (voteEnd (+ voteStart VOTING_PERIOD))

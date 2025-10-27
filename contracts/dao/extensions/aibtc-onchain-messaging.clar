@@ -38,6 +38,7 @@
       ))
       (isFromDao (is-ok (is-dao-or-extension)))
       (isFromHolder (> senderBalance u0))
+      (messageCostAmount (var-get messageCost))
     )
     ;; check there is a message
     (asserts! (> (len msg) u0) ERR_INVALID_INPUT)
@@ -52,17 +53,19 @@
         isFromDao: isFromDao,
         isFromHolder: isFromHolder,
         messageLength: (len msg),
+        messageCost: messageCostAmount,
         message: msg,
       },
     })
     ;; check if sender is not dao via proposal
     (ok (and
       (not isFromDao)
+      (> messageCostAmount u0)
       ;; transfer the message cost to the dao
       ;; /g/.aibtc-treasury/dao_contract_treasury
       ;; /g/.aibtc-faktory/dao_contract_token
       (try! (contract-call? .aibtc-treasury deposit-ft .aibtc-faktory
-        (var-get messageCost)
+        messageCostAmount
       ))
     ))
   )
