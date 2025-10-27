@@ -231,8 +231,8 @@
       })
     )
     ;; transfer the proposal bond to this contract
-    ;; /g/.aibtc-faktory/dao_contract_token
     ;; 2025/10: voting bond set to 0 for testing
+    ;; /g/.aibtc-faktory/dao_contract_token
     ;; (try! (contract-call? .aibtc-faktory transfer VOTING_BOND contract-caller SELF none))
     ;; transfer the run cost fee to the run AIBTC dao cost contract
     ;; /g/.aibtc-treasury/dao_contract_treasury
