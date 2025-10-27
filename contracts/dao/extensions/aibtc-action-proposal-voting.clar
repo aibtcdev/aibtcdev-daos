@@ -62,11 +62,13 @@
 ;; set voting delay
 ;; mainnet: 12 blocks (2 hours)
 ;; testnet: 3 blocks (30 minutes)
-(define-constant VOTING_DELAY u2) ;; FOR SPEEDY HUMAN
+;; 2025/10: using 24 blocks because testnet blocks avg 5 minutes
+(define-constant VOTING_DELAY u24)
 ;; set voting period
 ;; mainnet: 24 blocks (4 hours)
 ;; testnet: 3 blocks (30 minutes)
-(define-constant VOTING_PERIOD u2) ;; FOR SPEEDY HUMAN
+;; 2025/10: using 48 blocks because testnet blocks avg 5 minutes
+(define-constant VOTING_PERIOD u48)
 
 (define-constant REPUTATION_CHANGE u1) ;; reputation increase/decrease
 
