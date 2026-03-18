@@ -1,3 +1,5 @@
+> **⚠️ This repository is scheduled for archive.** Development has moved to [agent-contracts](https://github.com/aibtcdev/agent-contracts).
+
 # AIBTC DAO Platform
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/aibtcdev/aibtcdev-daos)
